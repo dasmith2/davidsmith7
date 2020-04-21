@@ -17,9 +17,11 @@ from django.contrib import admin
 from django.urls import include, path
 
 from example.urls import example_urls
+from tt_ui.urls import tt_ui_urls
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include(example_urls))
+    path('', include(example_urls)),
+    path('', include(tt_ui_urls))
 ]
