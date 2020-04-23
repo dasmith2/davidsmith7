@@ -18,12 +18,12 @@ from django.contrib.auth import urls as auth_urls
 from django.urls import include, path
 
 from example.urls import example_urls
-from tt_ui.urls import tt_ui_urls
+from tracktime.urls import tracktime_urls
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include(auth_urls)),
     path('', include(example_urls)),
-    path('', include(tt_ui_urls))
+    path('tt', include(tracktime_urls))
 ]

@@ -6,3 +6,7 @@ local_settings.py
 geckodriver.log
 __pycache__
 tracktime
+djaveForm
+djaveNav
+djaveTable
+djaveURL
