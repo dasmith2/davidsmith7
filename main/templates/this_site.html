@@ -1,0 +1,14 @@
+{% extends "all_sites.html" %}
+
+{% comment %}Feel free to modify this file on specific sites.{% endcomment %}
+
+{% block all_sites_head %}
+  {% include "this_site_css.html" %}
+  {% block this_site_head %}
+  {% endblock this_site_head %}
+{% endblock all_sites_head %}
+
+{% block all_sites_body %}
+  {% block this_site_body %}
+  {% endblock this_site_body %}
+{% endblock all_sites_body %}

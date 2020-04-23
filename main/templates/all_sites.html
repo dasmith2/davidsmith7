@@ -1,0 +1,15 @@
+{% comment %} Don't make site specific changes here. This file applies to all sites. {% endcomment %}
+<html>
+  <head>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+    {% include "all_sites_css.html" %}
+    {% block all_sites_head %}
+    {% endblock all_sites_head %}
+  </head>
+  <body>
+    {% block all_sites_body %}
+    {% endblock all_sites_body %}
+  </body>
+</html>
