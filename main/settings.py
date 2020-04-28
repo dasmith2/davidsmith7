@@ -3,6 +3,9 @@ Don't modify this file on specific sites. Use this_site_settings.py for that.
 This file should stay the same between all the sites.
 """
 import os
+import re
+import sys
+import warnings
 
 import django_heroku
 
@@ -133,8 +136,9 @@ STATIC_URL = '/static/'
 
 
 """ Secret key. """
-SECRET_KEY = os.environ.get('SECRET_KEY', '')
-if (PROD or STAGE) and not SECRET_KEY:
+DEFAULT_SECRET_KEY = 'DEFAULT_SECRET_KEY'
+SECRET_KEY = os.environ.get('SECRET_KEY', DEFAULT_SECRET_KEY)
+if (PROD or STAGE) and SECRET_KEY == DEFAULT_SECRET_KEY:
   raise Exception(
       'Set the SECRET_KEY environment variable to a long random string')
 
