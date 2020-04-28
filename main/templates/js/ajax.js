@@ -1,3 +1,4 @@
+/* AJAX stuff */
 function ok(response) {
   return response['OK'];
 }

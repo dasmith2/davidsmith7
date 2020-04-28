@@ -1,3 +1,4 @@
+/* Global error reporter */
 window.onerror = function(msg, url, line, col, error) {
   url = url || window.location.href;
   $.post('/js_error', {
