@@ -57,7 +57,7 @@ ROOT_URLCONF = 'main.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['main/templates'],
+        'DIRS': ['main/templates', 'djaveNav/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
