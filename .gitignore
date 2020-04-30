@@ -1,13 +1,5 @@
 collected_static_files
 db.sqlite3
-djaveForm
-djAveJAX
-djaveNav
-djaveRMOld
-djavError
-djaveStaffEmail
-djaveTable
-djaveURL
 geckodriver.log
 local_settings.py
 __pycache__
