@@ -1,4 +1,4 @@
-web: gunicorn stayd.wsgi
+web: gunicorn main.wsgi
 worker: python worker.py
 worker2: python worker.py
 clock: python clock.py
