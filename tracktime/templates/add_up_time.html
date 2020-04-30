@@ -1,0 +1,12 @@
+{% extends "tracktime_base.html" %}
+
+{% block tracktime_head %}
+{% endblock tracktime_head %}
+
+{% block tracktime_body %}
+
+<form method="GET">
+  {{ filters.as_html|safe }}
+</form>
+
+{% endblock tracktime_body %}

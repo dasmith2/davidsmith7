@@ -1,0 +1,52 @@
+{% extends "tracktime_base.html" %}
+
+{% block tracktime_head %}
+<style>
+  form { margin: 20px 0px 0px 0px; }
+  .hours { width: 100px; text-align: right; }
+</style>
+{% endblock tracktime_head %}
+
+{% block tracktime_body %}
+
+{{ date_roller.as_html|safe }}
+
+{% if punch_the_clock_table.is_visible %}
+  <h2>Punch the clock</h2>
+
+  <form method="POST" class="punch_the_clock">
+    {% csrf_token %}
+    {{ punch_the_clock_table.as_html|safe }}
+  </form>
+
+  <h2>Enter time</h2>
+{% endif %}
+
+<form method="POST" class="enter_time">
+  {% csrf_token %}
+  {{ enter_time_table.as_html|safe }}
+</form>
+
+<script>
+function wire_up_delete() {
+  $('button.delete').each(function() {
+    var delete_button = $(this);
+    var row = delete_button.parents('tr');
+    var pk = row.attr('data-pk');
+    delete_button.click(function() {
+      post('{{ delete_tracked_url }}', {pk: pk}, function(data) {
+        if (data['problem']) {
+          alert('There was a problem: ' + data['problem']);
+        } else {
+          row.remove();
+        }
+      }).fail(function(data) {
+        alert('There was a server error with status ' + data.status);
+      });
+    });
+  });
+}
+$(wire_up_delete);
+</script>
+
+{% endblock tracktime_body %}

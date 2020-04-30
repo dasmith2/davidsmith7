@@ -1,0 +1,15 @@
+{% extends "this_site.html" %}
+
+{% block this_site_head %}
+{% block tracktime_head %}
+{% endblock tracktime_head %}
+{% endblock this_site_head %}
+
+{% block this_site_body %}
+
+{{ nav.as_html|safe }}
+
+{% block tracktime_body %}
+{% endblock tracktime_body %}
+
+{% endblock this_site_body %}

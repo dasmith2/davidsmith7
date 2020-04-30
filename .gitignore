@@ -5,5 +5,4 @@ local_settings.py
 __pycache__
 staticfiles
 *.swp
-tracktime
 .venv
