@@ -82,6 +82,10 @@ Then go create a main/local_settings.py file and put something like this in it
 
     heroku apps:create whatever-stage
     heroku addons:create heroku-postgresql:hobby-dev -a whatever-stage
+    # Now go to heroku.com and set this app up to automatically deploy from
+    # github. At first though, you'll have to manually deploy. There's a button
+    # for that somewhere. Then you can...
+    heroku run python manage.py createsuperuser -a whatever-stage
 
 # CSS, Javascript, and Django templates
 
