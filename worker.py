@@ -3,14 +3,14 @@ The background thread might be held up with a long running task! Check
 https://keys.hihoward.com/admin/commands/commandrun/
 
 You can see the production logs of this worker thusly:
-heroku logs -t -p worker -a stayd-prod
+heroku logs -t -p worker -a <this app's name on Heroku>
 
 You can see how much memory the redis queue is using by going here and clicking
 on Redis To Go
-https://dashboard.heroku.com/apps/stayd-prod
+https://dashboard.heroku.com/apps/<this app's name on Heroku>
 
 You can restart the worker (not the same as restarting the queue!) with
-heroku ps:restart worker -a stayd-prod
+heroku ps:restart worker -a <this app's name on Heroku>
 
 Errors are automatically caught and mailed to us as long as the
 util/background.py @background decorator is the mechanism used to pass tasks
@@ -35,7 +35,7 @@ from rq import Worker, Queue, Connection
 # This file is imported by both workers and web. Settings are already
 # configured on web but not on workers.
 if not settings.configured:
-  os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'stayd.settings')
+  os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'main.settings')
   django.setup()
 
 listen = ['high', 'default', 'low']

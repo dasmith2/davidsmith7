@@ -12,7 +12,7 @@ careful. Follow conventions. Don't get fancy.
 
 If something fishy is going on despite all the precautions, check the logs.
 
-heroku logs -d clock -t -a stayd-prod
+heroku logs -d clock -t -a <this-heroku-app-name e.g. davidsmith7-stage>
 
 You can also look in the commands/models#CommandRun table to ensure your
 @background_command is running successfully.

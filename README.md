@@ -78,6 +78,11 @@ Then go create a main/local_settings.py file and put something like this in it
         }
     }
 
+## Heroku
+
+    heroku apps:create whatever-stage
+    heroku addons:create heroku-postgresql:hobby-dev -a whatever-stage
+
 # CSS, Javascript, and Django templates
 
 ## How NOT to do it
@@ -173,3 +178,9 @@ my_specific_page.html should inherit from my_specific_section.html
 
 If the css is specifically for a particular widget, just inline the styles
 immediately above the widget in the template for the widget.
+
+# Developing libraries
+
+At first, while only one site is using a library,
+
+https://stackoverflow.com/questions/86402/how-can-i-get-git-to-follow-symlinks

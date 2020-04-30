@@ -9,7 +9,7 @@
 #      "scripts": {
 #        "test-setup": "python manage.py migrate",
 #        "test": "python submit_checks.py"
-#        "test": "python manage.py test --settings=stayd.heroku_ci_test_settings"
+#        "test": "python manage.py test --settings=main.heroku_ci_test_settings"
 #        "test": "./lint.sh"
 #      }
 #    }
@@ -19,7 +19,7 @@
 set -e
 
 : "${IN_HEROKU_CI?Only run test.sh in Heroku\'s CI test environment. \
-stayd/heroku_ci_test_settings.py explains why.}"
+main/heroku_ci_test_settings.py explains why.}"
 
 # You can make sure code you're working on doesn't get submitted by accident
 # by putting the literal string DO NOT SUBMIT anywhere.
@@ -40,5 +40,5 @@ echo "python manage.py collectstatic"
 python manage.py collectstatic
 echo "python clock.py --no-run"
 python clock.py --no-run
-echo "python manage.py test --settings=stayd.heroku_ci_test_settings"
-python manage.py test --settings=stayd.heroku_ci_test_settings
+echo "python manage.py test --settings=main.heroku_ci_test_settings"
+python manage.py test --settings=main.heroku_ci_test_settings
