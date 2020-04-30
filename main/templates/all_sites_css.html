@@ -3,6 +3,31 @@
    * main/templates/site_css.html for that. */
   body { font-family: 'Roboto', sans-serif; margin: 0px; padding: 0px; }
   h1 { font-weight: 300; margin: 40px 0px 0px 0px; }
+  h2 { margin: 40px 0px 0px 0px; }
   h3 { color: #999; margin: 10px 0px 0px 0px; }
   .problem { color: #f00; }
+  table {
+    border-collapse: collapse; border-left: 1px solid #999;
+    border-top: 1px solid #999; }
+  td, th { border-right: 1px solid #999;
+    border-bottom: 1px solid #999; padding: 10px; }
+  th, .row2 { background-color: #eee; }
+  button, .button, input[type="submit"], input[type="button"], a.button {
+      background: #79aec8;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 4px 4px 2px grey;
+  }
+  button:active, .button:active, input[type=submit]:active, input[type=button]:active,
+  button:focus, .button:focus, input[type=submit]:focus, input[type=button]:focus,
+  button:hover, .button:hover, input[type=submit]:hover, input[type=button]:hover {
+      background: #609ab6;
+  }
+
+  .button[disabled], input[type=submit][disabled], input[type=button][disabled] {
+      opacity: 0.4;
+  }
 </style>
