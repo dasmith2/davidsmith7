@@ -4,22 +4,21 @@ import re
 import sys
 
 
-pipfile = open('Pipfile').read()
+requirements_file = open('requirements.txt').read()
 
 ABNORMAL = 1
 
-if re.compile(r'\nDjango\s*=').search(pipfile):
+if re.compile(r'\nDjango\s*=').search(requirements_file):
   print(
-      'In Pipfile, change Django=... to django=... and run pipenv install to '
-      'update the lock file. The stage environment of Heroku chokes on the '
-      'upper case Django during automatic deployment for some reason.')
+      'In requirements.txt, change Django=... to django=... The stage '
+      'environment of Heroku chokes on the upper case Django during automatic '
+      'deployment for some reason.')
   sys.exit(ABNORMAL)
 
-if re.compile(r'\nselenium\s*=').search(pipfile):
+if re.compile(r'\nselenium\s*=').search(requirements_file):
   print(
-      'You can\'t have selenium in the Pipfile. The stage environment of '
-      'Heroku chokes on it during automatic deployment. Since the '
-      'scrape app needs it, you\'ll have to install it manually with '
-      'Pipenv install selenium, then go modify Pipfile to remove selenium, '
-      'then call Pipenv install to fix the lock file.')
+      'You can\'t have selenium in the requirements file. The stage '
+      'environment of Heroku chokes on it during automatic deployment. In '
+      'order to have selenium locally, python -m pip install selenium, but '
+      'leave selenium out of requirements.txt')
   sys.exit(ABNORMAL)

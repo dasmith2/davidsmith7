@@ -20,7 +20,9 @@ function show_problem(response, feedback_or_append_to) {
 }
 
 function post(url, data, success) {
-  return $.post(url, add_csrf_token(data), success);
+  return $.post(url, add_csrf_token(data), success).fail(function() {
+    alert('Server error :(');
+  });
 }
 
 /* csrf token stuff */
