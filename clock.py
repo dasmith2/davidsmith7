@@ -54,7 +54,7 @@ django.setup()
 
 
 from apscheduler.schedulers.blocking import BlockingScheduler
-from djaves3.models import (
+from djaveS3.models import (
     clean_up_never_used, clean_up_no_longer_needed, resize_all)
 
 
