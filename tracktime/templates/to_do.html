@@ -1,7 +1,55 @@
 {% extends "tracktime_base.html" %}
 
 {% block tracktime_head %}
+<script>
+function remove_to_do_helper(url, pk) {
+  post(url, {pk: pk}, function() {
+    $('tr[data-pk=' + pk + ']').remove();
+  });
+}
+
+function to_do_done(pk) {
+  remove_to_do_helper('{{ to_do_done_url }}', pk);
+}
+
+function delete_to_do(pk) {
+  if (confirm('Delete to do?')) {
+    remove_to_do_helper('{{ delete_to_do_url }}', pk);
+  }
+}
+
+function setup_done_and_delete() {
+  $('button.done,button.delete').click(function() {
+    var button = $(this);
+    var pk = button.parents('tr').attr('data-pk')
+    if (button.hasClass('done')) {
+      to_do_done(pk);
+    } else if (button.hasClass('delete')) {
+      delete_to_do(pk);
+    }
+  });
+}
+</script>
+
+<style>
+table, h3 { margin-top: 30px; }
+</style>
 {% endblock tracktime_head %}
 
 {% block tracktime_body %}
+
+<form method="POST">
+  {% csrf_token %}
+  {% if project %}
+    <h1>Project: {{ project.name }}</h1>
+    {{ to_do_table.as_html|safe }}
+    <script>
+      $(setup_done_and_delete);
+    </script>
+  {% else %}
+    <h3>You have to be on the clock first</h3>
+    {{ punch_the_clock_table.as_html|safe }}
+  {% endif %}
+</form>
+
 {% endblock tracktime_body %}

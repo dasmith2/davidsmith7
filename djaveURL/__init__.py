@@ -1,10 +1,8 @@
 from datetime import datetime, date
 from urllib.parse import urlparse, parse_qsl, urlencode
 
-from django.conf import settings
 from django.http import HttpRequest
 from django.shortcuts import reverse
-from djaveDT import now
 
 
 def admin_edit_url(my_object):

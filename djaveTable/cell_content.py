@@ -60,6 +60,7 @@ class CellContentList(CellContent):
   def as_csv(self):
     return cell_contents_as_csv(self.cell_contents)
 
+
 def assert_cell_contents_equal(
     expected_cell_contents, actual_cell_contents, message_prefix=''):
   if expected_cell_contents.__class__ != actual_cell_contents.__class__:

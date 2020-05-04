@@ -9,9 +9,11 @@ from tracktime.models.project import Project
 class TrackedManager(models.Manager):
   def currently_tracking_project(self, user, nnow=None):
     nnow = nnow or now()
-    return self.filter(
+    tracking = self.filter(
         user=user, date=nnow.date(), started__isnull=False,
-        stopped__isnull=True).first()
+        stopped__isnull=True).select_related('project').first()
+    if tracking:
+      return tracking.project
 
 
 class Tracked(models.Model):
@@ -55,6 +57,6 @@ class Tracked(models.Model):
         self.date, self.hours)
 
   def __str__(self):
-    return self.name
+    return self.__repr__()
 
   objects = TrackedManager()

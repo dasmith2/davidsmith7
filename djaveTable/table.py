@@ -1,12 +1,9 @@
-from datetime import datetime, timedelta
-
 from django.utils.safestring import mark_safe
-from djaveDT import tz_dt_to_str, tz_dt_to_tz_dt
 
 from djaveTable.csv import csv_writer_and_response
 from djaveTable.cell_content import (
     CellContent, cell_contents_as_html, cell_contents_as_csv,
-    obj_as_cell_content)
+    obj_as_cell_content, is_primitive)
 
 
 class Table(object):
@@ -229,6 +226,6 @@ class Row(object):
         if not isinstance(use_cell_content, CellContent):
           use_cell_content = CellContent(cell)
         use_cell = Cell(use_cell_content)
-      cell.assertEqual(
+      use_cell.assertEqual(
           expected_row.cells[i],
           message_prefix='Cell {} explains: '.format(i))

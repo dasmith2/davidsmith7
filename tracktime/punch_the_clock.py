@@ -1,5 +1,3 @@
-from datetime import date
-
 from djaveForm.button import Button
 from djaveForm.form import Form
 from djaveDT import now, tz_dt_to_tz_dt

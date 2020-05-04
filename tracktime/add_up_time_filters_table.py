@@ -28,14 +28,14 @@ class AddUpTimeFiltersTable(Table):
     super().__init__()
     self.form = FiltersForm()
 
-    for title, element in [
+    title_element = [
         ('Starting on', self.form.starting_on),
         ('Ending on', self.form.ending_on),
         ('Project', self.form.project),
         ('Work type', self.form.work_type),
-        ('', Button('Filter', button_type='submit'))]:
-      self.create_row([
-          Cell(title, is_header=True), element])
+        ('', Button('Filter', button_type='submit'))]
+    for title, element in title_element:
+      self.create_row([Cell(title, is_header=True), element])
 
   def set_form_data(self, form_data):
     self.form.set_form_data(form_data)

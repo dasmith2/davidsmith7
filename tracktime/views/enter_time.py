@@ -1,8 +1,15 @@
+from datetime import date
+
 from django.contrib.auth.decorators import login_required
-from djaveURL import url_with_date, date_from_url
+from django.shortcuts import render, reverse
+from djAveJAX import ajax, AjaxProblem, get_ajax_variable, OK
+from djaveNav.date_roller import DateRoller
+from djaveURL import date_from_url
 
-from tracktime.views.util import tt_ui_context
-
+from tracktime.enter_time_table import EnterTimeTable
+from tracktime.models.tracked import Tracked
+from tracktime.punch_the_clock import PunchTheClockTable
+from tracktime.views.util import tt_ui_context, ENTER_TIME
 
 
 @login_required(login_url='/admin/login/')
@@ -17,7 +24,7 @@ def enter_time(request):
       enter_time_table = EnterTimeTable(
           user=request.user, day=day, form_data=request.POST)
       if enter_time_table.is_valid():
-        tracked = enter_time_table.save()
+        enter_time_table.save()
         enter_time_table = EnterTimeTable(user=request.user, day=day)
   date_roller = DateRoller(ENTER_TIME, day, max_day=date.today())
   context = tt_ui_context(

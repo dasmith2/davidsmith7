@@ -1,17 +1,53 @@
+from datetime import date
+
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, reverse
+from djaveDT import now
+from djAveJAX import ajax, OK, AjaxProblem, get_ajax_variable
 
-from tracktime.views.util import tt_ui_context
-
+from tracktime.models.to_do import ToDo
+from tracktime.models.tracked import Tracked
+from tracktime.views.util import tt_ui_context, TO_DO
+from tracktime.punch_the_clock import PunchTheClockTable
+from tracktime.to_do_table import ToDoTable
 
 
 @login_required(login_url='/admin/login/')
 def to_do(request):
-  project = Tracked.objects.currently_tracking_project()
-  context = tt_ui_context(
-      TO_DO, project=project, punch_the_clock_table=None, to_dos=None)
+  # This has to go first because it might process a POST and set the project.
+  punch_the_clock_table = PunchTheClockTable(
+      user=request.user, day=date.today(), form_data=request.POST)
+  to_do_table = None
+  project = Tracked.objects.currently_tracking_project(user=request.user)
   if project:
-    context['to_dos'] = ToDo.objects.not_checked_off(request.user, project)
-  else:
-    context['punch_the_clock_table'] = PunchTheClockTable(
-        user=request.user, day=date.today(), form_data=request.POST)
+    to_do_table = ToDoTable(
+        user=request.user, project=project, form_data=request.POST)
+  context = tt_ui_context(
+      TO_DO, project=project, punch_the_clock_table=punch_the_clock_table,
+      to_do_table=to_do_table, to_do_done_url=reverse(to_do_done),
+      delete_to_do_url=reverse(delete_to_do))
   return render(request, 'to_do.html', context)
+
+
+@login_required
+@ajax
+def to_do_done(request):
+  to_do = _ajax_to_do(request)
+  to_do.checked_off = now()
+  to_do.save()
+  return OK
+
+
+@login_required
+@ajax
+def delete_to_do(request):
+  _ajax_to_do(request).delete()
+  return OK
+
+
+def _ajax_to_do(request):
+  pk = get_ajax_variable(request, 'pk')
+  to_do = ToDo.objects.filter(pk=pk).first()
+  if not to_do:
+    raise AjaxProblem('There is no ToDo with pk {}'.format(pk))
+  return to_do

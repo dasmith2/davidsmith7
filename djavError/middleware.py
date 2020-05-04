@@ -1,8 +1,7 @@
 from datetime import datetime
 from django.conf import settings
 
-from djavError.models import DjavError, LongRequest
-from performance.models import 
+from djavError.models import Error, LongRequest
 
 
 def TrackRequestTimeMiddleware(get_response):
@@ -42,5 +41,5 @@ class LogExceptionsMiddleware:
     exc_info = (exception.__class__, exception, exception.__traceback__)
     extra_to = []
     always_new_error = False
-    StaydError.objects.log_error(
+    Error.objects.log_error(
         title, message, exc_info, extra_to, always_new_error)

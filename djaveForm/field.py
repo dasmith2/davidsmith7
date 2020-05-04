@@ -1,4 +1,5 @@
 from collections import namedtuple
+from datetime import date
 import html
 
 from django.utils.dateparse import parse_date
@@ -25,6 +26,14 @@ class Field(FormElement):
     else:
       self.value = value
     self._value_set = True
+
+  def get_value(self):
+    if not self._value_set:
+      raise Exception(
+          'You have to set the value of a field before you can get the value '
+          'of a field. You probably want to call set_form_data on the form '
+          'to do this.')
+    return self.value
 
   def explain_why_not_valid(self):
     if self.required and not self.value:
@@ -148,6 +157,11 @@ class DateField(HtmlInputField):
 
   def input_type(self):
     return 'date'
+
+
+class Textfield(HtmlInputField):
+  def input_type(self):
+    return 'text'
 
 
 class PositiveFloatField(HtmlInputField):
