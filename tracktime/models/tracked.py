@@ -2,26 +2,16 @@ from django.contrib.auth.models import User
 from django.db import models
 from djaveDT import now
 
-
-class Project(models.Model):
-  name = models.CharField(max_length=400)
-  created = models.DateTimeField(auto_now_add=True)
-
-  def __repr__(self):
-    return '<Project {}: {}>'.format(self.pk, self.name)
-
-  def __str__(self):
-    return self.name
+from tracktime.models.work_type import WorkType
+from tracktime.models.project import Project
 
 
-class WorkType(models.Model):
-  name = models.CharField(max_length=400)
-
-  def __repr__(self):
-    return '<WorkType {}: {}>'.format(self.pk, self.name)
-
-  def __str__(self):
-    return self.name
+class TrackedManager(models.Manager):
+  def currently_tracking_project(self, user, nnow=None):
+    nnow = nnow or now()
+    return self.filter(
+        user=user, date=nnow.date(), started__isnull=False,
+        stopped__isnull=True).first()
 
 
 class Tracked(models.Model):
@@ -66,3 +56,5 @@ class Tracked(models.Model):
 
   def __str__(self):
     return self.name
+
+  objects = TrackedManager()

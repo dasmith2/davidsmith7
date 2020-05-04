@@ -1,6 +1,7 @@
 from djaveForm.field import SelectField, PositiveFloatField, Option
 
-from tracktime.models import WorkType, Project
+from tracktime.models.project import Project
+from tracktime.models.work_type import WorkType
 
 
 def work_type_field(tracked=None):

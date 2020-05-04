@@ -134,10 +134,10 @@ class PunchTheClockTable(Table):
 
   def display_abandoned(self, abandoned):
     for tracked in abandoned:
-      delete = Button('Abandoned. Delete', pk=abandoned.pk)
+      delete = Button('Abandoned. Delete.', pk=tracked.pk, css_class='delete')
       self.create_row([
           tracked.work_type.name, tracked.project.name, tracked.started,
-          delete], pk=abandoned.pk)
+          delete], pk=tracked.pk)
 
   def is_visible(self):
     return bool(self.rows)

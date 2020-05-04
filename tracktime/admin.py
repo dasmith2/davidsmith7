@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from tracktime.models import Project, WorkType
+from tracktime.models.project import Project
+from tracktime.models.work_type import WorkType
 
 
 @admin.register(Project)
