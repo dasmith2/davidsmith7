@@ -48,7 +48,7 @@ ALWAYS_ALLOW_SEND_MAIL = False
 # listed in the ADMINS
 ADMINS = []
 EMAIL_ERRORS_TO = os.environ.get(
-    'EMAIL_STACK_TRACES_TO', default = 'dave@davespace.tech')
+    'EMAIL_STACK_TRACES_TO', default='dave@davespace.tech')
 if EMAIL_ERRORS_TO:
   ADMINS.append(
       ('Heroku errors', EMAIL_ERRORS_TO))
@@ -205,16 +205,16 @@ if DEBUG:
 """ Password validation. """
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',  # noqa: E501
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',  # noqa: E501
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',  # noqa: E501
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',  # noqa: E501
     },
 ]
 
