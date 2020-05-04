@@ -54,18 +54,22 @@ django.setup()
 
 
 from apscheduler.schedulers.blocking import BlockingScheduler
+"""
 from djaveS3.models import (
     clean_up_never_used, clean_up_no_longer_needed, resize_all)
+"""
 
 
 sched = BlockingScheduler()
 
 
+"""
 @sched.scheduled_job('cron', hour='1')
 def photo_stuff():
   clean_up_never_used()
   clean_up_no_longer_needed()
   resize_all()
+"""
 
 
 # test.sh fires this file up with --no-run so continuous integration breaks
