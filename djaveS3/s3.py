@@ -1,18 +1,19 @@
 import base64
 import os
 import re
+import sys
 
 import boto3
 import botocore
 from django.conf import settings
 from django.db import models
-from django.shortcuts import reverse
 
+from djavError.models import log_error
 from djaveS3.get_bucket_config import get_bucket_config
 
 
 s3_region_name = 'us-east-2'
-if hasattr(settings, S3_REGION_NAME):
+if hasattr(settings, 'S3_REGION_NAME'):
   s3_region_name = settings.S3_REGION_NAME
 else:
   raise Exception(
@@ -162,7 +163,8 @@ class SignedFile(models.Model):
   bucket_name = models.CharField(max_length=200)
   created_at = models.DateTimeField(auto_now_add=True)
 
-  def delete_file(self):
+  def delete_file(self, boto3_client=None):
+    boto3_client = boto3_client or get_boto_3_client(self.bucket_name)
     boto3_client.delete(self.file_name)
 
   def __repr__(self):
