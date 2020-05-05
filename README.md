@@ -185,6 +185,15 @@ immediately above the widget in the template for the widget.
 
 # Developing libraries
 
-At first, while only one site is using a library,
+The libraries will ideally stabilize and just sit on PyPI. But while I'm still
+actively developing them I don't want to push to PyPI as part of local
+development. So for now I'm removing djaveS3, say, from requirements.txt and
+simply checking the djaveS3 source directly into my projects thusly:
+
+cd davidsmith7
+mkdir djaveS3
+sudo mount --bind ../djaveS3/djaveS3 djaveS3
+
+I found out about this technique from
 
 https://stackoverflow.com/questions/86402/how-can-i-get-git-to-follow-symlinks
