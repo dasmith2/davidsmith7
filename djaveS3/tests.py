@@ -1,9 +1,9 @@
 from unittest.mock import Mock, call
 
-from photos.models import (
+from djaveS3.models import (
     TestPhoto, Photo, clean_up_never_used, clean_up_no_longer_needed,
     resize_all, signed_photo_is_used)
-from photos.s3 import SignedPhoto, S3
+from djaveS3.s3 import SignedPhoto, S3
 from util.random_string import random_string
 from util.tests import TestCase
 from util.timezone import str_to_tz_dt

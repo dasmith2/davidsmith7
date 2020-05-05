@@ -39,10 +39,10 @@ from django.db import models
 from django.db.models import Q
 from PIL import Image
 
-from commands.models import background_command
-from photos.s3 import SignedPhoto, S3, photo_url
-from util.background import background
-from util.timezone import now
+from djaveThread.background_command import background_command
+from djaveThread.background import background
+from djaveS3.s3 import SignedPhoto, S3, photo_url
+from djaveDT import now
 
 
 @background_command
