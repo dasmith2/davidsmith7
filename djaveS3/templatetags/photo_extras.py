@@ -1,6 +1,6 @@
 from django import template
 
-from photos.file_types import VALID_IMAGE_TYPES
+from djaveS3.file_types import VALID_IMAGE_TYPES
 
 
 register = template.Library()

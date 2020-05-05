@@ -6,7 +6,7 @@ from django.db import models
 
 from djaveDT import now
 from djaveStaffEmail import StaffEmailSender
-from djaveRMOld import RmOldManager
+from djaveClass import RmOldManager
 
 
 class ErrorLogger(object):

@@ -152,6 +152,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'djavError',
+    'djaveS3',
     'djaveThread',
     'tracktime'
 ]

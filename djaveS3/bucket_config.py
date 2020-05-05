@@ -1,7 +1,11 @@
-from collections import namedtuple
+""" BucketConfig has to stay separate from everything to avoid a circular
+dependency. djaveS3 loads bucket configuration from settings, but settings uses
+this BucketConfig definition. So any file that defines BucketConfig can't also
+use settings.
 
+You're probably looking for get_bucket_config in djaveS3.models.bucket
 
-""" bucket_name is the name of the S3 bucket obviously. access_key_id
+bucket_name is the name of the S3 bucket obviously. access_key_id
 secret_access_key are from the Amazon IAm user. is_public is a boolean which
 says whether or not random people on the internet can see the image. So lets
 say you have a single IAm user with two buckets, one of which is publically
@@ -20,6 +24,8 @@ BUCKETS = [
 This configuration is basically so we know how to view an image given a bucket
 name and a file name.
 """
+from collections import namedtuple
+
 
 BucketConfig = namedtuple(
-    'BucketConfig', 'bucket_name access_key_id secret_access_key is_public')
+    'BucketConfig', 'name access_key_id secret_access_key is_public')

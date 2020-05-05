@@ -1,5 +1,5 @@
 from django.apps import AppConfig
 
 
-class PhotosConfig(AppConfig):
+class FilesConfig(AppConfig):
     name = 'photos'

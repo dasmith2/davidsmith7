@@ -147,9 +147,9 @@ function sign_and_upload($file_input, sensitive, success) {
   var file = file_from_input($file_input);
   var url_root;
   if (sensitive) {
-    url_root = '/sign_s3_sensitive/';
+    url_root = '/sign_upload_sensitive/';
   } else {
-    url_root = '/sign_s3_public/';
+    url_root = '/sign_upload_public/';
   }
   var url = (
       url_root + '?file_type=' + file.type + '&do_not_cache=' + Math.random());
