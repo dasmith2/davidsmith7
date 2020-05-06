@@ -13,6 +13,7 @@ def public_biscuits(request):
 
 
 def biscuit_context(current_view_name):
-  return {'nav': Nav([
+  nav_list = [
       NavItem('private_biscuits', 'Private biscuits'),
-      NavItem('public_biscuits', 'Public biscuits')])}
+      NavItem('public_biscuits', 'Public biscuits')]
+  return {'nav': Nav(nav_list, current_view_name)}
