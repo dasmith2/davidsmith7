@@ -1,4 +1,13 @@
-# Put settings that are particular to this specific site here instead of in
-# settings.py
+from djaveS3.bucket_config import BucketConfig
 
-""" Keys for external APIs go here """
+
+# Amazon S3
+IAM_ACCESS_KEY_ID = 'AKIAXKZEWKA3E4O4VCM6'
+IAM_SECRET_ACCESS_KEY = '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'
+PUBLIC_BUCKET = BucketConfig(
+    'davespacepublic', IAM_ACCESS_KEY_ID,
+    IAM_SECRET_ACCESS_KEY, is_public=True)
+PRIVATE_BUCKET = BucketConfig(
+    'davespaceprivate', IAM_ACCESS_KEY_ID,
+    IAM_SECRET_ACCESS_KEY, is_public=False)
+BUCKETS = [PRIVATE_BUCKET, PUBLIC_BUCKET]
