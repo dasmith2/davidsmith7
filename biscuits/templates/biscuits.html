@@ -1,0 +1,12 @@
+{% extends "this_site.html" %}
+
+{% block this_site_head %}
+{% endblock this_site_head %}
+
+{% block this_site_body %}
+
+{{ nav.as_html|safe }}
+{% block biscuit_body %}
+{% endblock biscuit_body %}
+
+{% endblock this_site_body %}
