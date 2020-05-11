@@ -1,7 +1,9 @@
+# Put settings that are particular to this specific site here instead of in
+# settings.py
+
+
+# Amazon S3 test buckets. Replace these!
 from djaveS3.bucket_config import BucketConfig
-
-
-# Amazon S3
 MAX_WIDTH_OR_HEIGHT = 800
 IAM_ACCESS_KEY_ID = 'AKIAXKZEWKA3E4O4VCM6'
 IAM_SECRET_ACCESS_KEY = 'MrJnXwk83JbFXDyzHOcLzCyywq3Moeek0g72dN9N'

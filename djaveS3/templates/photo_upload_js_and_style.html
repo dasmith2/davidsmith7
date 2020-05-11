@@ -98,7 +98,6 @@ function setup_file_upload_hover($element) {
 }
 
 function set_up_file_upload($element, bucket, success) {
-  window.$element = $element; // DO NOT SUBMIT
   $element.find('.file_input').change(function() {
     var $file_input = $(this);
     var file = file_from_input($file_input);
