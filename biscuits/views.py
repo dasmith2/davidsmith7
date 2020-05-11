@@ -1,7 +1,6 @@
 from django.shortcuts import render, reverse
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from djAveJAX import ajax, get_ajax_variable
 from djaveNav.nav import NavItem, Nav
 from djaveS3.public_file_url import public_file_url_root
 from djaveS3.views import sensitive_file_response

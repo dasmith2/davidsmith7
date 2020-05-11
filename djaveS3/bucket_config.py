@@ -30,10 +30,10 @@ import json
 from django.utils.safestring import mark_safe
 
 
-class BucketConfig(namedtuple(
-    'BucketConfig',
-    'name access_key_id secret_access_key is_public max_width_or_height')):
+FIELDS = 'name access_key_id secret_access_key is_public max_width_or_height'
 
+
+class BucketConfig(namedtuple('BucketConfig', FIELDS)):
   def as_javascript(self):
     return mark_safe(json.dumps({
         'name': self.name,

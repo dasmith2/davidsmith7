@@ -90,7 +90,7 @@ function overlay_upload_with_elt(wrapper, elt) {
 }
 
 function setup_file_upload_hover($element) {
-  $element.hover(function() {
+  $element.find('.file_upload_box').hover(function() {
     $(this).addClass('hover');
   }, function() {
     $(this).removeClass('hover');
