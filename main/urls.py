@@ -5,6 +5,7 @@ from django.contrib import admin
 from django.contrib.auth import urls as auth_urls
 from django.urls import include, path
 from djavError.urls import djaverror_urls
+from djaveS3.urls import djave_s3_urls
 
 from main.views import this_site_js
 from main.this_site_urls import this_site_urls
@@ -15,6 +16,7 @@ urlpatterns = [
     path('accounts/', include(auth_urls)),
     path('js/this_site.js', this_site_js, name='this_site_js'),
     path('', include(djaverror_urls)),
+    path('', include(djave_s3_urls)),
     path('', include(this_site_urls))
 ]
 

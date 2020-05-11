@@ -1,3 +1,6 @@
+from datetime import timedelta
+
+from django.shortcuts import reverse
 from djaveDT import now
 from django.conf import settings
 from djaveS3.models.photo import Photo
@@ -20,10 +23,17 @@ class Biscuit(Photo):
 
 
 class PublicBiscuit(Biscuit):
+  def src(self):
+    return self.public_file_url()
+
   def bucket_config(self):
     return settings.PUBLIC_BUCKET
 
 
 class PrivateBiscuit(Biscuit):
+  def src(self):
+    return reverse(
+        'view_private_biscuit', kwargs={'file_name': self.file_name})
+
   def bucket_config(self):
     return settings.PRIVATE_BUCKET

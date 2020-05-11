@@ -55,6 +55,7 @@ if EMAIL_ERRORS_TO:
 
 # Otherwise, when Django sends emails to the admins due to 500 errors, they're
 # from root@localhost and no self respecting smtp provider lets that through.
+# You'll probably need to override this in this_site_settings
 SERVER_EMAIL = 'server@davespace.tech'
 
 # There are two huge different use cases for email. One is emailing staff
@@ -143,7 +144,10 @@ if (PROD or STAGE) and SECRET_KEY == DEFAULT_SECRET_KEY:
       'Set the SECRET_KEY environment variable to a long random string')
 
 
-""" Telling Django about packages. """
+""" Telling Django about packages. Don't put site specific packages here. Put
+them in THIS_SITE_INSTALLED_APPS in main/this_site_installed_apps.py """
+from main.this_site_installed_apps import THIS_SITE_INSTALLED_APPS
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -153,9 +157,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'djavError',
     'djaveS3',
-    'djaveThread',
-    'tracktime'
-]
+    'djaveThread'] + THIS_SITE_INSTALLED_APPS
 
 if DEBUG:
   # I try to keep things out of requirements.txt that aren't necessary in the

@@ -1,5 +1,4 @@
 from django.utils.safestring import mark_safe
-
 from djaveTable.csv import csv_writer_and_response
 from djaveTable.cell_content import (
     CellContent, cell_contents_as_html, cell_contents_as_csv,
@@ -66,7 +65,7 @@ class Table(object):
     to_return.extend(self._rows_html())
 
     to_return.append('</table>')
-    return '\n'.join(to_return)
+    return mark_safe('\n'.join(to_return))
 
   def _rows_html(self):
     to_return = []

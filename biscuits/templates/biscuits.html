@@ -1,12 +1,48 @@
 {% extends "this_site.html" %}
 
 {% block this_site_head %}
+  {% include "photo_upload_js_and_style.html" %}
+  <style>
+    img { width: 500px; }
+    body { background-color: #aaa; }
+  </style>
+  {% block biscuit_head %}
+  {% endblock biscuit_head %}
+  <script>
+
+function append_submit(to, submit_url, file_name) {
+  to.find('.submit').remove();
+  $('<button type="button" class="submit">Submit</button>').click(function() {
+    $(this).prop('disabled', true);
+    $(this).text('Submitting...');
+    post(submit_url, {'file_name': file_name}, function() {
+      location.reload();
+    });
+  }).appendTo(to);
+}
+
+$(function() {
+  var to = $('#upload_biscuit');
+  var success = function(file_name) {
+    append_submit(to, '{{ save_biscuit_url }}', file_name);
+    specific_biscuit_upload_success(file_name);
+  };
+  append_photo_upload(to, {{ bucket.as_javascript }}, success);
+});
+
+  </script>
 {% endblock this_site_head %}
 
 {% block this_site_body %}
+  {{ nav.as_html|safe }}
 
-{{ nav.as_html|safe }}
-{% block biscuit_body %}
-{% endblock biscuit_body %}
+  {% csrf_token %}
+  <div id="upload_biscuit">
+  </div>
 
+  {% for biscuit in biscuits %}
+  <div>
+    <img src="{{ biscuit.src }}">
+  </div>
+  {% endfor %}
 {% endblock this_site_body %}

@@ -31,6 +31,8 @@ from abc import abstractmethod
 from django.core.exceptions import ValidationError
 from django.db import models
 from djaveClass import BaseKnowsChild
+from djaveS3.models.bucket import Bucket
+from djaveS3.public_file_url import public_file_url
 
 
 class File(BaseKnowsChild):
@@ -84,8 +86,11 @@ class File(BaseKnowsChild):
       raise ValidationError('file_name must be a non empty string')
     return super().clean()
 
+  def public_file_url(self):
+    return public_file_url(self.bucket_config(), self.file_name)
+
   def _bucket(self):
-    return self.as_child_class().bucket()
+    return Bucket(self.as_child_class().bucket_config())
 
   def __repr__(self):
     return '<{} {}: {}>'.format(
