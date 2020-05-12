@@ -44,7 +44,7 @@ class TrackedManager(models.Manager):
     if tracking:
       return tracking.project
 
-  def get_clock_never_stopped(self, user, nnow = None):
+  def get_clock_never_stopped(self, user, nnow=None):
     # A week old clock that wasn't stopped isn't running, it's abandoned. Don't
     # bother looking back over a week. There's not much point to drawing the
     # user's attention to ancient unpunched time.

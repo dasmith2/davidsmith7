@@ -9,6 +9,7 @@ def get_latest_project(user):
   if latest_project:
     return latest_project.project
 
+
 def set_latest_project(user, project):
   latest_project = LatestProject.objects.filter(user=user).first()
   if latest_project:
