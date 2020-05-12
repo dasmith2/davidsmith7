@@ -5,10 +5,10 @@ from django.template.loader import render_to_string
 from django.template.exceptions import TemplateDoesNotExist
 from django.shortcuts import reverse
 from djaveDT import days_ago_str, now
-from djaveURL import url_with_date
+from djaveNav import url_with_date, date_to_url_str
 
 
-RollerDay = namedtuple('RollerDay', 'is_current text css_class url')
+RollerDay = namedtuple('RollerDay', 'is_current text css_class url date_str')
 
 
 class DateRoller(object):
@@ -16,7 +16,7 @@ class DateRoller(object):
   In your views,
 
   from djaveNav.date_roller import DateRoller
-  from djaveURL import date_from_url
+  from djaveNav import date_from_url
 
   def my_view(request):
     day = date_from_url(request)
@@ -55,7 +55,8 @@ class DateRoller(object):
         url = reverse('enter_time')
       else:
         url = url_with_date(reverse('enter_time'), day=this_day)
-      days.append(RollerDay(is_current, text, css_class, url))
+      days.append(RollerDay(
+          is_current, text, css_class, url, date_to_url_str(this_day)))
     try:
       return render_to_string('date_roller.html', {'days': days})
     except TemplateDoesNotExist:

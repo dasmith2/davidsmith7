@@ -1,5 +1,6 @@
 import re
 
+from django.utils.safestring import mark_safe
 from djaveForm.form_element import FormElement
 
 
@@ -38,7 +39,7 @@ class Button(FormElement):
     name_attr = ''
     if self.key():
       name_attr = ' name="{}" value="{}"'.format(self.key(), self.key())
-    return (
+    return mark_safe((
         '<button type="{}"{}{}>'
         '{}</button>').format(
-            self.button_type, css_class_str, name_attr, self.text)
+            self.button_type, css_class_str, name_attr, self.text))

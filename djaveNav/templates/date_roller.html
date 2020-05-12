@@ -7,14 +7,27 @@
 .when .one_before a, .when .one_after a { font-size: 20px; }
 .when .two_before a, .when .two_after a { font-size: 15px; }
 </style>
+<script>
+function append_day_info_to_date_roller(date_info_lookup) {
+  /* date_info_lookup should be like {'2020-05-20': 'Stuff about may 20th'} */
+  var keys = Object.keys(date_info_lookup);
+  for (var i = 0; i < keys.length; i++) {
+    var key = keys[i];
+    $('span[data-date-str=' + key + ']').text(date_info_lookup[key]);
+  }
+}
+</script>
 
 <div class="when">
   {% for day in days %}
     {% if day.is_current %}
-      <h1>{{ day.text }}</h1>
+      <h1>{{ day.text }} <span data-date-str="{{ day.date_str }}"></span></h1>
     {% else %}
       <div class="{{ day.css_class }}">
-        <a href="{{ day.url }}">{{ day.text }}</a>
+        <a href="{{ day.url }}">
+          {{ day.text }}
+          <span data-date-str="{{ day.date_str }}"></span>
+        </a>
       </div>
     {% endif %}
   {% endfor %}

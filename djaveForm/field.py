@@ -35,6 +35,14 @@ class Field(FormElement):
           'to do this.')
     return self.value
 
+  def get_value_string(self):
+    if self._value_set:
+      if self.value is not None:
+        return self.value
+    elif self.default:
+      return self.default
+    return ''
+
   def explain_why_not_valid(self):
     if self.required and not self.value:
       return 'Required'
@@ -116,21 +124,18 @@ def datefield_string_to_date(day_string):
   return parse_date(day_string)
 
 
+class TextAreaField(Field):
+  def widget_html(self):
+    return '<textarea name="{}" class="{}">{}</textarea>'.format(
+        self.key(), self.key_prefix, self.get_value_string())
+
+
 class HtmlInputField(Field):
   """ This is for fields that start with <input type="... """
   def widget_html(self):
-    value_string = ''
-    value_attr = ''
-    if self._value_set:
-      if self.value is not None:
-        value_string = self.value
-    elif self.default:
-      value_string = self.default
-    if value_string:
-      value_attr = ' value="{}"'.format(value_string)
-    return '<input type="{}"{} name="{}" class="{}"{}>'.format(
-        self.input_type(), self.additional_attrs_str(), self.key_prefix,
-        self.key(), value_attr)
+    return '<input type="{}"{} name="{}" class="{}" value="{}">'.format(
+        self.input_type(), self.additional_attrs_str(), self.key(),
+        self.key_prefix, self.get_value_string())
 
   def input_type(self):
     raise NotImplementedError('input_type')
@@ -159,7 +164,7 @@ class DateField(HtmlInputField):
     return 'date'
 
 
-class Textfield(HtmlInputField):
+class TextField(HtmlInputField):
   def input_type(self):
     return 'text'
 

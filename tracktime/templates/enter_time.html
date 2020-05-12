@@ -11,7 +11,7 @@
 
 {{ date_roller.as_html|safe }}
 
-{% if punch_the_clock_table.is_visible %}
+{% if punch_the_clock_table %}
   <h2>Punch the clock</h2>
 
   <form method="POST" class="punch_the_clock">
@@ -47,6 +47,13 @@ function wire_up_delete() {
   });
 }
 $(wire_up_delete);
+
+$(function() {
+  $('.hours').focus();
+
+  var total_hours_per_day = {{ total_hours_per_day|safe }};
+  append_day_info_to_date_roller(total_hours_per_day);
+});
 </script>
 
 {% endblock tracktime_body %}

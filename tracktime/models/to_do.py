@@ -7,7 +7,7 @@ from tracktime.models.project import Project
 class ToDoManager(models.Manager):
   def not_checked_off(self, user, project):
     return self.filter(
-        checked_off=None, user=user, project=project).order_by('pk')
+        checked_off=None, user=user, project=project).order_by('-pk')
 
 
 class ToDo(models.Model):

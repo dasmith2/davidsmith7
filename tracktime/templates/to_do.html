@@ -27,12 +27,22 @@ function setup_done_and_delete() {
     } else if (button.hasClass('delete')) {
       delete_to_do(pk);
     }
+    focus_on_new_to_do();
   });
 }
+
+function focus_on_new_to_do() {
+  $('.text').focus();
+}
+
+$(function() {
+  focus_on_new_to_do();
+});
 </script>
 
 <style>
 table, h3 { margin-top: 30px; }
+table textarea { width: 100%; }
 </style>
 {% endblock tracktime_head %}
 
@@ -41,14 +51,14 @@ table, h3 { margin-top: 30px; }
 <form method="POST">
   {% csrf_token %}
   {% if project %}
-    <h1>Project: {{ project.name }}</h1>
-    {{ to_do_table.as_html|safe }}
+    <h1>Project: {{ project.name }} {{ punch_out_button.as_html }}</h1>
+    {{ to_do_table.as_html }}
     <script>
       $(setup_done_and_delete);
     </script>
   {% else %}
     <h3>You have to be on the clock first</h3>
-    {{ punch_the_clock_table.as_html|safe }}
+    {{ punch_the_clock_table.as_html }}
   {% endif %}
 </form>
 

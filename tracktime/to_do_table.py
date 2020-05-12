@@ -1,6 +1,6 @@
 from djaveForm.button import Button
 from djaveForm.form import Form
-from djaveForm.field import Textfield
+from djaveForm.field import TextAreaField
 from djaveTable.table import Table
 
 from tracktime.models.to_do import ToDo
@@ -8,7 +8,7 @@ from tracktime.models.to_do import ToDo
 
 class ToDoForm(Form):
   def __init__(self):
-    self.text_field = Textfield('text', required=True)
+    self.text_field = TextAreaField('text', required=True)
     self.save_button = Button('New to do', button_type='submit')
     super().__init__([self.text_field, self.save_button])
 
