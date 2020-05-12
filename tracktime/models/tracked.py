@@ -8,6 +8,13 @@ from djaveNav import date_to_url_str
 from tracktime.models.project import Project
 
 
+# If a Tracked isn't stopped within 16 hours it's considered abandoned.
+ABANDONED_AFTER_HOURS = 16
+# If a Tracked was started less than 5 minutes ago, it should probably just be
+# canceled.
+TOO_FEW_MINUTES = 5
+
+
 class TrackedManager(models.Manager):
   def total_hours_per_day(self, start_day, end_day, user):
     if start_day > end_day:
@@ -37,19 +44,22 @@ class TrackedManager(models.Manager):
     if tracking:
       return tracking.project
 
-  def get_unpunched(self, user, nnow=None):
-    # Don't bother looking back over a week. There's not much point to drawing
-    # the user's attention to ancient unpunched time.
+  def get_clock_never_stopped(self, user, nnow = None):
+    # A week old clock that wasn't stopped isn't running, it's abandoned. Don't
+    # bother looking back over a week. There's not much point to drawing the
+    # user's attention to ancient unpunched time.
     nnow = nnow or now()
     return self.filter(
         user=user, started__isnull=False,
         stopped__isnull=True,
         date__gte=nnow.date() - timedelta(days=7)).select_related('project')
 
-  def get_can_punch_out(self, user, nnow=None):
+  def get_clock_running(self, user, nnow=None):
+    # By clock running I mean specifically the Tracked whose clock can be
+    # stopped.
     nnow = nnow or now()
-    for tracked in self.get_unpunched(user, nnow=nnow):
-      if nnow.date() == tracked.date:
+    for tracked in self.get_clock_never_stopped(user, nnow=nnow):
+      if tracked.clock_running(nnow=nnow):
         return tracked
 
 
@@ -65,35 +75,45 @@ class Tracked(models.Model):
 
   def stop(self, nnow=None):
     nnow = nnow or now()
-    if self.stopped:
-      raise Exception(
-          'You can not stop a Tracked that is already stopped {}'.format(
-              self.pk))
-    if not self.started:
-      raise Exception(
-          'I can not stop a Tracked that was never started {}'.format(self.pk))
-    if nnow < self.started:
-      raise Exception((
-          'How can I stop a Tracked that was started in the '
-          'future? {}').format(self.pk))
+    why_not = self.explain_why_can_not_stop()
+    if why_not:
+      raise Exception(why_not)
     self.stopped = nnow
     self.hours = self._calculate_hours(self.stopped)
     self.save()
 
-  def can_punch_out(self, nnow=None):
-    nnow = nnow or now()
-    return self.started and not self.stopped and self.date == nnow.date()
+  def clock_running(self, nnow=None):
+    return self.started and not self.stopped and not self.abandoned(nnow=nnow)
 
   def abandoned(self, nnow=None):
-    return self.started and not self.stopped and (
-        not self.can_punch_out(nnow=nnow))
+    nnow = nnow or now()
+    return self.started < nnow - timedelta(hours=ABANDONED_AFTER_HOURS)
+
+  def explain_why_can_not_stop(self, nnow=None):
+    nnow = nnow or now()
+    if self.stopped:
+      return 'The clock is already stopped on this work session'
+    if not self.started:
+      return 'The clock was never started on this work session'
+    if nnow < self.started:
+      return (
+          'How can I stop a work session that was started in the '
+          'future?!')
+    if self.abandoned(nnow=nnow):
+      return (
+          'This work session appears to be abandoned because it '
+          'was started over {} hours ago').format(ABANDONED_AFTER_HOURS)
+    if self.started > nnow - timedelta(minutes=TOO_FEW_MINUTES):
+      return (
+          'This work session is less than {} minutes old. You '
+          'should probably just cancel it.').format(TOO_FEW_MINUTES)
+
+  def can_stop(self, nnow=None):
+    return not bool(self.explain_why_can_not_stop(nnow=nnow))
 
   def _calculate_hours(self, stopped):
     delta = stopped - self.started
     return round(delta.total_seconds() / 3600, 2)
-
-  def started_basically_equals(self, stopped):
-    return 0.08 > self._calculate_hours(stopped)
 
   def __repr__(self):
     return '<Tracked {}: {} {} {} for {} hrs>'.format(

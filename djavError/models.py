@@ -117,6 +117,7 @@ class ErrorManager(RmOldManager):
     return self.create(
         title=title,
         count=1,
+        latest=now(),
         message=message,
         error_message=error_message,
         stack_trace=stack_trace,

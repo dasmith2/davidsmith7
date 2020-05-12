@@ -4,12 +4,14 @@ from djaveForm.form import Form
 from djaveForm.button import Button
 
 from tracktime.fields import project_field, hours_field
-from tracktime.models import Tracked, Project
+from tracktime.models.tracked import Tracked
+from tracktime.models.project import Project
+from tracktime.models.latest_project import set_latest_project
 
 
 class EnterTimeForm(Form):
-  def __init__(self):
-    self.project_field = project_field(tracked=None)
+  def __init__(self, user):
+    self.project_field = project_field(user, tracked=None)
     self.hours_field = hours_field(tracked=None)
     self.save_button = Button('Save new', button_type='submit')
     super().__init__([
@@ -32,8 +34,8 @@ class EnterTimeTable(Table):
     self.setup_edit_existing(tracked)
 
   def setup_enter_new(self):
-    self.form = EnterTimeForm()
-    if self.form_data:
+    self.form = EnterTimeForm(self.user)
+    if self.form.a_button_was_clicked(self.form_data):
       self.form.set_form_data(self.form_data)
     row = [
         self.form.project_field, self.form.hours_field, self.form.save_button]
@@ -69,6 +71,7 @@ class EnterTimeTable(Table):
   def save(self):
     project = Project.objects.get(pk=self.form.project_field.value)
     hours = self.form.hours_field.value
+    set_latest_project(self.user, project)
     return Tracked.objects.create(
         user=self.user, project=project, date=self.day,
         hours=hours)

@@ -15,34 +15,71 @@ function to_do_done(pk) {
 function delete_to_do(pk) {
   if (confirm('Delete to do?')) {
     remove_to_do_helper('{{ delete_to_do_url }}', pk);
+    return true;
   }
+  return false;
 }
 
 function setup_done_and_delete() {
   $('button.done,button.delete').click(function() {
-    var button = $(this);
+    var button = $(this).prop('disabled', true);
     var pk = button.parents('tr').attr('data-pk')
     if (button.hasClass('done')) {
       to_do_done(pk);
     } else if (button.hasClass('delete')) {
-      delete_to_do(pk);
+      if (!delete_to_do(pk)) {
+        button.prop('disabled', false);
+      }
     }
     focus_on_new_to_do();
   });
 }
 
+function setup_edit_description() {
+  $('.edit_description').change(function() {
+    var text = $(this);
+    var pk = text.parents('tr').attr('data-pk');
+    var data = {pk: pk, description: text.val()};
+    var feedback = get_feedback_elt_after(text);
+    post('{{ edit_description_url }}', data, function(response) {
+      if (!show_problem(response, feedback)) {
+        feedback.show().text('Saved!');
+        window.setTimeout(function() {
+          feedback.text('');
+        }, 1000);
+      }
+    }).fail(function() {
+      feedback.show().text(
+          'I was unable to save the updated description due to a ' +
+          'server error');
+    });
+  });
+}
+
 function focus_on_new_to_do() {
-  $('.text').focus();
+  $('.new_description').focus();
 }
 
 $(function() {
   focus_on_new_to_do();
 });
+
+$(setup_done_and_delete);
+$(setup_edit_description);
 </script>
 
 <style>
 table, h3 { margin-top: 30px; }
 table textarea { width: 100%; }
+textarea.edit_description {
+  border-style: none;
+  border-color: Transparent;
+  overflow: auto;
+  resize: none;
+  width: 300px;
+  height: 45px;
+}
+.row2 textarea.edit_description { background-color: #eee; }
 </style>
 {% endblock tracktime_head %}
 
@@ -52,14 +89,24 @@ table textarea { width: 100%; }
   {% csrf_token %}
   {% if project %}
     <h1>Project: {{ project.name }} {{ punch_out_button.as_html }}</h1>
+    {% if stop_problem %}
+      <div>{{ stop_problem.as_html }}</div>
+    {% endif %}
     {{ to_do_table.as_html }}
-    <script>
-      $(setup_done_and_delete);
-    </script>
   {% else %}
     <h3>You have to be on the clock first</h3>
-    {{ punch_the_clock_table.as_html }}
+    {{ punch_in_table.as_html }}
   {% endif %}
 </form>
+
+<div style="margin-top: 50px;">
+  <a href="{{ to_do_for_another_project_url }}">
+    {% if project %}
+      Wait, I thought of something I need to do for another project
+    {% else %}
+      Let me "To do" all projects at once
+    {% endif %}
+  </a>
+</div>
 
 {% endblock tracktime_body %}

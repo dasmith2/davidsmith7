@@ -28,6 +28,18 @@ class Form(object):
           to_return.append(explanation)
     return ', '.join(to_return) or None
 
+  def a_button_was_clicked(self, post_data):
+    """ If you've got multiple forms on a page, you might want to check which
+    form has a button that appears in the post data so you don't end up
+    validating a form that wasn't actually clicked. """
+    if not post_data:
+      return False
+    for element in self.form_elements:
+      if isinstance(element, Button):
+        if element.key() in post_data:
+          return True
+    return False
+
   def form_data_was_set(self):
     return self._form_data_set
 

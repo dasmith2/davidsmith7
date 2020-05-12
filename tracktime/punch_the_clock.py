@@ -6,7 +6,9 @@ from djaveDT import now, tz_dt_to_tz_dt
 from djaveTable.problem import Problem
 from djaveTable.table import Table
 
-from tracktime.models import Tracked, Project
+from tracktime.models.tracked import Tracked
+from tracktime.models.project import Project
+from tracktime.models.latest_project import set_latest_project
 
 
 class StartTheClockForm(Form):
@@ -28,6 +30,7 @@ class StartTheClockForm(Form):
       if start_the_clock_button.button.get_was_clicked():
         started_project = start_the_clock_button.project
         self.start(user, started_project, nnow=nnow)
+        set_latest_project(user, started_project)
         return started_project
 
   def start(self, user, project, nnow=None):
@@ -47,12 +50,8 @@ class StartTheClockForm(Form):
 class StopTheClockForm(Form):
   def __init__(self, stoppable: Tracked):
     self.stoppable = stoppable
-    # I include the pk here in case there's some confusion about which
-    # trackable we're stopping the clock on.
-    self.stop_button = Button(
-        'Punch out', button_type='submit', pk=stoppable.pk)
-    self.cancel_button = Button(
-        'Cancel', button_type='submit', pk=stoppable.pk)
+    self.stop_button = Button('Punch out', button_type='submit')
+    self.cancel_button = Button('Cancel', button_type='submit')
     super().__init__([self.stop_button, self.cancel_button])
 
   def stop(self, nnow=None):
@@ -71,19 +70,18 @@ class StopTheClockForm(Form):
         [self.stop_button, self.cancel_button, problem]])
 
   def explain_why_not_valid(self, nnow=None):
-    nnow = nnow or now()
-    if self.stop_button.get_was_clicked() and (
-        self.stoppable.started_basically_equals(nnow)):
-      return 'Barely any time passed yet'
+    return self.stoppable.explain_why_can_not_stop(nnow=nnow)
 
   def is_valid(self, nnow=None):
     return not self.explain_why_not_valid(nnow=nnow)
 
 
 class PunchTheClockTable(Table):
-  def __init__(self, user, day, form_data=None, nnow=None):
+  def __init__(
+      self, user, day, show_abandoned=True, form_data=None, nnow=None):
     self.user = user
     self.day = day
+    self.show_abandoned = show_abandoned
     self.form_data = form_data
     nnow = nnow or now()
     self.today = nnow.date().today()
@@ -92,27 +90,27 @@ class PunchTheClockTable(Table):
 
     start_form = StartTheClockForm()
     self.started_clock_on_project = None
-    if form_data:
+    if start_form.a_button_was_clicked(form_data):
       start_form.set_form_data(form_data)
       self.started_clock_on_project = start_form.started_clock_on_project(
           user, nnow=nnow)
 
-    can_stop_clock = False
+    a_clock_can_be_stopped = False
 
     abandoned = []
-    for tracked in Tracked.objects.get_unpunched(user):
-      if tracked.can_punch_out(nnow=nnow):
+    for tracked in Tracked.objects.get_clock_never_stopped(user):
+      if tracked.clock_running(nnow=nnow):
         stop_form = StopTheClockForm(tracked)
         stop_clicked = False
         cancel_clicked = False
-        if form_data:
+        if stop_form.a_button_was_clicked(form_data):
           stop_form.set_form_data(form_data)
           stop_clicked = stop_form.stop_button.get_was_clicked()
           cancel_clicked = stop_form.cancel_button.get_was_clicked()
-        can_stop_clock = True
+        a_clock_can_be_stopped = True
         if stop_clicked or cancel_clicked:
           if stop_form.is_valid():
-            can_stop_clock = False
+            a_clock_can_be_stopped = False
             if stop_clicked:
               stop_form.stop()
             if cancel_clicked:
@@ -120,23 +118,25 @@ class PunchTheClockTable(Table):
       else:
         abandoned.append(tracked)
 
-    display_started_column = abandoned or can_stop_clock
+    display_started_column = a_clock_can_be_stopped or (
+        abandoned and self.show_abandoned)
     columns = ['Project', '']
     if display_started_column:
       columns = ['Project', 'Started', '']
     super().__init__(columns)
 
-    if can_stop_clock:
+    if a_clock_can_be_stopped:
       stop_form.display(self)
     elif self.day == self.today:
-      start_form.display(self, display_started_column=bool(abandoned))
+      start_form.display(self, display_started_column=display_started_column)
 
-    if abandoned:
+    if abandoned and self.show_abandoned:
       self.display_abandoned(abandoned)
 
   def display_abandoned(self, abandoned):
     for tracked in abandoned:
-      delete = Button('Abandoned. Delete.', pk=tracked.pk, css_class='delete')
+      delete = Button(
+          'Abandoned session. Delete.', pk=tracked.pk, css_class='delete')
       self.create_row([
           tracked.project.name, tracked.started,
           delete], pk=tracked.pk)

@@ -1,12 +1,18 @@
 from djaveForm.field import SelectField, PositiveFloatField, Option
 
 from tracktime.models.project import Project
+from tracktime.models.latest_project import get_latest_project
 
 
-def project_field(tracked=None):
+def project_field(user, tracked=None):
   # If you're creating a new one, set tracked to None.
+  default = None
+  latest_project = get_latest_project(user)
+  if latest_project:
+    default = latest_project.pk
   field = SelectField(
-      key_prefix='project', options=project_options(), required=True)
+      key_prefix='project', options=project_options(), required=True,
+      default=default)
   if tracked:
     field.set_value(tracked.project.pk)
     field.pk = tracked.pk
