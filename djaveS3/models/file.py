@@ -43,7 +43,7 @@ class File(BaseKnowsChild):
   # it.
   file_name = models.CharField(
       max_length=200, db_index=True, unique=True, null=False, blank=False)
-  created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+  created = models.DateTimeField(auto_now_add=True, db_index=True)
   keep_until = models.DateTimeField(db_index=True, null=True, help_text=(
       'Once keep_until is in the past, if I can '
       'explain_why_can_delete, I will chuck this file.'))

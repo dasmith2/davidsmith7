@@ -14,7 +14,7 @@ class LoggedCommand(models.Model):
   completed = models.DateTimeField(null=True, blank=True)
   error = models.ForeignKey(
       Error, null=True, blank=True, on_delete=models.CASCADE)
-  created_at = models.DateTimeField(auto_now_add=True)
+  created = models.DateTimeField(auto_now_add=True)
 
   objects = LoggedCommandManager()
 

@@ -87,6 +87,26 @@ Then go create a main/local_settings.py file and put something like this in it
     # for that somewhere. Then you can...
     heroku run python manage.py createsuperuser -a whatever-stage
 
+# Developing libraries
+
+The libraries will ideally stabilize and just sit on PyPI. But while I'm still
+actively developing them I don't want to push to PyPI as part of local
+development. So for now I'm removing djaveS3, say, from requirements.txt and
+simply checking the djaveS3 source directly into my projects thusly:
+
+    cd davidsmith7
+    mkdir djaveS3
+    sudo mount --bind ../djaveS3/djaveS3 djaveS3
+
+Then when everything stabilizes, you deploy djaveS3 to PyPI, add djaveS3 to
+requirements.txt, and
+
+    umount djaveS3
+
+I found out about this technique from
+
+https://stackoverflow.com/questions/86402/how-can-i-get-git-to-follow-symlinks
+
 # CSS, Javascript, and Django templates
 
 ## How NOT to do it
@@ -182,18 +202,3 @@ my_specific_page.html should inherit from my_specific_section.html
 
 If the css is specifically for a particular widget, just inline the styles
 immediately above the widget in the template for the widget.
-
-# Developing libraries
-
-The libraries will ideally stabilize and just sit on PyPI. But while I'm still
-actively developing them I don't want to push to PyPI as part of local
-development. So for now I'm removing djaveS3, say, from requirements.txt and
-simply checking the djaveS3 source directly into my projects thusly:
-
-cd davidsmith7
-mkdir djaveS3
-sudo mount --bind ../djaveS3/djaveS3 djaveS3
-
-I found out about this technique from
-
-https://stackoverflow.com/questions/86402/how-can-i-get-git-to-follow-symlinks

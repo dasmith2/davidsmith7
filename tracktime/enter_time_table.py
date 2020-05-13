@@ -46,7 +46,7 @@ class EnterTimeTable(Table):
     for tracked in got_tracked:
       if tracked.hours:
         total += tracked.hours
-    return total
+    return round(total, 2)
 
   def get_tracked(self):
     """ If the hours aren't set, it isn't tracked yet really """

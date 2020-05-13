@@ -92,6 +92,32 @@ def str_to_naive_dt(dt_str):
   raise Exception('Unable to parse date string {}'.format(dt_str))
 
 
+def to_d(d_or_d_str):
+  """ d_or_d_str can be None, a string like '2012-02-21' or a date. """
+  if d_or_d_str is None:
+    return None
+  if isinstance(d_or_d_str, str):
+    return parse_date(d_or_d_str)
+  if isinstance(d_or_d_str, date):
+    return d_or_d_str
+  raise Exception(
+      'Im not sure what to do with a {}'.format(d_or_d_str.__class__))
+
+
+def to_tz_dt(dt_or_dt_str, tz_str=None):
+  """ dt_or_dt_str can be None, a string like "2012-02-21 10:28:45", or a
+  timezone enabled datetime. This returns in the tz_str timezone if provided,
+  otherwise it uses settings.TIME_ZONE """
+  if dt_or_dt_str is None:
+    return None
+  if isinstance(dt_or_dt_str, str):
+    return str_to_tz_dt(dt_or_dt_str, tz_str=tz_str)
+  elif isinstance(dt_or_dt_str, datetime):
+    return tz_dt_to_tz_dt(dt_or_dt_str)
+  raise Exception('I am not sure what to do with a {}'.format(
+      dt_or_dt_str.__class__))
+
+
 def str_to_tz_dt(dt_str, tz_str=None):
   """ dt_str is, like, "2012-02-21 10:28:45" while tz_str is, like,
   "Europe/Helsinki". See pytz.all_timezones. This function returns
@@ -99,6 +125,9 @@ def str_to_tz_dt(dt_str, tz_str=None):
       2012, 2, 21, 10, 28, 45,
       tzinfo=<DstTzInfo 'Europe/Helsinki' EET+2:00:00 STD>)
   dt_str can also be, like, "2012-02-21" which will just do midnight. """
+  if not isinstance(dt_str, str):
+    raise Exception(
+        'str_to_tz_dt expects a string, not a {}'.format(dt_str.__class__))
   tz_str = tz_str or settings.TIME_ZONE
   return naive_dt_to_tz_dt(str_to_naive_dt(dt_str), tz_str)
 
@@ -121,6 +150,28 @@ def tz_dt_to_tz_dt(tz_dt, tz_str=None):
   send something at 9am in Hawaii or whatever. """
   tz_str = tz_str or settings.TIME_ZONE
   return tz_dt.astimezone(pytz.timezone(tz_str))
+
+
+def dt_for_json(tz_dt, tz_str=None):
+  """ If tz_dt is None, return None. Otherwise, put tz_dt in the specified
+  timezone. If no timezone is specified, use settings.TIME_ZONE (which for me
+  is 'America/New_York'). Return the isoformat. So for instance this could
+  return '2020-01-01T13:00:00-05:00' """
+  if not tz_dt:
+    return None
+  if not isinstance(tz_dt, datetime):
+    raise Exception((
+        'dt_for_json expects a timezone enabled datetime, '
+        'not a {}').format(tz_dt.__class__))
+  return tz_dt_to_tz_dt(tz_dt).isoformat()
+
+
+def d_for_json(d):
+  if not d:
+    return None
+  if not isinstance(d, date):
+    raise Exception('d_for_json expects a date, not a {}'.format(d.__class__))
+  return d.isoformat()
 
 
 def now(use_django_now=django_now, tz_str=None):

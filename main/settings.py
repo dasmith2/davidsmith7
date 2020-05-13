@@ -17,6 +17,8 @@ STAGE = os.environ.get('STAGE', default='False') == 'True'
 PROD = os.environ.get('PROD', default='False') == 'True'
 TEST = 'test' in sys.argv
 RUNSERVER = 'runserver' in sys.argv
+GUNICORN = 'gunicorn' in sys.argv
+WEB = RUNSERVER or GUNICORN
 MANAGE_COMMAND_FINDER = re.compile(r'[^\w]*manage.py')
 MANAGE_COMMAND = any([MANAGE_COMMAND_FINDER.match(arg) for arg in sys.argv])
 SHELL = MANAGE_COMMAND and 'shell' in sys.argv

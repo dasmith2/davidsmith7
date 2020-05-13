@@ -16,7 +16,7 @@ class Biscuit(Photo):
     self.keep_until = self.get_keep_until()
 
   def get_keep_until(self):
-    return self.created_at + timedelta(hours=1)
+    return self.created + timedelta(hours=1)
 
   class Meta:
     abstract = True
