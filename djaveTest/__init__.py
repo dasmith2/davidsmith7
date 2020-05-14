@@ -59,3 +59,23 @@ class TestCase(DjangoTestCase):
     elapsed = time_time.time() - self._started_at
     if elapsed > 1.0:
       print('\n{} ({}s)'.format(self.id(), round(elapsed, 2)))
+
+
+def recursive_assert_equal(expected, got, message_prefix):
+  if expected.__class__ != got.__class__:
+    raise AssertionError('{} I expected a {} but I got a {}'.format(
+        message_prefix, expected.__class__, got.__class__))
+  if isinstance(expected, list):
+    if len(expected) != len(got):
+      raise AssertionError((
+          '{} I expected a list of length {} but I got a list of '
+          'length {}').format(
+              message_prefix, len(expected), len(got)))
+    for i, expected_element in enumerate(expected):
+      got_element = got[i]
+      recursive_assert_equal(
+          expected_element, got_element, '{} element {} explains: '.format(
+              message_prefix, i))
+  elif expected != got:
+    raise AssertionError('{} I expected {} but I got {}'.format(
+        message_prefix, expected, got))

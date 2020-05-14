@@ -7,9 +7,9 @@ from djAveJAX import ajax, AjaxProblem, get_ajax_variable, OK
 from djaveNav.date_roller import DateRoller
 from djaveURL import date_from_url
 
-from tracktime.enter_time_table import EnterTimeTable
 from tracktime.models.tracked import Tracked
-from tracktime.punch_the_clock import PunchTheClockTable
+from tracktime.tables.enter_time_table import EnterTimeTable
+from tracktime.tables.punch_the_clock import PunchTheClockTable
 from tracktime.views.util import tt_ui_context, ENTER_TIME
 
 
@@ -23,16 +23,10 @@ def enter_time(request):
     return redirect('to_do')
   if day != date.today():
     punch_the_clock_table = None
-  enter_time_table = EnterTimeTable(user=request.user, day=day)
-  if request.method == 'POST':
-    if enter_time_table.form.save_button.key() in request.POST:
-      enter_time_table = EnterTimeTable(
-          user=request.user, day=day, form_data=request.POST)
-      if enter_time_table.is_valid():
-        enter_time_table.save()
-        enter_time_table = EnterTimeTable(user=request.user, day=day)
+  enter_time_table = EnterTimeTable(
+      user=request.user, day=day, form_data=request.POST)
   date_roller = DateRoller(ENTER_TIME, day, max_day=date.today())
-  totals = Tracked.objects.total_hours_per_day(
+  totals = Tracked.live.total_hours_per_day(
       day - timedelta(days=2), day + timedelta(days=2), request.user)
   context = tt_ui_context(
       ENTER_TIME,
@@ -48,7 +42,7 @@ def enter_time(request):
 @ajax
 def delete_tracked(request):
   pk = get_ajax_variable(request.POST, 'pk', required=True)
-  tracked = Tracked.objects.filter(pk=pk).first()
+  tracked = Tracked.live.filter(pk=pk).first()
   if not tracked:
     raise AjaxProblem('This Tracked does not exist')
   tracked.delete()

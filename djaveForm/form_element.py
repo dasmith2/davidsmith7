@@ -1,3 +1,5 @@
+from abc import abstractmethod
+
 from djaveTable.cell_content import CellContent
 
 
@@ -15,3 +17,16 @@ class FormElement(CellContent):
         return '{}_{}'.format(self.key_prefix, self.pk)
       return self.key_prefix
     return ''
+
+  @abstractmethod
+  def as_html(self):
+    raise NotImplementedError('as_html')
+
+  def __eq__(self, other):
+    if self.__class__ != other.__class__:
+      raise Exception('I do not know how to compare a {} to a {}'.format(
+          self.__class__, other.__class__))
+    return self.as_html() == other.as_html()
+
+  def __repr__(self):
+    return self.as_html()

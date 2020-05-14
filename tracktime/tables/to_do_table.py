@@ -42,10 +42,10 @@ class ToDoTable(Table):
         if self.form.is_valid():
           project = self.project
           if not project:
-            project = Project.objects.get(
+            project = Project.live.get(
                 pk=self.form.project_field.get_value())
             set_latest_project(self.user, project)
-          ToDo.objects.create(
+          ToDo.live.create(
               user=self.user, project=project,
               description=self.form.description_field.get_value())
           self.form = ToDoForm(self.user, show_project=show_project)
@@ -57,7 +57,7 @@ class ToDoTable(Table):
     self.create_row(cells)
 
   def setup_existing(self):
-    for to_do in ToDo.objects.not_done(self.user, self.project):
+    for to_do in ToDo.live.not_done(self.user, self.project):
       done = Button('Done')
       delete = Button('Delete')
       description = TextAreaField(

@@ -1,7 +1,7 @@
 from djaveTest import TestCase, get_test_user
 from djaveDT import str_to_tz_dt
 
-from tracktime.models.to_do import ToDo
+from tracktime.models.to_do import ToDo, OPEN, DONE
 from tracktime.tests.models.test_project import get_test_project
 
 
@@ -12,13 +12,13 @@ def get_test_to_do(**kwargs):
   user = kwargs.get('user', None)
   if not user:
     user = get_test_user(**kwargs)
-  to_do = ToDo.objects.create(
+  to_do = ToDo.live.create(
       description=kwargs.get('description', 'Do some stuff'),
       done=kwargs.get('done', None),
       project=project,
       user=user)
   if 'created' in kwargs:
-    ToDo.objects.filter(pk=to_do.pk).update(
+    ToDo.live.filter(pk=to_do.pk).update(
         created=str_to_tz_dt(kwargs['created']))
     to_do.refresh_from_db()
   return to_do
@@ -37,9 +37,9 @@ class ToDoTests(TestCase):
         project=project_1, done=str_to_tz_dt('2020-01-01'), user=user)
 
     self.assertEqual(
-        [not_done_2, not_done_1], list(ToDo.objects.not_done(user)))
+        [not_done_2, not_done_1], list(ToDo.live.not_done(user)))
     self.assertEqual(
-        [not_done_1], list(ToDo.objects.not_done(user, project_1)))
+        [not_done_1], list(ToDo.live.not_done(user, project_1)))
 
   def test_as_json(self):
     project = get_test_project()
@@ -52,10 +52,13 @@ class ToDoTests(TestCase):
         description='Hello world',
         created='2020-01-01T13:00:00-05:00',
         done=None,
+        deleted=None,
         project=project.pk,
+        status=OPEN,
         user=user.pk)
     self.assertEqual(expected, to_do.as_json())
 
     to_do.done = str_to_tz_dt('2020-01-02 11:00')
     expected['done'] = '2020-01-02T11:00:00-05:00'
+    expected['status'] = DONE
     self.assertEqual(expected, to_do.as_json())

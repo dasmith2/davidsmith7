@@ -2,7 +2,8 @@ from django.utils.safestring import mark_safe
 from djaveTable.csv import csv_writer_and_response
 from djaveTable.cell_content import (
     CellContent, cell_contents_as_html, cell_contents_as_csv,
-    obj_as_cell_content, is_primitive)
+    obj_as_cell_content)
+from djaveTest import recursive_assert_equal
 
 
 class Table(object):
@@ -129,49 +130,15 @@ class Cell(object):
   def as_csv(self):
     return cell_contents_as_csv(self.cell_contents)
 
-  def assertEqual(self, expected_cell, message_prefix=''):
-    """ Handy for tests. """
-    if not isinstance(expected_cell, Cell):
-      raise AssertionError(
-          '{}I\'m a Cell but the expected_cell is a {}'.format(
-              message_prefix, expected_cell.__class__))
-    if self.cell_contents != expected_cell.cell_contents:
-      raise AssertionError(
-          '{}I\'ve got {} but expected_cell\'s got {}'.format(
-              message_prefix, self.cell_contents, expected_cell.cell_contents))
-    if self.classes != expected_cell.classes:
-      raise AssertionError(
-          '{}My classes are {} but expected_cell\'s classes are {}'.format(
-              message_prefix, self.classes, expected_cell.classes))
-    if self.is_header != expected_cell.is_header:
-      if self.is_header:
-        raise AssertionError('I\'m a header but expected_cell isn\'t.')
-      raise AssertionError('I\'m not a header but expected_cell is.')
-    return True
-
   def __str__(self):
-    return self.__repr__()
+    return self.as_html()
 
   def __repr__(self):
-    attrs = []
-    if is_primitive(self.cell_contents):
-      attrs.append(self.cell_contents)
-    else:
-      attrs.append(str(self.cell_contents.__class__))
-    if self.classes:
-      attrs.append("classes={}".format(self.classes))
-    if self.is_header:
-      attrs.append("is_header=True")
-    if self.additional_attrs:
-      for (key, value) in self.additional_attrs.items():
-        attrs.append("{}='{}'".format(key, value))
-    return "Cell({})".format(', '.join(attrs))
+    return self.as_html()
 
   def __eq__(self, other):
-    try:
-      return self.assertEqual(other)
-    except AssertionError:
-      return False
+    return self.__class__ == other.__class__ and (
+        self.as_html() == other.as_html())
 
 
 class Row(object):
@@ -214,17 +181,4 @@ class Row(object):
           'I\'m expecting additional_attrs {} on this row but I '
           'have {}').format(
               expected_row.additional_attrs, self.additional_attrs))
-    if len(self.cells) != len(expected_row.cells):
-      message = 'I have {} cells but the expected_row has {} cells'.format(
-          len(self.cells), len(expected_row.cells))
-      raise AssertionError(message)
-    for i, cell in enumerate(self.cells):
-      use_cell = cell
-      if not isinstance(cell, Cell):
-        use_cell_content = cell
-        if not isinstance(use_cell_content, CellContent):
-          use_cell_content = CellContent(cell)
-        use_cell = Cell(use_cell_content)
-      use_cell.assertEqual(
-          expected_row.cells[i],
-          message_prefix='Cell {} explains: '.format(i))
+    recursive_assert_equal(expected_row.cells, self.cells, '')

@@ -9,9 +9,9 @@ from djaveTable.problem import Problem
 
 from tracktime.models.to_do import ToDo
 from tracktime.models.tracked import Tracked
+from tracktime.tables.punch_the_clock import PunchTheClockTable
+from tracktime.tables.to_do_table import ToDoTable
 from tracktime.views.util import tt_ui_context, TO_DO
-from tracktime.punch_the_clock import PunchTheClockTable
-from tracktime.to_do_table import ToDoTable
 
 
 @login_required(login_url='/admin/login/')
@@ -25,7 +25,7 @@ def to_do(request):
 
   project = None
   to_do_table = None
-  clock_running = Tracked.objects.get_clock_running(user=request.user)
+  clock_running = Tracked.live.get_clock_running(user=request.user)
   stop_problem = ''
   if clock_running:
     project = clock_running.project
@@ -72,7 +72,7 @@ def edit_description(request):
 
 def _ajax_to_do(request):
   pk = get_ajax_variable(request, 'pk')
-  to_do = ToDo.objects.filter(pk=pk).first()
+  to_do = ToDo.live.filter(pk=pk).first()
   if not to_do:
     raise AjaxProblem('There is no ToDo with pk {}'.format(pk))
   return to_do

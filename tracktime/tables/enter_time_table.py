@@ -20,23 +20,33 @@ class EnterTimeForm(Form):
 
 
 class EnterTimeTable(Table):
-  def __init__(self, user, day, form_data=None):
+  """ Saving a new one is done by posting a form. Deleting an existing one is
+  done by AJAX. In general, I think that when a page is talking about a single
+  instance of something it should be manipulated through posting the page,
+  but when you have a list of things, those should be done through AJAX. """
+  def __init__(self, user, day, form_data):
     self.day = day
     self.user = user
     self.form_data = form_data
+    super().__init__()
 
-    tracked = self.get_tracked()
-    hours = self.total_hours(tracked)
-    super().__init__(['Project', 'Hours: {}'.format(hours), ''])
-
+    # This might save a new one if the form is valid so it has to go before we
+    # load this user's Trackeds.
     self.setup_enter_new()
 
+    tracked = Tracked.live.by_user_and_day(self.user, self.day)
     self.setup_edit_existing(tracked)
+
+    hours = self.total_hours(tracked)
+    self.headers = ['Project', 'Hours: {}'.format(hours), '']
 
   def setup_enter_new(self):
     self.form = EnterTimeForm(self.user)
     if self.form.a_button_was_clicked(self.form_data):
       self.form.set_form_data(self.form_data)
+      if self.is_valid():
+        self.save()
+        self.form = EnterTimeForm(self.user)
     row = [
         self.form.project_field, self.form.hours_field, self.form.save_button]
     self.create_row(row, classes=['new'])
@@ -48,16 +58,10 @@ class EnterTimeTable(Table):
         total += tracked.hours
     return round(total, 2)
 
-  def get_tracked(self):
-    """ If the hours aren't set, it isn't tracked yet really """
-    return Tracked.objects.filter(
-        user=self.user, date=self.day, hours__gt=0).select_related(
-            'project').order_by('pk')
-
   def setup_edit_existing(self, got_tracked):
     for tracked in got_tracked:
-      delete = Button('Delete', pk=tracked.pk)
-      hours = str(tracked.hours)
+      delete = Button('Delete')
+      hours = tracked.hours
       if tracked.started:
         hours = '{} starting at {}'.format(
             hours, dt_to_time_str(tracked.started))
@@ -69,9 +73,9 @@ class EnterTimeTable(Table):
     return self.form.is_valid()
 
   def save(self):
-    project = Project.objects.get(pk=self.form.project_field.value)
+    project = Project.live.get(pk=self.form.project_field.value)
     hours = self.form.hours_field.value
     set_latest_project(self.user, project)
-    return Tracked.objects.create(
+    return Tracked.live.create(
         user=self.user, project=project, date=self.day,
         hours=hours)

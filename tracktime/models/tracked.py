@@ -2,6 +2,7 @@ from datetime import timedelta
 
 from django.contrib.auth.models import User
 from django.db import models
+from djaveAPI.published import Published, PublishedManager
 from djaveDT import now, dt_for_json, d_for_json
 from djaveNav import date_to_url_str
 
@@ -14,8 +15,17 @@ ABANDONED_AFTER_HOURS = 16
 # canceled.
 TOO_FEW_MINUTES = 5
 
+DELETED = 'DELETED'
+DONE = 'DONE'
+ABANDONED = 'ABANDONED'
+IN_PROGRESS = 'IN_PROGRESS'
 
-class TrackedManager(models.Manager):
+
+class TrackedManager(PublishedManager):
+  def by_user_and_day(self, user, day):
+    return self.filter(user=user, date=day).select_related(
+        'project').order_by('-pk')
+
   def total_hours_per_day(self, start_day, end_day, user):
     if start_day > end_day:
       raise Exception('{} > {}'.format(start_day, end_day))
@@ -59,7 +69,7 @@ class TrackedManager(models.Manager):
         return tracked
 
 
-class Tracked(models.Model):
+class Tracked(Published):
   user = models.ForeignKey(User, on_delete=models.PROTECT)
   project = models.ForeignKey(Project, on_delete=models.PROTECT)
   date = models.DateField(db_index=True)
@@ -92,6 +102,8 @@ class Tracked(models.Model):
       return 'The clock is already stopped on this work session'
     if not self.started:
       return 'The clock was never started on this work session'
+    if self.deleted:
+      return 'This work session was canceled or deleted'
     if nnow < self.started:
       return (
           'How can I stop a work session that was started in the '
@@ -109,20 +121,33 @@ class Tracked(models.Model):
     return not bool(self.explain_why_can_not_stop(nnow=nnow))
 
   def _calculate_hours(self, stopped):
+    if self.deleted:
+      raise Exception('I can not calculate hours for a deleted work session')
     delta = stopped - self.started
     return round(delta.total_seconds() / 3600, 2)
 
-  def __repr__(self):
-    return '<Tracked {}: {} {} {} for {} hrs>'.format(
+  def __repr__(self, nnow=None):
+    return '<Tracked {}: {} {} {} {} for {} hrs>'.format(
         self.pk, self.user.username, self.project.name,
-        self.date, self.hours)
+        self.date, self.hours, self.status(nnow=nnow))
 
-  def __str__(self):
-    return self.__repr__()
+  def __str__(self, nnow=None):
+    return self.__repr__(nnow=nnow)
 
-  objects = TrackedManager()
+  def status(self, nnow=None):
+    nnow = nnow or now()
+    if self.deleted:
+      return DELETED
+    elif self.stopped:
+      return DONE
+    elif self.started:
+      if self.abandoned(nnow=nnow):
+        return ABANDONED
+      return IN_PROGRESS
 
-  def as_json(self):
+  live = TrackedManager()
+
+  def as_json(self, nnow=None):
     return dict(
         pk=self.pk,
         user=self.user.pk,
@@ -130,4 +155,9 @@ class Tracked(models.Model):
         date=d_for_json(self.date),
         hours=self.hours,
         started=dt_for_json(self.started),
-        stopped=dt_for_json(self.stopped))
+        stopped=dt_for_json(self.stopped),
+        deleted=dt_for_json(self.deleted),
+        status=self.status(nnow=nnow))
+
+  class Meta:
+    verbose_name = 'work session'

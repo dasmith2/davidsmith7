@@ -20,7 +20,7 @@ def project_field(user, tracked=None):
 
 
 def project_options():
-  projects = Project.objects.order_by('name')
+  projects = Project.live.order_by('name')
   return [Option(project.pk, project.name) for project in projects]
 
 
