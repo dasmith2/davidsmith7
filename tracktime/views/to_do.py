@@ -21,7 +21,9 @@ def to_do(request):
   punch_in_table = PunchTheClockTable(
       user=request.user, day=date.today(), show_abandoned=False,
       form_data=request.POST)
-  punch_out_button = Button('Punch out', button_type='submit')
+  # key_prefix otherwise the punch out button in the punch_in_table takes over
+  punch_out_button = Button(
+      'Punch out', key_prefix='punch_out_on_to_do', button_type='submit')
 
   project = None
   to_do_table = None
