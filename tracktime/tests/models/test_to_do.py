@@ -15,6 +15,7 @@ def get_test_to_do(**kwargs):
   to_do = ToDo.live.create(
       description=kwargs.get('description', 'Do some stuff'),
       done=kwargs.get('done', None),
+      deleted=kwargs.get('deleted', None),
       project=project,
       user=user)
   if 'created' in kwargs:
