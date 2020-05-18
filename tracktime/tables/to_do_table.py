@@ -59,6 +59,15 @@ class ToDoTable(Table):
   def setup_existing(self):
     for to_do in ToDo.live.not_done(self.user, self.project):
       done = Button('Done')
+      # The save button is mainly here for usability. You save a to do
+      # description by leaving the description text box which triggers a change
+      # event. But if you change the description and then immediately click the
+      # done button, there's a race between changing the description and
+      # displaying the "Saved!" message, and between marking the thing done and
+      # removing it from the list. So the whole point of this save button is to
+      # give the user something to click on which will cause the cursor to
+      # leave the text box.
+      save = Button('Save')
       delete = Button('Delete')
       description = TextAreaField(
           'edit_description', default=to_do.description, required=False)
@@ -66,5 +75,5 @@ class ToDoTable(Table):
       cells = []
       if not bool(self.project):
         cells.append(to_do.project.name)
-      cells.extend([description, [done, delete]])
+      cells.extend([description, [save, done, delete]])
       self.create_row(cells, pk=to_do.pk)

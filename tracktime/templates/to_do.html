@@ -36,13 +36,25 @@ function setup_done_and_delete() {
 }
 
 function setup_edit_description() {
-  $('.edit_description').change(function() {
-    var text = $(this);
-    var pk = text.parents('tr').attr('data-pk');
-    var data = {pk: pk, description: text.val()};
-    var feedback = get_feedback_elt_after(text);
+  // If you modify the description and then click done, there's a race. At
+  // first I tried solving this by having the done button save the description
+  // first before marking done, but that started to get complicated. So now I
+  // just disable the done button until the description is saved.
+  var button_for_box = function(text_box, button_css_class) {
+    return text_box.parents('tr').find('.' + button_css_class);
+  };
+  $('.edit_description').keyup(function() {
+    button_for_box($(this), 'done').hide();
+    button_for_box($(this), 'save').show();
+  }).change(function() {
+    var text_box = $(this);
+    var pk = text_box.parents('tr').attr('data-pk');
+    var data = {pk: pk, description: text_box.val()};
+    var feedback = get_feedback_elt_after(text_box);
     post('{{ edit_description_url }}', data, function(response) {
       if (!show_problem(response, feedback)) {
+        button_for_box(text_box, 'done').show();
+        button_for_box(text_box, 'save').hide();
         feedback.show().text('Saved!');
         window.setTimeout(function() {
           feedback.text('');
@@ -80,6 +92,12 @@ textarea.edit_description {
   height: 45px;
 }
 .row2 textarea.edit_description { background-color: #eee; }
+/* The save button is really there to give the user something to click on so
+ * the cursor leaves the description text box which triggers a change event
+ * which causes the save. So when you modify the description, show the save
+ * button and hide the done button to remove all ambiguity. When the
+ * description is saved, remove the save button and show the done button. */
+button.save { display: none; }
 </style>
 {% endblock tracktime_head %}
 
