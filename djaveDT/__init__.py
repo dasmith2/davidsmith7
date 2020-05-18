@@ -23,7 +23,8 @@ def tz_dt_to_str(tz_dt, tz_str=None):
 
 
 def d_to_str(d):
-  return d.strftime('%b. %d, %Y')
+  # I don't do '%b. %d, %Y' because "May. 5, 2020" looks dumb.
+  return d.strftime('%b %d, %Y')
 
 
 def dt_to_str(tz_dt):

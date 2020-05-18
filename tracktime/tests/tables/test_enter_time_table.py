@@ -2,37 +2,19 @@ from datetime import date
 
 from djaveForm.button import Button
 from djaveTable.table import Cell, Row
-from djaveTest import TestCase, get_test_user
 
 from tracktime.tables.enter_time_table import EnterTimeTable
 from tracktime.models.tracked import Tracked
-from tracktime.tests.models.test_project import get_test_project
-from tracktime.tests.models.test_tracked import get_test_tracked
+from tracktime.tests.tables.test_case_with_tt_data import TestCaseWithTTData
 
 
-class EnterTimeTableTests(TestCase):
+class EnterTimeTableTests(TestCaseWithTTData):
   def setUp(self):
     super().setUp()
-    self.user = get_test_user()
-    get_test_user(username='irrelevant_user')
-    self.project_1 = get_test_project(name='Project 1')
-    self.project_2 = get_test_project(name='Project 2')
-    self.tracked_1 = get_test_tracked(
-        user=self.user, project=self.project_1, hours=1.1, date='2020-01-15',
-        started='2020-01-15 11:00', stopped='2020-01-15 12:06')
-    self.tracked_2 = get_test_tracked(
-        user=self.user, project=self.project_1, hours=2.1, date='2020-01-15')
-
-    # Irrelevant stuff
-    get_test_tracked(  # Wrong day
-        user=self.user, project=self.project_1, hours=20.0, date='2020-01-05')
-    get_test_tracked(  # Wrong user
-        user=get_test_user(), project=self.project_1, hours=30.8,
-        date='2020-01-15')
-    get_test_tracked(  # Deleted
-        user=self.user, project=self.project_1, hours=40.0, date='2020-01-15',
-        started='2020-01-15 11:00', stopped='2020-01-15 12:06',
-        deleted='2020-01-15 12:08')
+    self.setup_user()
+    self.setup_projects()
+    self.setup_trackeds()
+    self.setup_irrelevant_stuff()
 
   def test_table_contents(self):
     table = EnterTimeTable(self.user, date(2020, 1, 15), None)

@@ -199,6 +199,6 @@ class PerDayTests(TestCase):
     self.assertEqual([self.fifteenth], list(Tracked.live.by_user_and_date(
         self.user, date(2020, 1, 15))))
     self.assertEqual(
-        [self.fifteenth, self.sixteenth],
-        list(Tracked.live.by_user_and_date_range(
+        set([self.fifteenth, self.sixteenth]),
+        set(Tracked.live.by_user_and_date_range(
             self.user, date(2020, 1, 15), date(2020, 1, 16))))

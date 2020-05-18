@@ -17,13 +17,13 @@ class TimeBreakdown(DateRangeReport):
     default_to_date = nnow.date()
     super().__init__(default_from_date, default_to_date, request_get)
 
-    self.project = None
+    project = None
     if 'project' in request_get:
-      self.project = Project.live.filter(pk=request_get['project']).first()
+      project = Project.live.filter(pk=request_get['project']).first()
 
-    content = TimeBreakdownContent(
-        user, self.project, self.from_date(), self.to_date())
-    self.add_content(content)
+    self.time_breakdown_content = TimeBreakdownContent(
+        user, project, self.from_date(), self.to_date())
+    self.add_content(self.time_breakdown_content)
 
 
 class TimeBreakdownContent(object):

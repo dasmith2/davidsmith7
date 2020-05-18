@@ -18,32 +18,37 @@ class WhatIDidReport(DateRangeReport):
     super().__init__(default_from_date, default_to_date, request_get)
 
     current_query_dict = self.get_query_dict()
-    content = WhatIDidReportContent(
+    self.what_i_did_content = WhatIDidReportContent(
         user, self.from_date(), self.to_date(), current_query_dict)
-    self.add_content(content)
+    self.add_content(self.what_i_did_content)
 
 
 class WhatIDidReportContent(object):
   def __init__(self, user, from_date, to_date, current_query_dict):
-    self.projects = {}
+    self.projects = self.get_projects(
+        user, from_date, to_date, current_query_dict)
+
+  def get_projects(self, user, from_date, to_date, current_query_dict):
+    projects = {}
     for tracked in Tracked.live.by_user_and_date_range(
         user, from_date, to_date):
       if tracked.hours:
-        if tracked.project not in self.projects:
-          self.projects[tracked.project] = WhatIDidPerProject(
+        if tracked.project not in projects:
+          projects[tracked.project] = WhatIDidPerProject(
               tracked.project, current_query_dict)
-        self.projects[tracked.project].hours = round(
-            self.projects[tracked.project].hours + tracked.hours, 2)
+        projects[tracked.project].hours = round(
+            projects[tracked.project].hours + tracked.hours, 2)
     for to_do in ToDo.live.done_by_user_in_date_range(
         user, from_date, to_date).order_by('-pk'):
-      if to_do.project not in self.projects:
-        self.projects[to_do.project] = WhatIDidPerProject(
+      if to_do.project not in projects:
+        projects[to_do.project] = WhatIDidPerProject(
             to_do.project, current_query_dict)
-      self.projects[to_do.project].to_dos.append(to_do)
+      projects[to_do.project].to_dos.append(to_do)
+    return sorted(list(projects.values()), key=lambda x: x.name)
 
   def as_html(self):
     template = loader.get_template('what_i_did.html')
-    context = {'projects': list(self.projects.values())}
+    context = {'projects': self.projects}
     return template.render(context)
 
 
