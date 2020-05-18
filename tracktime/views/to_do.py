@@ -59,7 +59,7 @@ def to_do_done(request):
 @login_required
 @ajax
 def delete_to_do(request):
-  _ajax_to_do(request).delete()
+  _ajax_to_do(request).mark_deleted()
   return OK
 
 
