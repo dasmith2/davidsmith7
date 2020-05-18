@@ -45,8 +45,9 @@ class ToDoTableTests(TestCase):
     to_do = ToDo.live.filter(user=self.user, project=self.project).first()
     description = TextAreaField(
         'edit_description', default='Hello world!', required=False)
+    buttons = [Button('Save'), Button('Done'), Button('Delete')]
     table.rows[1].assertEqual(Row([
-        description, [Button('Done'), Button('Delete')]], pk=to_do.pk))
+        description, buttons], pk=to_do.pk))
 
   def test_new_to_do_all_projects(self):
     table = ToDoTable(
@@ -61,9 +62,9 @@ class ToDoTableTests(TestCase):
         project_field(self.user),
         TextAreaField('new_description', required=True),
         Button('New to do', button_type='submit')]))
+    buttons = [Button('Save'), Button('Done'), Button('Delete')]
     table.rows[1].assertEqual(Row(
-        ['My rad project', description, [Button('Done'), Button('Delete')]],
-        pk=to_do.pk))
+        ['My rad project', description, buttons], pk=to_do.pk))
 
   def test_blank_to_do_required(self):
     table = ToDoTable(self.user, self.project, {

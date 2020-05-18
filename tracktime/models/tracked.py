@@ -24,13 +24,17 @@ IN_PROGRESS = 'IN_PROGRESS'
 
 
 class TrackedManager(PublishedManager):
-  def by_user_and_date(self, user, date):
-    return self.by_user_and_date_range(user, date, date)
+  def by_user_and_date(self, user, date, nnow=None):
+    return self.by_user_and_date_range(user, date, date, nnow=nnow)
 
-  def by_user_and_date_range(self, user, from_date, to_date):
-    return self.filter(
+  def by_user_and_date_range(self, user, from_date, to_date, nnow=None):
+    to_return = []
+    for tracked in self.filter(
         user=user, date__gte=from_date, date__lte=to_date).select_related(
-        'project', 'user').order_by('-pk')
+            'project', 'user').order_by('-pk'):
+      if not tracked.abandoned(nnow=nnow):
+        to_return.append(tracked)
+    return to_return
 
   def total_hours_per_date(self, start_date, end_date, user):
     if start_date > end_date:
@@ -87,7 +91,7 @@ class Tracked(Published):
 
   def describe_time_span(self, tz_str=None):
     if self.started and self.stopped:
-      started = tz_dt_to_tz_dt(self.started, tz_str=tz_str)
+      started = self.get_started(tz_str=tz_str)
       stopped = tz_dt_to_tz_dt(self.stopped, tz_str=tz_str)
       from_string = tz_dt_to_str(started)
       if started.date() == stopped.date():
@@ -99,6 +103,9 @@ class Tracked(Published):
     elif self.date and self.hours:
       return '{}, {} hours'.format(
           d_to_str(self.date), round(self.hours, 2))
+    elif self.clock_running():
+      started = self.get_started(tz_str=tz_str)
+      return '{}, still working'.format(tz_dt_to_str(started))
 
   def stop(self, nnow=None):
     nnow = nnow or now()
@@ -119,7 +126,7 @@ class Tracked(Published):
 
   def abandoned(self, nnow=None):
     nnow = nnow or now()
-    return not self.stopped and (
+    return self.started and not self.stopped and (
         self.started < nnow - timedelta(hours=ABANDONED_AFTER_HOURS))
 
   def explain_why_can_not_stop(self, nnow=None):
