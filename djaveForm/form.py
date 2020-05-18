@@ -1,5 +1,6 @@
 from djaveForm.button import Button
 from djaveForm.field import Field
+from djaveURL import dict_as_query
 
 
 class Form(object):
@@ -44,6 +45,7 @@ class Form(object):
     return self._form_data_set
 
   def set_form_data(self, values):
+    values = values or {}
     self._form_data_set = True
     for form_element in self.form_elements:
       key_present = form_element.key() in values
@@ -55,3 +57,12 @@ class Form(object):
         else:
           raise Exception('I do not know how to set the value of a {}'.format(
               form_element.__class__))
+
+  def to_query_string(self):
+    return dict_as_query(self.to_query_dict())
+
+  def to_query_dict(self):
+    query_dict = {}
+    for form_element in self.form_elements:
+      query_dict[form_element.key()] = form_element.get_value_or_default()
+    return query_dict

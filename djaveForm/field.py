@@ -3,6 +3,7 @@ from datetime import date
 import html
 
 from django.utils.dateparse import parse_date
+from django.utils.safestring import mark_safe
 from djaveForm.form_element import FormElement
 from djaveTable.problem import Problem
 
@@ -10,7 +11,8 @@ from djaveTable.problem import Problem
 class Field(FormElement):
   # You can put djaveForm fields in djaveTables.
   def __init__(
-      self, key_prefix, required=False, default=None, pk=None, value=None):
+      self, key_prefix, required=False, default=None, pk=None, value=None,
+      label=None):
     super().__init__(key_prefix, pk)
     self.required = required
     self.default = default
@@ -19,6 +21,8 @@ class Field(FormElement):
     self._value_set = False
     if value is not None and value != '':
       self.set_value(value)
+
+    self.label = label
 
   def set_value(self, value):
     if value == '':
@@ -43,6 +47,11 @@ class Field(FormElement):
       return self.default
     return ''
 
+  def get_value_or_default(self):
+    if self._value_set:
+      return self.value
+    return self.default
+
   def explain_why_not_valid(self):
     if self.required and not self.value:
       return 'Required'
@@ -66,7 +75,10 @@ class Field(FormElement):
       why_invalid = self.explain_why_not_valid()
       if why_invalid:
         error_html = Problem(why_invalid).as_html()
-    return '{}\n{}'.format(widget_html, error_html)
+    html = '{}\n{}'.format(widget_html, error_html)
+    if self.label:
+      html = '<label>{} {}</label>'.format(self.label, html)
+    return mark_safe(html)
 
   def widget_html(self):
     raise NotImplementedError('widget_html')

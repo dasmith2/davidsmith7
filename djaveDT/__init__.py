@@ -22,12 +22,16 @@ def tz_dt_to_str(tz_dt, tz_str=None):
   return dt_to_str(tz_dt)
 
 
+def d_to_str(d):
+  return d.strftime('%b. %d, %Y')
+
+
 def dt_to_str(tz_dt):
   return ''.join([dt_to_date_str(tz_dt), ', ', dt_to_time_str(tz_dt)])
 
 
 def dt_to_date_str(tz_dt):
-  return tz_dt.strftime('%b. %d, %Y')
+  return d_to_str(tz_dt.date())
 
 
 def dt_to_time_str(tz_dt, tz_str=None):
@@ -132,11 +136,22 @@ def str_to_tz_dt(dt_str, tz_str=None):
   return naive_dt_to_tz_dt(str_to_naive_dt(dt_str), tz_str)
 
 
+def d_to_naive_dt(d):
+  return datetime(d.year, d.month, d.day)
+
+
 def naive_dt_to_tz_dt(naive, tz_str=None):
-  # I THINK is_dst is is daylight savings time and is only used in weird corner
+  # If you hand this thing noon it'll return noon in New York or whatever. I
+  # THINK is_dst is is daylight savings time and is only used in weird corner
   # cases.
   tz_str = tz_str or settings.TIME_ZONE
   return pytz.timezone(tz_str).localize(naive, is_dst=None)
+
+
+def beginning_of_day(d, tz_str=None):
+  """ Given a plain old date, this will return the beginning of that day in
+  New York time or whatever. """
+  return naive_dt_to_tz_dt(d_to_naive_dt(d), tz_str=tz_str)
 
 
 def tz_dt_to_tz_dt(tz_dt, tz_str=None):

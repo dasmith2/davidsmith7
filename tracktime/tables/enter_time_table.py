@@ -34,7 +34,7 @@ class EnterTimeTable(Table):
     # load this user's Trackeds.
     self.setup_enter_new()
 
-    tracked = Tracked.live.by_user_and_day(self.user, self.day)
+    tracked = Tracked.live.by_user_and_date(self.user, self.day)
     self.setup_edit_existing(tracked)
 
     hours = self.total_hours(tracked)

@@ -158,6 +158,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'djavError',
+    'djaveReport',
     'djaveS3',
     'djaveThread'] + THIS_SITE_INSTALLED_APPS
 

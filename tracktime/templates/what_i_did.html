@@ -1,0 +1,11 @@
+{% for project in projects %}
+<h1>
+  {{ project.name }}:
+  <a href="{{ project.hours_breakdown_url }}">{{ project.hours }} hours</a>
+</h1>
+<ul>
+  {% for to_do in project.to_dos %}
+    <li>{{ to_do.description }}</li>
+  {% endfor %}
+</ul>
+{% endfor %}

@@ -39,6 +39,28 @@ function get_query_string_obj(search) {
   return obj;
 }
 
+function refresh_with_query_string(query_str_or_obj) {
+  var str = query_str_or_obj;
+  if (typeof(query_str_or_obj) == 'object') {
+    str = query_string_obj_to_str(strip_empty_values(query_str_or_obj));
+  }
+  window.location = window.location.pathname + str;
+}
+
+function strip_empty_values(query_string_obj) {
+  var delete_attrs = [];
+  for (key in query_string_obj) {
+    var value = query_string_obj[key];
+    if (value === null || value === '') {
+      delete_attrs.push(key);
+    }
+  }
+  for (var i = 0; i < delete_attrs.length; i++) {
+    delete query_string_obj[delete_attrs[i]];
+  }
+  return query_string_obj;
+}
+
 function refresh_with_qs(key, value) {
   // Go to the exact same URL we're on with one difference: the query string
   // key=value. Or, if value is null, with that query string variable not set.
@@ -50,6 +72,4 @@ function refresh_with_qs(key, value) {
   } else {
     search_obj[key] = value;
   }
-  window.location = (
-      window.location.pathname + query_string_obj_to_str(search_obj));
 }

@@ -3,7 +3,8 @@
     margin-top: 40px; background-color: #eee; border: 1px solid #aaa;
     padding: 10px; }
 .when div.two_before { margin-top: 0px; }
-.when h1, .when div { margin-top: 10px; }
+.when div { margin-top: 12px; }
+.when .current { font-size: 37px; }
 .when .one_before a, .when .one_after a { font-size: 20px; }
 .when .two_before a, .when .two_after a { font-size: 15px; }
 </style>
@@ -21,7 +22,9 @@ function append_day_info_to_date_roller(date_info_lookup) {
 <div class="when">
   {% for day in days %}
     {% if day.is_current %}
-      <h1>{{ day.text }} <span data-date-str="{{ day.date_str }}"></span></h1>
+      <div class="current">
+        {{ day.text }} <span data-date-str="{{ day.date_str }}"></span>
+      </div>
     {% else %}
       <div class="{{ day.css_class }}">
         <a href="{{ day.url }}">

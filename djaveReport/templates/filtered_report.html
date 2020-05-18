@@ -1,0 +1,49 @@
+{% comment %}You'll need to include "js/query_string.js" in this_site.js{% endcomment %}
+<style>
+  .filtered_report { margin-top: 40px; }
+  .filters { display: flex; }
+  .filter { margin-right: 10px; }
+  .buttons { margin-top: 10px; }
+  .contents { margin-top: 30px; }
+</style>
+<script>
+function filter_report() {
+  var button = $(this);
+  var filters = button.parents('.filtered_report').find(
+      '.filter input,.filter select');
+  var query_string_obj = get_query_string_obj();
+  for (var i = 0; i < filters.length; i++) {
+    var filter = $(filters[i]);
+    var name = filter.attr('name');
+    var value = filter.val();
+    query_string_obj[name] = value;
+  }
+  refresh_with_query_string(query_string_obj);
+}
+
+function setup_report_button() {
+  // Just in case this script gets put on the page more than once.
+  if (typeof window.report_button_is_setup === 'boolean') {
+    return;
+  }
+  window.report_button_is_setup = true;
+  $('.report').click(filter_report);
+}
+$(setup_report_button);
+</script>
+
+<div class="filtered_report">
+  <div class="filters">
+    {% for filter in filters %}
+      <div class="filter">{{ filter.as_html }}</div>
+    {% endfor %}
+  </div>
+  <div class="buttons">
+    {{ report_button.as_html }}
+  </div>
+  <div class="contents">
+    {% for content in contents %}
+      <div class="content">{{ content.as_html }}</div>
+    {% endfor %}
+  </div>
+</div>

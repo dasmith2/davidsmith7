@@ -1,0 +1,16 @@
+<style>
+.tracked { margin: 5px 0px 0px 0px; font-size: 20px; }
+.to_do { margin: 5px 0px 0px 20px; }
+.entries { margin-top: 40px; }
+</style>
+{% if project %}
+<h1>{{ project.name }}: {{ total }} hours</h1>
+{% else %}
+<h1>Total: {{ total }} hours</h1>
+{% endif %}
+
+<div class="entries">
+  {% for entry in time_breakdown_entries %}
+    <div class="{{ entry.css_class }}">{{ entry.content }}</div>
+  {% endfor %}
+</div>

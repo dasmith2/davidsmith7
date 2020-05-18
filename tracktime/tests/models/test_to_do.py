@@ -1,3 +1,5 @@
+from datetime import date
+
 from djaveTest import TestCase, get_test_user
 from djaveDT import str_to_tz_dt
 
@@ -23,6 +25,32 @@ def get_test_to_do(**kwargs):
         created=str_to_tz_dt(kwargs['created']))
     to_do.refresh_from_db()
   return to_do
+
+
+class DoneByUserInDateRangeTests(TestCase):
+  def setUp(self):
+    super().setUp()
+    self.user = get_test_user()
+
+    get_test_to_do(
+        user=self.user, done=str_to_tz_dt('2020-01-14 12:00'))
+    self.fifteenth = get_test_to_do(
+        user=self.user, done=str_to_tz_dt('2020-01-15 12:00'))
+    self.sixteenth = get_test_to_do(
+        user=self.user, done=str_to_tz_dt('2020-01-16 12:00'))
+    get_test_to_do(
+        user=self.user, done=str_to_tz_dt('2020-01-17 12:00'))
+
+    # Irrelevant
+    get_test_to_do(  # Other user
+        user=get_test_user(), done=str_to_tz_dt('2020-01-15 12:00'))
+    self.fifteenth = get_test_to_do(user=self.user)  # Not done
+
+  def test_done_by_user_in_date_range(self):
+    self.assertEqual(
+        [self.fifteenth, self.sixteenth],
+        ToDo.live.done_by_user_in_date_range(
+            self.user, date(2020, 1, 15), date(2020, 1, 16)))
 
 
 class ToDoTests(TestCase):

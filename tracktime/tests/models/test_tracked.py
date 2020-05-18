@@ -173,18 +173,20 @@ class PerDayTests(TestCase):
     self.user = get_test_user()
     self.fifteenth = get_test_tracked(
         date='2020-01-15', hours=1.0, user=self.user)
-    get_test_tracked(date='2020-01-16', hours=2.0, user=self.user)
+    self.sixteenth = get_test_tracked(
+        date='2020-01-16', hours=2.0, user=self.user)
 
     # Irrelevant
-    get_test_tracked(date='2020-01-13', hours=3.0, user=self.user)  # Wrong day
+    get_test_tracked(
+        date='2020-01-13', hours=3.0, user=self.user)  # Wrong day
     get_test_tracked(  # Deleted
         date='2020-01-15', hours=1.0, user=self.user,
         deleted=str_to_tz_dt('2020-01-01'))
     # Wrong user
     get_test_tracked(date='2020-01-15', hours=4.0, user=get_test_user())
 
-  def test_total_hours_per_day(self):
-    got = Tracked.live.total_hours_per_day(
+  def test_total_hours_per_date(self):
+    got = Tracked.live.total_hours_per_date(
         date(2020, 1, 14), date(2020, 1, 17), self.user)
     expected = {
         '2020-01-14': '(0.0 hrs)',
@@ -193,6 +195,10 @@ class PerDayTests(TestCase):
         '2020-01-17': '(0.0 hrs)'}
     self.assertEqual(expected, got)
 
-  def test_by_user_and_day(self):
-    self.assertEqual([self.fifteenth], list(Tracked.live.by_user_and_day(
+  def test_by_user_and_date(self):
+    self.assertEqual([self.fifteenth], list(Tracked.live.by_user_and_date(
         self.user, date(2020, 1, 15))))
+    self.assertEqual(
+        [self.fifteenth, self.sixteenth],
+        list(Tracked.live.by_user_and_date_range(
+            self.user, date(2020, 1, 15), date(2020, 1, 16))))

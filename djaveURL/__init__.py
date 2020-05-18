@@ -47,6 +47,18 @@ def query_as_dict(request_get_full_path):
   return dict(parse_qsl(query_str))
 
 
+def dict_as_query(query_dict):
+  key_values = []
+  for key, value in query_dict.items():
+    if value is not None and value != '':
+      if isinstance(value, date):
+        value = date_to_url_str(value)
+      key_values.append('{}={}'.format(key, value))
+  if not key_values:
+    return ''
+  return '?{}'.format('&'.join(key_values))
+
+
 def url_with(request_get_full_path, **kwargs):
   # Add the given key value pairs to the query string. Why is this so hard haha
   # request_get_full_path can be a request object or a string.

@@ -3,7 +3,9 @@ from datetime import timedelta
 from django.contrib.auth.models import User
 from django.db import models
 from djaveAPI.published import Published, PublishedManager
-from djaveDT import now, dt_for_json, d_for_json
+from djaveDT import (
+    now, dt_for_json, d_for_json, d_to_str, time_to_time_str, tz_dt_to_tz_dt,
+    tz_dt_to_str, beginning_of_day)
 from djaveNav import date_to_url_str
 
 from tracktime.models.project import Project
@@ -22,26 +24,30 @@ IN_PROGRESS = 'IN_PROGRESS'
 
 
 class TrackedManager(PublishedManager):
-  def by_user_and_day(self, user, day):
-    return self.filter(user=user, date=day).select_related(
-        'project').order_by('-pk')
+  def by_user_and_date(self, user, date):
+    return self.by_user_and_date_range(user, date, date)
 
-  def total_hours_per_day(self, start_day, end_day, user):
-    if start_day > end_day:
-      raise Exception('{} > {}'.format(start_day, end_day))
+  def by_user_and_date_range(self, user, from_date, to_date):
+    return self.filter(
+        user=user, date__gte=from_date, date__lte=to_date).select_related(
+        'project', 'user').order_by('-pk')
+
+  def total_hours_per_date(self, start_date, end_date, user):
+    if start_date > end_date:
+      raise Exception('{} > {}'.format(start_date, end_date))
     got_tracked = self.filter(
-        date__gte=start_day, date__lte=end_day, user=user).order_by('date')
-    on_day = start_day
-    totals = {date_to_url_str(on_day): 0.0}
+        date__gte=start_date, date__lte=end_date, user=user).order_by('date')
+    on_date = start_date
+    totals = {date_to_url_str(on_date): 0.0}
     for tracked in got_tracked:
-      while tracked.date > on_day:
-        on_day += timedelta(days=1)
-        totals[date_to_url_str(on_day)] = 0.0
+      while tracked.date > on_date:
+        on_date += timedelta(days=1)
+        totals[date_to_url_str(on_date)] = 0.0
       if tracked.hours:
         totals[date_to_url_str(tracked.date)] += tracked.hours
-    while on_day < end_day:
-      on_day += timedelta(days=1)
-      totals[date_to_url_str(on_day)] = 0.0
+    while on_date < end_date:
+      on_date += timedelta(days=1)
+      totals[date_to_url_str(on_date)] = 0.0
     for key in totals:
       use_format = '({} hrs)'
       if totals[key] == 1:
@@ -79,6 +85,21 @@ class Tracked(Published):
   stopped = models.DateTimeField(blank=True, null=True, help_text=(
       'When did the user finish working?'))
 
+  def describe_time_span(self, tz_str=None):
+    if self.started and self.stopped:
+      started = tz_dt_to_tz_dt(self.started, tz_str=tz_str)
+      stopped = tz_dt_to_tz_dt(self.stopped, tz_str=tz_str)
+      from_string = tz_dt_to_str(started)
+      if started.date() == stopped.date():
+        to_string = time_to_time_str(stopped.time())
+      else:
+        to_string = tz_dt_to_str(stopped)
+      return '{} to {}, {} hours'.format(
+          from_string, to_string, round(self.hours, 2))
+    elif self.date and self.hours:
+      return '{}, {} hours'.format(
+          d_to_str(self.date), round(self.hours, 2))
+
   def stop(self, nnow=None):
     nnow = nnow or now()
     why_not = self.explain_why_can_not_stop(nnow=nnow)
@@ -87,6 +108,11 @@ class Tracked(Published):
     self.stopped = nnow
     self.hours = self._calculate_hours(self.stopped)
     self.save()
+
+  def get_started(self, tz_str=None):
+    return tz_dt_to_tz_dt(
+        self.started or beginning_of_day(self.date, tz_str=tz_str),
+        tz_str=tz_str)
 
   def clock_running(self, nnow=None):
     return self.started and not self.stopped and not self.abandoned(nnow=nnow)

@@ -1,7 +1,9 @@
+from datetime import timedelta
+
 from django.contrib.auth.models import User
 from django.db import models
 from djaveAPI.published import Published, PublishedManager
-from djaveDT import dt_for_json
+from djaveDT import dt_for_json, beginning_of_day
 
 from tracktime.models.project import Project
 
@@ -18,6 +20,13 @@ class ToDoManager(PublishedManager):
     if project:
       filtered = filtered.filter(project=project)
     return filtered
+
+  def done_by_user_in_date_range(self, user, from_date, to_date, tz_str=None):
+    from_dt = beginning_of_day(from_date, tz_str=tz_str)
+    to_dt = beginning_of_day(to_date + timedelta(days=1), tz_str=tz_str)
+    return self.filter(
+        user=user, done__gte=from_dt, done__lte=to_dt).select_related(
+        'project', 'user').order_by('-pk')
 
 
 class ToDo(Published):

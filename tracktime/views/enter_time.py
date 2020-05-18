@@ -26,7 +26,7 @@ def enter_time(request):
   enter_time_table = EnterTimeTable(
       user=request.user, day=day, form_data=request.POST)
   date_roller = DateRoller(ENTER_TIME, day, max_day=date.today())
-  totals = Tracked.live.total_hours_per_day(
+  totals = Tracked.live.total_hours_per_date(
       day - timedelta(days=2), day + timedelta(days=2), request.user)
   context = tt_ui_context(
       ENTER_TIME,
@@ -34,7 +34,7 @@ def enter_time(request):
       date_roller=date_roller,
       punch_the_clock_table=punch_the_clock_table,
       enter_time_table=enter_time_table,
-      total_hours_per_day=json.dumps(totals))
+      total_hours_per_date=json.dumps(totals))
   return render(request, 'enter_time.html', context)
 
 
@@ -45,5 +45,5 @@ def delete_tracked(request):
   tracked = Tracked.live.filter(pk=pk).first()
   if not tracked:
     raise AjaxProblem('This Tracked does not exist')
-  tracked.delete()
+  tracked.mark_deleted()
   return OK

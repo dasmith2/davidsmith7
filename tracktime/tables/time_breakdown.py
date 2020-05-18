@@ -1,0 +1,89 @@
+from collections import namedtuple
+from datetime import timedelta
+
+from django.template import loader
+from djaveDT import now
+from djaveReport.date_range_report import DateRangeReport
+
+from tracktime.models.project import Project
+from tracktime.models.to_do import ToDo
+from tracktime.models.tracked import Tracked
+
+
+class TimeBreakdown(DateRangeReport):
+  def __init__(self, request_get, user, nnow=None):
+    nnow = nnow or now()
+    default_from_date = nnow.date() - timedelta(days=7)
+    default_to_date = nnow.date()
+    super().__init__(default_from_date, default_to_date, request_get)
+
+    self.project = None
+    if 'project' in request_get:
+      self.project = Project.live.filter(pk=request_get['project']).first()
+
+    content = TimeBreakdownContent(
+        user, self.project, self.from_date(), self.to_date())
+    self.add_content(content)
+
+
+class TimeBreakdownContent(object):
+  def __init__(self, user, project, from_date, to_date, tz_str=None):
+    self.user = user
+    self.project = project
+    self.tz_str = tz_str
+
+    self.time_breakdown_entries = []
+
+    tracked_i = 0
+    trackeds = list(Tracked.live.by_user_and_date_range(
+        user, from_date, to_date))
+    trackeds.sort(key=lambda x: x.get_started(tz_str=tz_str))
+
+    to_do_i = 0
+    to_dos = list(ToDo.live.done_by_user_in_date_range(
+        user, from_date, to_date).order_by('done'))
+
+    self.total = 0.0
+    show_project = not project
+    while tracked_i < len(trackeds) or to_do_i < len(to_dos):
+      to_append = None
+      if tracked_i >= len(trackeds) or (
+          to_do_i < len(to_dos) and (
+              trackeds[tracked_i].get_started(tz_str=tz_str) > (
+                  to_dos[to_do_i].done))):
+        to_do = to_dos[to_do_i]
+        to_do_i += 1
+        if to_do.project == project or not project:
+          to_append = self._to_do_entry(to_do, show_project)
+      else:
+        tracked = trackeds[tracked_i]
+        tracked_i += 1
+        if tracked.project == project or not project:
+          to_append = self._tracked_entry(tracked, show_project)
+          if tracked.hours:
+            self.total += tracked.hours
+      if to_append:
+        self.time_breakdown_entries.append(to_append)
+
+  def _tracked_entry(self, tracked, show_project):
+    description = tracked.describe_time_span(self.tz_str)
+    if show_project:
+      description = '{} {}'.format(tracked.project.name, description)
+    return TimeBreakdownEntry('tracked', description)
+
+  def _to_do_entry(self, to_do, show_project):
+    description = to_do.description
+    if show_project:
+      description = '{} {}'.format(to_do.project.name, description)
+    return TimeBreakdownEntry('to_do', description)
+
+  def as_html(self):
+    template = loader.get_template('time_breakdown.html')
+    context = {
+        'time_breakdown_entries': self.time_breakdown_entries,
+        'project': self.project,
+        'total': round(self.total, 2)}
+    return template.render(context)
+
+
+TimeBreakdownEntry = namedtuple('TimeBreakdownEntry', 'css_class content')
