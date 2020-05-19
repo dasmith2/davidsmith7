@@ -91,50 +91,74 @@ function wire_up_ajax_save_text(
     text_box_selector, action_url, text_field_name, success) {
   /* This is for text boxes in tables so you can edit names and descriptions
    * inline with AJAX. Once you start editing a text box, this hides all the
-   * other buttons and gives the user a bogus "Save" button to click. Once the
-   * text is actually saved due to the change event, remove the "Save" button
-   * and put all the original buttons back. This ensures that we don't get a
-   * race between the AJAX that this text box kicks off with the AJAX that
-   * clicked buttons kick off. */
+   * other buttons and gives the user "Save" and "Cancel" buttons. */
   var get_other_buttons = function(text_box) {
     return text_box.parents('tr').find('button,.button');
   };
-  $(text_box_selector).keyup(function() {
+  $(text_box_selector).each(function() {
     var text_box = $(this);
-    var other_buttons = get_other_buttons(text_box).hide();
-    var cell = other_buttons.parents('td');
-    var bogus_save_button = cell.find('.bogus-save');
-    if (!bogus_save_button.length) {
-      bogus_save_button = $(
-          '<button class="bogus-save" type="button">Save</button>');
-      bogus_save_button.appendTo(cell).click(function() {
-        $(this).prop('disabled', true);
-      });
-    }
-    bogus_save_button.prop('disabled', false).show();
-  }).change(function() {
+    text_box.attr('data-saved-text', text_box.val());
+  });
+  $(text_box_selector).keyup(function(event) {
+    /* Make sure all the buttons, variables, and functions are set up */
     var text_box = $(this);
+    var feedback = get_feedback_elt_after(text_box);
     var other_buttons = get_other_buttons(text_box);
     var cell = other_buttons.parents('td');
-    var bogus_save_button = cell.find('.bogus-save');
-    var pk = find_pk(text_box);
-    var data = {pk: pk};
-    data[text_field_name] = text_box.val()
-    var feedback = get_feedback_elt_after(text_box);
-    post(action_url, data, function(response) {
-      if (!show_problem(response, feedback)) {
-        other_buttons.show();
-        bogus_save_button.hide();
-        feedback.show().text('Saved!');
-        if (success) {
-          success();
-        }
-        window.setTimeout(function() {
-          feedback.text('');
-        }, 1000);
-      }
-    }).fail(function() {
-      alert('Server error :(');
-    });
+    var save_text_button = cell.find('.save-text');
+    var cancel_save_text_button = cell.find('.cancel-save-text');
+
+    var turn_on_edit_text_mode = function() {
+      other_buttons.hide();
+      cell.find('.save-text,.cancel-save-text').show().prop('disabled', false);
+    };
+
+    var turn_off_edit_text_mode = function() {
+      other_buttons.show();
+      cell.find('.save-text,.cancel-save-text').hide();
+    };
+
+    if (!save_text_button.length) {
+      var save_html = '<button class="save-text" type="button">Save</button>';
+      save_text_button = $(save_html).appendTo(cell).hide();
+      var cancel_html =
+          '<button class="cancel-save-text" type="button">Cancel</button>';
+      cancel_save_text_button = $(cancel_html).appendTo(cell).hide();
+
+      save_text_button.click(function() {
+        save_text_button.prop('disabled', true);
+        cancel_save_text_button.prop('disabled', true);
+        var pk = find_pk(text_box);
+        var data = {pk: pk};
+        data[text_field_name] = text_box.val()
+        post(action_url, data, function(response) {
+          if (!show_problem(response, feedback)) {
+            turn_off_edit_text_mode();
+            feedback.show().text('Saved!');
+            text_box.attr('data-saved-text', text_box.val());
+            if (success) {
+              success();
+            }
+            window.setTimeout(function() {
+              feedback.text('');
+            }, 1000);
+          }
+        }).fail(function() {
+          feedback.show().text('Server error :(');
+        });
+      });
+
+      cancel_save_text_button.click(function() {
+        text_box.val(text_box.attr('data-saved-text'));
+        turn_off_edit_text_mode();
+      });
+    }
+
+    /* Actually respond to the event. */
+    if (text_box.attr('data-saved-text') == text_box.val()) {
+      turn_off_edit_text_mode();
+    } else {
+      turn_on_edit_text_mode();
+    }
   });
 }
