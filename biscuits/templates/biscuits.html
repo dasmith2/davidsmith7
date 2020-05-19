@@ -1,6 +1,6 @@
 {% extends "this_site.html" %}
 
-{% block this_site_head %}
+{% block this_section_head %}
   {% include "photo_upload_js_and_style.html" %}
   <style>
     img { width: 500px; }
@@ -31,7 +31,7 @@ $(function() {
 });
 
   </script>
-{% endblock this_site_head %}
+{% endblock this_section_head %}
 
 {% block this_site_body %}
   {{ nav.as_html|safe }}

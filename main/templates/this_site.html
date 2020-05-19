@@ -1,15 +1,17 @@
 {% extends "all_sites.html" %}
 
-{% comment %}Feel free to modify this file on specific sites.{% endcomment %}
+{% comment %}
+Feel free to modify this file on specific sites. The templates for the various sections of your website should inherit from this template.
+{% endcomment %}
 
-{% block all_sites_head %}
-  <link rel="stylesheet" href="/css/this_site.css">
+{% block this_site_head %}
   <script src="/js/this_site.js"></script>
-  {% block this_site_head %}
-  {% endblock this_site_head %}
-{% endblock all_sites_head %}
+  <link rel="stylesheet" href="/css/this_site.css">
+  {% block this_section_head %}
+  {% endblock this_section_head %}
+{% endblock this_site_head %}
 
-{% block all_sites_body %}
-  {% block this_site_body %}
-  {% endblock this_site_body %}
-{% endblock all_sites_body %}
+{% block this_site_body %}
+  {% block this_section_body %}
+  {% endblock this_section_body %}
+{% endblock this_site_body %}
