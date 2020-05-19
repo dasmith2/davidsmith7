@@ -1,3 +1,5 @@
+import time
+
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.shortcuts import reverse, render
@@ -36,6 +38,7 @@ def projects_context(table, **kwargs):
 @login_required
 @ajax
 def rename_project(request):
+  time.sleep(1)  # DO NOT SUBMIT
   project = get_ajax_project(request)
   name = get_ajax_variable(request.POST, 'name')
   if Project.all.filter(~Q(pk=project.pk), name=name).exists():

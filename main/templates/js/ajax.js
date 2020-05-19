@@ -95,7 +95,7 @@ function wire_up_ajax_save_text(
    * text is actually saved due to the change event, remove the "Save" button
    * and put all the original buttons back. This ensures that we don't get a
    * race between the AJAX that this text box kicks off with the AJAX that
-   * clicked buttons kick off.  */
+   * clicked buttons kick off. */
   var get_other_buttons = function(text_box) {
     return text_box.parents('tr').find('button,.button');
   };
@@ -106,9 +106,12 @@ function wire_up_ajax_save_text(
     var bogus_save_button = cell.find('.bogus-save');
     if (!bogus_save_button.length) {
       bogus_save_button = $(
-          '<button class="bogus-save">Save</button>').appendTo(cell);
+          '<button class="bogus-save" type="button">Save</button>');
+      bogus_save_button.appendTo(cell).click(function() {
+        $(this).prop('disabled', true);
+      });
     }
-    bogus_save_button.show();
+    bogus_save_button.prop('disabled', false).show();
   }).change(function() {
     var text_box = $(this);
     var other_buttons = get_other_buttons(text_box);
