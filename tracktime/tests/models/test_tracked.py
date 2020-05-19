@@ -15,13 +15,18 @@ def get_test_tracked(**kwargs):
   project = kwargs.get('project', None)
   if not project:
     project = get_test_project(**kwargs)
+  started = to_tz_dt(kwargs.get('started', None))
+  stopped = to_tz_dt(kwargs.get('stopped', None))
+  hours = kwargs.get('hours', None)
+  if started and stopped and not hours:
+    hours = round((stopped - started).total_seconds() / 3600, 2)
   return Tracked.live.create(
       user=user,
       project=project,
       date=to_d(kwargs.get('date', date(2020, 1, 1))),
-      hours=kwargs.get('hours', 1),
-      started=to_tz_dt(kwargs.get('started', None)),
-      stopped=to_tz_dt(kwargs.get('stopped', None)),
+      hours=hours,
+      started=started,
+      stopped=stopped,
       deleted=to_tz_dt(kwargs.get('deleted', None)))
 
 
@@ -134,7 +139,6 @@ class StatusTests(TestCase):
   def test_status(self):
     tracked = get_test_tracked(
         date='2020-01-15',
-        hours=2.0,
         started='2020-01-15 12:00')
     self.assertEqual(
         IN_PROGRESS, tracked.status(nnow=str_to_tz_dt('2020-01-15 13:00')))
@@ -150,7 +154,6 @@ class JSONTests(TestCase):
   def test_as_json(self):
     tracked = get_test_tracked(
         date='2020-01-15',
-        hours=2.0,
         started='2020-01-15 12:00')
     self.assertEqual(date(2020, 1, 15), tracked.date)
     expected = dict(
@@ -158,7 +161,7 @@ class JSONTests(TestCase):
         user=tracked.user.pk,
         project=tracked.project.pk,
         date='2020-01-15',
-        hours=2.0,
+        hours=None,
         started='2020-01-15T12:00:00-05:00',
         stopped=None,
         deleted=None,
@@ -195,10 +198,10 @@ class PerDayTests(TestCase):
         '2020-01-17': '(0.0 hrs)'}
     self.assertEqual(expected, got)
 
-  def test_by_user_and_date(self):
-    self.assertEqual([self.fifteenth], list(Tracked.live.by_user_and_date(
+  def test_done_by_user_and_date(self):
+    self.assertEqual([self.fifteenth], list(Tracked.live.done_by_user_and_date(
         self.user, date(2020, 1, 15))))
     self.assertEqual(
         set([self.fifteenth, self.sixteenth]),
-        set(Tracked.live.by_user_and_date_range(
+        set(Tracked.live.done_by_user_and_date_range(
             self.user, date(2020, 1, 15), date(2020, 1, 16))))

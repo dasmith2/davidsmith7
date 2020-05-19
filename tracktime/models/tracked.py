@@ -24,15 +24,15 @@ IN_PROGRESS = 'IN_PROGRESS'
 
 
 class TrackedManager(PublishedManager):
-  def by_user_and_date(self, user, date, nnow=None):
-    return self.by_user_and_date_range(user, date, date, nnow=nnow)
+  def done_by_user_and_date(self, user, date, nnow=None):
+    return self.done_by_user_and_date_range(user, date, date, nnow=nnow)
 
-  def by_user_and_date_range(self, user, from_date, to_date, nnow=None):
+  def done_by_user_and_date_range(self, user, from_date, to_date, nnow=None):
     to_return = []
     for tracked in self.filter(
         user=user, date__gte=from_date, date__lte=to_date).select_related(
             'project', 'user').order_by('-pk'):
-      if not tracked.abandoned(nnow=nnow):
+      if tracked.status(nnow=nnow) == DONE:
         to_return.append(tracked)
     return to_return
 
@@ -88,6 +88,13 @@ class Tracked(Published):
       'When did the user start work?'))
   stopped = models.DateTimeField(blank=True, null=True, help_text=(
       'When did the user finish working?'))
+
+  def save(self, *args, **kwargs):
+    if self.hours and self.started and not self.stopped:
+      raise Exception(
+          'It does not make sense to save a Tracked with hours when it has a '
+          'start time but no stop time')
+    super().save(*args, **kwargs)
 
   def describe_time_span(self, tz_str=None):
     if self.started and self.stopped:
@@ -162,7 +169,7 @@ class Tracked(Published):
   def __repr__(self, nnow=None):
     return '<Tracked {}: {} {} {} {} for {} hrs>'.format(
         self.pk, self.user.username, self.project.name,
-        self.date, self.hours, self.status(nnow=nnow))
+        self.date, self.status(nnow=nnow), self.hours)
 
   def __str__(self, nnow=None):
     return self.__repr__(nnow=nnow)
@@ -177,6 +184,9 @@ class Tracked(Published):
       if self.abandoned(nnow=nnow):
         return ABANDONED
       return IN_PROGRESS
+    elif self.hours:
+      return DONE
+    raise Exception('I cant figure out what status {} is'.format(self.pk))
 
   live = TrackedManager()
 

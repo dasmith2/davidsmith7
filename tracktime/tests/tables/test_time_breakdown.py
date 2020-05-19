@@ -1,8 +1,8 @@
 from tracktime.tables.time_breakdown import TimeBreakdown, TimeBreakdownEntry
-from tracktime.tests.tables.test_case_with_tt_data import TestCaseWithTTData
+from tracktime.tests.tables.test_case_with_data import TestCaseWithData
 
 
-class TimeBreakdownTests(TestCaseWithTTData):
+class TimeBreakdownTests(TestCaseWithData):
   def setUp(self):
     super().setUp()
 

@@ -35,7 +35,7 @@ class TimeBreakdownContent(object):
     self.time_breakdown_entries = []
 
     tracked_i = 0
-    trackeds = list(Tracked.live.by_user_and_date_range(
+    trackeds = list(Tracked.live.done_by_user_and_date_range(
         user, from_date, to_date))
     trackeds.sort(key=lambda x: x.get_started(tz_str=tz_str))
 

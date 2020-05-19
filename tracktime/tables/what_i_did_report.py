@@ -30,7 +30,7 @@ class WhatIDidReportContent(object):
 
   def get_projects(self, user, from_date, to_date, current_query_dict):
     projects = {}
-    for tracked in Tracked.live.by_user_and_date_range(
+    for tracked in Tracked.live.done_by_user_and_date_range(
         user, from_date, to_date):
       if tracked.hours:
         if tracked.project not in projects:

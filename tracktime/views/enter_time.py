@@ -10,7 +10,7 @@ from djaveURL import date_from_url
 from tracktime.models.tracked import Tracked
 from tracktime.tables.enter_time_table import EnterTimeTable
 from tracktime.tables.punch_the_clock import PunchTheClockTable
-from tracktime.views.util import tt_ui_context, ENTER_TIME
+from tracktime.views.util import tracktime_context, ENTER_TIME
 
 
 @login_required(login_url='/admin/login/')
@@ -28,7 +28,7 @@ def enter_time(request):
   date_roller = DateRoller(ENTER_TIME, day, max_day=date.today())
   totals = Tracked.live.total_hours_per_date(
       day - timedelta(days=2), day + timedelta(days=2), request.user)
-  context = tt_ui_context(
+  context = tracktime_context(
       ENTER_TIME,
       delete_tracked_url=reverse('delete_tracked'),
       date_roller=date_roller,

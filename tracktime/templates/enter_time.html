@@ -29,22 +29,7 @@
 
 <script>
 function wire_up_delete() {
-  $('button.delete').each(function() {
-    var delete_button = $(this);
-    var row = delete_button.parents('tr');
-    var pk = row.attr('data-pk');
-    delete_button.click(function() {
-      post('{{ delete_tracked_url }}', {pk: pk}, function(data) {
-        if (data['problem']) {
-          alert('There was a problem: ' + data['problem']);
-        } else {
-          row.remove();
-        }
-      }).fail(function(data) {
-        alert('There was a server error with status ' + data.status);
-      });
-    });
-  });
+  wire_up_ajax_button('button.delete', '{{ delete_tracked_url }}', remove_row);
 }
 $(wire_up_delete);
 

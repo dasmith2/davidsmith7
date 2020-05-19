@@ -1,10 +1,10 @@
 from django.shortcuts import reverse
 
 from tracktime.tables.what_i_did_report import WhatIDidReport
-from tracktime.tests.tables.test_case_with_tt_data import TestCaseWithTTData
+from tracktime.tests.tables.test_case_with_data import TestCaseWithData
 
 
-class WhatIDidReportTests(TestCaseWithTTData):
+class WhatIDidReportTests(TestCaseWithData):
   def setUp(self):
     super().setUp()
 

@@ -1,14 +1,15 @@
 from datetime import date
 
+from djaveDT import to_tz_dt
 from djaveForm.button import Button
 from djaveTable.table import Cell, Row
 
 from tracktime.tables.enter_time_table import EnterTimeTable
 from tracktime.models.tracked import Tracked
-from tracktime.tests.tables.test_case_with_tt_data import TestCaseWithTTData
+from tracktime.tests.tables.test_case_with_data import TestCaseWithData
 
 
-class EnterTimeTableTests(TestCaseWithTTData):
+class EnterTimeTableTests(TestCaseWithData):
   def setUp(self):
     super().setUp()
     self.setup_user()
@@ -17,7 +18,8 @@ class EnterTimeTableTests(TestCaseWithTTData):
     self.setup_irrelevant_stuff()
 
   def test_table_contents(self):
-    table = EnterTimeTable(self.user, date(2020, 1, 15), None)
+    table = EnterTimeTable(
+        self.user, date(2020, 1, 15), None, nnow=to_tz_dt('2020-01-15 15:00'))
     self.assertEqual(['Project', 'Hours: 3.2', ''], table.headers)
     self.assertEqual(3, len(table.rows))
 

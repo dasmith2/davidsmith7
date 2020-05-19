@@ -2,80 +2,27 @@
 
 {% block tracktime_head %}
 <script>
-function remove_to_do_helper(url, pk) {
-  post(url, {pk: pk}, function() {
-    $('tr[data-pk=' + pk + ']').remove();
-  });
-}
-
-function to_do_done(pk) {
-  remove_to_do_helper('{{ to_do_done_url }}', pk);
-}
-
-function delete_to_do(pk) {
-  if (confirm('Delete to do?')) {
-    remove_to_do_helper('{{ delete_to_do_url }}', pk);
-    return true;
-  }
-  return false;
-}
-
-function setup_done_and_delete() {
-  $('button.done,button.delete').click(function() {
-    var button = $(this).prop('disabled', true);
-    var pk = button.parents('tr').attr('data-pk')
-    if (button.hasClass('done')) {
-      to_do_done(pk);
-    } else if (button.hasClass('delete')) {
-      if (!delete_to_do(pk)) {
-        button.prop('disabled', false);
-      }
-    }
-    focus_on_new_to_do();
-  });
-}
-
-function setup_edit_description() {
-  // If you modify the description and then click done, there's a race. At
-  // first I tried solving this by having the done button save the description
-  // first before marking done, but that started to get complicated. So now I
-  // just disable the done button until the description is saved.
-  var button_for_box = function(text_box, button_css_class) {
-    return text_box.parents('tr').find('.' + button_css_class);
-  };
-  $('.edit_description').keyup(function() {
-    button_for_box($(this), 'done').hide();
-    button_for_box($(this), 'save').show();
-  }).change(function() {
-    var text_box = $(this);
-    var pk = text_box.parents('tr').attr('data-pk');
-    var data = {pk: pk, description: text_box.val()};
-    var feedback = get_feedback_elt_after(text_box);
-    post('{{ edit_description_url }}', data, function(response) {
-      if (!show_problem(response, feedback)) {
-        button_for_box(text_box, 'done').show();
-        button_for_box(text_box, 'save').hide();
-        feedback.show().text('Saved!');
-        window.setTimeout(function() {
-          feedback.text('');
-        }, 1000);
-      }
-    }).fail(function() {
-      feedback.show().text(
-          'I was unable to save the updated description due to a ' +
-          'server error');
-    });
-  });
-}
-
 function focus_on_new_to_do() {
   $('.new_description').focus();
 }
 
-$(function() {
-  focus_on_new_to_do();
-});
+function setup_done_and_delete() {
+  var success = function(pk) {
+    remove_row(pk);
+    focus_on_new_to_do();
+  };
+  wire_up_ajax_button('button.done', '{{ to_do_done_url }}', success);
+  wire_up_ajax_button(
+      'button.delete', '{{ delete_to_do_url }}', success, 'Delete?');
+}
 
+function setup_edit_description() {
+  wire_up_ajax_save_text(
+      '.edit_description', '{{ edit_description_url }}', 'description',
+      focus_on_new_to_do);
+}
+
+$(focus_on_new_to_do);
 $(setup_done_and_delete);
 $(setup_edit_description);
 </script>
@@ -92,12 +39,6 @@ textarea.edit_description {
   height: 45px;
 }
 .row2 textarea.edit_description { background-color: #eee; }
-/* The save button is really there to give the user something to click on so
- * the cursor leaves the description text box which triggers a change event
- * which causes the save. So when you modify the description, show the save
- * button and hide the done button to remove all ambiguity. When the
- * description is saved, remove the save button and show the done button. */
-button.save { display: none; }
 </style>
 {% endblock tracktime_head %}
 

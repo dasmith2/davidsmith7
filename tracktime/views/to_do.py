@@ -11,7 +11,7 @@ from tracktime.models.to_do import ToDo
 from tracktime.models.tracked import Tracked
 from tracktime.tables.punch_the_clock import PunchTheClockTable
 from tracktime.tables.to_do_table import ToDoTable
-from tracktime.views.util import tt_ui_context, TO_DO
+from tracktime.views.util import tracktime_context, TO_DO
 
 
 @login_required(login_url='/admin/login/')
@@ -89,7 +89,7 @@ def to_do_for_another_project(request):
 
 
 def to_do_context(to_do_table, **kwargs):
-  return tt_ui_context(
+  return tracktime_context(
       TO_DO, to_do_table=to_do_table,
       to_do_done_url=reverse(to_do_done),
       delete_to_do_url=reverse(delete_to_do),

@@ -16,6 +16,8 @@ def ajax(function):
       response = function(request, *args, **kwargs)
       if isinstance(response, JsonResponse):
         return response
+      elif response is None:
+        return OK_RESPONSE
       return JsonResponse(response)
     except AjaxProblem as ex:
       return ex.get_problem_response()

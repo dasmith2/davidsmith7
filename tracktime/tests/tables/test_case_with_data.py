@@ -5,7 +5,7 @@ from tracktime.tests.models.test_to_do import get_test_to_do
 from tracktime.tests.models.test_tracked import get_test_tracked
 
 
-class TestCaseWithTTData(TestCase):
+class TestCaseWithData(TestCase):
   def setup_user(self):
     self.user = get_test_user()
 
@@ -36,6 +36,9 @@ class TestCaseWithTTData(TestCase):
         user=self.user, project=self.project_1, hours=40.0, date='2020-01-15',
         started='2020-01-15 11:00', stopped='2020-01-15 12:06',
         deleted='2020-01-15 12:08')
+    get_test_tracked(  # The clock is running
+        user=self.user, project=self.project_1, date='2020-01-15',
+        started='2020-01-15 10:00', stopped=None)
 
     get_test_to_do(  # Not done yet
         user=self.user, project=self.project_1,

@@ -1,0 +1,16 @@
+{% extends "projects.html" %}
+
+{% block call_setup_functions %}
+$(setup_unarchive);
+$(setup_name_change);
+{% endblock %}
+
+{% block tracktime_body %}
+  <h1>Archived</h1>
+  {% csrf_token %}
+  {% if table.rows %}
+    {{ table.as_html }}
+  {% else %}
+    <div class="pad-top">There are no archived projects</div>
+  {% endif %}
+{% endblock tracktime_body %}

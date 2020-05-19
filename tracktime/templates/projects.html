@@ -1,0 +1,39 @@
+{% extends "tracktime_base.html" %}
+
+{% block tracktime_head %}
+<script>
+function setup_archive() {
+  wire_up_ajax_button('.archive', '{{ archive_project_url }}', remove_row);
+}
+
+function setup_unarchive() {
+  wire_up_ajax_button('.unarchive', '{{ unarchive_project_url }}', remove_row);
+}
+
+function setup_name_change() {
+  wire_up_ajax_save_text('.edit_name', '{{ rename_project_url }}', 'name');
+}
+
+{% block call_setup_functions %}
+$(setup_archive);
+$(setup_name_change);
+{% endblock %}
+</script>
+
+<style>
+.edit_name { border: none; }
+.row2 .edit_name { background-color: #eee; }
+table { margin-top: 40px; }
+</style>
+{% endblock tracktime_head %}
+
+{% block tracktime_body %}
+<form method="POST">
+  {% csrf_token %}
+  {{ table.as_html }}
+</form>
+
+<div class="pad-top">
+  <a href="{{ archived_projects_url }}">See archived projects</a>
+</div>
+{% endblock tracktime_body %}

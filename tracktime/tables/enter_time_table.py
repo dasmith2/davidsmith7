@@ -24,7 +24,7 @@ class EnterTimeTable(Table):
   done by AJAX. In general, I think that when a page is talking about a single
   instance of something it should be manipulated through posting the page,
   but when you have a list of things, those should be done through AJAX. """
-  def __init__(self, user, day, form_data):
+  def __init__(self, user, day, form_data, nnow=None):
     self.day = day
     self.user = user
     self.form_data = form_data
@@ -34,7 +34,8 @@ class EnterTimeTable(Table):
     # load this user's Trackeds.
     self.setup_enter_new()
 
-    tracked = Tracked.live.by_user_and_date(self.user, self.day)
+    tracked = Tracked.live.done_by_user_and_date(
+        self.user, self.day, nnow=nnow)
     self.setup_edit_existing(tracked)
 
     hours = self.total_hours(tracked)

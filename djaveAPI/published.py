@@ -9,6 +9,11 @@ class PublishedManager(models.Manager):
     return super().get_queryset().filter(deleted__isnull=True)
 
 
+class DeletedManager(models.Manager):
+  def get_queryset(self):
+    return super().get_queryset().filter(deleted__isnull=False)
+
+
 class Published(models.Model):
   """ Have your models inherit from this class if you want your models to be
   published online as part of a REST-ish API. """
@@ -30,6 +35,7 @@ class Published(models.Model):
     raise NotImplementedError('as_json')
 
   live = PublishedManager()
+  all = models.Manager()
 
   class Meta:
     abstract = True
