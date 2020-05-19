@@ -58,9 +58,9 @@ class Field(FormElement):
 
   def is_valid(self):
     if not self._value_set:
-      raise Exception(
-          'If the value of this field was never set, it does not make much '
-          'sense to ask if the field is valid.')
+      raise Exception((
+          'The value of field with key {} was never set, so it does not make '
+          'much sense to ask if the field is valid.').format(self.key()))
     return not self.explain_why_not_valid()
 
   def as_csv(self):
