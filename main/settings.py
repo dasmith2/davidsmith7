@@ -36,11 +36,11 @@ IN_HEROKU_CI = os.environ.get('IN_HEROKU_CI', default=False)
 
 
 """ Email stuff. """
-# All code ought to make sense in the shell, tests, and production. log_error
-# is a bit of a special case. By default in tests and the shell it shouldn't
-# send emails. But one time, sending emails was precisely the thing that was
-# broken and I couldn't experiment in the shell. Now you can do this in the
-# shell:
+# All code ought to make sense in production, the shell, tests, web tests, and
+# web demos. log_error is a bit of a special case. By default in tests and the
+# shell it shouldn't send emails. But one time, sending emails was precisely
+# the thing that was broken and I couldn't experiment in the shell. Now you can
+# do this in the shell:
 #
 # from django.conf import settings; settings.ALWAYS_ALLOW_SEND_MAIL = True
 # log_error('hello', 'world') # Will actually email

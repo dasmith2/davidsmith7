@@ -1,0 +1,43 @@
+/* This is for styles that apply to all sites. Modify this file only in
+ * davebase. Individual sites should not modify this file but they can totally
+ * modify this_site.css */
+body {
+  font-family: 'Roboto', sans-serif; margin: 0px; padding: 0px;
+  margin: 0px 10px 10px 10px; }
+
+h1 {
+  font-weight: 300; margin: 40px 0px 0px 0px; font-size: 37px;
+  border-top: 15px solid #558; }
+h2 { margin: 40px 0px 0px 0px; }
+h3 { color: #999; margin: 10px 0px 0px 0px; }
+
+.pad-top { margin: 40px 0px 0px 0px; }
+
+.problem { color: #f00; }
+.feedback { color: #f00; }
+.start-hidden { display: none; }
+
+table {
+  border-collapse: collapse; border-left: 1px solid #999;
+  border-top: 1px solid #999;
+  box-shadow: 4px 4px 2px grey; }
+td, th { border-right: 1px solid #999;
+  border-bottom: 1px solid #999; padding: 10px; }
+th, .row2 { background-color: #eee; }
+
+button, .button, input[type="submit"], input[type="button"], a.button {
+  background: #79aec8;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 4px 4px 2px grey;
+  margin: 3px 0px 3px 0px;}
+button:active, .button:active, input[type=submit]:active, input[type=button]:active,
+button:focus, .button:focus, input[type=submit]:focus, input[type=button]:focus,
+button:hover, .button:hover, input[type=submit]:hover, input[type=button]:hover {
+  background: #609ab6;}
+button[disabled], .button[disabled], input[type=submit][disabled], input[type=button][disabled] {
+  opacity: 0.4;
+  background: #999;}
