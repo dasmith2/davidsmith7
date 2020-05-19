@@ -138,50 +138,32 @@ Javascript, and templates.
 
 I use Django template inheritance to describe the hierarchy.
 
-There's a weakness here. If you want to make an app that's reusable between
-sites, the templates of that app have to inherit from something. I've provided
-the this_site.html layer, and that should provide sufficient flexibility most
-of the time. But I could see it being the case that an additional layer of
-inheritance could be required between this_site.html and my_new_wacky_app.html
-
-I think we have a choice between src-ing Javascript files (and then the
-further choice of doing some kind of fancy Javascript load mechanism), or just
-inlining the Javascript directly. Inlining directly does have the risk that the
-code could get big and clutter up the page.
-
-But that's exactly what I hope to avoid by inlining the Javascript. The
-critical thing is to keep the Javascript organized in such a way that it's easy
-to know where code is being used, and therefore easy to know whether or not
-it's ok to change it or remove it.
-
-Inlining the Javascript and CSS also gives us the option to make the CSS a bit
-more dynamic, using variables for colors and such without requiring a CSS
-compiler.
-
 ### All sites
 
 djaveForm.fields renders problems like <div style="problem">This field is
 required</div>. It's most helpful to just color all "problem" text red by
 default. So .problem { color: #f00; } belongs in
-main/templates/all_sites_css.html, which gets copied around to all the
-websites. all_site_css.html should stay pretty small.
+main/templates/css/all_sites.css, which gets copied around to all the
+websites.
 
 I like to start with margins and padding 0, and add them back in again as
 necessary. When it comes to vertical spacing, by convention, I use margin-top.
 This is like saying, "Everybody drive on the left hand side of the road." It
 doesn't matter which side of the road everybody drives on as long as it's the
 same side of the road. So anyway, this top-margins-only approach gets set up in
-all_sites_css.html too.
+all_sites.css too.
 
-main/templates/all_sites.html is for HTML that applies to all sites. As you can
-imagine, this too should be kept small. It includes 3 libraries: jQuery,
-Handlebars for Javascript templates, and Roboto, a nice font from Google.
+main/templates/all_sites.html is for HTML that applies to all sites. It
+includes 4 libraries: jQuery, Handlebars for Javascript templates, Roboto which
+is a nice font from Google, and last but not least, all_sites.js which includes
+global utility kinds of things such as helper functions for ajax that go well
+with tables.
 
 ### Specific site
 
-Now, davebase does provide this_site_css.html, but it's empty. This file is
+Now, davebase does provide this_site.css, but it's empty. This file is
 meant to be overwritten by the specific sites. The reason davebase provides
-this_site_css.html is so that this_site.html can come pre-loaded with the
+this_site.css is so that this_site.html can come pre-loaded with the
 correct css link. Obviously you can modify this_site.html to your heart's
 content as well.
 
