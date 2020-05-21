@@ -2,7 +2,8 @@ from djaveTest import TestCase, get_test_user
 
 from tracktime.tests.models.test_project import get_test_project
 from tracktime.tests.models.test_to_do import get_test_to_do
-from tracktime.tests.models.test_work_session import get_test_work_session
+from tracktime.tests.models.test_project_work_session import (
+    get_test_project_work_session)
 
 
 class TestCaseWithData(TestCase):
@@ -14,10 +15,10 @@ class TestCaseWithData(TestCase):
     self.project_2 = get_test_project(name='Project 2')
 
   def setup_work_sessions(self):
-    self.work_session_1 = get_test_work_session(
+    self.work_session_1 = get_test_project_work_session(
         user=self.user, project=self.project_1, hours=1.1, date='2020-01-15',
         started='2020-01-15 11:00', stopped='2020-01-15 12:06')
-    self.work_session_2 = get_test_work_session(
+    self.work_session_2 = get_test_project_work_session(
         user=self.user, project=self.project_1, hours=2.1, date='2020-01-15')
 
   def setup_to_dos(self):
@@ -27,16 +28,16 @@ class TestCaseWithData(TestCase):
 
   def setup_irrelevant_stuff(self):
     get_test_user(username='irrelevant_user')
-    get_test_work_session(  # Wrong day
+    get_test_project_work_session(  # Wrong day
         user=self.user, project=self.project_1, hours=20.0, date='2020-01-05')
-    get_test_work_session(  # Wrong user
+    get_test_project_work_session(  # Wrong user
         user=get_test_user(), project=self.project_1, hours=30.8,
         date='2020-01-15')
-    get_test_work_session(  # Deleted
+    get_test_project_work_session(  # Deleted
         user=self.user, project=self.project_1, hours=40.0, date='2020-01-15',
         started='2020-01-15 11:00', stopped='2020-01-15 12:06',
         deleted='2020-01-15 12:08')
-    get_test_work_session(  # The clock is running
+    get_test_project_work_session(  # The clock is running
         user=self.user, project=self.project_1, date='2020-01-15',
         started='2020-01-15 10:00', stopped=None)
 

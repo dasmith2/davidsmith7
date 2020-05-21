@@ -6,7 +6,7 @@ from djaveTable.table import Row
 from djaveTest import TestCase, get_test_user
 
 from tracktime.tables.punch_the_clock import PunchTheClockTable
-from tracktime.models.work_session import WorkSession
+from tracktime.models.project_work_session import ProjectWorkSession
 from tracktime.tests.models.test_project import get_test_project
 
 
@@ -33,7 +33,7 @@ class PunchTheClockTableTests(TestCase):
 
   def test_punch_in(self):
     a_minute_after_starting = self.clicked_start_at + timedelta(minutes=1)
-    self.assertIsNone(WorkSession.live.get_clock_running(
+    self.assertIsNone(ProjectWorkSession.live.get_clock_running(
         self.user, nnow=a_minute_after_starting))
 
     form_data = {'starttheclock_{}'.format(self.project_1.pk): 'yep'}
@@ -41,7 +41,7 @@ class PunchTheClockTableTests(TestCase):
         self.user, date(2020, 1, 15), form_data=form_data,
         nnow=self.clicked_start_at)
 
-    self.work_session = WorkSession.live.get_clock_running(
+    self.work_session = ProjectWorkSession.live.get_clock_running(
         self.user, nnow=a_minute_after_starting)
     self.assertEqual(self.clicked_start_at, self.work_session.started)
     self.assertEqual(self.project_1, self.work_session.project)

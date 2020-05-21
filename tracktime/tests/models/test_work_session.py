@@ -5,58 +5,58 @@ from djaveDT import str_to_tz_dt, to_tz_dt, to_d
 
 from tracktime.models.work_session import (
     WorkSession, DELETED, DONE, ABANDONED, IN_PROGRESS)
-from tracktime.tests.models.test_project import get_test_project
 
 
 def get_test_work_session(**kwargs):
+  work_session = WorkSession()
+  return set_work_session_stuff(work_session, **kwargs)
+
+
+def set_work_session_stuff(work_session, **kwargs):
   user = kwargs.get('user', None)
   if not user:
     user = get_test_user(**kwargs)
-  project = kwargs.get('project', None)
-  if not project:
-    project = get_test_project(**kwargs)
   started = to_tz_dt(kwargs.get('started', None))
   stopped = to_tz_dt(kwargs.get('stopped', None))
   hours = kwargs.get('hours', None)
   if started and stopped and not hours:
     hours = round((stopped - started).total_seconds() / 3600, 2)
-  return WorkSession.live.create(
-      user=user,
-      project=project,
-      date=to_d(kwargs.get('date', date(2020, 1, 1))),
-      hours=hours,
-      started=started,
-      stopped=stopped,
-      deleted=to_tz_dt(kwargs.get('deleted', None)))
+  work_session.user = user
+  work_session.date = to_d(kwargs.get('date', date(2020, 1, 1)))
+  work_session.hours = hours
+  work_session.started = started
+  work_session.stopped = stopped
+  work_session.deleted = to_tz_dt(kwargs.get('deleted', None))
+  work_session.save()
+  return work_session
 
 
 class RunningClockTests(TestCase):
   def setUp(self):
     super().setUp()
     self.user = get_test_user(username='relevant')
-    self.project = get_test_project(name='Time Tracker')
 
     # Irrelevant
     get_test_work_session(  # Really old
-        user=self.user, project=self.project, date=date(2020, 1, 1),
+        user=self.user, date=date(2020, 1, 1),
         started='2020-01-01 12:00', stopped=None)
     get_test_work_session(  # Clock is stopped
-        user=self.user, project=self.project, date=date(2020, 1, 15),
+        user=self.user, date=date(2020, 1, 15),
         started='2020-01-15 12:00', stopped='2020-01-15 13:00')
     get_test_work_session(  # Other user
-        user=get_test_user(username='irrelevant'), project=self.project,
+        user=get_test_user(username='irrelevant'),
         date=date(2020, 1, 15), started='2020-01-15 12:00', stopped=None)
     self.deleted = get_test_work_session(  # Canceled
-        user=self.user, project=self.project, date=date(2020, 1, 15),
-        started='2020-01-15 12:00', deleted='2020-01-15 13:00', stopped=None)
+        user=self.user, date=date(2020, 1, 15), started='2020-01-15 12:00',
+        deleted='2020-01-15 13:00', stopped=None)
 
     # Relevant
     self.old = get_test_work_session(
-        user=self.user, project=self.project, date=date(2020, 1, 10),
-        started='2020-01-10 12:00', stopped=None)
+        user=self.user, date=date(2020, 1, 10), started='2020-01-10 12:00',
+        stopped=None)
     self.recent = get_test_work_session(
-        user=self.user, project=self.project, date=date(2020, 1, 15),
-        started='2020-01-15 12:00', stopped=None)
+        user=self.user, date=date(2020, 1, 15), started='2020-01-15 12:00',
+        stopped=None)
 
     self.six_pm = str_to_tz_dt('2020-01-15 18:00')
 
@@ -121,7 +121,7 @@ class RunningClockTests(TestCase):
         'The clock is already stopped on this work session',
         self.recent.explain_why_can_not_stop(nnow=self.six_pm))
     never_started = get_test_work_session(
-        user=self.user, project=self.project, date=date(2020, 1, 14))
+        user=self.user, date=date(2020, 1, 14))
     self.assertEqual(
         'The clock was never started on this work session',
         never_started.explain_why_can_not_stop(nnow=self.six_pm))
@@ -160,7 +160,6 @@ class JSONTests(TestCase):
     expected = dict(
         pk=work_session.pk,
         user=work_session.user.pk,
-        project=work_session.project.pk,
         date='2020-01-15',
         hours=None,
         started='2020-01-15T12:00:00-05:00',

@@ -6,7 +6,7 @@ from djaveDT import now, tz_dt_to_tz_dt
 from djaveTable.problem import Problem
 from djaveTable.table import Table
 
-from tracktime.models.work_session import WorkSession
+from tracktime.models.project_work_session import ProjectWorkSession
 from tracktime.models.project import Project
 from tracktime.models.latest_project import set_latest_project
 
@@ -35,7 +35,7 @@ class StartTheClockForm(Form):
 
   def start(self, user, project, nnow=None):
     nnow = nnow or now()
-    WorkSession.live.create(
+    ProjectWorkSession.live.create(
         user=user, project=project, date=nnow.date(), started=nnow)
 
   def display(self, punch_the_clock_table, display_started_column):
@@ -48,7 +48,7 @@ class StartTheClockForm(Form):
 
 
 class StopTheClockForm(Form):
-  def __init__(self, stoppable: WorkSession):
+  def __init__(self, stoppable: ProjectWorkSession):
     self.stoppable = stoppable
     self.stop_button = Button('Punch out', button_type='submit')
     self.cancel_button = Button('Cancel', button_type='submit')
@@ -98,7 +98,7 @@ class PunchTheClockTable(Table):
     a_clock_can_be_stopped = False
 
     abandoned = []
-    for work_session in WorkSession.live.get_clock_never_stopped(
+    for work_session in ProjectWorkSession.live.get_clock_never_stopped(
         user, nnow=nnow):
       if work_session.clock_running(nnow=nnow):
         stop_form = StopTheClockForm(work_session)

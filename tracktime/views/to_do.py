@@ -8,7 +8,7 @@ from djAveJAX import ajax, OK, AjaxProblem, get_ajax_variable
 from djaveTable.problem import Problem
 
 from tracktime.models.to_do import ToDo
-from tracktime.models.work_session import WorkSession
+from tracktime.models.project_work_session import ProjectWorkSession
 from tracktime.tables.punch_the_clock import PunchTheClockTable
 from tracktime.tables.time_breakdown import time_breakdown_url
 from tracktime.tables.to_do_table import ToDoTable
@@ -28,7 +28,7 @@ def to_do(request):
 
   project = None
   to_do_table = None
-  clock_running = WorkSession.live.get_clock_running(user=request.user)
+  clock_running = ProjectWorkSession.live.get_clock_running(user=request.user)
   stop_problem = ''
   if clock_running:
     project = clock_running.project

@@ -5,7 +5,7 @@ from djaveForm.button import Button
 from djaveTable.table import Cell, Row
 
 from tracktime.tables.enter_time_table import EnterTimeTable
-from tracktime.models.work_session import WorkSession
+from tracktime.models.project_work_session import ProjectWorkSession
 from tracktime.tests.tables.test_case_with_data import TestCaseWithData
 
 
@@ -41,10 +41,11 @@ class EnterTimeTableTests(TestCaseWithData):
     table.rows[2].assertEqual(expected_row_2)
 
   def test_save_new(self):
-    work_session_count_at_first = WorkSession.live.count()
+    work_session_count_at_first = ProjectWorkSession.live.count()
     form_data = {'project': self.project_2.pk, 'hours': 3.1, 'savenew': 'yep'}
     table = EnterTimeTable(self.user, date(2020, 1, 15), form_data)
-    self.assertEqual(work_session_count_at_first + 1, WorkSession.live.count())
+    self.assertEqual(
+        work_session_count_at_first + 1, ProjectWorkSession.live.count())
 
     # The default of the project drop down should reflect the latest project
     save_new_row = table.rows[0]

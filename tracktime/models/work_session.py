@@ -11,8 +11,6 @@ from djaveDT import (
     tz_dt_to_str, beginning_of_day)
 from djaveNav import date_to_url_str
 
-from tracktime.models.project import Project
-
 
 # If a WorkSession isn't stopped within 16 hours it's considered abandoned.
 ABANDONED_AFTER_HOURS = 16
@@ -34,10 +32,13 @@ class WorkSessionManager(PublishedManager):
     to_return = []
     for work_session in self.filter(
         user=user, date__gte=from_date, date__lte=to_date).select_related(
-            'project', 'user').order_by('-pk'):
+            *self.select_related_list()).order_by('-pk'):
       if work_session.status(nnow=nnow) == DONE:
         to_return.append(work_session)
     return to_return
+
+  def select_related_list(self):
+    return ['user']
 
   def total_hours_per_date(self, start_date, end_date, user):
     if start_date > end_date:
@@ -71,7 +72,7 @@ class WorkSessionManager(PublishedManager):
         user=user, started__isnull=False,
         stopped__isnull=True,
         date__gte=nnow.date() - timedelta(days=7)).order_by(
-            'pk').select_related('project')
+            'pk').select_related(*self.select_related_list())
 
   def get_clock_running(self, user, nnow=None):
     # By clock running I mean specifically the WorkSession whose clock can be
@@ -84,7 +85,6 @@ class WorkSessionManager(PublishedManager):
 
 class WorkSession(Published):
   user = models.ForeignKey(User, on_delete=models.PROTECT)
-  project = models.ForeignKey(Project, on_delete=models.PROTECT)
   date = models.DateField(db_index=True)
   hours = models.FloatField(blank=True, null=True)
   started = models.DateTimeField(blank=True, null=True, help_text=(
@@ -170,9 +170,9 @@ class WorkSession(Published):
     return round(delta.total_seconds() / 3600, 2)
 
   def __repr__(self, nnow=None):
-    return '<WorkSession {}: {} {} {} {} for {} hrs>'.format(
-        self.pk, self.user.username, self.project.name,
-        self.date, self.status(nnow=nnow), self.hours)
+    return '<WorkSession {}: {} {} {} for {} hrs>'.format(
+        self.pk, self.user.username, self.date, self.status(nnow=nnow),
+        self.hours)
 
   def __str__(self, nnow=None):
     return self.__repr__(nnow=nnow)
@@ -197,13 +197,9 @@ class WorkSession(Published):
     return dict(
         pk=self.pk,
         user=self.user.pk,
-        project=self.project.pk,
         date=d_for_json(self.date),
         hours=self.hours,
         started=dt_for_json(self.started),
         stopped=dt_for_json(self.stopped),
         deleted=dt_for_json(self.deleted),
         status=self.status(nnow=nnow))
-
-  class Meta:
-    verbose_name = 'work session'

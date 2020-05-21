@@ -8,7 +8,7 @@ from djaveReport.date_range_report import DateRangeReport
 
 from tracktime.models.project import Project
 from tracktime.models.to_do import ToDo
-from tracktime.models.work_session import WorkSession
+from tracktime.models.project_work_session import ProjectWorkSession
 
 
 def time_breakdown_url(project):
@@ -85,7 +85,7 @@ class TimeBreakdownContent(object):
     return work_session_descriptions
 
   def _get_work_sessions(self, user, project, from_date, to_date):
-    work_sessions = list(WorkSession.live.done_by_user_and_date_range(
+    work_sessions = list(ProjectWorkSession.live.done_by_user_and_date_range(
         user, from_date, to_date))
     work_sessions.sort(key=lambda x: x.get_started())
     if project:

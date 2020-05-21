@@ -4,7 +4,7 @@ from djaveForm.form import Form
 from djaveForm.button import Button
 
 from tracktime.fields import project_field, hours_field
-from tracktime.models.work_session import WorkSession
+from tracktime.models.project_work_session import ProjectWorkSession
 from tracktime.models.project import Project
 from tracktime.models.latest_project import set_latest_project
 
@@ -34,7 +34,7 @@ class EnterTimeTable(Table):
     # load this user's WorkSessions.
     self.setup_enter_new()
 
-    work_session = WorkSession.live.done_by_user_and_date(
+    work_session = ProjectWorkSession.live.done_by_user_and_date(
         self.user, self.day, nnow=nnow)
     self.setup_edit_existing(work_session)
 
@@ -77,6 +77,6 @@ class EnterTimeTable(Table):
     project = Project.live.get(pk=self.form.project_field.value)
     hours = self.form.hours_field.value
     set_latest_project(self.user, project)
-    return WorkSession.live.create(
+    return ProjectWorkSession.live.create(
         user=self.user, project=project, date=self.day,
         hours=hours)
