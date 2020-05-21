@@ -18,8 +18,7 @@ function setup_done_and_delete() {
 
 function setup_edit_description() {
   wire_up_ajax_save_text(
-      '.edit_description', '{{ edit_description_url }}', 'description',
-      focus_on_new_to_do);
+      '.edit_description', '{{ edit_description_url }}', 'description');
 }
 
 $(focus_on_new_to_do);

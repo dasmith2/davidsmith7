@@ -88,7 +88,7 @@ function wire_up_ajax_button(selector, action_url, success, confirm_question) {
 }
 
 function wire_up_ajax_save_text(
-    text_box_selector, action_url, text_field_name, success) {
+    text_box_selector, action_url, text_field_name, success_callback) {
   /* This is for text boxes in tables so you can edit names and descriptions
    * inline with AJAX. Once you start editing a text box, this hides all the
    * other buttons and gives the user "Save" and "Cancel" buttons. */
@@ -136,9 +136,12 @@ function wire_up_ajax_save_text(
             turn_off_edit_text_mode();
             feedback.show().text('Saved!');
             text_box.attr('data-saved-text', text_box.val());
-            if (success) {
-              success();
+            if (success_callback) {
+              success_callback();
             }
+            // The save button disappears and you lose your tab location
+            // otherwise.
+            text_box.focus();
             window.setTimeout(function() {
               feedback.text('');
             }, 1000);

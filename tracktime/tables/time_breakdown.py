@@ -12,7 +12,7 @@ from tracktime.models.project_work_session import ProjectWorkSession
 
 
 def time_breakdown_url(project):
-  return '{}?project={}'.format(reverse('report'), project.pk)
+  return '{}?project={}'.format(reverse('time_breakdown'), project.pk)
 
 
 class TimeBreakdown(DateRangeReport):
@@ -60,9 +60,9 @@ class TimeBreakdownContent(object):
               work_sessions[work_session_i].get_started(tz_str=tz_str) > (
                   to_dos[to_do_i].done))):
         if not on_work_session:
-          raise Exception(
-              'How did I pull a to do which occured before any of the '
-              'work_sessions?')
+          on_work_session = WorkSessionDescription(
+              '(marked done outside a work session)', [])
+          work_session_descriptions.append(on_work_session)
         to_do = to_dos[to_do_i]
         to_do_i += 1
         if to_do.project == project or not project:
