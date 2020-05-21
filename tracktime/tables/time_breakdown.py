@@ -8,7 +8,7 @@ from djaveReport.date_range_report import DateRangeReport
 
 from tracktime.models.project import Project
 from tracktime.models.to_do import ToDo
-from tracktime.models.tracked import Tracked
+from tracktime.models.work_session import WorkSession
 
 
 def time_breakdown_url(project):
@@ -36,61 +36,62 @@ class TimeBreakdownContent(object):
     self.user = user
     self.project = project
     self.tz_str = tz_str
-    self.work_sessions = self.get_work_sessions(
+    self.work_session_descriptions = self.get_work_sessions(
         user, project, from_date, to_date, tz_str=tz_str)
 
   def get_work_sessions(self, user, project, from_date, to_date, tz_str=None):
-    work_sessions = []
+    work_session_descriptions = []
 
-    tracked_i = 0
-    trackeds = self._get_trackeds(user, project, from_date, to_date)
+    work_session_i = 0
+    work_sessions = self._get_work_sessions(user, project, from_date, to_date)
 
     to_do_i = 0
     to_dos = self._get_to_dos(user, project, from_date, to_date)
     self.total = 0.0
 
-    if not trackeds and not to_dos:
+    if not work_sessions and not to_dos:
       return
 
     show_project = not project
     on_work_session = None
-    while tracked_i < len(trackeds) or to_do_i < len(to_dos):
-      if tracked_i >= len(trackeds) or (
+    while work_session_i < len(work_sessions) or to_do_i < len(to_dos):
+      if work_session_i >= len(work_sessions) or (
           to_do_i < len(to_dos) and (
-              trackeds[tracked_i].get_started(tz_str=tz_str) > (
+              work_sessions[work_session_i].get_started(tz_str=tz_str) > (
                   to_dos[to_do_i].done))):
         if not on_work_session:
           raise Exception(
               'How did I pull a to do which occured before any of the '
-              'trackeds?')
+              'work_sessions?')
         to_do = to_dos[to_do_i]
         to_do_i += 1
         if to_do.project == project or not project:
           on_work_session.to_do_descriptions.append(
               self._to_do_description(to_do, show_project))
       else:
-        tracked = trackeds[tracked_i]
-        tracked_i += 1
-        if tracked.project == project or not project:
-          on_work_session = WorkSession(
-              self._time_description(tracked, show_project), [])
-          work_sessions.append(on_work_session)
-          if tracked.hours:
-            self.total += tracked.hours
+        work_session = work_sessions[work_session_i]
+        work_session_i += 1
+        if work_session.project == project or not project:
+          on_work_session = WorkSessionDescription(
+              self._time_description(work_session, show_project), [])
+          work_session_descriptions.append(on_work_session)
+          if work_session.hours:
+            self.total += work_session.hours
 
     # I want work sessions in reverse chronological order so when the user
     # punches out and comes to this report page, the most recent stuff they
     # worked on is up top.
-    work_sessions.reverse()
-    return work_sessions
+    work_session_descriptions.reverse()
+    return work_session_descriptions
 
-  def _get_trackeds(self, user, project, from_date, to_date):
-    trackeds = list(Tracked.live.done_by_user_and_date_range(
+  def _get_work_sessions(self, user, project, from_date, to_date):
+    work_sessions = list(WorkSession.live.done_by_user_and_date_range(
         user, from_date, to_date))
-    trackeds.sort(key=lambda x: x.get_started())
+    work_sessions.sort(key=lambda x: x.get_started())
     if project:
-      trackeds = list(filter(lambda x: x.project == project, trackeds))
-    return trackeds
+      work_sessions = list(filter(
+          lambda x: x.project == project, work_sessions))
+    return work_sessions
 
   def _get_to_dos(self, user, project, from_date, to_date):
     to_dos = list(ToDo.live.done_by_user_in_date_range(
@@ -99,10 +100,10 @@ class TimeBreakdownContent(object):
       to_dos = list(filter(lambda x: x.project == project, to_dos))
     return to_dos
 
-  def _time_description(self, tracked, show_project):
-    description = tracked.describe_time_span(self.tz_str)
+  def _time_description(self, work_session, show_project):
+    description = work_session.describe_time_span(self.tz_str)
     if show_project:
-      description = '{} {}'.format(tracked.project.name, description)
+      description = '{} {}'.format(work_session.project.name, description)
     return description
 
   def _to_do_description(self, to_do, show_project):
@@ -114,10 +115,11 @@ class TimeBreakdownContent(object):
   def as_html(self):
     template = loader.get_template('time_breakdown.html')
     context = {
-        'work_sessions': self.work_sessions,
+        'work_session_descriptions': self.work_session_descriptions,
         'project': self.project,
         'total': round(self.total, 2)}
     return template.render(context)
 
 
-WorkSession = namedtuple('WorkSession', 'time_description to_do_descriptions')
+WorkSessionDescription = namedtuple(
+    'WorkSessionDescription', 'time_description to_do_descriptions')

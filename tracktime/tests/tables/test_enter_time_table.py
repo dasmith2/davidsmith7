@@ -5,7 +5,7 @@ from djaveForm.button import Button
 from djaveTable.table import Cell, Row
 
 from tracktime.tables.enter_time_table import EnterTimeTable
-from tracktime.models.tracked import Tracked
+from tracktime.models.work_session import WorkSession
 from tracktime.tests.tables.test_case_with_data import TestCaseWithData
 
 
@@ -14,7 +14,7 @@ class EnterTimeTableTests(TestCaseWithData):
     super().setUp()
     self.setup_user()
     self.setup_projects()
-    self.setup_trackeds()
+    self.setup_work_sessions()
     self.setup_irrelevant_stuff()
 
   def test_table_contents(self):
@@ -31,20 +31,20 @@ class EnterTimeTableTests(TestCaseWithData):
 
     expected_cells_row_1 = [
         'Project 1', Cell(2.1, classes=['hours']), Button('Delete')]
-    expected_row_1 = Row(expected_cells_row_1, pk=self.tracked_2.pk)
+    expected_row_1 = Row(expected_cells_row_1, pk=self.work_session_2.pk)
     table.rows[1].assertEqual(expected_row_1)
 
     expected_cells_row_2 = [
         'Project 1', Cell('1.1 starting at 11 a.m.', classes=['hours']),
         Button('Delete')]
-    expected_row_2 = Row(expected_cells_row_2, pk=self.tracked_1.pk)
+    expected_row_2 = Row(expected_cells_row_2, pk=self.work_session_1.pk)
     table.rows[2].assertEqual(expected_row_2)
 
   def test_save_new(self):
-    tracked_count_at_first = Tracked.live.count()
+    work_session_count_at_first = WorkSession.live.count()
     form_data = {'project': self.project_2.pk, 'hours': 3.1, 'savenew': 'yep'}
     table = EnterTimeTable(self.user, date(2020, 1, 15), form_data)
-    self.assertEqual(tracked_count_at_first + 1, Tracked.live.count())
+    self.assertEqual(work_session_count_at_first + 1, WorkSession.live.count())
 
     # The default of the project drop down should reflect the latest project
     save_new_row = table.rows[0]
@@ -52,6 +52,6 @@ class EnterTimeTableTests(TestCaseWithData):
 
     self.assertEqual(4, len(table.rows))  # Header, 2 existing, 1 new
 
-    first_tracked_row = table.rows[1]
-    self.assertEqual('Project 2', first_tracked_row.cells[0])
-    self.assertEqual(Cell(3.1, classes=['hours']), first_tracked_row.cells[1])
+    first_work_session_row = table.rows[1]
+    self.assertEqual('Project 2', first_work_session_row.cells[0])
+    self.assertEqual(Cell(3.1, classes=['hours']), first_work_session_row.cells[1])

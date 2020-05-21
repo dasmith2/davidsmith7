@@ -6,7 +6,7 @@ from djaveDT import now, tz_dt_to_tz_dt
 from djaveTable.problem import Problem
 from djaveTable.table import Table
 
-from tracktime.models.tracked import Tracked
+from tracktime.models.work_session import WorkSession
 from tracktime.models.project import Project
 from tracktime.models.latest_project import set_latest_project
 
@@ -35,7 +35,7 @@ class StartTheClockForm(Form):
 
   def start(self, user, project, nnow=None):
     nnow = nnow or now()
-    Tracked.live.create(
+    WorkSession.live.create(
         user=user, project=project, date=nnow.date(), started=nnow)
 
   def display(self, punch_the_clock_table, display_started_column):
@@ -48,7 +48,7 @@ class StartTheClockForm(Form):
 
 
 class StopTheClockForm(Form):
-  def __init__(self, stoppable: Tracked):
+  def __init__(self, stoppable: WorkSession):
     self.stoppable = stoppable
     self.stop_button = Button('Punch out', button_type='submit')
     self.cancel_button = Button('Cancel', button_type='submit')
@@ -98,9 +98,9 @@ class PunchTheClockTable(Table):
     a_clock_can_be_stopped = False
 
     abandoned = []
-    for tracked in Tracked.live.get_clock_never_stopped(user, nnow=nnow):
-      if tracked.clock_running(nnow=nnow):
-        stop_form = StopTheClockForm(tracked)
+    for work_session in WorkSession.live.get_clock_never_stopped(user, nnow=nnow):
+      if work_session.clock_running(nnow=nnow):
+        stop_form = StopTheClockForm(work_session)
         stop_clicked = False
         cancel_clicked = False
         if stop_form.a_button_was_clicked(form_data):
@@ -116,7 +116,7 @@ class PunchTheClockTable(Table):
             if cancel_clicked:
               stop_form.cancel(nnow=nnow)
       else:
-        abandoned.append(tracked)
+        abandoned.append(work_session)
 
     display_started_column = a_clock_can_be_stopped or (
         abandoned and self.show_abandoned)
@@ -134,10 +134,10 @@ class PunchTheClockTable(Table):
       self.display_abandoned(abandoned)
 
   def display_abandoned(self, abandoned):
-    for tracked in abandoned:
+    for work_session in abandoned:
       delete = Button('Abandoned session. Delete.', key_prefix='delete')
       self.create_row([
-          tracked.project.name, tracked.started, delete], pk=tracked.pk)
+          work_session.project.name, work_session.started, delete], pk=work_session.pk)
 
   def is_visible(self):
     return bool(self.rows)

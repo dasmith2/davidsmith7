@@ -6,7 +6,7 @@ from djaveTable.table import Row
 from djaveTest import TestCase, get_test_user
 
 from tracktime.tables.punch_the_clock import PunchTheClockTable
-from tracktime.models.tracked import Tracked
+from tracktime.models.work_session import WorkSession
 from tracktime.tests.models.test_project import get_test_project
 
 
@@ -33,7 +33,7 @@ class PunchTheClockTableTests(TestCase):
 
   def test_punch_in(self):
     a_minute_after_starting = self.clicked_start_at + timedelta(minutes=1)
-    self.assertIsNone(Tracked.live.get_clock_running(
+    self.assertIsNone(WorkSession.live.get_clock_running(
         self.user, nnow=a_minute_after_starting))
 
     form_data = {'starttheclock_{}'.format(self.project_1.pk): 'yep'}
@@ -41,10 +41,10 @@ class PunchTheClockTableTests(TestCase):
         self.user, date(2020, 1, 15), form_data=form_data,
         nnow=self.clicked_start_at)
 
-    self.tracked = Tracked.live.get_clock_running(
+    self.work_session = WorkSession.live.get_clock_running(
         self.user, nnow=a_minute_after_starting)
-    self.assertEqual(self.clicked_start_at, self.tracked.started)
-    self.assertEqual(self.project_1, self.tracked.project)
+    self.assertEqual(self.clicked_start_at, self.work_session.started)
+    self.assertEqual(self.project_1, self.work_session.project)
 
     self._punched_in_table_assertions(table)
     self._punched_in_table_assertions(PunchTheClockTable(
@@ -67,8 +67,8 @@ class PunchTheClockTableTests(TestCase):
     table = PunchTheClockTable(
         self.user, date(2020, 1, 15), form_data=form_data,
         nnow=punched_out_at)
-    self.tracked.refresh_from_db()
-    self.assertEqual(punched_out_at, self.tracked.stopped)
+    self.work_session.refresh_from_db()
+    self.assertEqual(punched_out_at, self.work_session.stopped)
     self._not_started_table_assertions(table)
 
   def test_cancel(self):
@@ -79,9 +79,9 @@ class PunchTheClockTableTests(TestCase):
     table = PunchTheClockTable(
         self.user, date(2020, 1, 15), form_data=form_data,
         nnow=canceled_at)
-    self.tracked.refresh_from_db()
-    self.assertEqual(canceled_at, self.tracked.deleted)
-    self.assertEqual(None, self.tracked.hours)
+    self.work_session.refresh_from_db()
+    self.assertEqual(canceled_at, self.work_session.deleted)
+    self.assertEqual(None, self.work_session.hours)
 
     self._not_started_table_assertions(table)
 
@@ -104,4 +104,4 @@ class PunchTheClockTableTests(TestCase):
     delete_button = Button('Abandoned session. Delete.', key_prefix='delete')
     table.rows[2].assertEqual(Row(
         ['Project 1', self.clicked_start_at, delete_button],
-        pk=self.tracked.pk))
+        pk=self.work_session.pk))

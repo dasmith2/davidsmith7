@@ -10,7 +10,7 @@ class WhatIDidReportTests(TestCaseWithData):
 
     self.setup_user()
     self.setup_projects()
-    self.setup_trackeds()
+    self.setup_work_sessions()
     self.setup_to_dos()
     self.setup_irrelevant_stuff()
 

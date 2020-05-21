@@ -1,7 +1,7 @@
 from django.shortcuts import reverse
 
 from tracktime.tables.time_breakdown import (
-    TimeBreakdown, WorkSession, time_breakdown_url)
+    TimeBreakdown, WorkSessionDescription, time_breakdown_url)
 from tracktime.tests.tables.test_case_with_data import TestCaseWithData
 
 
@@ -11,7 +11,7 @@ class TimeBreakdownTests(TestCaseWithData):
 
     self.setup_user()
     self.setup_projects()
-    self.setup_trackeds()
+    self.setup_work_sessions()
     self.setup_to_dos()
     self.setup_irrelevant_stuff()
 
@@ -23,12 +23,13 @@ class TimeBreakdownTests(TestCaseWithData):
     html = report.as_html()
     report_content = report.time_breakdown_content
 
-    manual_session = WorkSession('Jan 15, 2020, 2.1 hours', [])
-    punched_session = WorkSession(
+    manual_session = WorkSessionDescription('Jan 15, 2020, 2.1 hours', [])
+    punched_session = WorkSessionDescription(
         'Jan 15, 2020, 11 a.m. to 12:06 p.m., 1.1 hours',
         [self.to_do.description])
     expected_sessions = [punched_session, manual_session]
-    self.assertEqual(expected_sessions, report_content.work_sessions)
+    self.assertEqual(
+        expected_sessions, report_content.work_session_descriptions)
     self.assertTrue(html.find('Jan 15, 2020, 2.1 hours') >= 0)
     self.assertEqual(self.project_1, report_content.project)
     self.assertTrue(html.find(self.project_1.name) >= 0)

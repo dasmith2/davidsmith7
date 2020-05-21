@@ -7,7 +7,7 @@ from djAveJAX import ajax, AjaxProblem, get_ajax_variable, OK
 from djaveNav.date_roller import DateRoller
 from djaveURL import date_from_url
 
-from tracktime.models.tracked import Tracked
+from tracktime.models.work_session import WorkSession
 from tracktime.tables.enter_time_table import EnterTimeTable
 from tracktime.tables.punch_the_clock import PunchTheClockTable
 from tracktime.views.util import tracktime_context, ENTER_TIME
@@ -26,11 +26,11 @@ def enter_time(request):
   enter_time_table = EnterTimeTable(
       user=request.user, day=day, form_data=request.POST)
   date_roller = DateRoller(ENTER_TIME, day, max_day=date.today())
-  totals = Tracked.live.total_hours_per_date(
+  totals = WorkSession.live.total_hours_per_date(
       day - timedelta(days=2), day + timedelta(days=2), request.user)
   context = tracktime_context(
       ENTER_TIME,
-      delete_tracked_url=reverse('delete_tracked'),
+      delete_work_session_url=reverse('delete_work_session'),
       date_roller=date_roller,
       punch_the_clock_table=punch_the_clock_table,
       enter_time_table=enter_time_table,
@@ -40,10 +40,10 @@ def enter_time(request):
 
 @login_required
 @ajax
-def delete_tracked(request):
+def delete_work_session(request):
   pk = get_ajax_variable(request.POST, 'pk', required=True)
-  tracked = Tracked.live.filter(pk=pk).first()
-  if not tracked:
-    raise AjaxProblem('This Tracked does not exist')
-  tracked.mark_deleted()
+  work_session = WorkSession.live.filter(pk=pk).first()
+  if not work_session:
+    raise AjaxProblem('This WorkSession does not exist')
+  work_session.mark_deleted()
   return OK

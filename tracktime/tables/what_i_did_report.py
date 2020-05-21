@@ -7,7 +7,7 @@ from djaveReport.date_range_report import DateRangeReport
 from djaveURL import dict_as_query
 
 from tracktime.models.to_do import ToDo
-from tracktime.models.tracked import Tracked
+from tracktime.models.work_session import WorkSession
 
 
 class WhatIDidReport(DateRangeReport):
@@ -30,14 +30,14 @@ class WhatIDidReportContent(object):
 
   def get_projects(self, user, from_date, to_date, current_query_dict):
     projects = {}
-    for tracked in Tracked.live.done_by_user_and_date_range(
+    for work_session in WorkSession.live.done_by_user_and_date_range(
         user, from_date, to_date):
-      if tracked.hours:
-        if tracked.project not in projects:
-          projects[tracked.project] = WhatIDidPerProject(
-              tracked.project, current_query_dict)
-        projects[tracked.project].hours = round(
-            projects[tracked.project].hours + tracked.hours, 2)
+      if work_session.hours:
+        if work_session.project not in projects:
+          projects[work_session.project] = WhatIDidPerProject(
+              work_session.project, current_query_dict)
+        projects[work_session.project].hours = round(
+            projects[work_session.project].hours + work_session.hours, 2)
     for to_do in ToDo.live.done_by_user_in_date_range(
         user, from_date, to_date).order_by('-pk'):
       if to_do.project not in projects:

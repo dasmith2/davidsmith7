@@ -11,10 +11,10 @@ from djaveNav import date_to_url_str
 from tracktime.models.project import Project
 
 
-# If a Tracked isn't stopped within 16 hours it's considered abandoned.
+# If a WorkSession isn't stopped within 16 hours it's considered abandoned.
 ABANDONED_AFTER_HOURS = 16
-# If a Tracked was started less than 5 minutes ago, it should probably just be
-# canceled.
+# If a WorkSession was started less than 5 minutes ago, it should probably just
+# be canceled.
 TOO_FEW_MINUTES = 5
 
 DELETED = 'DELETED'
@@ -23,32 +23,32 @@ ABANDONED = 'ABANDONED'
 IN_PROGRESS = 'IN_PROGRESS'
 
 
-class TrackedManager(PublishedManager):
+class WorkSessionManager(PublishedManager):
   def done_by_user_and_date(self, user, date, nnow=None):
     return self.done_by_user_and_date_range(user, date, date, nnow=nnow)
 
   def done_by_user_and_date_range(self, user, from_date, to_date, nnow=None):
     to_return = []
-    for tracked in self.filter(
+    for work_session in self.filter(
         user=user, date__gte=from_date, date__lte=to_date).select_related(
             'project', 'user').order_by('-pk'):
-      if tracked.status(nnow=nnow) == DONE:
-        to_return.append(tracked)
+      if work_session.status(nnow=nnow) == DONE:
+        to_return.append(work_session)
     return to_return
 
   def total_hours_per_date(self, start_date, end_date, user):
     if start_date > end_date:
       raise Exception('{} > {}'.format(start_date, end_date))
-    got_tracked = self.filter(
+    got_work_session = self.filter(
         date__gte=start_date, date__lte=end_date, user=user).order_by('date')
     on_date = start_date
     totals = {date_to_url_str(on_date): 0.0}
-    for tracked in got_tracked:
-      while tracked.date > on_date:
+    for work_session in got_work_session:
+      while work_session.date > on_date:
         on_date += timedelta(days=1)
         totals[date_to_url_str(on_date)] = 0.0
-      if tracked.hours:
-        totals[date_to_url_str(tracked.date)] += tracked.hours
+      if work_session.hours:
+        totals[date_to_url_str(work_session.date)] += work_session.hours
     while on_date < end_date:
       on_date += timedelta(days=1)
       totals[date_to_url_str(on_date)] = 0.0
@@ -71,15 +71,15 @@ class TrackedManager(PublishedManager):
             'pk').select_related('project')
 
   def get_clock_running(self, user, nnow=None):
-    # By clock running I mean specifically the Tracked whose clock can be
+    # By clock running I mean specifically the WorkSession whose clock can be
     # stopped.
     nnow = nnow or now()
-    for tracked in self.get_clock_never_stopped(user, nnow=nnow):
-      if tracked.clock_running(nnow=nnow):
-        return tracked
+    for work_session in self.get_clock_never_stopped(user, nnow=nnow):
+      if work_session.clock_running(nnow=nnow):
+        return work_session
 
 
-class Tracked(Published):
+class WorkSession(Published):
   user = models.ForeignKey(User, on_delete=models.PROTECT)
   project = models.ForeignKey(Project, on_delete=models.PROTECT)
   date = models.DateField(db_index=True)
@@ -92,7 +92,7 @@ class Tracked(Published):
   def save(self, *args, **kwargs):
     if self.hours and self.started and not self.stopped:
       raise Exception(
-          'It does not make sense to save a Tracked with hours when it has a '
+          'It does not make sense to save a WorkSession with hours when it has a '
           'start time but no stop time')
     super().save(*args, **kwargs)
 
@@ -167,7 +167,7 @@ class Tracked(Published):
     return round(delta.total_seconds() / 3600, 2)
 
   def __repr__(self, nnow=None):
-    return '<Tracked {}: {} {} {} {} for {} hrs>'.format(
+    return '<WorkSession {}: {} {} {} {} for {} hrs>'.format(
         self.pk, self.user.username, self.project.name,
         self.date, self.status(nnow=nnow), self.hours)
 
@@ -188,7 +188,7 @@ class Tracked(Published):
       return DONE
     raise Exception('I cant figure out what status {} is'.format(self.pk))
 
-  live = TrackedManager()
+  live = WorkSessionManager()
 
   def as_json(self, nnow=None):
     return dict(

@@ -1,5 +1,5 @@
 # flake8: noqa
-from tracktime.views.enter_time import enter_time, delete_tracked
+from tracktime.views.enter_time import enter_time, delete_work_session
 from tracktime.views.projects import (
     projects, archived_projects, archive_project, unarchive_project,
     rename_project)

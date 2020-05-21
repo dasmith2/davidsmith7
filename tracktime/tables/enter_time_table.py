@@ -4,15 +4,15 @@ from djaveForm.form import Form
 from djaveForm.button import Button
 
 from tracktime.fields import project_field, hours_field
-from tracktime.models.tracked import Tracked
+from tracktime.models.work_session import WorkSession
 from tracktime.models.project import Project
 from tracktime.models.latest_project import set_latest_project
 
 
 class EnterTimeForm(Form):
   def __init__(self, user):
-    self.project_field = project_field(user, tracked=None)
-    self.hours_field = hours_field(tracked=None)
+    self.project_field = project_field(user, work_session=None)
+    self.hours_field = hours_field(work_session=None)
     self.save_button = Button('Save new', button_type='submit')
     super().__init__([
         self.project_field, self.hours_field,
@@ -31,14 +31,14 @@ class EnterTimeTable(Table):
     super().__init__()
 
     # This might save a new one if the form is valid so it has to go before we
-    # load this user's Trackeds.
+    # load this user's WorkSessions.
     self.setup_enter_new()
 
-    tracked = Tracked.live.done_by_user_and_date(
+    work_session = WorkSession.live.done_by_user_and_date(
         self.user, self.day, nnow=nnow)
-    self.setup_edit_existing(tracked)
+    self.setup_edit_existing(work_session)
 
-    hours = self.total_hours(tracked)
+    hours = self.total_hours(work_session)
     self.headers = ['Project', 'Hours: {}'.format(hours), '']
 
   def setup_enter_new(self):
@@ -52,23 +52,23 @@ class EnterTimeTable(Table):
         self.form.project_field, self.form.hours_field, self.form.save_button]
     self.create_row(row, classes=['new'])
 
-  def total_hours(self, got_tracked):
+  def total_hours(self, got_work_session):
     total = 0.0
-    for tracked in got_tracked:
-      if tracked.hours:
-        total += tracked.hours
+    for work_session in got_work_session:
+      if work_session.hours:
+        total += work_session.hours
     return round(total, 2)
 
-  def setup_edit_existing(self, got_tracked):
-    for tracked in got_tracked:
+  def setup_edit_existing(self, got_work_session):
+    for work_session in got_work_session:
       delete = Button('Delete')
-      hours = tracked.hours
-      if tracked.started:
+      hours = work_session.hours
+      if work_session.started:
         hours = '{} starting at {}'.format(
-            hours, dt_to_time_str(tracked.started))
+            hours, dt_to_time_str(work_session.started))
       self.create_row([
-          tracked.project.name, Cell(hours, classes=['hours']), delete],
-          pk=tracked.pk)
+          work_session.project.name, Cell(hours, classes=['hours']), delete],
+          pk=work_session.pk)
 
   def is_valid(self):
     return self.form.is_valid()
@@ -77,6 +77,6 @@ class EnterTimeTable(Table):
     project = Project.live.get(pk=self.form.project_field.value)
     hours = self.form.hours_field.value
     set_latest_project(self.user, project)
-    return Tracked.live.create(
+    return WorkSession.live.create(
         user=self.user, project=project, date=self.day,
         hours=hours)

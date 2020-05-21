@@ -3,12 +3,12 @@ from datetime import date, timedelta
 from djaveTest import TestCase, get_test_user
 from djaveDT import str_to_tz_dt, to_tz_dt, to_d
 
-from tracktime.models.tracked import (
-    Tracked, DELETED, DONE, ABANDONED, IN_PROGRESS)
+from tracktime.models.work_session import (
+    WorkSession, DELETED, DONE, ABANDONED, IN_PROGRESS)
 from tracktime.tests.models.test_project import get_test_project
 
 
-def get_test_tracked(**kwargs):
+def get_test_work_session(**kwargs):
   user = kwargs.get('user', None)
   if not user:
     user = get_test_user(**kwargs)
@@ -20,7 +20,7 @@ def get_test_tracked(**kwargs):
   hours = kwargs.get('hours', None)
   if started and stopped and not hours:
     hours = round((stopped - started).total_seconds() / 3600, 2)
-  return Tracked.live.create(
+  return WorkSession.live.create(
       user=user,
       project=project,
       date=to_d(kwargs.get('date', date(2020, 1, 1))),
@@ -37,24 +37,24 @@ class RunningClockTests(TestCase):
     self.project = get_test_project(name='Time Tracker')
 
     # Irrelevant
-    get_test_tracked(  # Really old
+    get_test_work_session(  # Really old
         user=self.user, project=self.project, date=date(2020, 1, 1),
         started='2020-01-01 12:00', stopped=None)
-    get_test_tracked(  # Clock is stopped
+    get_test_work_session(  # Clock is stopped
         user=self.user, project=self.project, date=date(2020, 1, 15),
         started='2020-01-15 12:00', stopped='2020-01-15 13:00')
-    get_test_tracked(  # Other user
+    get_test_work_session(  # Other user
         user=get_test_user(username='irrelevant'), project=self.project,
         date=date(2020, 1, 15), started='2020-01-15 12:00', stopped=None)
-    self.deleted = get_test_tracked(  # Canceled
+    self.deleted = get_test_work_session(  # Canceled
         user=self.user, project=self.project, date=date(2020, 1, 15),
         started='2020-01-15 12:00', deleted='2020-01-15 13:00', stopped=None)
 
     # Relevant
-    self.old = get_test_tracked(
+    self.old = get_test_work_session(
         user=self.user, project=self.project, date=date(2020, 1, 10),
         started='2020-01-10 12:00', stopped=None)
-    self.recent = get_test_tracked(
+    self.recent = get_test_work_session(
         user=self.user, project=self.project, date=date(2020, 1, 15),
         started='2020-01-15 12:00', stopped=None)
 
@@ -62,16 +62,16 @@ class RunningClockTests(TestCase):
 
   def test_get_clock_never_stopped(self):
     self.assertEqual(
-        [self.old, self.recent], list(Tracked.live.get_clock_never_stopped(
+        [self.old, self.recent], list(WorkSession.live.get_clock_never_stopped(
             self.user, nnow=self.six_pm)))
 
   def test_get_clock_running(self):
     self.assertEqual(
-        self.recent, Tracked.live.get_clock_running(
+        self.recent, WorkSession.live.get_clock_running(
             self.user, nnow=self.six_pm))
     self.recent.deleted = self.recent.started + timedelta(hours=1)
     self.recent.save()
-    self.assertIsNone(Tracked.live.get_clock_running(
+    self.assertIsNone(WorkSession.live.get_clock_running(
         self.user, nnow=self.six_pm))
 
   def test_stop_and_clock_running(self):
@@ -120,7 +120,7 @@ class RunningClockTests(TestCase):
     self.assertEqual(
         'The clock is already stopped on this work session',
         self.recent.explain_why_can_not_stop(nnow=self.six_pm))
-    never_started = get_test_tracked(
+    never_started = get_test_work_session(
         user=self.user, project=self.project, date=date(2020, 1, 14))
     self.assertEqual(
         'The clock was never started on this work session',
@@ -137,29 +137,29 @@ class RunningClockTests(TestCase):
 
 class StatusTests(TestCase):
   def test_status(self):
-    tracked = get_test_tracked(
+    work_session = get_test_work_session(
         date='2020-01-15',
         started='2020-01-15 12:00')
     self.assertEqual(
-        IN_PROGRESS, tracked.status(nnow=str_to_tz_dt('2020-01-15 13:00')))
+        IN_PROGRESS, work_session.status(nnow=str_to_tz_dt('2020-01-15 13:00')))
     self.assertEqual(
-        ABANDONED, tracked.status(nnow=str_to_tz_dt('2020-01-17 12:00')))
-    tracked.stopped = str_to_tz_dt('2020-01-15 13:00')
-    self.assertEqual(DONE, tracked.status())
-    tracked.deleted = str_to_tz_dt('2020-01-15 13:00')
-    self.assertEqual(DELETED, tracked.status())
+        ABANDONED, work_session.status(nnow=str_to_tz_dt('2020-01-17 12:00')))
+    work_session.stopped = str_to_tz_dt('2020-01-15 13:00')
+    self.assertEqual(DONE, work_session.status())
+    work_session.deleted = str_to_tz_dt('2020-01-15 13:00')
+    self.assertEqual(DELETED, work_session.status())
 
 
 class JSONTests(TestCase):
   def test_as_json(self):
-    tracked = get_test_tracked(
+    work_session = get_test_work_session(
         date='2020-01-15',
         started='2020-01-15 12:00')
-    self.assertEqual(date(2020, 1, 15), tracked.date)
+    self.assertEqual(date(2020, 1, 15), work_session.date)
     expected = dict(
-        pk=tracked.pk,
-        user=tracked.user.pk,
-        project=tracked.project.pk,
+        pk=work_session.pk,
+        user=work_session.user.pk,
+        project=work_session.project.pk,
         date='2020-01-15',
         hours=None,
         started='2020-01-15T12:00:00-05:00',
@@ -167,29 +167,29 @@ class JSONTests(TestCase):
         deleted=None,
         status=ABANDONED)
     self.assertEqual(
-        expected, tracked.as_json(nnow=str_to_tz_dt('2020-05-14')))
+        expected, work_session.as_json(nnow=str_to_tz_dt('2020-05-14')))
 
 
 class PerDayTests(TestCase):
   def setUp(self):
     super().setUp()
     self.user = get_test_user()
-    self.fifteenth = get_test_tracked(
+    self.fifteenth = get_test_work_session(
         date='2020-01-15', hours=1.0, user=self.user)
-    self.sixteenth = get_test_tracked(
+    self.sixteenth = get_test_work_session(
         date='2020-01-16', hours=2.0, user=self.user)
 
     # Irrelevant
-    get_test_tracked(
+    get_test_work_session(
         date='2020-01-13', hours=3.0, user=self.user)  # Wrong day
-    get_test_tracked(  # Deleted
+    get_test_work_session(  # Deleted
         date='2020-01-15', hours=1.0, user=self.user,
         deleted=str_to_tz_dt('2020-01-01'))
     # Wrong user
-    get_test_tracked(date='2020-01-15', hours=4.0, user=get_test_user())
+    get_test_work_session(date='2020-01-15', hours=4.0, user=get_test_user())
 
   def test_total_hours_per_date(self):
-    got = Tracked.live.total_hours_per_date(
+    got = WorkSession.live.total_hours_per_date(
         date(2020, 1, 14), date(2020, 1, 17), self.user)
     expected = {
         '2020-01-14': '(0.0 hrs)',
@@ -199,9 +199,9 @@ class PerDayTests(TestCase):
     self.assertEqual(expected, got)
 
   def test_done_by_user_and_date(self):
-    self.assertEqual([self.fifteenth], list(Tracked.live.done_by_user_and_date(
+    self.assertEqual([self.fifteenth], list(WorkSession.live.done_by_user_and_date(
         self.user, date(2020, 1, 15))))
     self.assertEqual(
         set([self.fifteenth, self.sixteenth]),
-        set(Tracked.live.done_by_user_and_date_range(
+        set(WorkSession.live.done_by_user_and_date_range(
             self.user, date(2020, 1, 15), date(2020, 1, 16))))

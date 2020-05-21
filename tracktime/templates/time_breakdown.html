@@ -1,5 +1,5 @@
 <style>
-.tracked { margin: 5px 0px 0px 0px; font-size: 20px; }
+.work_session { margin: 5px 0px 0px 0px; font-size: 20px; }
 .to_do { margin: 5px 0px 0px 20px; font-size: 16px; }
 .entries { margin-top: 40px; }
 </style>
@@ -10,8 +10,8 @@
 {% endif %}
 
 <div class="entries">
-  {% for work_session in work_sessions %}
-    <div class="tracked">{{ work_session.time_description }}</div>
+  {% for work_session in work_session_descriptions %}
+    <div class="work_session">{{ work_session.time_description }}</div>
       {% for to_do_description in work_session.to_do_descriptions %}
         <div class="to_do">{{ to_do_description }}</div>
       {% endfor %}
