@@ -98,7 +98,8 @@ class PunchTheClockTable(Table):
     a_clock_can_be_stopped = False
 
     abandoned = []
-    for work_session in WorkSession.live.get_clock_never_stopped(user, nnow=nnow):
+    for work_session in WorkSession.live.get_clock_never_stopped(
+        user, nnow=nnow):
       if work_session.clock_running(nnow=nnow):
         stop_form = StopTheClockForm(work_session)
         stop_clicked = False
@@ -137,7 +138,8 @@ class PunchTheClockTable(Table):
     for work_session in abandoned:
       delete = Button('Abandoned session. Delete.', key_prefix='delete')
       self.create_row([
-          work_session.project.name, work_session.started, delete], pk=work_session.pk)
+          work_session.project.name, work_session.started, delete],
+          pk=work_session.pk)
 
   def is_visible(self):
     return bool(self.rows)

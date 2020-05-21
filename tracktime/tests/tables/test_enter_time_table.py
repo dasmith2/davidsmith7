@@ -54,4 +54,5 @@ class EnterTimeTableTests(TestCaseWithData):
 
     first_work_session_row = table.rows[1]
     self.assertEqual('Project 2', first_work_session_row.cells[0])
-    self.assertEqual(Cell(3.1, classes=['hours']), first_work_session_row.cells[1])
+    self.assertEqual(
+        Cell(3.1, classes=['hours']), first_work_session_row.cells[1])

@@ -92,8 +92,8 @@ class WorkSession(Published):
   def save(self, *args, **kwargs):
     if self.hours and self.started and not self.stopped:
       raise Exception(
-          'It does not make sense to save a WorkSession with hours when it has a '
-          'start time but no stop time')
+          'It does not make sense to save a WorkSession with hours when it '
+          'has a start time but no stop time')
     super().save(*args, **kwargs)
 
   def describe_time_span(self, tz_str=None):

@@ -141,7 +141,8 @@ class StatusTests(TestCase):
         date='2020-01-15',
         started='2020-01-15 12:00')
     self.assertEqual(
-        IN_PROGRESS, work_session.status(nnow=str_to_tz_dt('2020-01-15 13:00')))
+        IN_PROGRESS,
+        work_session.status(nnow=str_to_tz_dt('2020-01-15 13:00')))
     self.assertEqual(
         ABANDONED, work_session.status(nnow=str_to_tz_dt('2020-01-17 12:00')))
     work_session.stopped = str_to_tz_dt('2020-01-15 13:00')
@@ -199,8 +200,9 @@ class PerDayTests(TestCase):
     self.assertEqual(expected, got)
 
   def test_done_by_user_and_date(self):
-    self.assertEqual([self.fifteenth], list(WorkSession.live.done_by_user_and_date(
-        self.user, date(2020, 1, 15))))
+    got = list(WorkSession.live.done_by_user_and_date(
+        self.user, date(2020, 1, 15)))
+    self.assertEqual([self.fifteenth], got)
     self.assertEqual(
         set([self.fifteenth, self.sixteenth]),
         set(WorkSession.live.done_by_user_and_date_range(
