@@ -1,4 +1,7 @@
-from tracktime.tables.time_breakdown import TimeBreakdown, WorkSession
+from django.shortcuts import reverse
+
+from tracktime.tables.time_breakdown import (
+    TimeBreakdown, WorkSession, time_breakdown_url)
 from tracktime.tests.tables.test_case_with_data import TestCaseWithData
 
 
@@ -30,3 +33,11 @@ class TimeBreakdownTests(TestCaseWithData):
     self.assertEqual(self.project_1, report_content.project)
     self.assertTrue(html.find(self.project_1.name) >= 0)
     self.assertEqual(3.2, report_content.total)
+
+
+class TimeBreakdownUrlTests(TestCaseWithData):
+  def test_time_breakdown_url(self):
+    self.setup_projects()
+    expected_url = reverse('report') + '?project=' + str(self.project_1.pk)
+    got_url = time_breakdown_url(self.project_1)
+    self.assertEqual(expected_url, got_url)

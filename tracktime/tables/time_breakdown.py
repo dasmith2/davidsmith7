@@ -1,6 +1,7 @@
 from collections import namedtuple
 from datetime import timedelta
 
+from django.shortcuts import reverse
 from django.template import loader
 from djaveDT import now
 from djaveReport.date_range_report import DateRangeReport
@@ -8,6 +9,10 @@ from djaveReport.date_range_report import DateRangeReport
 from tracktime.models.project import Project
 from tracktime.models.to_do import ToDo
 from tracktime.models.tracked import Tracked
+
+
+def time_breakdown_url(project):
+  return '{}?project={}'.format(reverse('report'), project.pk)
 
 
 class TimeBreakdown(DateRangeReport):
