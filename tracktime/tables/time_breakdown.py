@@ -36,18 +36,17 @@ class TimeBreakdownContent(object):
     self.user = user
     self.project = project
     self.tz_str = tz_str
+    self.work_sessions = self.get_work_sessions(
+        user, project, from_date, to_date, tz_str=tz_str)
 
-    # Get work sessions
-    self.work_sessions = []
+  def get_work_sessions(self, user, project, from_date, to_date, tz_str=None):
+    work_sessions = []
 
     tracked_i = 0
-    trackeds = list(Tracked.live.done_by_user_and_date_range(
-        user, from_date, to_date))
-    trackeds.sort(key=lambda x: x.get_started(tz_str=tz_str))
+    trackeds = self._get_trackeds(user, project, from_date, to_date)
 
     to_do_i = 0
-    to_dos = list(ToDo.live.done_by_user_in_date_range(
-        user, from_date, to_date).order_by('done'))
+    to_dos = self._get_to_dos(user, project, from_date, to_date)
     self.total = 0.0
 
     if not trackeds and not to_dos:
@@ -75,11 +74,30 @@ class TimeBreakdownContent(object):
         if tracked.project == project or not project:
           on_work_session = WorkSession(
               self._time_description(tracked, show_project), [])
-          self.work_sessions.append(on_work_session)
+          work_sessions.append(on_work_session)
           if tracked.hours:
             self.total += tracked.hours
 
-    self.work_sessions.reverse()
+    # I want work sessions in reverse chronological order so when the user
+    # punches out and comes to this report page, the most recent stuff they
+    # worked on is up top.
+    work_sessions.reverse()
+    return work_sessions
+
+  def _get_trackeds(self, user, project, from_date, to_date):
+    trackeds = list(Tracked.live.done_by_user_and_date_range(
+        user, from_date, to_date))
+    trackeds.sort(key=lambda x: x.get_started())
+    if project:
+      trackeds = list(filter(lambda x: x.project == project, trackeds))
+    return trackeds
+
+  def _get_to_dos(self, user, project, from_date, to_date):
+    to_dos = list(ToDo.live.done_by_user_in_date_range(
+        user, from_date, to_date).order_by('done'))
+    if project:
+      to_dos = list(filter(lambda x: x.project == project, to_dos))
+    return to_dos
 
   def _time_description(self, tracked, show_project):
     description = tracked.describe_time_span(self.tz_str)
