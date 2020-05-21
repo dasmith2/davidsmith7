@@ -1,3 +1,6 @@
+""" All this class knows about is a user tracking time. But you probably want
+to track time against something specific, so you'll probably inherit from these
+classes. See tracktime.models.project_work_session as an example. """
 from datetime import timedelta
 
 from django.contrib.auth.models import User
