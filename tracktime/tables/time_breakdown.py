@@ -32,7 +32,8 @@ class TimeBreakdownContent(object):
     self.project = project
     self.tz_str = tz_str
 
-    self.time_breakdown_entries = []
+    # Get work sessions
+    self.work_sessions = []
 
     tracked_i = 0
     trackeds = list(Tracked.live.done_by_user_and_date_range(
@@ -42,48 +43,58 @@ class TimeBreakdownContent(object):
     to_do_i = 0
     to_dos = list(ToDo.live.done_by_user_in_date_range(
         user, from_date, to_date).order_by('done'))
-
     self.total = 0.0
+
+    if not trackeds and not to_dos:
+      return
+
     show_project = not project
+    on_work_session = None
     while tracked_i < len(trackeds) or to_do_i < len(to_dos):
-      to_append = None
       if tracked_i >= len(trackeds) or (
           to_do_i < len(to_dos) and (
               trackeds[tracked_i].get_started(tz_str=tz_str) > (
                   to_dos[to_do_i].done))):
+        if not on_work_session:
+          raise Exception(
+              'How did I pull a to do which occured before any of the '
+              'trackeds?')
         to_do = to_dos[to_do_i]
         to_do_i += 1
         if to_do.project == project or not project:
-          to_append = self._to_do_entry(to_do, show_project)
+          on_work_session.to_do_descriptions.append(
+              self._to_do_description(to_do, show_project))
       else:
         tracked = trackeds[tracked_i]
         tracked_i += 1
         if tracked.project == project or not project:
-          to_append = self._tracked_entry(tracked, show_project)
+          on_work_session = WorkSession(
+              self._time_description(tracked, show_project), [])
+          self.work_sessions.append(on_work_session)
           if tracked.hours:
             self.total += tracked.hours
-      if to_append:
-        self.time_breakdown_entries.append(to_append)
 
-  def _tracked_entry(self, tracked, show_project):
+    self.work_sessions.reverse()
+
+  def _time_description(self, tracked, show_project):
     description = tracked.describe_time_span(self.tz_str)
     if show_project:
       description = '{} {}'.format(tracked.project.name, description)
-    return TimeBreakdownEntry('tracked', description)
+    return description
 
-  def _to_do_entry(self, to_do, show_project):
+  def _to_do_description(self, to_do, show_project):
     description = to_do.description
     if show_project:
       description = '{} {}'.format(to_do.project.name, description)
-    return TimeBreakdownEntry('to_do', description)
+    return description
 
   def as_html(self):
     template = loader.get_template('time_breakdown.html')
     context = {
-        'time_breakdown_entries': self.time_breakdown_entries,
+        'work_sessions': self.work_sessions,
         'project': self.project,
         'total': round(self.total, 2)}
     return template.render(context)
 
 
-TimeBreakdownEntry = namedtuple('TimeBreakdownEntry', 'css_class content')
+WorkSession = namedtuple('WorkSession', 'time_description to_do_descriptions')

@@ -34,7 +34,7 @@ def to_do(request):
     if request.method == 'POST' and punch_out_button.key() in request.POST:
       if clock_running.can_stop():
         clock_running.stop()
-        return redirect('enter_time')
+        return redirect('report') + '?project={}'.format(project.pk)
       stop_problem = Problem(clock_running.explain_why_can_not_stop())
     to_do_table = ToDoTable(
         user=request.user, project=project, form_data=request.POST)

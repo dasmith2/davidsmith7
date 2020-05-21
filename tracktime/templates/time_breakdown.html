@@ -1,6 +1,6 @@
 <style>
 .tracked { margin: 5px 0px 0px 0px; font-size: 20px; }
-.to_do { margin: 5px 0px 0px 20px; }
+.to_do { margin: 5px 0px 0px 20px; font-size: 16px; }
 .entries { margin-top: 40px; }
 </style>
 {% if project %}
@@ -10,7 +10,11 @@
 {% endif %}
 
 <div class="entries">
-  {% for entry in time_breakdown_entries %}
-    <div class="{{ entry.css_class }}">{{ entry.content }}</div>
+  {% for work_session in work_sessions %}
+    <div class="tracked">{{ work_session.time_description }}</div>
+      {% for to_do_description in work_session.to_do_descriptions %}
+        <div class="to_do">{{ to_do_description }}</div>
+      {% endfor %}
+    </div>
   {% endfor %}
 </div>

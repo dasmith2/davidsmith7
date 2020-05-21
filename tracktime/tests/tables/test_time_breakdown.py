@@ -1,4 +1,4 @@
-from tracktime.tables.time_breakdown import TimeBreakdown, TimeBreakdownEntry
+from tracktime.tables.time_breakdown import TimeBreakdown, WorkSession
 from tracktime.tests.tables.test_case_with_data import TestCaseWithData
 
 
@@ -20,12 +20,12 @@ class TimeBreakdownTests(TestCaseWithData):
     html = report.as_html()
     report_content = report.time_breakdown_content
 
-    manual_entry = TimeBreakdownEntry('tracked', 'Jan 15, 2020, 2.1 hours')
-    punched_entry = TimeBreakdownEntry(
-        'tracked', 'Jan 15, 2020, 11 a.m. to 12:06 p.m., 1.1 hours')
-    to_do_entry = TimeBreakdownEntry('to_do', self.to_do.description)
-    expected_entries = [manual_entry, punched_entry, to_do_entry]
-    self.assertEqual(expected_entries, report_content.time_breakdown_entries)
+    manual_session = WorkSession('Jan 15, 2020, 2.1 hours', [])
+    punched_session = WorkSession(
+        'Jan 15, 2020, 11 a.m. to 12:06 p.m., 1.1 hours',
+        [self.to_do.description])
+    expected_sessions = [punched_session, manual_session]
+    self.assertEqual(expected_sessions, report_content.work_sessions)
     self.assertTrue(html.find('Jan 15, 2020, 2.1 hours') >= 0)
     self.assertEqual(self.project_1, report_content.project)
     self.assertTrue(html.find(self.project_1.name) >= 0)
