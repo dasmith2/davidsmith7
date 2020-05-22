@@ -5,15 +5,18 @@ OK = {'OK': True}
 OK_RESPONSE = JsonResponse(OK)
 
 
-def ajax(function):
+class ajax(object):
   """ A decorator for views that will return
   JsonResponse({'problem': 'Things bad!'}) when the view
   raises AjaxProblem('Things bad!') If the view returns data, return
   JsonResponse(data). If the view returns a JsonResponse, simply return the
   JsonResponse. """
-  def wrap(request, *args, **kwargs):
+  def __init__(self, view_function):
+    self.view_function = view_function
+
+  def __call__(self, request, *args, **kwargs):
     try:
-      response = function(request, *args, **kwargs)
+      response = self.view_function(request, *args, **kwargs)
       if isinstance(response, JsonResponse):
         return response
       elif response is None:
@@ -21,7 +24,13 @@ def ajax(function):
       return JsonResponse(response)
     except AjaxProblem as ex:
       return ex.get_problem_response()
-  return wrap
+
+
+class ajax_login_required(ajax):
+  def __call__(self, request, *args, **kwargs):
+    if request.user.is_authenticated:
+      return super().__call__(request, *args, **kwargs)
+    return problem_response('You are not logged in')
 
 
 class AjaxProblem(Exception):

@@ -1,4 +1,5 @@
-from djaveNav.nav import NavItem, Nav
+from djaveNav.nav import NavItem
+from djaveNav.nav_with_account import NavWithAccount
 
 
 ENTER_TIME = 'enter_time'
@@ -12,7 +13,7 @@ NAV_LIST = [
     NavItem(PROJECTS, 'Projects')]
 
 
-def tracktime_context(current_view, **kwargs):
-  context = {'nav': Nav(NAV_LIST, current_view)}
+def tracktime_context(current_view, request, **kwargs):
+  context = {'nav': NavWithAccount(NAV_LIST, current_view, request)}
   context.update(kwargs)
   return context

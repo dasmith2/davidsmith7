@@ -158,6 +158,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'djavError',
+    'djaveLogin',
     'djaveReport',
     'djaveS3',
     'djaveThread'] + THIS_SITE_INSTALLED_APPS
@@ -224,6 +225,10 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',  # noqa: E501
     },
 ]
+
+AUTHENTICATION_BACKENDS = [
+    'djaveLogin.authentication_backend.AuthenticationBackend',
+    'django.contrib.auth.backends.ModelBackend']
 
 
 """ Internationalization. """

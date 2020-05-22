@@ -21,11 +21,15 @@ class Button(FormElement):
     self._was_clicked = was_clicked
     self._was_clicked_set = True
 
-  def get_was_clicked(self):
+  def get_was_clicked(self, post_data=None):
+    if post_data is not None:
+      return self.key() in post_data
     if not self._was_clicked_set:
       raise Exception(
           'I can not tell you if this button was clicked because '
-          'set_was_clicked was never called.')
+          'set_was_clicked was never called and you didnt pass in post_data. '
+          'You probably need to call set_form_data on the form containing '
+          'this button.')
     return self._was_clicked
 
   def as_csv(self):

@@ -1,12 +1,12 @@
 from datetime import timedelta
 
 from django.shortcuts import reverse
-from django.template import loader
 from djaveDT import now
+from djaveTable.cell_content import InHref
+from djaveTable.table import Table
 from djaveReport.date_range_report import DateRangeReport
 from djaveURL import dict_as_query
 
-from tracktime.models.to_do import ToDo
 from tracktime.models.project_work_session import ProjectWorkSession
 
 
@@ -23,17 +23,21 @@ class WhatIDidReport(DateRangeReport):
     self.add_content(self.what_i_did_content)
 
 
-class WhatIDidReportContent(object):
+class WhatIDidReportContent(Table):
   def __init__(self, user, from_date, to_date, current_query_dict):
+    super().__init__(['Project', 'Hours'])
+
     self.projects = self.get_projects(
         user, from_date, to_date, current_query_dict)
+    for project in self.projects:
+      self.create_row([
+          project.name,
+          InHref(project.hours, project.hours_breakdown_url)])
 
   def get_projects(self, user, from_date, to_date, current_query_dict):
     projects = {}
     work_sessions = ProjectWorkSession.live.done_by_user_and_date_range(
         user, from_date, to_date)
-    to_dos = ToDo.live.done_by_user_in_date_range(
-        user, from_date, to_date).order_by('-pk')
     for work_session in work_sessions:
       if work_session.hours:
         if work_session.project not in projects:
@@ -41,23 +45,12 @@ class WhatIDidReportContent(object):
               work_session.project, current_query_dict)
         projects[work_session.project].hours = round(
             projects[work_session.project].hours + work_session.hours, 2)
-    for to_do in to_dos:
-      if to_do.project not in projects:
-        projects[to_do.project] = WhatIDidPerProject(
-            to_do.project, current_query_dict)
-      projects[to_do.project].to_dos.append(to_do)
     return sorted(list(projects.values()), key=lambda x: x.name)
-
-  def as_html(self):
-    template = loader.get_template('what_i_did.html')
-    context = {'projects': self.projects}
-    return template.render(context)
 
 
 class WhatIDidPerProject(object):
   def __init__(self, project, current_query_dict):
     self.name = project.name
-    self.to_dos = []
     self.hours = 0.0
     # This is why the WhatIDidPerProject filters should be exactly the same as
     # the TimeBreakdown filters, except time breakdown is also by project.

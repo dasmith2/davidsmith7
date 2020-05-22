@@ -37,7 +37,7 @@ class Form(object):
       return False
     for element in self.form_elements:
       if isinstance(element, Button):
-        if element.key() in post_data:
+        if element.get_was_clicked(post_data):
           return True
     return False
 

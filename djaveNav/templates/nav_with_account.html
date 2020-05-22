@@ -1,0 +1,13 @@
+<style>
+  .nav_and_account_wrapper {
+      display: flex; justify-content: space-between; align-items: baseline; }
+  .account { display: flex; }
+  .account a { padding-left: 20px; }
+</style>
+<div class="nav_and_account_wrapper">
+  {% include 'nav.html' %}
+  <div class="account">
+    Hello {{ describe_user }}
+    <a href="{{ logout_url }}">Logout</a>
+  </div>
+</div>

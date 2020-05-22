@@ -1,10 +1,10 @@
 from datetime import date
 
-from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, reverse, redirect
 from djaveDT import now
 from djaveForm.button import Button
-from djAveJAX import ajax, OK, AjaxProblem, get_ajax_variable
+from djAveJAX import ajax_login_required, AjaxProblem, get_ajax_variable
+from djaveLogin.login_required import login_required
 from djaveTable.problem import Problem
 
 from tracktime.models.to_do import ToDo
@@ -15,7 +15,7 @@ from tracktime.tables.to_do_table import ToDoTable
 from tracktime.views.util import tracktime_context, TO_DO
 
 
-@login_required(login_url='/admin/login/')
+@login_required
 def to_do(request):
   # These have to go first because they might process a POST and change the
   # current project.
@@ -32,15 +32,16 @@ def to_do(request):
   stop_problem = ''
   if clock_running:
     project = clock_running.project
-    if request.method == 'POST' and punch_out_button.key() in request.POST:
+    if punch_out_button.get_was_clicked(request.POST):
       if clock_running.can_stop():
         clock_running.stop()
-        return redirect(time_breakdown_url(project))
+        return redirect(time_breakdown_url(
+            project, date.today(), date.today()))
       stop_problem = Problem(clock_running.explain_why_can_not_stop())
     to_do_table = ToDoTable(
         user=request.user, project=project, form_data=request.POST)
   context = to_do_context(
-      to_do_table, project=project,
+      to_do_table, request, project=project,
       punch_in_table=punch_in_table,
       punch_out_button=punch_out_button,
       stop_problem=stop_problem,
@@ -48,29 +49,23 @@ def to_do(request):
   return render(request, 'to_do.html', context)
 
 
-@login_required
-@ajax
+@ajax_login_required
 def to_do_done(request):
   to_do = _ajax_to_do(request)
   to_do.done = now()
   to_do.save()
-  return OK
 
 
-@login_required
-@ajax
+@ajax_login_required
 def delete_to_do(request):
   _ajax_to_do(request).mark_deleted()
-  return OK
 
 
-@login_required
-@ajax
+@ajax_login_required
 def edit_description(request):
   to_do = _ajax_to_do(request)
   to_do.description = get_ajax_variable(request, 'description')
   to_do.save()
-  return OK
 
 
 def _ajax_to_do(request):
@@ -81,17 +76,17 @@ def _ajax_to_do(request):
   return to_do
 
 
-@login_required(login_url='/admin/login/')
+@login_required
 def to_do_for_another_project(request):
   to_do_table = ToDoTable(
       user=request.user, project=None, form_data=request.POST)
-  context = to_do_context(to_do_table)
+  context = to_do_context(to_do_table, request)
   return render(request, 'to_do_for_another_project.html', context)
 
 
-def to_do_context(to_do_table, **kwargs):
+def to_do_context(to_do_table, request, **kwargs):
   return tracktime_context(
-      TO_DO, to_do_table=to_do_table,
+      TO_DO, request, to_do_table=to_do_table,
       to_do_done_url=reverse(to_do_done),
       delete_to_do_url=reverse(delete_to_do),
       edit_description_url=reverse('edit_description'), **kwargs)

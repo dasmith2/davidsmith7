@@ -26,6 +26,12 @@ class Nav(object):
       raise Exception(
           'I was unable to find {} in the nav_list'.format(current_view_name))
 
+  def template(self):
+    return 'nav.html'
+
+  def context(self):
+    return {
+        'nav_items_current_or_not': self.nav_items_current_or_not}
+
   def as_html(self):
-    return render_to_string('nav.html', {
-        'nav_items_current_or_not': self.nav_items_current_or_not})
+    return render_to_string(self.template(), self.context())

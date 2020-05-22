@@ -28,5 +28,8 @@ class FormElement(CellContent):
           self.__class__, other.__class__))
     return self.as_html() == other.as_html()
 
+  def __str__(self):
+    return self.as_html()
+
   def __repr__(self):
     return self.as_html()

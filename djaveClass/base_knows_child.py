@@ -1,4 +1,10 @@
-from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import AppRegistryNotReady
+try:
+  from django.contrib.contenttypes.models import ContentType
+except AppRegistryNotReady:
+  raise Exception(
+      'The last time this happened it was because I put '
+      '`from djavError.models import log_error` in djavError.__init__')
 from django.db import models
 
 

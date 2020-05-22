@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.shortcuts import reverse
 
 from tracktime.tables.time_breakdown import (
@@ -39,6 +41,11 @@ class TimeBreakdownTests(TestCaseWithData):
 class TimeBreakdownUrlTests(TestCaseWithData):
   def test_time_breakdown_url(self):
     self.setup_projects()
-    expected_url = reverse('report') + '?project=' + str(self.project_1.pk)
+    expected_url = reverse('time_breakdown') + '?project=' + str(
+        self.project_1.pk)
     got_url = time_breakdown_url(self.project_1)
+    self.assertEqual(expected_url, got_url)
+
+    expected_url += '&from_date=2020-01-15'
+    got_url = time_breakdown_url(self.project_1, from_date=date(2020, 1, 15))
     self.assertEqual(expected_url, got_url)

@@ -10,6 +10,15 @@ class CellContent(object):
   def as_csv(self):
     raise NotImplementedError('as_csv')
 
+  def __eq__(self, other):
+    return self.as_html() == other.as_html()
+
+  def __str__(self):
+    return self.as_html()
+
+  def __repr__(self):
+    return self.as_html()
+
 
 class InHref(CellContent):
   def __init__(self, cell_contents, url):

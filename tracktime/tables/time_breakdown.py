@@ -4,15 +4,22 @@ from datetime import timedelta
 from django.shortcuts import reverse
 from django.template import loader
 from djaveDT import now
-from djaveReport.date_range_report import DateRangeReport
+from djaveReport.date_range_report import DateRangeReport, FROM_DATE, TO_DATE
+from djaveURL import date_to_url_str, dict_as_query
 
+from tracktime.fields import PROJECT, project_field
 from tracktime.models.project import Project
 from tracktime.models.to_do import ToDo
 from tracktime.models.project_work_session import ProjectWorkSession
 
 
-def time_breakdown_url(project):
-  return '{}?project={}'.format(reverse('time_breakdown'), project.pk)
+def time_breakdown_url(project, from_date=None, to_date=None):
+  query_dict = {PROJECT: project.pk}
+  if from_date:
+    query_dict[FROM_DATE] = date_to_url_str(from_date)
+  if to_date:
+    query_dict[TO_DATE] = date_to_url_str(to_date)
+  return '{}{}'.format(reverse('time_breakdown'), dict_as_query(query_dict))
 
 
 class TimeBreakdown(DateRangeReport):
@@ -20,11 +27,14 @@ class TimeBreakdown(DateRangeReport):
     nnow = nnow or now()
     default_from_date = nnow.date() - timedelta(days=7)
     default_to_date = nnow.date()
-    super().__init__(default_from_date, default_to_date, request_get)
+    project_select = project_field(label='Project')
+    super().__init__(
+        default_from_date, default_to_date, request_get,
+        filters=[project_select])
 
     project = None
-    if 'project' in request_get:
-      project = Project.live.filter(pk=request_get['project']).first()
+    if PROJECT in request_get:
+      project = Project.live.filter(pk=request_get[PROJECT]).first()
 
     self.time_breakdown_content = TimeBreakdownContent(
         user, project, self.from_date(), self.to_date())
@@ -116,7 +126,7 @@ class TimeBreakdownContent(object):
     template = loader.get_template('time_breakdown.html')
     context = {
         'work_session_descriptions': self.work_session_descriptions,
-        'project': self.project,
+        PROJECT: self.project,
         'total': round(self.total, 2)}
     return template.render(context)
 

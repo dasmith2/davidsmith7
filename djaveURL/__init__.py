@@ -3,6 +3,31 @@ from urllib.parse import urlparse, parse_qsl, urlencode
 
 from django.http import HttpRequest
 from django.shortcuts import reverse
+from django.urls.exceptions import Resolver404
+from django.urls import resolve
+
+
+def is_valid_url(url):
+  if not isinstance(url, str):
+    raise Exception('Not sure what to do with a {}'.format(url.__class__))
+  if url.find('?') >= 0:
+    url = url.split('?')[0]
+  try:
+    resolve(url)
+    return True
+  except Resolver404:
+    return False
+
+
+def protocol_and_host(request):
+  """ This will return, like, http://127.0.0.1:8000 or https://maintenance.tech
+  request does appear to have a _current_scheme_host property that's exactly
+  what I want, but as it's a "private" property I'm reluctant to rely on it.
+  """
+  protocol = 'http'
+  if request.is_secure():
+    protocol = 'https'
+  return '{}://{}'.format(protocol, request.get_host())
 
 
 def admin_edit_url(my_object):

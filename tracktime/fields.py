@@ -4,18 +4,18 @@ from tracktime.models.project import Project
 from tracktime.models.latest_project import get_latest_project
 
 
-def project_field(user, work_session=None):
-  # If you're creating a new one, set work_session to None.
+PROJECT = 'project'
+
+
+def project_field(user=None, label=None):
   default = None
-  latest_project = get_latest_project(user)
-  if latest_project:
-    default = latest_project.pk
+  if user:
+    latest_project = get_latest_project(user)
+    if latest_project:
+      default = latest_project.pk
   field = SelectField(
-      key_prefix='project', options=project_options(), required=True,
-      default=default)
-  if work_session:
-    field.set_value(work_session.project.pk)
-    field.pk = work_session.pk
+      key_prefix=PROJECT, options=project_options(), required=True,
+      default=default, label=label)
   return field
 
 
@@ -24,10 +24,6 @@ def project_options():
   return [Option(project.pk, project.name) for project in projects]
 
 
-def hours_field(work_session):
-  field = PositiveFloatField(
+def hours_field():
+  return PositiveFloatField(
       key_prefix='hours', required=True, default=0.0)
-  if work_session:
-    field.set_value(work_session.hours)
-    field.pk = work_session.pk
-  return field

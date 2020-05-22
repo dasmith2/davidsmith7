@@ -2,14 +2,18 @@ from djaveForm.field import DateField
 from djaveReport.filtered_report import FilteredReport
 
 
+FROM_DATE = 'from_date'
+TO_DATE = 'to_date'
+
+
 class DateRangeReport(FilteredReport):
   def __init__(
       self, default_from_date, default_to_date, request_get=None, filters=None,
       contents=None):
     self.from_date_field = DateField(
-        key_prefix='from_date', default=default_from_date, label='From')
+        key_prefix=FROM_DATE, default=default_from_date, label='From')
     self.to_date_field = DateField(
-        key_prefix='to_date', default=default_to_date, label='To')
+        key_prefix=TO_DATE, default=default_to_date, label='To')
     date_filters = [self.from_date_field, self.to_date_field]
     dynamic_filters = self._validate_filters(filters)
     use_filters = date_filters + dynamic_filters

@@ -1,14 +1,14 @@
 from django.shortcuts import render, reverse
 from django.conf import settings
-from django.contrib.auth.decorators import login_required
 from djaveNav.nav import NavItem, Nav
+from djaveLogin.login_required import login_required
 from djaveS3.public_file_url import public_file_url_root
 from djaveS3.views import sensitive_file_response
 
 from biscuits.models import PrivateBiscuit, PublicBiscuit
 
 
-@login_required(login_url='/admin/login/')
+@login_required
 def private_biscuits(request):
   if request.method == 'POST':
     PrivateBiscuit.objects.create(file_name=request.POST['file_name'])
@@ -18,7 +18,7 @@ def private_biscuits(request):
   return render(request, 'private_biscuits.html', context)
 
 
-@login_required(login_url='/admin/login/')
+@login_required
 def public_biscuits(request):
   if request.method == 'POST':
     PublicBiscuit.objects.create(file_name=request.POST['file_name'])

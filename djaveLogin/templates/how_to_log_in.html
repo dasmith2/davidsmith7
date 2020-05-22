@@ -1,0 +1,27 @@
+{% extends "this_site.html" %}
+
+{% block this_section_head %}
+<script>
+$(function() {
+  $('.email').focus();
+});
+</script>
+{% endblock this_section_head %}
+
+{% block this_section_body %}
+  {% if possible_used_up_token %}
+    <h1>Expired link</h1>
+    <p>No worries, just send yourself a new one.</p>
+  {% elif email_sent_to %}
+    <h1>Check {{ email_sent_to }} for a login link</h1>
+  {% else %}
+    <h1>Login</h1>
+  {% endif %}
+
+
+  <form method="POST" class="pad-top" action="{{ post_to }}">
+    {% csrf_token %}
+    <label>Email: {{ email_text_box }}</label>
+    {{ email_me_button }}
+  </form>
+{% endblock this_section_body %}
