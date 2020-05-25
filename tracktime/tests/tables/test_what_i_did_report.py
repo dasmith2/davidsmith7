@@ -19,7 +19,6 @@ class WhatIDidReportTests(TestCaseWithData):
   def test_data_and_display(self):
     request_get = {'from_date': '2020-01-15', 'to_date': '2020-01-15'}
     report = WhatIDidReport(request_get, self.user)
-    html = report.as_html()
     table = report.what_i_did_content
     self.assertEqual(1, len(table.rows))
     url = reverse('time_breakdown') + (
