@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import urls as auth_urls
 from django.urls import include, path
+from djaveAPI.urls import djave_api_urls
 from djavError.urls import djaverror_urls
 from djaveLogin.urls import djave_login_urls
 from djaveS3.urls import djave_s3_urls
@@ -19,6 +20,7 @@ urlpatterns = [
     path('js/this_site.js', this_site_js, name='this_site_js'),
     path('css/all_sites.css', all_sites_css, name='all_sites_css'),
     path('css/this_site.css', this_site_css, name='this_site_css'),
+    path('api/', include(djave_api_urls)),
     path('', include(djave_login_urls)),
     path('', include(djaverror_urls)),
     path('', include(djave_s3_urls)),

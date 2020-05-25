@@ -1,0 +1,15 @@
+<h1>{{ model_name }}</h1>
+
+<p>{{ model_description }}</p>
+
+{{ fields_table }}
+
+{% for example in examples %}
+
+<h2>{{ example.title }}</h2>
+{% comment %}Leave this pre at this indent or the actual visual code examples will be indented{% endcomment %}
+<pre>
+{{ example.code }}
+</pre>
+
+{% endfor %}

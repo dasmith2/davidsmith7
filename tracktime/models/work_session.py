@@ -5,9 +5,9 @@ from datetime import timedelta
 
 from django.contrib.auth.models import User
 from django.db import models
-from djaveAPI.published import Published, PublishedManager
+from djaveAPI.publishable import Publishable, PublishableManager
 from djaveDT import (
-    now, dt_for_json, d_for_json, d_to_str, time_to_time_str, tz_dt_to_tz_dt,
+    now, d_to_str, time_to_time_str, tz_dt_to_tz_dt,
     tz_dt_to_str, beginning_of_day)
 from djaveNav import date_to_url_str
 
@@ -24,7 +24,7 @@ ABANDONED = 'ABANDONED'
 IN_PROGRESS = 'IN_PROGRESS'
 
 
-class WorkSessionManager(PublishedManager):
+class WorkSessionManager(PublishableManager):
   def done_by_user_and_date(self, user, date, nnow=None):
     return self.done_by_user_and_date_range(user, date, date, nnow=nnow)
 
@@ -83,14 +83,22 @@ class WorkSessionManager(PublishedManager):
         return work_session
 
 
-class WorkSession(Published):
-  user = models.ForeignKey(User, on_delete=models.PROTECT)
-  date = models.DateField(db_index=True)
-  hours = models.FloatField(blank=True, null=True)
+class WorkSession(Publishable):
+  user = models.ForeignKey(User, on_delete=models.PROTECT, help_text=(
+      'Which user actually did the work?'))
+  date = models.DateField(db_index=True, help_text=(
+      'What date did this work session occur on? If a '
+      'user in New York punches out at 11pm on Friday, the '
+      'stopped field is technically stored as 3 or 4am Greenwich '
+      'Mean Time, but the date field here will say Friday.'))
+  hours = models.FloatField(blank=True, null=True, help_text=(
+      'How long was the work session in hours?'))
   started = models.DateTimeField(blank=True, null=True, help_text=(
-      'When did the user start work?'))
+      'If the user used the clock to time this work session, when did they '
+      'start the clock?'))
   stopped = models.DateTimeField(blank=True, null=True, help_text=(
-      'When did the user finish working?'))
+      'If the user used the clock to time this work session, when did they '
+      'stop the clock?'))
 
   def save(self, *args, **kwargs):
     if self.hours and self.started and not self.stopped:
@@ -192,14 +200,3 @@ class WorkSession(Published):
     raise Exception('I cant figure out what status {} is'.format(self.pk))
 
   live = WorkSessionManager()
-
-  def as_json(self, nnow=None):
-    return dict(
-        pk=self.pk,
-        user=self.user.pk,
-        date=d_for_json(self.date),
-        hours=self.hours,
-        started=dt_for_json(self.started),
-        stopped=dt_for_json(self.stopped),
-        deleted=dt_for_json(self.deleted),
-        status=self.status(nnow=nnow))

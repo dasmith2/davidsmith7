@@ -34,12 +34,13 @@ class ajax_login_required(ajax):
 
 
 class AjaxProblem(Exception):
-  def __init__(self, *args, **kwargs):
-    self.message = args[0]
-    super().__init__(*args, **kwargs)
+  def __init__(self, message, status_code=200):
+    self.message = message
+    self.status_code = status_code
+    super().__init__(message, status_code)
 
   def get_problem_response(self):
-    return problem_response(self.message)
+    return problem_response(self.message, status_code=self.status_code)
 
 
 def problem_response(message, status_code=200):

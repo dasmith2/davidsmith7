@@ -68,6 +68,12 @@ class Table(object):
     to_return.append('</table>')
     return mark_safe('\n'.join(to_return))
 
+  def __str__(self):
+    return self.as_html()
+
+  def __repr__(self):
+    return self.as_html()
+
   def _rows_html(self):
     to_return = []
     if self.rows:

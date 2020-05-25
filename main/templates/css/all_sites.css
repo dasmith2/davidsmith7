@@ -25,6 +25,10 @@ td, th { border-right: 1px solid #999;
   border-bottom: 1px solid #999; padding: 10px; }
 th, .row2 { background-color: #eee; }
 
+pre {
+  margin: 10px 0px 0px 0px; background-color: #eee; border: 1px solid #999;
+  padding: 10px; font-size: 14px; box-shadow: 4px 4px 2px grey; }
+
 button, .button, input[type="submit"], input[type="button"], a.button {
   background: #79aec8;
   padding: 10px 15px;
