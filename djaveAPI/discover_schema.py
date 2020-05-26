@@ -83,8 +83,3 @@ def api_fields(model):
         name, help_text, can_filter, field_type, foreign_key_to, max_length,
         required, editable))
   return fields
-
-
-def get_project_work_session_fields():  # DO NOT SUBMIT
-  from tracktime.models.project_work_session import ProjectWorkSession
-  return api_fields(ProjectWorkSession)

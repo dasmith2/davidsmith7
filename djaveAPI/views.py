@@ -17,7 +17,6 @@ def generic_api_docs(request, model_names, api_root_url):
 def list_objects(request, model_name):
   results = []
   model = _get_model(model_name)
-  # DO NOT SUBMIT. How does permission work?
   for obj in filter_model(model, request.GET):
     results.append(to_json_dict(obj))
   return {'results': results}
@@ -33,7 +32,7 @@ def get_object(request, model_name, pk):
         'specified {}').format(model_name, ', '.join(request.GET.keys())), 400)
 
   try:
-    instance = model.live.filter(pk=pk).first()  # DO NOT SUBMIT permission
+    instance = model.live.filter(pk=pk).first()
   except ValueError as ex:
     # "Field 'id' expected a number but got 'a'."
     if ex.args[0].find('number'):
