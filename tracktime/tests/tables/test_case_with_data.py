@@ -23,8 +23,9 @@ class TestCaseWithData(TestCase):
 
   def setup_to_dos(self):
     self.to_do = get_test_to_do(
-        user=self.user, project=self.project_1,
-        description='Glue the arms on the manikin', done='2020-01-15 11:30')
+        creator=self.user, project=self.project_1,
+        description='Glue the arms on the manikin', done='2020-01-15 11:30',
+        done_by=self.user)
 
   def setup_irrelevant_stuff(self):
     get_test_user(username='irrelevant_user')
@@ -42,8 +43,8 @@ class TestCaseWithData(TestCase):
         started='2020-01-15 10:00', stopped=None)
 
     get_test_to_do(  # Not done yet
-        user=self.user, project=self.project_1,
+        creator=self.user, project=self.project_1,
         description='Drink the leftover coffee')
     get_test_to_do(  # Done a long time ago
-        user=self.user, project=self.project_1,
+        creator=self.user, done_by=self.user, project=self.project_1,
         description='I\'m going to not vote yes', done='2020-01-05')

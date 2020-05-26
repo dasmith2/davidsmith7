@@ -19,11 +19,11 @@ class ToDoTableTests(TestCase):
 
     # Irrelevant
     get_test_to_do(  # Other user
-        description='one', user=get_test_user(), project=self.project)
+        description='one', creator=get_test_user(), project=self.project)
     get_test_to_do(  # Other project
-        description='two', user=self.user, project=get_test_project())
+        description='two', creator=self.user, project=get_test_project())
     get_test_to_do(  # Deleted
-        description='three', user=self.user, project=self.project,
+        description='three', creator=self.user, project=self.project,
         deleted=to_tz_dt('2020-01-01'))
 
   def test_empty(self):
@@ -42,7 +42,7 @@ class ToDoTableTests(TestCase):
             'todo': 'yep'})
     self.assertEqual(2, len(table.rows))
     self.assertEqual(to_do_count_before + 1, ToDo.live.count())
-    to_do = ToDo.live.filter(user=self.user, project=self.project).first()
+    to_do = ToDo.live.filter(creator=self.user, project=self.project).first()
     description = TextAreaField(
         'edit_description', default='Hello world!', required=False)
     buttons = [Button('Done'), Button('Delete')]
@@ -56,8 +56,9 @@ class ToDoTableTests(TestCase):
             'did': 'yep'}, nnow=to_tz_dt('2020-01-15 12:00'))
     self.assertEqual(1, len(table.rows))
     ToDo.live.get(
-        user=self.user, project=self.project,
-        description='Hello world!', done=to_tz_dt('2020-01-15 12:00'))
+        creator=self.user, project=self.project,
+        description='Hello world!', done=to_tz_dt('2020-01-15 12:00'),
+        done_by=self.user)
 
   def test_new_to_do_all_projects(self):
     table = ToDoTable(
@@ -65,7 +66,7 @@ class ToDoTableTests(TestCase):
             'new_description': 'Hello world!',
             'project': self.project.pk,
             'todo': 'yep'})
-    to_do = ToDo.live.filter(user=self.user, project=self.project).first()
+    to_do = ToDo.live.filter(creator=self.user, project=self.project).first()
     description = TextAreaField(
         'edit_description', default='Hello world!', required=False)
     table.rows[0].assertEqual(Row([

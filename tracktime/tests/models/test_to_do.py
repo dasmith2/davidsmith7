@@ -8,18 +8,21 @@ from tracktime.tests.models.test_project import get_test_project
 
 
 def get_test_to_do(**kwargs):
+  if 'user' in kwargs:
+    raise Exception('user has been replaced by creator and done_by')
   project = kwargs.get('project', None)
   if not project:
     project = get_test_project(**kwargs)
-  user = kwargs.get('user', None)
-  if not user:
-    user = get_test_user(**kwargs)
+  creator = kwargs.get('creator', None)
+  if not creator:
+    creator = get_test_user(**kwargs)
   to_do = ToDo.live.create(
       description=kwargs.get('description', 'Do some stuff'),
       done=to_tz_dt(kwargs.get('done', None)),
       deleted=to_tz_dt(kwargs.get('deleted', None)),
       project=project,
-      user=user)
+      creator=creator,
+      done_by=kwargs.get('done_by', None))
   if 'created' in kwargs:
     ToDo.live.filter(pk=to_do.pk).update(created=to_tz_dt(kwargs['created']))
     to_do.refresh_from_db()
@@ -32,19 +35,23 @@ class DoneByUserInDateRangeTests(TestCase):
     self.user = get_test_user()
 
     get_test_to_do(
-        user=self.user, done=to_tz_dt('2020-01-14 12:00'), description='a')
+        creator=self.user, done_by=self.user,
+        done=to_tz_dt('2020-01-14 12:00'), description='a')
     self.fifteenth = get_test_to_do(
-        user=self.user, done=to_tz_dt('2020-01-15 12:00'), description='b')
+        creator=self.user, done_by=self.user,
+        done=to_tz_dt('2020-01-15 12:00'), description='b')
     self.sixteenth = get_test_to_do(
-        user=self.user, done=to_tz_dt('2020-01-16 12:00'), description='c')
+        creator=self.user, done_by=self.user,
+        done=to_tz_dt('2020-01-16 12:00'), description='c')
     get_test_to_do(
-        user=self.user, done=to_tz_dt('2020-01-17 12:00'), description='d')
+        creator=self.user, done_by=self.user,
+        done=to_tz_dt('2020-01-17 12:00'), description='d')
 
     # Irrelevant
     get_test_to_do(  # Other user
-        user=get_test_user(), done=to_tz_dt('2020-01-15 12:00'),
-        description='e')
-    get_test_to_do(user=self.user, description='f')  # Not done
+        creator=get_test_user(), done_by=get_test_user(),
+        done=to_tz_dt('2020-01-15 12:00'), description='e')
+    get_test_to_do(creator=self.user, description='f')  # Not done
 
   def test_done_by_user_in_date_range(self):
     self.assertEqual(
@@ -59,11 +66,12 @@ class ToDoTests(TestCase):
     project_2 = get_test_project(name='Davespace')
     user = get_test_user()
 
-    not_done_1 = get_test_to_do(project=project_1, user=user)
-    not_done_2 = get_test_to_do(project=project_2, user=user)
+    not_done_1 = get_test_to_do(project=project_1, creator=user)
+    not_done_2 = get_test_to_do(project=project_2, creator=user)
     # Done. Should never show up.
     get_test_to_do(
-        project=project_1, done=to_tz_dt('2020-01-01'), user=user)
+        project=project_1, done=to_tz_dt('2020-01-01'), creator=user,
+        done_by=user)
 
     self.assertEqual(
         [not_done_2, not_done_1], list(ToDo.live.not_done(user)))

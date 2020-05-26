@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 from djaveAPI.publishable import Publishable
 
@@ -8,6 +9,10 @@ class Project(Publishable):
       'What is this project called?'))
   created = models.DateTimeField(auto_now_add=True, help_text=(
       'When was this project created?'))
+  # null and blank should be False. Switch once production is populated.
+  creator = models.ForeignKey(
+      User, on_delete=models.PROTECT, null=True, blank=True, help_text=(
+          'Who created this project?'))
 
   def model_description():
     return 'Users track time against Projects.'

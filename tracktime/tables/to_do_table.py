@@ -48,10 +48,11 @@ class ToDoTable(Table):
               pk=self.form.project_field.get_value())
           set_latest_project(self.user, project)
         to_do = ToDo.live.create(
-            user=self.user, project=project,
+            creator=self.user, project=project,
             description=self.form.description_field.get_value())
         if self.form.did_button.get_was_clicked():
           to_do.done = nnow
+          to_do.done_by = self.user
           to_do.save()
         self.form = ToDoForm(self.user, show_project=show_project)
 

@@ -1,3 +1,6 @@
+""" By itself, an APIKey isn't much use. You're probably going to inherit from
+APIKey in order to describe some kind of scope. djaveAPI.models.user_api_key is
+an example. It's an API key created at the user level.  """
 from secrets import token_urlsafe
 
 from django.contrib.auth.hashers import check_password, make_password

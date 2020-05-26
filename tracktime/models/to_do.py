@@ -14,19 +14,20 @@ OPEN = 'OPEN'
 
 
 class ToDoManager(PublishableManager):
-  def not_done(self, user, project=None):
-    filtered = self.filter(
-        done=None, user=user).select_related('project').order_by('-pk')
+  def not_done(self, creator, project=None):
+    filtered = self.filter(done=None, creator=creator).select_related(
+        'project', 'creator').order_by('-pk')
     if project:
       filtered = filtered.filter(project=project)
     return filtered
 
-  def done_by_user_in_date_range(self, user, from_date, to_date, tz_str=None):
+  def done_by_user_in_date_range(
+      self, done_by, from_date, to_date, tz_str=None):
     from_dt = beginning_of_day(from_date, tz_str=tz_str)
     to_dt = beginning_of_day(to_date + timedelta(days=1), tz_str=tz_str)
     return self.filter(
-        user=user, done__gte=from_dt, done__lte=to_dt).select_related(
-        'project', 'user').order_by('-pk')
+        done_by=done_by, done__gte=from_dt, done__lte=to_dt).select_related(
+        'project', 'creator', 'done_by').order_by('-pk')
 
 
 class ToDo(Publishable):
@@ -36,9 +37,20 @@ class ToDo(Publishable):
       'When, if ever, was this ToDo marked done?'))
   project = models.ForeignKey(Project, on_delete=models.PROTECT, help_text=(
       'What project does this ToDo apply to?'))
-  user = models.ForeignKey(User, on_delete=models.PROTECT)
+  creator = models.ForeignKey(
+      User, on_delete=models.PROTECT, related_name='creator')
+  done_by = models.ForeignKey(
+      User, on_delete=models.PROTECT, related_name='done_by', null=True,
+      blank=True)
 
   live = ToDoManager()
+
+  def save(self, *args, **kwargs):
+    if int(bool(self.done)) + int(bool(self.done_by)) == 1:
+      raise Exception((
+          'A done ToDo should say done_by and done. You specified '
+          '{} and {} respectively').format(self.done, self.done_by))
+    super().save(*args, **kwargs)
 
   def status(self):
     if self.deleted:

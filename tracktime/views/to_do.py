@@ -53,6 +53,7 @@ def to_do(request):
 def to_do_done(request):
   to_do = _ajax_to_do(request)
   to_do.done = now()
+  to_do.done_by = request.user
   to_do.save()
 
 
