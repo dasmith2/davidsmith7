@@ -1,0 +1,58 @@
+from secrets import token_urlsafe
+
+from django.contrib.auth.hashers import check_password, make_password
+from django.db import models
+
+
+class APIKeyManager(models.Manager):
+  def create_key(self, name, **kwargs):
+    username = token_urlsafe(8)
+    plain_password = token_urlsafe()
+    hashed_password = make_password(plain_password)
+    api_key = self.create(
+        name=name, username=username,
+        hashed_password=hashed_password, **kwargs)
+    api_key.set_plain_password(plain_password)
+    return api_key
+
+  def get_api_key(self, username, plain_password):
+    api_key = self.filter(username=username).first()
+    if not api_key:
+      return
+    if check_password(plain_password, api_key.hashed_password):
+      return api_key
+
+
+class APIKey(models.Model):
+  name = models.CharField(max_length=200, blank=True, default='', help_text=(
+      'API Keys have names to help you keep track of who you gave this key '
+      'to. Then you can selectively revoke access.'))
+  username = models.CharField(max_length=100, help_text=(
+      'Because passwords are encrypted in the database, we need a username '
+      'to look up the key.'))
+
+  hashed_password = models.CharField(max_length=100, help_text=(
+      'The password is salted and hashed. Then, if a hacker gains '
+      'readonly access to the database, they will at least be prevented from '
+      'immediately executing requests on behalf of teams.'))
+  # Actually this isn't really true. If a hacker gainst readonly access to the
+  # database, they can read the django_session table which stores unencrypted
+  # session keys. With a valid session key, a hacker can be logged in and just
+  # go make a new APIKey.
+
+  def __init__(self, *args, **kwargs):
+    self._plain_password = None
+    super().__init__(*args, **kwargs)
+
+  def set_plain_password(self, plain_password):
+    self._plain_password = plain_password
+
+  def get_plain_password(self):
+    if self._plain_password is None:
+      raise Exception(
+          'You can only get the unhashed password immediately after '
+          'creating the key. We purposefully dont store unhashed '
+          'passwords.')
+    return self._plain_password
+
+  objects = APIKeyManager()

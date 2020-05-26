@@ -151,25 +151,6 @@ class StatusTests(TestCase):
     self.assertEqual(DELETED, work_session.status())
 
 
-class JSONTests(TestCase):
-  def test_as_json(self):
-    work_session = get_test_work_session(
-        date='2020-01-15',
-        started='2020-01-15 12:00')
-    self.assertEqual(date(2020, 1, 15), work_session.date)
-    expected = dict(
-        pk=work_session.pk,
-        user=work_session.user.pk,
-        date='2020-01-15',
-        hours=None,
-        started='2020-01-15T12:00:00-05:00',
-        stopped=None,
-        deleted=None,
-        status=ABANDONED)
-    self.assertEqual(
-        expected, work_session.as_json(nnow=str_to_tz_dt('2020-05-14')))
-
-
 class PerDayTests(TestCase):
   def setUp(self):
     super().setUp()

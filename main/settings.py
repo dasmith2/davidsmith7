@@ -162,6 +162,7 @@ INSTALLED_APPS = [
     'djaveLogin',
     'djaveReport',
     'djaveS3',
+    'djaveTeam',
     'djaveThread'] + THIS_SITE_INSTALLED_APPS
 
 if DEBUG:
