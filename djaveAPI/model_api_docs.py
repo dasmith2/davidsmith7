@@ -47,7 +47,7 @@ def model_api_examples(model, api_root_url):
   list_with_filters_url = '{}{}'.format(
       list_url, dict_as_query(example_filters(model)))
   get_one_url = '{}/{}'.format(list_url, 1234)
-  examples = [APIExample('Get all ever', basic_get.format(list_url))]
+  examples = [APIExample('Get all', basic_get.format(list_url))]
   if list_url != list_with_filters_url:  # a.k.a. filters exist
     examples.append(APIExample('Get a filtered list', basic_get.format(
         list_with_filters_url)))
