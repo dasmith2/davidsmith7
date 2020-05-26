@@ -17,12 +17,12 @@ class BaseProjectTable(Table):
 
 
 class ProjectTable(BaseProjectTable):
-  def __init__(self, request_post):
+  def __init__(self, user, request_post):
     self.new_project_form = NewProjectForm()
     if request_post:
       self.new_project_form.set_form_data(request_post)
       if self.new_project_form.is_valid():
-        self.new_project_form.save_new()
+        self.new_project_form.save_new(creator=user)
         self.new_project_form = NewProjectForm()
 
     super().__init__()
@@ -56,8 +56,8 @@ class NewProjectForm(Form):
     self.save_new_button = Button('Save new', button_type='submit')
     super().__init__([self.name_field, self.save_new_button])
 
-  def save_new(self):
-    Project.live.create(name=self.name_field.get_value())
+  def save_new(self, creator):
+    Project.live.create(name=self.name_field.get_value(), creator=creator)
 
 
 class NewProjectNameField(TextField):
