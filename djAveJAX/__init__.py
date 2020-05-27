@@ -16,17 +16,22 @@ class ajax(object):
 
   def __call__(self, request, *args, **kwargs):
     try:
-      response = self.view_function(request, *args, **kwargs)
-      if isinstance(response, JsonResponse):
-        return response
-      elif response is None:
-        return OK_RESPONSE
-      return JsonResponse(response)
+      return self.response_as_ajax(
+          self.view_function(request, *args, **kwargs))
     except AjaxProblem as ex:
       return ex.get_problem_response()
 
+  def response_as_ajax(self, response):
+    if isinstance(response, JsonResponse):
+      return response
+    elif response is None:
+      return OK_RESPONSE
+    return JsonResponse(response)
+
 
 class ajax_login_required(ajax):
+  """ You'll use this to decorate functions that respond to user button clicks
+  and such. """
   def __call__(self, request, *args, **kwargs):
     if request.user.is_authenticated:
       return super().__call__(request, *args, **kwargs)

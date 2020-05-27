@@ -1,9 +1,10 @@
 from django.shortcuts import render
+from djaveAPI.api_key_ajax import api_key_ajax
 from djaveAPI.filters import filter_model
 from djaveAPI.model_api_docs import model_api_docs
 from djaveAPI.to_json import to_json_dict
 from djaveClass.find_models import model_from_name
-from djAveJAX import AjaxProblem, ajax
+from djAveJAX import AjaxProblem
 
 
 def generic_api_docs(request, model_names, api_root_url):
@@ -13,17 +14,17 @@ def generic_api_docs(request, model_names, api_root_url):
   return render(request, 'api_docs.html', context={'model_docs': model_docs})
 
 
-@ajax
-def list_objects(request, model_name):
+@api_key_ajax
+def list_objects(request, api_key, model_name):
   results = []
   model = _get_model(model_name)
-  for obj in filter_model(model, request.GET):
+  for obj in filter_model(model, api_key, request.GET):
     results.append(to_json_dict(obj))
   return {'results': results}
 
 
-@ajax
-def get_object(request, model_name, pk):
+@api_key_ajax
+def get_object(request, api_key, model_name, pk):
   model = _get_model(model_name)
 
   if request.GET:
@@ -32,7 +33,7 @@ def get_object(request, model_name, pk):
         'specified {}').format(model_name, ', '.join(request.GET.keys())), 400)
 
   try:
-    instance = model.live.filter(pk=pk).first()
+    instance = model.all.allowed(api_key).filter(pk=pk).first()
   except ValueError as ex:
     # "Field 'id' expected a number but got 'a'."
     if ex.args[0].find('number'):

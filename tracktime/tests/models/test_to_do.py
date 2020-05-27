@@ -1,7 +1,8 @@
 from datetime import date
 
-from djaveTest import TestCase, get_test_user
+from djaveAPI.tests.test_user_api_key import get_test_user_api_key
 from djaveDT import to_tz_dt
+from djaveTest import TestCase, get_test_user
 
 from tracktime.models.to_do import ToDo
 from tracktime.tests.models.test_project import get_test_project
@@ -27,6 +28,16 @@ def get_test_to_do(**kwargs):
     ToDo.live.filter(pk=to_do.pk).update(created=to_tz_dt(kwargs['created']))
     to_do.refresh_from_db()
   return to_do
+
+
+class AllowedTests(TestCase):
+  def test_allowed(self):
+    user = get_test_user()
+    to_do_1 = get_test_to_do(creator=user)
+    to_do_2 = get_test_to_do(done_by=user, done='2020-01-15')
+    get_test_to_do()  # Other user
+    api_key = get_test_user_api_key(user=user)
+    self.assertEqual(set([to_do_1, to_do_2]), set(ToDo.allowed(api_key)))
 
 
 class DoneByUserInDateRangeTests(TestCase):

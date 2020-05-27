@@ -5,6 +5,7 @@ from datetime import timedelta
 
 from django.contrib.auth.models import User
 from django.db import models
+from djaveAPI.models.user_api_key import UserAPIKey
 from djaveAPI.publishable import Publishable, PublishableManager
 from djaveDT import (
     now, d_to_str, time_to_time_str, tz_dt_to_tz_dt,
@@ -106,6 +107,14 @@ class WorkSession(Publishable):
           'It does not make sense to save a WorkSession with hours when it '
           'has a start time but no stop time')
     super().save(*args, **kwargs)
+
+  @classmethod
+  def allowed(cls, api_key):
+    if isinstance(api_key, UserAPIKey):
+      return cls.all.filter(user=api_key.user)
+    else:
+      raise Exception(
+          'I do not know how to handle {} api keys'.format(api_key.__class__))
 
   def describe_time_span(self, tz_str=None):
     if self.started and self.stopped:

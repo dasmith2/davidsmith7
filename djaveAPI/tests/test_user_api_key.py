@@ -1,5 +1,13 @@
 from djaveAPI.models.user_api_key import UserAPIKey
+from djaveAPI.tests.test_api_key import set_api_key_stuff
 from djaveTest import TestCase, get_test_user
+
+
+def get_test_user_api_key(**kwargs):
+  user = kwargs.get('user', None)
+  if not user:
+    user = get_test_user()
+  return set_api_key_stuff(UserAPIKey(user=user), **kwargs)
 
 
 class UserAPIKeyTests(TestCase):

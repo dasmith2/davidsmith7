@@ -2,6 +2,8 @@ from datetime import timedelta
 
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models import Q
+from djaveAPI.models.user_api_key import UserAPIKey
 from djaveAPI.publishable import Publishable, PublishableManager
 from djaveDT import beginning_of_day
 
@@ -44,6 +46,14 @@ class ToDo(Publishable):
       blank=True)
 
   live = ToDoManager()
+
+  @classmethod
+  def allowed(cls, api_key):
+    if isinstance(api_key, UserAPIKey):
+      return cls.all.filter(Q(creator=api_key.user) | Q(done_by=api_key.user))
+    else:
+      raise Exception(
+          'I do not know how to handle {} api keys'.format(api_key.__class__))
 
   def save(self, *args, **kwargs):
     if int(bool(self.done)) + int(bool(self.done_by)) == 1:

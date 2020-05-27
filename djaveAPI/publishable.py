@@ -7,11 +7,6 @@ class PublishableManager(models.Manager):
     return super().get_queryset().filter(deleted__isnull=True)
 
 
-class DeletedManager(models.Manager):
-  def get_queryset(self):
-    return super().get_queryset().filter(deleted__isnull=False)
-
-
 class Publishable(models.Model):
   """ Have your models inherit from this class if you want your models to be
   published online as part of a REST-ish API. """
@@ -31,6 +26,12 @@ class Publishable(models.Model):
         'If you actually delete a record and the consumer misses the '
         'webhook, how will they ever find out it was deleted? Use '
         'mark_deleted instead.')
+
+  @classmethod
+  def allowed(cls, api_key):
+    """ Return a query set that will only retrieve instances the api_key is
+    allowed to see. """
+    raise NotImplementedError('allowed')
 
   live = PublishableManager()
   all = models.Manager()

@@ -10,8 +10,8 @@ from djAveJAX import AjaxProblem
 AVAILABLE_OPERATORS = ['gt', 'gte', 'lt', 'lte']
 
 
-def filter_model(model, request_GET):
-  queryset = model.live.all()
+def filter_model(model, api_key, request_GET):
+  queryset = model.all.allowed(api_key)
   available_filters = filters(model)
   for key, value in request_GET.items():
     if not value:
