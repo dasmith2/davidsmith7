@@ -5,7 +5,7 @@ from django.shortcuts import reverse
 from django.template import loader
 from djaveAPI.discover_schema import (
     api_fields, DATE_TIME, DATE, INTEGER, FLOAT)
-from djaveAPI.field_table import field_table
+from djaveAPI.widgets.field_table import field_table
 from djaveDT import to_tz_dt
 from djaveClass.find_models import model_from_name
 from djaveURL import dict_as_query

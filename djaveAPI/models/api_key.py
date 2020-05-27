@@ -1,11 +1,15 @@
 """ By itself, an APIKey isn't much use. You're probably going to inherit from
 APIKey in order to describe some kind of scope. djaveAPI.models.user_api_key is
-an example. It's an API key created at the user level.  """
+an example. It's an API Key created at the user level.  """
 from secrets import token_urlsafe
 
 from django.contrib.auth.hashers import check_password, make_password
 from django.db import models
 from djaveClass.base_knows_child import BaseKnowsChild
+
+
+def username_available(username):
+  return not APIKey.objects.filter(username=username).exists()
 
 
 class APIKeyManager(models.Manager):
@@ -46,12 +50,18 @@ class APIKey(BaseKnowsChild):
   def set_plain_password(self, plain_password):
     self._plain_password = plain_password
 
+  def has_plain_password(self):
+    return self._plain_password is not None
+
   def get_plain_password(self):
-    if self._plain_password is None:
+    if not self.has_plain_password():
       raise Exception(
           'You can only get the unhashed password immediately after '
           'creating the key. We purposefully dont store unhashed '
           'passwords.')
     return self._plain_password
+
+  def can_delete(self, user):
+    raise NotImplementedError('can_delete')
 
   objects = APIKeyManager()

@@ -2,9 +2,12 @@ from django.shortcuts import render
 from djaveAPI.api_key_ajax import api_key_ajax
 from djaveAPI.filters import filter_model
 from djaveAPI.model_api_docs import model_api_docs
+from djaveAPI.models.api_key import APIKey
 from djaveAPI.to_json import to_json_dict
+from djaveAPI.widgets.new_api_key_widget import NewAPIKeyWidget
+from djaveAPI.widgets.new_user_api_key_table import NewUserAPIKeyTable
 from djaveClass.find_models import model_from_name
-from djAveJAX import AjaxProblem
+from djAveJAX import AjaxProblem, ajax_login_required, get_ajax_variable
 
 
 def generic_api_docs(request, model_names, api_root_url):
@@ -49,3 +52,26 @@ def _get_model(model_name):
   if not model:
     raise AjaxProblem('There is no {} API'.format(model_name), status_code=404)
   return model
+
+
+def user_api_keys(request):
+  table = NewUserAPIKeyTable(request.user, request.POST)
+  description = (
+      'User API Keys will retrieve data based on what you, the user, can '
+      'see on the website.')
+  widget = NewAPIKeyWidget(
+      request, table, 'User API Keys', description)
+  context = {'the_one_thing_on_this_page': widget}
+  return render(request, 'this_site.html', context)
+
+
+@ajax_login_required
+def delete_key(request):
+  pk = get_ajax_variable(request.POST, 'pk')
+  api_key = APIKey.objects.filter(pk=pk).first()
+  if not api_key:
+    raise AjaxProblem('This API Key does not exist')
+  api_key = api_key.as_child_class()
+  if not api_key.can_delete(request.user):
+    raise AjaxProblem('You do not have permission to delete this key')
+  api_key.delete()

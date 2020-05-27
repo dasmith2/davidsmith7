@@ -13,5 +13,8 @@ Feel free to modify this file on specific sites. The templates for the various s
 
 {% block this_site_body %}
   {% block this_section_body %}
+    {% comment %} This is in case you just want to display a thing without
+    creating a whole new page level template for it. {% endcomment %}
+    {{ the_one_thing_on_this_page }}
   {% endblock this_section_body %}
 {% endblock this_site_body %}

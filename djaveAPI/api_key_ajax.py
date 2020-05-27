@@ -7,7 +7,7 @@ from djAveJAX import ajax, problem_response, AjaxProblem
 class api_key_ajax(ajax):
   """ Unlike ajax_login_required in djAveJax, which assumes requests are being
   sent by a logged in user, you'll use api_key_ajax when requests are being
-  sent by a server that's using API keys. It adds a second argument to your
+  sent by a server that's using API Keys. It adds a second argument to your
   view which is the API Key used to make the request. """
 
   def __call__(self, request, *args, **kwargs):

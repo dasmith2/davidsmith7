@@ -1,6 +1,7 @@
 from collections import namedtuple
 from datetime import date
 import html
+import re
 
 from django.utils.dateparse import parse_date
 from django.utils.safestring import mark_safe
@@ -179,6 +180,15 @@ class DateField(HtmlInputField):
 class TextField(HtmlInputField):
   def input_type(self):
     return 'text'
+
+
+class SlugField(TextField):
+  def explain_why_not_valid(self):
+    super_invalid = super().explain_why_not_valid()
+    if super_invalid:
+      return super_invalid
+    if re.compile(r'[^\w-]').findall(self.value):
+      return 'You can only use letters, numbers, _ and -'
 
 
 class PositiveFloatField(HtmlInputField):

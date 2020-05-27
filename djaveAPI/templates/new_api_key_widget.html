@@ -1,0 +1,16 @@
+<script>
+$(function() {
+  wire_up_ajax_button(
+      '.delete', '{{ delete_api_key_url }}', remove_row, 'Delete API Key?');
+});
+</script>
+{% if title %}
+  <h1>{{ title }}</h1>
+{% endif %}
+{% if description %}
+  <p>{{ description }}</p>
+{% endif %}
+<form method="POST">
+  {% csrf_token %}
+  {{ new_api_key_table }}
+</form>

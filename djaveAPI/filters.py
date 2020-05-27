@@ -11,7 +11,7 @@ AVAILABLE_OPERATORS = ['gt', 'gte', 'lt', 'lte']
 
 
 def filter_model(model, api_key, request_GET):
-  queryset = model.all.allowed(api_key)
+  queryset = model.allowed(api_key)
   available_filters = filters(model)
   for key, value in request_GET.items():
     if not value:
