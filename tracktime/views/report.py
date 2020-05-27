@@ -2,8 +2,8 @@ from django.shortcuts import render
 from djaveLogin.login_required import login_required
 
 from tracktime.views.util import tracktime_context, REPORT
-from tracktime.tables.what_i_did_report import WhatIDidReport
-from tracktime.tables.time_breakdown import TimeBreakdown
+from tracktime.widgets.what_i_did_report import WhatIDidReport
+from tracktime.widgets.time_breakdown import TimeBreakdown
 
 
 @login_required

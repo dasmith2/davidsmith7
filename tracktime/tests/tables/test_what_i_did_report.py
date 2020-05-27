@@ -2,7 +2,7 @@ from django.shortcuts import reverse
 from djaveTable.cell_content import InHref
 from djaveTable.table import Row
 
-from tracktime.tables.what_i_did_report import WhatIDidReport
+from tracktime.widgets.what_i_did_report import WhatIDidReport
 from tracktime.tests.tables.test_case_with_data import TestCaseWithData
 
 

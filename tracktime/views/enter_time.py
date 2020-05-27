@@ -8,8 +8,8 @@ from djaveNav.date_roller import DateRoller
 from djaveURL import date_from_url
 
 from tracktime.models.project_work_session import ProjectWorkSession
-from tracktime.tables.enter_time_table import EnterTimeTable
-from tracktime.tables.punch_the_clock import PunchTheClockTable
+from tracktime.widgets.enter_time_table import EnterTimeTable
+from tracktime.widgets.punch_the_clock import PunchTheClockTable
 from tracktime.views.util import tracktime_context, ENTER_TIME
 
 

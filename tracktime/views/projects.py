@@ -4,7 +4,7 @@ from djAveJAX import ajax_login_required, get_ajax_variable, AjaxProblem
 from djaveLogin.login_required import login_required
 
 from tracktime.models.project import Project
-from tracktime.tables.project_table import (
+from tracktime.widgets.project_table import (
     ProjectTable, ArchivedProjectTable)
 from tracktime.views.util import tracktime_context, PROJECTS
 

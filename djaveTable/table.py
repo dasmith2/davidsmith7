@@ -153,6 +153,7 @@ class Row(object):
     self.cells = cells or []
     self.classes = classes or []
     self.additional_attrs = additional_attrs or {}
+    self.pk = pk
     if pk is not None:
       self.additional_attrs['data-pk'] = pk
 

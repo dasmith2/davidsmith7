@@ -6,7 +6,7 @@ from djaveTest import TestCase, get_test_user
 
 from tracktime.fields import project_field
 from tracktime.models.to_do import ToDo
-from tracktime.tables.to_do_table import ToDoTable
+from tracktime.widgets.to_do_table import ToDoTable
 from tracktime.tests.models.test_project import get_test_project
 from tracktime.tests.models.test_to_do import get_test_to_do
 

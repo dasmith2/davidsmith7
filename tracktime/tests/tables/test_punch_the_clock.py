@@ -5,7 +5,7 @@ from djaveForm.button import Button
 from djaveTable.table import Row
 from djaveTest import TestCase, get_test_user
 
-from tracktime.tables.punch_the_clock import PunchTheClockTable
+from tracktime.widgets.punch_the_clock import PunchTheClockTable
 from tracktime.models.project_work_session import ProjectWorkSession
 from tracktime.tests.models.test_project import get_test_project
 

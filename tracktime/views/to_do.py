@@ -9,9 +9,9 @@ from djaveTable.problem import Problem
 
 from tracktime.models.to_do import ToDo
 from tracktime.models.project_work_session import ProjectWorkSession
-from tracktime.tables.punch_the_clock import PunchTheClockTable
-from tracktime.tables.time_breakdown import time_breakdown_url
-from tracktime.tables.to_do_table import ToDoTable
+from tracktime.widgets.punch_the_clock import PunchTheClockTable
+from tracktime.widgets.time_breakdown import time_breakdown_url
+from tracktime.widgets.to_do_table import ToDoTable
 from tracktime.views.util import tracktime_context, TO_DO
 
 

@@ -2,7 +2,7 @@ from datetime import date
 
 from django.shortcuts import reverse
 
-from tracktime.tables.time_breakdown import (
+from tracktime.widgets.time_breakdown import (
     TimeBreakdown, WorkSessionDescription, time_breakdown_url)
 from tracktime.tests.tables.test_case_with_data import TestCaseWithData
 

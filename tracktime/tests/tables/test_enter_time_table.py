@@ -4,7 +4,7 @@ from djaveDT import to_tz_dt
 from djaveForm.button import Button
 from djaveTable.table import Cell, Row
 
-from tracktime.tables.enter_time_table import EnterTimeTable
+from tracktime.widgets.enter_time_table import EnterTimeTable
 from tracktime.models.project_work_session import ProjectWorkSession
 from tracktime.tests.tables.test_case_with_data import TestCaseWithData
 

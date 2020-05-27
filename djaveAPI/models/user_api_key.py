@@ -9,6 +9,11 @@ class UserAPIKeyManager(APIKeyManager):
     if api_key:
       return api_key.user
 
+  def create_key(self, username, user):
+    # I know this function looks redundant, but without it I ran into some
+    # confusion about how, exactly, you create a UserAPIKey.
+    return super().create_key(username, user=user)
+
 
 class UserAPIKey(APIKey):
   user = models.ForeignKey(User, on_delete=models.CASCADE)
