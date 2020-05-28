@@ -27,7 +27,7 @@ $(setup_edit_description);
 </script>
 
 <style>
-table, h3 { margin-top: 30px; }
+table { margin-top: 30px; }
 table textarea { width: 100%; }
 textarea.edit_description {
   border-style: none;
@@ -52,7 +52,7 @@ textarea.edit_description {
     {% endif %}
     {{ to_do_table.as_html }}
   {% else %}
-    <h3>You have to be on the clock first</h3>
+    <h2>You have to be on the clock first</h2>
     {{ punch_in_table.as_html }}
   {% endif %}
 </form>

@@ -8,13 +8,20 @@ from djaveAPI.widgets.new_api_key_widget import NewAPIKeyWidget
 from djaveAPI.widgets.new_user_api_key_table import NewUserAPIKeyTable
 from djaveClass.find_models import model_from_name
 from djAveJAX import AjaxProblem, ajax_login_required, get_ajax_variable
+from djaveURL import protocol_and_host
 
 
-def generic_api_docs(request, model_names, api_root_url):
+def generic_api_docs(request, model_names):
+  model_docs = api_doc_contents(request, model_names)
+  return render(request, 'api_docs.html', context={'model_docs': model_docs})
+
+
+def api_doc_contents(request, model_names):
+  api_root_url = protocol_and_host(request)
   model_docs = []
   for model_name in model_names:
     model_docs.append(model_api_docs(model_name, api_root_url))
-  return render(request, 'api_docs.html', context={'model_docs': model_docs})
+  return model_docs
 
 
 @api_key_ajax

@@ -2,12 +2,6 @@
 
 {% block this_section_body %}
 
-<style>
-table, p { max-width: 778px; }
-p { margin: 30px 0px 30px 0px; }
-pre { max-width: 757px; overflow: auto; }
-h1 { margin-top: 80px; }
-</style>
 {% for model_doc in model_docs %}
   {{ model_doc }}
 {% endfor %}

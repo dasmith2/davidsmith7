@@ -4,7 +4,7 @@ from tracktime.views import (
     enter_time, delete_work_session, to_do, to_do_done, delete_to_do,
     edit_description, to_do_for_another_project, report, time_breakdown,
     projects, archived_projects, archive_project, unarchive_project,
-    rename_project, api_docs)
+    rename_project, api_docs, settings)
 
 
 tracktime_urls = [
@@ -32,4 +32,5 @@ tracktime_urls = [
     path('archive_project', archive_project, name='archive_project'),
     path('unarchive_project', unarchive_project, name='unarchive_project'),
 
+    path('settings', settings, name='settings_tracktime'),
     path('api_docs', api_docs, name='api_docs')]

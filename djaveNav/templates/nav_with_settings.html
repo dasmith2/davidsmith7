@@ -1,0 +1,15 @@
+<style>
+  .nav_and_account_wrapper { justify-content: space-between; }
+  .account { display: flex; align-items: baseline; }
+  .settings_url { margin-right: 20px; }
+</style>
+<div class="nav nav_and_account_wrapper">
+  {% include 'nav.html' %}
+  <div class="account">
+    <div{% if settings_nav.is_current %} class="current"{% endif %}>
+      <a class="settings_url" href="{{ settings_nav.url }}">
+        {{ settings_nav.display }}
+      </a>
+    </div>
+  </div>
+</div>

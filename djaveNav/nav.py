@@ -30,8 +30,7 @@ class Nav(object):
     return 'nav.html'
 
   def context(self):
-    return {
-        'nav_items_current_or_not': self.nav_items_current_or_not}
+    return {'primary_nav_items': self.nav_items_current_or_not}
 
   def as_html(self):
     return render_to_string(self.template(), self.context())

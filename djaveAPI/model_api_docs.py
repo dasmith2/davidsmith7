@@ -41,7 +41,7 @@ def model_api_examples(model, api_root_url):
   -u, --user <user:password> Used for server authentication.
   -X, --request <command> use a custom request method. PUT, DELETE
   """
-  basic_get = """curl -u <your_username>:<your_password> {}"""
+  basic_get = """curl -u <api_key_username>:<api_key_password> {}"""
   list_url = '{}{}'.format(api_root_url, reverse(
       'list_objects', kwargs={'model_name': model.__name__}))
   list_with_filters_url = '{}{}'.format(

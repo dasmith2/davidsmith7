@@ -5,6 +5,7 @@ from tracktime.views.projects import (
     projects, archived_projects, archive_project, unarchive_project,
     rename_project)
 from tracktime.views.report import report, time_breakdown
+from tracktime.views.settings import settings
 from tracktime.views.to_do import (
     to_do, to_do_done, delete_to_do, edit_description,
     to_do_for_another_project)

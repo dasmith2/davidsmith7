@@ -1,5 +1,5 @@
 from django.shortcuts import reverse, redirect
-from djaveLogin.models import append_next_url
+from djaveLogin.calc_urls import append_next_url
 
 
 class login_required(object):
