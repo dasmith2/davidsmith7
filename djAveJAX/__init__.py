@@ -82,7 +82,7 @@ def do_simple_rest_request(
     obj = klass.objects.filter(pk=pk).first()
     if not obj:
       return problem_response('This {} doesn\'t exist'.format(
-          klass._meta.model_name, 404))
+          klass._meta.model_name), 404)
   try:
     if request.method in ['POST', 'PUT']:
       data = get_ajax_data_from_request(request)

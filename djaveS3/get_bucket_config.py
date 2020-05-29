@@ -33,7 +33,8 @@ def get_bucket_config(bucket_config):
     if not isinstance(got_bucket, BucketConfig):
       raise GetBucketConfigException((
           'S3 bucket {} in S3_BUCKETS in django.conf.settings should be a '
-          'BucketConfig, but it is a {}').format(got_bucket.__class__))
+          'BucketConfig, but it is a {}').format(
+              bucket_config, got_bucket.__class__))
     return got_bucket
   raise GetBucketConfigException(
       'I am expecting a BucketConfig or a string. You gave me a {}'.format(
