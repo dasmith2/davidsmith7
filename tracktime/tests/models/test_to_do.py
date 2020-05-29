@@ -9,6 +9,10 @@ from tracktime.tests.models.test_project import get_test_project
 
 
 def get_test_to_do(**kwargs):
+  return set_to_do_stuff(ToDo(), **kwargs)
+
+
+def set_to_do_stuff(instance, **kwargs):
   if 'user' in kwargs:
     raise Exception('user has been replaced by creator and done_by')
   project = kwargs.get('project', None)
