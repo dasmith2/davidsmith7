@@ -53,7 +53,7 @@ def get_or_save_existing(request, api_key, model_name, pk):
   if filter_field_names:
     raise AjaxProblem((
         'When getting or saving a single {}, no filters are valid. You '
-        'specified {}').format(model_name, ', '.join(filter_field_names), 400))
+        'specified {}').format(model_name, ', '.join(filter_field_names)), 400)
 
   try:
     instance = model.allowed(api_key).filter(pk=pk).first()
