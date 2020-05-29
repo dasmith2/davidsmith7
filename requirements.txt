@@ -1,5 +1,6 @@
 apscheduler
 django
+django-fake-model
 requests
 gunicorn
 django-heroku
