@@ -25,13 +25,15 @@ def get_test_user(**kwargs):
     existing = User.objects.filter(username=username).first()
     if existing:
       return existing
+  username = kwargs.get('username', 'bernie_sanders' + random_string(5))
+  email = kwargs.get('email', '{}@email.com'.format(username))
   user = User.objects.create(
       password=kwargs.get('password', 'asdf1234'),
       is_superuser=kwargs.get('is_superuser', False),
-      username=kwargs.get('username', 'bernie_sanders' + random_string(5)),
+      username=username,
       first_name=kwargs.get('first_name', 'Bernie'),
       last_name=kwargs.get('last_name', 'Sanders'),
-      email=kwargs.get('email', 'bernie_sanders@email.com'),
+      email=email,
       is_staff=kwargs.get('is_staff', False),
       is_active=kwargs.get('is_active', True))
   groups = kwargs.get('groups', [])

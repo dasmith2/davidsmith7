@@ -61,7 +61,7 @@ class APIKey(BaseKnowsChild):
           'passwords.')
     return self._plain_password
 
-  def can_delete(self, user):
-    raise NotImplementedError('can_delete')
+  def user_can_delete_me(self, user):
+    raise NotImplementedError('user_can_delete_me')
 
   objects = APIKeyManager()

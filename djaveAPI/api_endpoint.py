@@ -1,14 +1,21 @@
+""" This is a decorator for views that handle API requests, as opposed to AJAX
+requests. """
 import base64
 
 from djaveAPI.models.api_key import APIKey
 from djAveJAX import ajax, problem_response, AjaxProblem
 
 
-class api_key_ajax(ajax):
+class api_endpoint(ajax):
   """ Unlike ajax_login_required in djAveJax, which assumes requests are being
-  sent by a logged in user, you'll use api_key_ajax when requests are being
+  sent by a logged in user, you'll use api_endpoint when requests are being
   sent by a server that's using API Keys. It adds a second argument to your
-  view which is the API Key used to make the request. """
+  view which is the API Key used to make the request, and turns off CSRF
+  protection. """
+
+  def __init__(self, request, *args, **kwargs):
+    super().__init__(request, *args, **kwargs)
+    self.csrf_exempt = True
 
   def __call__(self, request, *args, **kwargs):
     auth_header = request.headers.get('Authorization')

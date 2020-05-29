@@ -27,6 +27,25 @@ class Publishable(models.Model):
         'webhook, how will they ever find out it was deleted? Use '
         'mark_deleted instead.')
 
+  def explain_why_invalid(self):
+    """ If you have anything more complicated than required fields in your
+    class, you'll want to override this function to prevent bad data coming in
+    through the API. """
+    return
+
+  def save(self, *args, **kwargs):
+    if self.explain_why_invalid():
+      raise Exception(self.explain_why_invalid())
+    super().save(*args, **kwargs)
+
+  @classmethod
+  def new_instance(cls):
+    return cls()
+
+  @classmethod
+  def get_model_fields_for_api(cls):
+    return cls._meta.get_fields()
+
   @classmethod
   def allowed(cls, api_key):
     """ Return a query set that will only retrieve instances the api_key is

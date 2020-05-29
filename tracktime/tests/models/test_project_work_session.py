@@ -18,7 +18,7 @@ def get_test_project_work_session(**kwargs):
 class AllowedTests(TestCase):
   def test_allowed(self):
     user = get_test_user()
-    work_session = get_test_project_work_session(user=user)
-    get_test_project_work_session()  # Different user
+    work_session = get_test_project_work_session(user=user, hours=1)
+    get_test_project_work_session(hours=1)  # Different user
     api_key = get_test_user_api_key(user=user)
     self.assertEqual([work_session], list(ProjectWorkSession.allowed(api_key)))

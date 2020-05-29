@@ -6,7 +6,7 @@ from datetime import timedelta
 from django.contrib.auth.models import User
 from django.db import models
 from djaveAPI.models.user_api_key import UserAPIKey
-from djaveAPI.publishable import Publishable, PublishableManager
+from djaveAPI.models.publishable import Publishable, PublishableManager
 from djaveDT import (
     now, d_to_str, time_to_time_str, tz_dt_to_tz_dt,
     tz_dt_to_str, beginning_of_day)
@@ -93,7 +93,8 @@ class WorkSession(Publishable):
       'stopped field is technically stored as 3 or 4am Greenwich '
       'Mean Time, but the date field here will say Friday.'))
   hours = models.FloatField(blank=True, null=True, help_text=(
-      'How long was the work session in hours?'))
+      'How long was the work session in hours? If this is null, then '
+      'the work session is ongoing.'))
   started = models.DateTimeField(blank=True, null=True, help_text=(
       'If the user used the clock to time this work session, when did they '
       'start the clock?'))
@@ -101,12 +102,24 @@ class WorkSession(Publishable):
       'If the user used the clock to time this work session, when did they '
       'stop the clock?'))
 
-  def save(self, *args, **kwargs):
-    if self.hours and self.started and not self.stopped:
-      raise Exception(
-          'It does not make sense to save a WorkSession with hours when it '
-          'has a start time but no stop time')
-    super().save(*args, **kwargs)
+  def explain_why_invalid(self):
+    if self.started is None and self.hours is None:
+      return (
+          'You have to specify hours, meaning a completed work session, or '
+          'started, meaning a started work session. It is pointless to create '
+          'a work session with neither a start time nor a duration.')
+    if self.stopped:
+      if self.started:
+        if self.started > self.stopped:
+          return 'started should be <= stopped'
+      else:
+        return (
+            'If you say when a work session stopped, you have to say when it '
+            'started too')
+    if self.started and self.hours and not self.stopped:
+      return (
+          'If a work session has a start time and hours, it must have a '
+          'stop time')
 
   @classmethod
   def allowed(cls, api_key):

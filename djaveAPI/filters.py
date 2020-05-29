@@ -1,41 +1,65 @@
+from collections import namedtuple
 from datetime import date
 
 from django.utils.dateparse import parse_datetime, parse_date
 from djaveAPI.discover_schema import (
     api_fields, DATE_TIME, DATE, FLOAT, INTEGER)
+from djaveAPI.paged_results import PAGE
 from djaveDT import to_tz_dt
 from djAveJAX import AjaxProblem
+
+
+def filter_model(model, api_key, request_GET):
+  queryset = model.allowed(api_key)
+  for _filter in get_filters(model, request_GET):
+    field = _filter.filter_field
+    if field.foreign_key_to:
+      queryset = _filter_foreign_key(
+          queryset, field, _filter.operator, _filter.value)
+    else:
+      key = field.name
+      if _filter.operator:
+        key = '{}__{}'.format(key, _filter.operator)
+      queryset = queryset.filter(**{key: _parsed_value(field, _filter.value)})
+  return queryset
 
 
 AVAILABLE_OPERATORS = ['gt', 'gte', 'lt', 'lte']
 
 
-def filter_model(model, api_key, request_GET):
-  queryset = model.allowed(api_key)
-  available_filters = filters(model)
+Filter = namedtuple('Filter', 'filter_field operator value')
+
+
+def get_filters(model, request_GET):
+  _available_filters = available_filters(model)
+  filters = []
   for key, value in request_GET.items():
-    if not value:
+    if key == PAGE or not value:
       continue
     field_name, operator = field_operator(key)
-    if field_name not in available_filters:
+    if field_name not in _available_filters:
       raise AjaxProblem((
           '{} is not an available filter on {}. The available filters are '
           '{}').format(
-          field_name, model.__name__, ', '.join(available_filters.keys())))
+          field_name, model.__name__, ', '.join(_available_filters.keys())))
     if operator and operator not in AVAILABLE_OPERATORS:
       raise AjaxProblem((
           'You tried to filter on {}, but {} is not an available operator. '
           'The available operators are {}').format(
               key, operator, ', '.join(AVAILABLE_OPERATORS)))
-    field = available_filters[field_name]
-    if field.foreign_key_to:
-      queryset = _filter_foreign_key(queryset, field, operator, value)
-    else:
-      queryset = queryset.filter(**{key: _parsed_value(field, key, value)})
-  return queryset
+    filters.append(Filter(_available_filters[field_name], operator, value))
+  return filters
 
 
-def _parsed_value(field, key, value):
+def available_filters(model):
+  to_return = {}
+  for field in api_fields(model):
+    if field.can_filter:
+      to_return[field.name] = field
+  return to_return
+
+
+def _parsed_value(field, value):
 
   def _raise_problem():
     if field.type == DATE_TIME:
@@ -52,7 +76,7 @@ def _parsed_value(field, key, value):
     raise AjaxProblem((
         'Your {} filter is set to {}, which I was unable to parse. '
         'An example of something I can parse is '
-        '{}').format(key, value, example))
+        '{}').format(field.name, value, example))
 
   # As per Django's annoying habit, parse_date and parse_datetime swallow
   # errors and simply return None.
@@ -98,11 +122,3 @@ def field_operator(key):
   if key.find('__') >= 0:
     return key.split('__')
   return (key, None)
-
-
-def filters(model):
-  to_return = {}
-  for field in api_fields(model):
-    if field.can_filter:
-      to_return[field.name] = field
-  return to_return

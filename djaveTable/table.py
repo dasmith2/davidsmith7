@@ -106,6 +106,12 @@ class Cell(object):
     """ cell_contents can be a datetime, date, string, float, int, any object
     that inherits from CellContent, or a list of any of those things. """
     self.cell_contents = cell_contents
+
+    # This just makes sure we populate cells with stuff we can turn into html
+    # later. By checking at this point, I prevent garbage in, and make problems
+    # much easier to debug.
+    obj_as_cell_content(cell_contents)
+
     self.classes = classes
     self.is_header = is_header
     self.additional_attrs = additional_attrs
@@ -150,7 +156,10 @@ class Cell(object):
 class Row(object):
   def __init__(self, cells=None, classes=None, additional_attrs=None, pk=None):
     # cells can be primitives, CellContent objects, or Cells
-    self.cells = cells or []
+    self.cells = []
+    if cells:
+      for cell in cells:
+        self.add(cell)
     self.classes = classes or []
     self.additional_attrs = additional_attrs or {}
     self.pk = pk
@@ -169,10 +178,16 @@ class Row(object):
     return 'Row({})'.format(', '.join(attrs))
 
   def add(self, cell):
+    if not isinstance(cell, Cell):
+      # This just makes sure we populate cells with stuff we can turn into html
+      # later. By checking at this point, I prevent garbage in, and make
+      # problems much easier to debug.
+      obj_as_cell_content(cell)
     self.cells.append(cell)
 
   def extend(self, cells):
-    self.cells.extend(cells)
+    for cell in cells:
+      self.add(cell)
 
   def add_class(self, css_class):
     self.classes.append(css_class)

@@ -1,3 +1,6 @@
+from django_fake_model import models as fake_models
+from djaveAPI.models.publishable import Publishable
+from djaveAPI.models.user import User as DjaveAPIUser
 from djaveAPI.models.user_api_key import UserAPIKey
 from djaveAPI.tests.test_api_key import set_api_key_stuff
 from djaveTest import TestCase, get_test_user
@@ -10,6 +13,13 @@ def get_test_user_api_key(**kwargs):
   return set_api_key_stuff(UserAPIKey(user=user), **kwargs)
 
 
+class Foo(fake_models.FakeModel, Publishable):
+  @classmethod
+  def new_instance(cls):
+    return cls()
+
+
+@Foo.fake_me
 class UserAPIKeyTests(TestCase):
   def test_get_user(self):
     user = get_test_user()
@@ -17,3 +27,8 @@ class UserAPIKeyTests(TestCase):
     plain_password = key.get_plain_password()
     self.assertEqual(user, UserAPIKey.objects.get_user(
         key.username, plain_password))
+
+  def test_explain_why_can_not_create(self):
+    key = get_test_user_api_key()
+    self.assertTrue(bool(key.explain_why_can_not_create(DjaveAPIUser)))
+    self.assertFalse(bool(key.explain_why_can_not_create(Foo)))

@@ -1,12 +1,16 @@
+import json
+
 from django.shortcuts import render
-from djaveAPI.api_key_ajax import api_key_ajax
-from djaveAPI.filters import filter_model
+from djaveAPI.api_endpoint import api_endpoint
+from djaveAPI.discover_schema import publishable_model_from_name
+from djaveAPI.filters import filter_model, get_filters
 from djaveAPI.model_api_docs import model_api_docs
 from djaveAPI.models.api_key import APIKey
+from djaveAPI.paged_results import paged_results, get_page
+from djaveAPI.save import update, save_new, delete
 from djaveAPI.to_json import to_json_dict
 from djaveAPI.widgets.new_api_key_widget import NewAPIKeyWidget
 from djaveAPI.widgets.new_user_api_key_table import NewUserAPIKeyTable
-from djaveClass.find_models import model_from_name
 from djAveJAX import AjaxProblem, ajax_login_required, get_ajax_variable
 from djaveURL import protocol_and_host
 
@@ -24,38 +28,60 @@ def api_doc_contents(request, model_names):
   return model_docs
 
 
-@api_key_ajax
-def list_objects(request, api_key, model_name):
-  results = []
+@api_endpoint
+def list_or_save_new(request, api_key, model_name):
   model = _get_model(model_name)
-  for obj in filter_model(model, api_key, request.GET):
-    results.append(to_json_dict(obj))
-  return {'results': results}
-
-
-@api_key_ajax
-def get_object(request, api_key, model_name, pk):
-  model = _get_model(model_name)
-
-  if request.GET:
+  if request.method == 'GET':
+    return paged_results(
+        model, filter_model(model, api_key, request.GET),
+        page=get_page(request.GET))
+  elif request.method == 'POST':
+    instance = save_new(model, posted_json(request), api_key, model)
+    return to_json_dict(instance, model)
+  else:
     raise AjaxProblem((
-        'When getting a single {}, no filters are valid. You '
-        'specified {}').format(model_name, ', '.join(request.GET.keys())), 400)
+        'This API endpoint is not sure what to do with the {} '
+        'request method').format(request.method))
+
+
+@api_endpoint
+def get_or_save_existing(request, api_key, model_name, pk):
+  model = _get_model(model_name)
+
+  filters = get_filters(model, request.GET)
+  filter_field_names = [f.filter_field.name for f in filters]
+  if filter_field_names:
+    raise AjaxProblem((
+        'When getting or saving a single {}, no filters are valid. You '
+        'specified {}').format(model_name, ', '.join(filter_field_names), 400))
 
   try:
-    instance = model.all.allowed(api_key).filter(pk=pk).first()
+    instance = model.allowed(api_key).filter(pk=pk).first()
   except ValueError as ex:
     # "Field 'id' expected a number but got 'a'."
     if ex.args[0].find('number'):
       raise AjaxProblem('{} is not a valid integer'.format(pk), 400)
   if not instance:
-    raise AjaxProblem('There is no {} with id {}'.format(
-        model_name, pk), 404)
-  return to_json_dict(instance)
+    raise AjaxProblem((
+        'Either there is no {} with id {}, or this API '
+        'Key does not have permission to access it.').format(
+            model_name, pk), 404)
+  if request.method == 'POST':
+    update(instance, posted_json(request), api_key, model)
+  elif request.method == 'DELETE':
+    delete(instance, model)
+  return to_json_dict(instance, model)
+
+
+def posted_json(request):
+  try:
+    return json.loads(request.body)
+  except json.decoder.JSONDecodeError:
+    raise AjaxProblem('The request contained invalid JSON')
 
 
 def _get_model(model_name):
-  model = model_from_name(model_name)
+  model = publishable_model_from_name(model_name)
   if not model:
     raise AjaxProblem('There is no {} API'.format(model_name), status_code=404)
   return model
@@ -79,6 +105,6 @@ def delete_key(request):
   if not api_key:
     raise AjaxProblem('This API Key does not exist')
   api_key = api_key.as_child_class()
-  if not api_key.can_delete(request.user):
+  if not api_key.user_can_delete_me(request.user):
     raise AjaxProblem('You do not have permission to delete this key')
   api_key.delete()

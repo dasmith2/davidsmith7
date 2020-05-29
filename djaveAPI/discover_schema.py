@@ -5,8 +5,27 @@ import re
 
 from django.conf import settings
 from django.db.models.fields.reverse_related import ManyToOneRel
-from djaveAPI.publishable import Publishable
+from djaveAPI.models.publishable import Publishable
+from djaveAPI.models.pretend_publishable import PretendPublishable
 from djaveClass.find_models import models_in_app
+
+
+def use_publishable(instance, publishable_class=None):
+  """ Returns a (model, instance) tuple. The entire point of this is wiring
+  Django's user model into the API. """
+  model = None
+  if publishable_class:
+    model = publishable_class
+    if issubclass(model, PretendPublishable):
+      instance = model(instance)
+  elif isinstance(instance, Publishable):
+    model = instance.__class__
+  else:
+    raise Exception(
+        '{} is not a Publishable class, so I need you to tell me what '
+        'PretendPublishable class I should use.'.format(
+            instance.__class__.__name__))
+  return model, instance
 
 
 def publishable_models():
@@ -17,11 +36,14 @@ def publishable_models():
 
 
 def publishable_models_in_app(app_name):
-  to_return = []
-  for model in models_in_app(app_name):
-    if issubclass(model, Publishable):
-      to_return.append(model)
-  return to_return
+  return models_in_app(app_name, Publishable) + models_in_app(
+      app_name, PretendPublishable)
+
+
+def publishable_model_from_name(model_name):
+  for model in publishable_models():
+    if model.__name__ == model_name:
+      return model
 
 
 APIField = namedtuple('APIField', [
@@ -34,12 +56,13 @@ FLOAT = 'Float'
 INTEGER = 'Integer'
 TEXT = 'Text'
 CHAR = 'Char'
-TYPES = [DATE_TIME, DATE, FLOAT, INTEGER, TEXT, CHAR]
+BOOLEAN = 'Boolean'
+TYPES = [DATE_TIME, DATE, FLOAT, INTEGER, TEXT, CHAR, BOOLEAN]
 
 
 def api_fields(model):
   fields = []
-  for field in model._meta.get_fields():
+  for field in model.get_model_fields_for_api():
     name = field.name
     is_ptr_to_base_class = re.compile(r'\w+_ptr').findall(name)
     if is_ptr_to_base_class:

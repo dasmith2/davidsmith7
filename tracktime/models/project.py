@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 from djaveAPI.models.user_api_key import UserAPIKey
-from djaveAPI.publishable import Publishable
+from djaveAPI.models.publishable import Publishable
 
 
 class Project(Publishable):
@@ -13,7 +13,8 @@ class Project(Publishable):
   creator = models.ForeignKey(User, on_delete=models.PROTECT, help_text=(
       'Who created this project?'))
 
-  def model_description():
+  @classmethod
+  def model_description(cls):
     return 'Users track time against Projects.'
 
   @classmethod

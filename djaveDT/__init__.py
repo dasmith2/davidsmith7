@@ -87,7 +87,9 @@ def parse_dt(dt_maybe):
   return make_aware(dt_definitely)
 
 
-def str_to_naive_dt(dt_str):
+def str_to_dt(dt_str):
+  """ If the string contains timezone information, this will return a timezone
+  aware datetime. """
   parsed_as_dt = parse_datetime(dt_str)
   if parsed_as_dt:
     return parsed_as_dt
@@ -133,8 +135,13 @@ def str_to_tz_dt(dt_str, tz_str=None):
   if not isinstance(dt_str, str):
     raise Exception(
         'str_to_tz_dt expects a string, not a {}'.format(dt_str.__class__))
+  dt = str_to_dt(dt_str)
+  if dt.tzinfo:
+    if not tz_str:
+      return dt
+    return tz_dt_to_tz_dt(dt, tz_str=tz_str)
   tz_str = tz_str or settings.TIME_ZONE
-  return naive_dt_to_tz_dt(str_to_naive_dt(dt_str), tz_str)
+  return naive_dt_to_tz_dt(dt, tz_str)
 
 
 def d_to_naive_dt(d):

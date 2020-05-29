@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Q
 from djaveAPI.models.user_api_key import UserAPIKey
-from djaveAPI.publishable import Publishable, PublishableManager
+from djaveAPI.models.publishable import Publishable, PublishableManager
 from djaveDT import beginning_of_day
 
 from tracktime.models.project import Project
@@ -40,10 +40,11 @@ class ToDo(Publishable):
   project = models.ForeignKey(Project, on_delete=models.PROTECT, help_text=(
       'What project does this ToDo apply to?'))
   creator = models.ForeignKey(
-      User, on_delete=models.PROTECT, related_name='creator')
+      User, on_delete=models.PROTECT, related_name='creator', help_text=(
+          'Who created this ToDo?'))
   done_by = models.ForeignKey(
       User, on_delete=models.PROTECT, related_name='done_by', null=True,
-      blank=True)
+      blank=True, help_text='Who completed this ToDo?')
 
   live = ToDoManager()
 
@@ -55,21 +56,14 @@ class ToDo(Publishable):
       raise Exception(
           'I do not know how to handle {} api keys'.format(api_key.__class__))
 
-  def save(self, *args, **kwargs):
+  def explain_why_invalid(self):
     if int(bool(self.done)) + int(bool(self.done_by)) == 1:
-      raise Exception((
+      return ((
           'A done ToDo should say done_by and done. You specified '
           '{} and {} respectively').format(self.done, self.done_by))
-    super().save(*args, **kwargs)
 
-  def status(self):
-    if self.deleted:
-      return DELETED
-    if self.done:
-      return DONE
-    return OPEN
-
-  def model_description():
+  @classmethod
+  def model_description(cls):
     return """
         A ToDo is a single task that a user intends to complete. Picking these
         is a bit of an art form. Ideally, you click "Done" on a few ToDos every

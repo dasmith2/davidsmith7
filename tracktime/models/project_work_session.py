@@ -18,15 +18,11 @@ class ProjectWorkSession(WorkSession):
 
   live = ProjectWorkSessionManager()
 
-  def model_description():
+  @classmethod
+  def model_description(cls):
     return (
         'A ProjectWorkSession describes a single time span that a user worked '
         'on a Project.')
-
-  def as_json(self, nnow=None):
-    base_dict = super().as_json(nnow=nnow)
-    base_dict['project'] = self.project.pk
-    return base_dict
 
   def __repr__(self, nnow=None):
     return '<ProjectWorkSession {}: {} {} {} {} for {} hrs>'.format(

@@ -121,7 +121,7 @@ class RunningClockTests(TestCase):
         'The clock is already stopped on this work session',
         self.recent.explain_why_can_not_stop(nnow=self.six_pm))
     never_started = get_test_work_session(
-        user=self.user, date=date(2020, 1, 14))
+        user=self.user, date=date(2020, 1, 14), hours=1)
     self.assertEqual(
         'The clock was never started on this work session',
         never_started.explain_why_can_not_stop(nnow=self.six_pm))

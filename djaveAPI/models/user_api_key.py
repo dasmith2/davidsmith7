@@ -20,5 +20,11 @@ class UserAPIKey(APIKey):
 
   objects = UserAPIKeyManager()
 
-  def can_delete(self, user):
+  def user_can_delete_me(self, user):
     return self.user == user
+
+  def explain_why_can_not_create(self, of_model):
+    if isinstance(of_model.new_instance(), User):
+      return (
+          'User level API keys only have access to a single user. They are '
+          'not powerful enough to create new users.')
