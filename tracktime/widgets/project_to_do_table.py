@@ -39,7 +39,7 @@ class ProjectToDoTable(ToDoTable):
           pk=self.form.project_field.get_value())
       set_latest_project(self.user, project)
     return ProjectToDo.live.create(
-        creator=self.user, project_new=project,
+        creator=self.user, project=project,
         description=self.form.get_description())
 
   def cells_for_enter_new(self):
@@ -55,6 +55,6 @@ class ProjectToDoTable(ToDoTable):
   def cells_for_existing(self, to_do):
     cells = []
     if self.do_all_projects():
-      cells.append(to_do.project_new.name)
+      cells.append(to_do.project.name)
     cells.extend(super().cells_for_existing(to_do))
     return cells

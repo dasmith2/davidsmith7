@@ -9,7 +9,7 @@ def get_test_project_to_do(**kwargs):
   project = kwargs.get('project', None)
   if not project:
     project = get_test_project(**kwargs)
-  return set_to_do_stuff(ProjectToDo(project_new=project), **kwargs)
+  return set_to_do_stuff(ProjectToDo(project=project), **kwargs)
 
 
 class NotDoneTests(TestCase):

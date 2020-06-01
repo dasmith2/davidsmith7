@@ -23,7 +23,7 @@ class ProjectToDoTableTests(TestCase):
         'new_description': 'Hello world!',
         'todo': 'yep'})
     ProjectToDo.live.filter(
-        creator=self.user, project_new=self.project,
+        creator=self.user, project=self.project,
         description='Hello world!', done__isnull=True).first()
 
   def test_new_to_do_all_projects(self):
@@ -33,7 +33,7 @@ class ProjectToDoTableTests(TestCase):
             'project': self.project.pk,
             'todo': 'yep'})
     to_do = ProjectToDo.live.filter(
-        creator=self.user, project_new=self.project,
+        creator=self.user, project=self.project,
         description='Hello world!', done__isnull=True).first()
     description = TextAreaField(
         'edit_description', default='Hello world!', required=False)

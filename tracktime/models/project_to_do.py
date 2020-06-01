@@ -6,17 +6,17 @@ from tracktime.models.to_do import ToDo, ToDoManager
 
 class ProjectToDoManager(ToDoManager):
   def select_related_list(self):
-    return super().select_related_list() + ['project_new']
+    return super().select_related_list() + ['project']
 
   def not_done(self, creator, project=None):
     filtered = super().not_done(creator)
     if project:
-      filtered = filtered.filter(project_new=project)
+      filtered = filtered.filter(project=project)
     return filtered
 
 
 class ProjectToDo(ToDo):
-  project_new = models.ForeignKey(
+  project = models.ForeignKey(
       Project, on_delete=models.PROTECT, help_text=(
           'What Project does this ProjectToDo apply to?'))
 
