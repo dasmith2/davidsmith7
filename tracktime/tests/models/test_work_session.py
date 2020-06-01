@@ -105,13 +105,6 @@ class RunningClockTests(TestCase):
         'How can I stop a work session that was started in the future?!',
         self.recent.explain_why_can_not_stop(nnow=yesterday))
     self.assertFalse(self.recent.can_stop(nnow=yesterday))
-    too_soon_message = (
-        'This work session is less than 5 minutes old. You '
-        'should probably just cancel it.')
-    started_plus_1_minute = self.recent.started + timedelta(minutes=1)
-    self.assertEqual(
-        too_soon_message,
-        self.recent.explain_why_can_not_stop(nnow=started_plus_1_minute))
 
     # 6pm stuff
     self.assertIsNone(self.recent.explain_why_can_not_stop(nnow=self.six_pm))

@@ -15,9 +15,6 @@ from djaveNav import date_to_url_str
 
 # If a WorkSession isn't stopped within 16 hours it's considered abandoned.
 ABANDONED_AFTER_HOURS = 16
-# If a WorkSession was started less than 5 minutes ago, it should probably just
-# be canceled.
-TOO_FEW_MINUTES = 5
 
 DELETED = 'DELETED'
 DONE = 'DONE'
@@ -185,10 +182,6 @@ class WorkSession(Publishable):
       return (
           'This work session appears to be abandoned because it '
           'was started over {} hours ago').format(ABANDONED_AFTER_HOURS)
-    if self.started > nnow - timedelta(minutes=TOO_FEW_MINUTES):
-      return (
-          'This work session is less than {} minutes old. You '
-          'should probably just cancel it.').format(TOO_FEW_MINUTES)
 
   def can_stop(self, nnow=None):
     return not bool(self.explain_why_can_not_stop(nnow=nnow))
