@@ -10,7 +10,7 @@ from djaveURL import dict_as_query
 from tracktime.models.project_work_session import ProjectWorkSession
 
 
-class WhatIDidReport(DateRangeReport):
+class ProjectWorkSessionSummaryReport(DateRangeReport):
   def __init__(self, request_get, user, nnow=None):
     nnow = nnow or now()
     default_from_date = nnow.date() - timedelta(days=7)
@@ -18,12 +18,12 @@ class WhatIDidReport(DateRangeReport):
     super().__init__(default_from_date, default_to_date, request_get)
 
     current_query_dict = self.get_query_dict()
-    self.what_i_did_content = WhatIDidReportContent(
+    self.what_i_did_content = ProjectWorkSessionSummaryTable(
         user, self.from_date(), self.to_date(), current_query_dict)
     self.add_content(self.what_i_did_content)
 
 
-class WhatIDidReportContent(Table):
+class ProjectWorkSessionSummaryTable(Table):
   def __init__(self, user, from_date, to_date, current_query_dict):
     super().__init__(['Project', 'Hours'])
 

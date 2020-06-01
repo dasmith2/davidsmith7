@@ -4,13 +4,13 @@ from djaveNav.nav_with_settings import NavWithAccount
 
 ENTER_TIME = 'enter_time'
 TO_DO = 'to_do'
-REPORT = 'report'
+PROJECT_WORK_SESSION_SUMMARY = 'project_work_summary'
 PROJECTS = 'projects'
 SETTINGS = 'settings_tracktime'
 NAV_LIST = [
     NavItem(ENTER_TIME, 'Enter time'),
     NavItem(TO_DO, 'To do'),
-    NavItem(REPORT, 'Report'),
+    NavItem(PROJECT_WORK_SESSION_SUMMARY, 'Report'),
     NavItem(PROJECTS, 'Projects')]
 
 

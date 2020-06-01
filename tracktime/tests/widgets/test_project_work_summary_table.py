@@ -2,11 +2,12 @@ from django.shortcuts import reverse
 from djaveTable.cell_content import InHref
 from djaveTable.table import Row
 
-from tracktime.widgets.what_i_did_report import WhatIDidReport
+from tracktime.widgets.project_work_summary_table import (
+    ProjectWorkSessionSummaryReport)
 from tracktime.tests.widgets.test_case_with_data import TestCaseWithData
 
 
-class WhatIDidReportTests(TestCaseWithData):
+class ProjectWorkSessionSummaryTableTests(TestCaseWithData):
   def setUp(self):
     super().setUp()
 
@@ -18,7 +19,7 @@ class WhatIDidReportTests(TestCaseWithData):
 
   def test_data_and_display(self):
     request_get = {'from_date': '2020-01-15', 'to_date': '2020-01-15'}
-    report = WhatIDidReport(request_get, self.user)
+    report = ProjectWorkSessionSummaryReport(request_get, self.user)
     table = report.what_i_did_content
     self.assertEqual(1, len(table.rows))
     url = reverse('project_work_report') + (
