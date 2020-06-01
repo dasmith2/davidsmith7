@@ -10,8 +10,8 @@ from djaveTable.problem import Problem
 from tracktime.models.to_do import ToDo
 from tracktime.models.project_work_session import ProjectWorkSession
 from tracktime.widgets.punch_the_clock import PunchTheClockTable
+from tracktime.widgets.project_to_do_table import ProjectToDoTable
 from tracktime.widgets.project_work_report import project_work_report_url
-from tracktime.widgets.to_do_table import ToDoTable
 from tracktime.views.util import tracktime_context, TO_DO
 
 
@@ -38,7 +38,7 @@ def to_do(request):
         return redirect(project_work_report_url(
             project, date.today(), date.today()))
       stop_problem = Problem(clock_running.explain_why_can_not_stop())
-    to_do_table = ToDoTable(
+    to_do_table = ProjectToDoTable(
         user=request.user, project=project, form_data=request.POST)
   context = to_do_context(
       to_do_table, request, project=project,
@@ -79,7 +79,7 @@ def _ajax_to_do(request):
 
 @login_required
 def to_do_for_another_project(request):
-  to_do_table = ToDoTable(
+  to_do_table = ProjectToDoTable(
       user=request.user, project=None, form_data=request.POST)
   context = to_do_context(to_do_table, request)
   return render(request, 'to_do_for_another_project.html', context)

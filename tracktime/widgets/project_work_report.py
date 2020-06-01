@@ -41,8 +41,8 @@ class ProjectWorkReport(DateRangeReport):
 
 class ProjectWorkReportContent(WorkReportContent):
   def __init__(self, user, project, from_date, to_date, tz_str=None):
-    super().__init__(user, from_date, to_date, tz_str=tz_str)
     self.project = project
+    super().__init__(user, from_date, to_date, tz_str=tz_str)
 
   def show_project(self):
      return not self.project
