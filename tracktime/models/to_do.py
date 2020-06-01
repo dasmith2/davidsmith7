@@ -7,8 +7,6 @@ from djaveAPI.models.user_api_key import UserAPIKey
 from djaveAPI.models.publishable import Publishable, PublishableManager
 from djaveDT import beginning_of_day
 
-from tracktime.models.project import Project
-
 
 DELETED = 'DELETED'
 DONE = 'DONE'
@@ -16,12 +14,9 @@ OPEN = 'OPEN'
 
 
 class ToDoManager(PublishableManager):
-  def not_done(self, creator, project=None):
-    filtered = self.filter(done=None, creator=creator).select_related(
+  def not_done(self, creator):
+    return self.filter(done=None, creator=creator).select_related(
         *self.select_related_list()).order_by('-pk')
-    if project:
-      filtered = filtered.filter(project=project)
-    return filtered
 
   def done_by_user_in_date_range(
       self, done_by, from_date, to_date, tz_str=None):
@@ -40,8 +35,6 @@ class ToDo(Publishable):
   created = models.DateTimeField(auto_now_add=True)
   done = models.DateTimeField(null=True, blank=True, db_index=True, help_text=(
       'When, if ever, was this ToDo marked done?'))
-  project = models.ForeignKey(Project, on_delete=models.PROTECT, help_text=(
-      'What project does this ToDo apply to?'), related_name='project_old')
   creator = models.ForeignKey(
       User, on_delete=models.PROTECT, related_name='creator', help_text=(
           'Who created this ToDo?'))

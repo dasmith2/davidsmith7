@@ -6,7 +6,7 @@ from djaveTable.table import Cell, Row
 
 from tracktime.widgets.enter_time_table import EnterTimeTable
 from tracktime.models.project_work_session import ProjectWorkSession
-from tracktime.tests.tables.test_case_with_data import TestCaseWithData
+from tracktime.tests.widgets.test_case_with_data import TestCaseWithData
 
 
 class EnterTimeTableTests(TestCaseWithData):

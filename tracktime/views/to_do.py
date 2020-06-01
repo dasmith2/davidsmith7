@@ -10,7 +10,7 @@ from djaveTable.problem import Problem
 from tracktime.models.to_do import ToDo
 from tracktime.models.project_work_session import ProjectWorkSession
 from tracktime.widgets.punch_the_clock import PunchTheClockTable
-from tracktime.widgets.time_breakdown import time_breakdown_url
+from tracktime.widgets.project_work_report import project_work_report_url
 from tracktime.widgets.to_do_table import ToDoTable
 from tracktime.views.util import tracktime_context, TO_DO
 
@@ -35,7 +35,7 @@ def to_do(request):
     if punch_out_button.get_was_clicked(request.POST):
       if clock_running.can_stop():
         clock_running.stop()
-        return redirect(time_breakdown_url(
+        return redirect(project_work_report_url(
             project, date.today(), date.today()))
       stop_problem = Problem(clock_running.explain_why_can_not_stop())
     to_do_table = ToDoTable(

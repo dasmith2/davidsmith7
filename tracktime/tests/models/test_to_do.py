@@ -5,7 +5,6 @@ from djaveDT import to_tz_dt
 from djaveTest import TestCase, get_test_user
 
 from tracktime.models.to_do import ToDo
-from tracktime.tests.models.test_project import get_test_project
 
 
 def get_test_to_do(**kwargs):
@@ -15,23 +14,20 @@ def get_test_to_do(**kwargs):
 def set_to_do_stuff(instance, **kwargs):
   if 'user' in kwargs:
     raise Exception('user has been replaced by creator and done_by')
-  project = kwargs.get('project', None)
-  if not project:
-    project = get_test_project(**kwargs)
   creator = kwargs.get('creator', None)
   if not creator:
     creator = get_test_user(**kwargs)
-  to_do = ToDo.live.create(
-      description=kwargs.get('description', 'Do some stuff'),
-      done=to_tz_dt(kwargs.get('done', None)),
-      deleted=to_tz_dt(kwargs.get('deleted', None)),
-      project=project,
-      creator=creator,
-      done_by=kwargs.get('done_by', None))
+  instance.description = kwargs.get('description', 'Do some stuff')
+  instance.done = to_tz_dt(kwargs.get('done', None))
+  instance.deleted = to_tz_dt(kwargs.get('deleted', None))
+  instance.creator = creator
+  instance.done_by = kwargs.get('done_by', None)
+  instance.save()
   if 'created' in kwargs:
-    ToDo.live.filter(pk=to_do.pk).update(created=to_tz_dt(kwargs['created']))
-    to_do.refresh_from_db()
-  return to_do
+    ToDo.live.filter(pk=instance.pk).update(
+        created=to_tz_dt(kwargs['created']))
+    instance.refresh_from_db()
+  return instance
 
 
 class AllowedTests(TestCase):
@@ -75,20 +71,14 @@ class DoneByUserInDateRangeTests(TestCase):
             self.user, date(2020, 1, 15), date(2020, 1, 16))))
 
 
-class ToDoTests(TestCase):
+class NotDoneTests(TestCase):
   def test_not_done(self):
-    project_1 = get_test_project(name='Time Tracker')
-    project_2 = get_test_project(name='Davespace')
     user = get_test_user()
 
-    not_done_1 = get_test_to_do(project=project_1, creator=user)
-    not_done_2 = get_test_to_do(project=project_2, creator=user)
+    not_done = get_test_to_do(creator=user)
     # Done. Should never show up.
     get_test_to_do(
-        project=project_1, done=to_tz_dt('2020-01-01'), creator=user,
-        done_by=user)
+        done=to_tz_dt('2020-01-01'), creator=user, done_by=user)
 
     self.assertEqual(
-        [not_done_2, not_done_1], list(ToDo.live.not_done(user)))
-    self.assertEqual(
-        [not_done_1], list(ToDo.live.not_done(user, project_1)))
+        [not_done], list(ToDo.live.not_done(user)))

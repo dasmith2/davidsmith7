@@ -3,7 +3,7 @@ from djaveTable.cell_content import InHref
 from djaveTable.table import Row
 
 from tracktime.widgets.what_i_did_report import WhatIDidReport
-from tracktime.tests.tables.test_case_with_data import TestCaseWithData
+from tracktime.tests.widgets.test_case_with_data import TestCaseWithData
 
 
 class WhatIDidReportTests(TestCaseWithData):
@@ -21,7 +21,7 @@ class WhatIDidReportTests(TestCaseWithData):
     report = WhatIDidReport(request_get, self.user)
     table = report.what_i_did_content
     self.assertEqual(1, len(table.rows))
-    url = reverse('time_breakdown') + (
+    url = reverse('project_work_report') + (
         '?project={}&from_date=2020-01-15&to_date=2020-01-15'.format(
             self.project_1.pk))
     table.rows[0].assertEqual(Row([self.project_1.name, InHref(3.2, url)]))

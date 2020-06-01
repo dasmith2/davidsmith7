@@ -53,8 +53,8 @@ class WhatIDidPerProject(object):
     self.name = project.name
     self.hours = 0.0
     # This is why the WhatIDidPerProject filters should be exactly the same as
-    # the TimeBreakdown filters, except time breakdown is also by project.
+    # the WorkReport filters, except time breakdown is also by project.
     use_query_dict = {'project': project.pk}
     use_query_dict.update(current_query_dict)
     self.hours_breakdown_url = reverse(
-        'time_breakdown') + dict_as_query(use_query_dict)
+        'project_work_report') + dict_as_query(use_query_dict)
