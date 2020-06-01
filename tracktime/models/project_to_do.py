@@ -23,7 +23,7 @@ class ProjectToDo(ToDo):
   @classmethod
   def model_description(cls):
     return """
-        A ProjectToDo is a single task that a user intends to complete. '
+        A ProjectToDo is a single task that a user intends to complete.
         Picking these is a bit of an art form. Ideally, you click "Done" on a
         few ProjectToDos every ProjectWorkSession. Then when you Report, you
         can see a steady rhythm. """

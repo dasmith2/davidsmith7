@@ -37,7 +37,8 @@ class NewAPIKeyForm(Form):
 
 class NewAPIKeyTable(Table):
   def __init__(self, request_POST):
-    super().__init__(['API Key username', 'API Key password', ''])
+    super().__init__([
+        'API Key username', 'API Key password', 'Webhook URL', ''])
     self.form = NewAPIKeyForm()
     keys = list(self.existing_keys())
 
