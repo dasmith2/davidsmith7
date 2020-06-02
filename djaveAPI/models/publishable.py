@@ -55,7 +55,7 @@ class Publishable(models.Model):
   def allowed(cls, api_key):
     """ Return a query set that will only retrieve instances the given api_key
     is allowed to see. """
-    raise NotImplementedError('allowed {}'.format(self.__class__))
+    raise NotImplementedError('allowed {}'.format(cls))
 
   def allowed_api_keys(self, api_key_type):
     raise NotImplementedError('allowed_api_keys {}'.format(self.__class__))

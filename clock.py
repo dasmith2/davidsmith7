@@ -6,7 +6,7 @@ process catches import errors, and as long as the functions you import and run
 are decorated with @background or @background_command then any exceptions they
 raise will get emailed. But there are still cracks in the system you can sneak
 bugs into, such as running a @background function that's on a models.Manager.
-See util/background.py for a more detailed explanation of why that fails
+See djaveThread/background.py for a more detailed explanation of why that fails
 specifically, but the point is, it is possible to swallow errors here, so be
 careful. Follow conventions. Don't get fancy.
 
@@ -14,14 +14,14 @@ If something fishy is going on despite all the precautions, check the logs.
 
 heroku logs -d clock -t -a <this-heroku-app-name e.g. davidsmith7-stage>
 
-You can also look in the commands/models#CommandRun table to ensure your
+You can also look in the djaveThread.models.LoggedCommand table to ensure your
 @background_command is running successfully.
 
-You can't import background here because any function you decorate with it will
-trigger "Functions from the __main__ module cannot be processed by workers".
-So you have to import functions that are decorated with background. And they
-all should be, because the clock itself should never do any actual work. It
-should only kick tasks off to background threads.
+You can't import `background` here because any function you decorate with it
+will trigger "Functions from the __main__ module cannot be processed by
+workers".  So you have to import functions that are decorated with background.
+And they all should be, because the clock itself should never do any actual
+work. It should only kick tasks off to background threads.
 
 Hence, no work may be placed directly in this file. This file is strictly for
 scheduling.
@@ -33,12 +33,9 @@ Interval scheduling:
 https://apscheduler.readthedocs.io/en/latest/modules/triggers/interval.html
 
 Uh, it seems to me that interval scheduling is not very reliable. I'm looking
-at a case where it went 3 hours and 8 minutes for the 1 hour interval scheduled
-fix_stale, and there wasn't anything happening to block it or anything. But
-that could also be our reddis provider.
-
-This file is the entire reason we have flake8 (./lint.sh) globally ignore
-E402 module level import not at top of file
+at a case where it went 3 hours and 8 minutes for the 1 hour interval, and
+there wasn't anything happening to block it or anything. But that could also be
+our reddis provider.
 """
 import os
 import sys
@@ -48,7 +45,9 @@ import django
 # Otherwise you get "django.core.exceptions.ImproperlyConfigured: Requested
 # setting INSTALLED_APPS, but settings are not configured. You must either
 # define the environment variable DJANGO_SETTINGS_MODULE or call
-# settings.configure() before accessing settings."
+# settings.configure() before accessing settings." This is the entire reason we
+# have flake8 (./lint.sh) globally ignore E402 module level import not at top
+# of file
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'main.settings')
 django.setup()
 
@@ -57,6 +56,7 @@ from apscheduler.schedulers.blocking import BlockingScheduler
 """
 from djaveS3.models import (
     clean_up_never_used, clean_up_no_longer_needed, resize_all)
+from djaveAPI.models.webhook import send_webhooks
 """
 
 
@@ -69,6 +69,10 @@ def photo_stuff():
   clean_up_never_used()
   clean_up_no_longer_needed()
   resize_all()
+
+@sched.scheduled_job('cron', minute='0,5,10,15,20,25,30,35,40,45,50,55')
+def webhook_stuff():
+  send_webhooks()
 """
 
 

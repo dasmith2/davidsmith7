@@ -6,11 +6,12 @@ instead of username. I also copy the email field to the username field.
 But then there's a bunch of magic, which I'm not super excited about. """
 from django.contrib.auth.models import User as DjangoUser
 from django.db import connection
-from django.db.models.signals import pre_save
+from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 
 from djaveAPI.models.pretend_publishable import PretendPublishable
 from djaveAPI.models.user_api_key import UserAPIKey
+from djaveAPI.signals import publishable_post_save
 
 
 class User(PretendPublishable):
@@ -46,12 +47,24 @@ class User(PretendPublishable):
         'I do not know how to calculate allowed on an {}'.format(
             api_key.__class__.__name__))
 
+  def allowed_api_keys(self, api_key_type):
+    if api_key_type is UserAPIKey:
+      return UserAPIKey.objects.filter(user=self.instance)
+    else:
+      raise Exception('I dont know which {} are allowed'.format(
+          api_key_type.__class__))
+
 
 @receiver(pre_save, sender=DjangoUser)
 def pre_save_user(sender, instance, **kwargs):
   ensure_unique_email_index()
   if instance.username != instance.email:
     instance.username = instance.email
+
+
+@receiver(post_save, sender=DjangoUser)
+def post_save_user(sender, instance, **kwargs):
+  publishable_post_save.send(sender=User, instance=User(instance))
 
 
 CREATE_UNIQUE_EMAIL_INDEX_SQL = (

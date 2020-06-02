@@ -43,11 +43,16 @@ def _set_fields(instance, request_POST, api_key, publishable_class=None):
         if raw_value:
           value = allowed(field.foreign_key_to, api_key).filter(
               pk=raw_value).first()
-          if not value:
+          if value is None:
             raise AjaxProblem((
                 'Either {} {} does not exist, or your API key does not have '
                 'access to it').format(
                     field.foreign_key_to.__name__, raw_value))
+          if not isinstance(value, field.foreign_key_to):
+            raise Exception(
+                '{} allowed function should return {}, not {}'.format(
+                    field.foreign_key_to, field.foreign_key_to,
+                    value.__class__))
       elif field.type in [DATE, DATE_TIME]:
         value = _date_or_date_time(field, raw_value)
       elif field.type in [FLOAT, INTEGER]:

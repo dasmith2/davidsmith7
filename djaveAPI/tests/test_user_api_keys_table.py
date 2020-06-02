@@ -2,9 +2,9 @@ import re
 
 from djaveAPI.models.user_api_key import UserAPIKey
 from djaveAPI.tests.test_user_api_key import get_test_user_api_key
-from djaveAPI.widgets.new_user_api_key_table import UserAPIKeysTable
+from djaveAPI.widgets.user_api_keys_table import UserAPIKeysTable
 from djaveForm.button import Button
-from djaveForm.field import SlugField
+from djaveForm.field import SlugField, URLField
 from djaveTable.table import Row
 from djaveTest import TestCase, get_test_user
 
@@ -22,11 +22,13 @@ class TestUserAPIKeysTable(TestCase):
     expected_row = Row([
         SlugField('username', required=True),
         '',
-        Button('Save', button_type='submit')])
+        URLField('webhook_url', required=False),
+        Button('Create', button_type='submit')])
     table.rows[0].assertEqual(expected_row)
 
   def save_new(self):
-    request_POST = {'username': 'asdf', 'save': 'yep'}
+    request_POST = {
+        'username': 'asdf', 'webhook_url': 'https://whatever', 'save': 'yep'}
     return UserAPIKeysTable(self.user, request_POST)
 
   def test_save_new(self):
@@ -42,7 +44,10 @@ class TestUserAPIKeysTable(TestCase):
         r"Write this down because you'll never see it "
         r"again:<br><br><b>[\w-]{10}")
     self.assertTrue(description_tester.findall(row.cells[1]))
-    self.assertEqual(Button('Delete'), row.cells[2])
+    webhook_field = URLField(
+        'update_webhook_url', required=False, default='https://whatever')
+    self.assertEqual(webhook_field, row.cells[2])
+    self.assertEqual(Button('Delete'), row.cells[3])
     self.assertEqual(api_key.pk, row.pk)
 
   def test_cant_save_dupe_usernames(self):

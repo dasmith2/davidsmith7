@@ -168,6 +168,13 @@ INSTALLED_APPS = [
     'djaveS3',
     'djaveThread'] + THIS_SITE_INSTALLED_APPS
 
+# Whichever of these test classes reference django.contrib.auth.User need
+# explicit migrations to work. I did that by uncommenting "if TEST:" here,
+# briefly creating for example djaveAPI/tests/migrations, configuring
+# djaveAPI/tests/apps.py, then ./manage.py makemigrations
+if TEST:
+  INSTALLED_APPS.append('djaveAPI.tests.apps.DjaveAPITestsConfig')
+
 if DEBUG:
   # I try to keep things out of requirements.txt that aren't necessary in the
   # server enviroment because Heroku likes to choke unexpectedly and with

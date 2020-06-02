@@ -1,5 +1,5 @@
 from django.apps import AppConfig
 
 
-class TrackTimeConfig(AppConfig):
-    name = 'djaveAPI'
+class DjaveAPIConfig(AppConfig):
+  name = 'djaveAPI'

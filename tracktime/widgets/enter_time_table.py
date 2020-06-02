@@ -74,8 +74,8 @@ class EnterTimeTable(Table):
     return self.form.is_valid()
 
   def save(self):
-    project = Project.live.get(pk=self.form.project_field.value)
-    hours = self.form.hours_field.value
+    project = Project.live.get(pk=self.form.project_field.get_value())
+    hours = self.form.hours_field.get_value()
     set_latest_project(self.user, project)
     return ProjectWorkSession.live.create(
         user=self.user, project=project, date=self.day,
