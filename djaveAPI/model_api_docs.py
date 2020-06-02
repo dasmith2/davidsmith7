@@ -58,8 +58,17 @@ def model_api_examples(model, api_root_url):
       APIExample('Update', example_update(model, api_root_url), single),
       APIExample(
           '"Delete"', example_delete(model, api_root_url),
-          example_single_result(model, deleted=True))])
+          example_single_result(model, deleted=True)),
+      APIExample('Webhook', example_webhook(model, single), '')])
   return examples
+
+
+def example_webhook(model, single):
+  return (
+      '# If a new {} gets created, or an existing one changes,\n'
+      '# and if you give your API Key a webhook URL, we will POST\n'
+      '# something like this to your webhook URL:\n\n{}').format(
+          model.__name__, single)
 
 
 def example_list_result(model):

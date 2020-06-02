@@ -13,10 +13,10 @@
 <h2>{{ example.title }}</h2>
 {% comment %}Leave this pre at this indent or the actual visual code examples will be indented{% endcomment %}
 <pre>
-{{ example.code }}
+{{ example.code }}{% if example.result %}
 
 {{ example.result }}
-</pre>
+{% endif %}</pre>
 
 {% endfor %}
 
