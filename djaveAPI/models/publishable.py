@@ -1,4 +1,5 @@
 from django.db import models
+from djaveAPI.signals import publishable_post_save
 from djaveDT import now
 
 
@@ -37,6 +38,10 @@ class Publishable(models.Model):
     if self.explain_why_invalid():
       raise Exception(self.explain_why_invalid())
     super().save(*args, **kwargs)
+    publishable_post_save.send(sender=self.__class__, instance=self)
+
+  def published_object(self):
+    return self
 
   @classmethod
   def new_instance(cls):
@@ -48,9 +53,12 @@ class Publishable(models.Model):
 
   @classmethod
   def allowed(cls, api_key):
-    """ Return a query set that will only retrieve instances the api_key is
-    allowed to see. """
-    raise NotImplementedError('allowed')
+    """ Return a query set that will only retrieve instances the given api_key
+    is allowed to see. """
+    raise NotImplementedError('allowed {}'.format(self.__class__))
+
+  def allowed_api_keys(self, api_key_type):
+    raise NotImplementedError('allowed_api_keys {}'.format(self.__class__))
 
   live = PublishableManager()
   all = models.Manager()

@@ -20,7 +20,7 @@ class UserAPIKey(APIKey):
 
   objects = UserAPIKeyManager()
 
-  def user_can_delete_me(self, user):
+  def user_can_manage_me(self, user):
     return self.user == user
 
   def explain_why_can_not_create(self, of_model):

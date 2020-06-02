@@ -52,6 +52,16 @@ class ToDo(Publishable):
       raise Exception(
           'I do not know how to handle {} api keys'.format(api_key.__class__))
 
+  def allowed_api_keys(self, api_key_type):
+    if api_key_type is UserAPIKey:
+      users = set([self.creator])
+      if self.done_by:
+        users.add(self.done_by)
+      return UserAPIKey.objects.filter(user__in=users)
+    else:
+      raise Exception('I dont know which {} are allowed'.format(
+          api_key_type.__class__))
+
   def explain_why_invalid(self):
     if int(bool(self.done)) + int(bool(self.done_by)) == 1:
       return ((

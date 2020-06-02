@@ -13,5 +13,6 @@ def set_api_key_stuff(api_key, **kwargs):
   if plain_password:
     api_key.set_plain_password(plain_password)
   api_key.hashed_password = hashed_password
+  api_key.webhook_url = kwargs.get('webhook_url', '')
   api_key.save()
   return api_key

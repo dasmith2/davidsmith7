@@ -16,9 +16,10 @@ def use_publishable(instance, publishable_class=None):
   model = None
   if publishable_class:
     model = publishable_class
-    if issubclass(model, PretendPublishable):
+    if issubclass(model, PretendPublishable) and not isinstance(
+        instance, PretendPublishable):
       instance = model(instance)
-  elif isinstance(instance, Publishable):
+  elif isinstance(instance, (Publishable, PretendPublishable)):
     model = instance.__class__
   else:
     raise Exception(

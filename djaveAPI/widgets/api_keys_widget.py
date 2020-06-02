@@ -3,11 +3,11 @@ from django.template import loader
 from djaveAPI.models.api_key import username_available
 from djaveTable.table import Table
 from djaveForm.button import Button
-from djaveForm.field import SlugField
+from djaveForm.field import SlugField, URLField
 from djaveForm.form import Form
 
 
-class NewAPIKeyWidget(object):
+class APIKeysWidget(object):
   def __init__(self, request, new_api_key_table, title, description):
     self.request = request
     self.new_api_key_table = new_api_key_table
@@ -15,10 +15,11 @@ class NewAPIKeyWidget(object):
     self.description = description
 
   def __str__(self):
-    template = loader.get_template('new_api_key_widget.html')
+    template = loader.get_template('api_keys_widget.html')
     context = {
         'new_api_key_table': self.new_api_key_table,
         'delete_api_key_url': reverse('delete_key'),
+        'update_webhook_url': reverse('update_webhook_url'),
         'title': self.title,
         'description': self.description}
     return template.render(context, request=self.request)
@@ -27,15 +28,17 @@ class NewAPIKeyWidget(object):
 class NewAPIKeyForm(Form):
   def __init__(self):
     self.username_field = SlugField('username', required=True)
-    self.save_button = Button('Save', button_type='submit')
-    super().__init__([self.username_field, self.save_button])
+    self.webhook_url_field = URLField('webhook_url', required=False)
+    self.save_button = Button('Create', button_type='submit')
+    super().__init__([
+        self.username_field, self.webhook_url_field, self.save_button])
 
   def is_valid(self):
     return super().is_valid() and (
         username_available(self.username_field.get_value()))
 
 
-class NewAPIKeyTable(Table):
+class APIKeysTable(Table):
   def __init__(self, request_POST):
     super().__init__([
         'API Key username', 'API Key password', 'Webhook URL', ''])
@@ -46,6 +49,10 @@ class NewAPIKeyTable(Table):
       self.form.set_form_data(request_POST)
       if self.form.is_valid():
         new_api_key = self.create_key(self.form.username_field.get_value())
+        webhook_url = self.form.webhook_url_field.get_value()
+        if webhook_url:
+          new_api_key.webhook_url = webhook_url
+          new_api_key.save()
         keys = [new_api_key] + keys
         self.form = NewAPIKeyForm()
 
@@ -53,7 +60,9 @@ class NewAPIKeyTable(Table):
     self.setup_keys_rows(keys)
 
   def setup_top_row(self):
-    self.create_row([self.form.username_field, '', self.form.save_button])
+    self.create_row([
+        self.form.username_field, '',
+        self.form.webhook_url_field, self.form.save_button])
 
   def setup_keys_rows(self, keys):
     for key in keys:
@@ -62,7 +71,11 @@ class NewAPIKeyTable(Table):
         password = (
             'Write this down because you\'ll never see it again:<br><br>'
             '<b>{}</b>').format(key.get_plain_password())
-      self.create_row([key.username, password, Button('Delete')], pk=key.pk)
+      webhook_url_field = URLField(
+          'update_webhook_url', required=False, default=key.webhook_url)
+      self.create_row([
+          key.username, password, webhook_url_field, Button('Delete')],
+          pk=key.pk)
 
   def existing_keys(self):
     raise NotImplementedError('existing_keys')

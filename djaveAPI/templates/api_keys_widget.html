@@ -2,6 +2,8 @@
 $(function() {
   wire_up_ajax_button(
       '.delete', '{{ delete_api_key_url }}', remove_row, 'Delete API Key?');
+  wire_up_ajax_save_text(
+    '.update_webhook_url', '{{ update_webhook_url }}', 'webhook_url');
 });
 </script>
 {% if title %}

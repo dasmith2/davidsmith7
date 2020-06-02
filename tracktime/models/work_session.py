@@ -126,6 +126,13 @@ class WorkSession(Publishable):
       raise Exception(
           'I do not know how to handle {} api keys'.format(api_key.__class__))
 
+  def allowed_api_keys(self, api_key_type):
+    if api_key_type is UserAPIKey:
+      return UserAPIKey.objects.filter(user=self.user)
+    else:
+      raise Exception('I dont know which {} are allowed'.format(
+          api_key_type.__class__))
+
   def describe_time_span(self, tz_str=None):
     if self.started and self.stopped:
       started = self.get_started(tz_str=tz_str)

@@ -9,8 +9,9 @@ from djaveAPI.models.api_key import APIKey
 from djaveAPI.paged_results import paged_results, get_page
 from djaveAPI.save import update, save_new, delete
 from djaveAPI.to_json import to_json_dict
-from djaveAPI.widgets.new_api_key_widget import NewAPIKeyWidget
-from djaveAPI.widgets.new_user_api_key_table import NewUserAPIKeyTable
+from djaveAPI.widgets.api_keys_widget import APIKeysWidget
+from djaveAPI.widgets.user_api_keys_table import UserAPIKeysTable
+from djaveForm.field import URLField
 from djAveJAX import AjaxProblem, ajax_login_required, get_ajax_variable
 from djaveURL import protocol_and_host
 
@@ -88,11 +89,11 @@ def _get_model(model_name):
 
 
 def user_api_keys(request):
-  table = NewUserAPIKeyTable(request.user, request.POST)
+  table = UserAPIKeysTable(request.user, request.POST)
   description = (
       'User API Keys will retrieve data based on what you, the user, can '
       'see on the website.')
-  widget = NewAPIKeyWidget(
+  widget = APIKeysWidget(
       request, table, 'User API Keys', description)
   context = {'the_one_thing_on_this_page': widget}
   return render(request, 'this_site.html', context)
@@ -100,11 +101,27 @@ def user_api_keys(request):
 
 @ajax_login_required
 def delete_key(request):
+  _ajax_api_key(request).delete()
+
+
+@ajax_login_required
+def update_webhook_url(request):
+  api_key = _ajax_api_key(request)
+  api_key.webhook_url = get_ajax_variable(request.POST, 'webhook_url')
+  url_field = URLField('webhook_url', required=False)
+  url_field.set_value(api_key.webhook_url)
+  why_not_valid = url_field.explain_why_not_valid()
+  if why_not_valid:
+    raise AjaxProblem(why_not_valid)
+  api_key.save()
+
+
+def _ajax_api_key(request):
   pk = get_ajax_variable(request.POST, 'pk')
   api_key = APIKey.objects.filter(pk=pk).first()
   if not api_key:
     raise AjaxProblem('This API Key does not exist')
   api_key = api_key.as_child_class()
-  if not api_key.user_can_delete_me(request.user):
-    raise AjaxProblem('You do not have permission to delete this key')
-  api_key.delete()
+  if not api_key.user_can_manage_me(request.user):
+    raise AjaxProblem('You do not have permission to manage this key')
+  return api_key

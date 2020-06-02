@@ -2,14 +2,14 @@ import re
 
 from djaveAPI.models.user_api_key import UserAPIKey
 from djaveAPI.tests.test_user_api_key import get_test_user_api_key
-from djaveAPI.widgets.new_user_api_key_table import NewUserAPIKeyTable
+from djaveAPI.widgets.new_user_api_key_table import UserAPIKeysTable
 from djaveForm.button import Button
 from djaveForm.field import SlugField
 from djaveTable.table import Row
 from djaveTest import TestCase, get_test_user
 
 
-class TestNewUserAPIKeyTable(TestCase):
+class TestUserAPIKeysTable(TestCase):
   def setUp(self):
     super().setUp()
     self.user = get_test_user()
@@ -17,7 +17,7 @@ class TestNewUserAPIKeyTable(TestCase):
     get_test_user_api_key()
 
   def test_nothing_happened_yet(self):
-    table = NewUserAPIKeyTable(self.user, None)
+    table = UserAPIKeysTable(self.user, None)
     self.assertEqual(1, len(table.rows))
     expected_row = Row([
         SlugField('username', required=True),
@@ -27,7 +27,7 @@ class TestNewUserAPIKeyTable(TestCase):
 
   def save_new(self):
     request_POST = {'username': 'asdf', 'save': 'yep'}
-    return NewUserAPIKeyTable(self.user, request_POST)
+    return UserAPIKeysTable(self.user, request_POST)
 
   def test_save_new(self):
     table = self.save_new()
@@ -52,5 +52,5 @@ class TestNewUserAPIKeyTable(TestCase):
 
   def test_cant_save_username_with_space(self):
     request_POST = {'username': 'asdf ', 'save': 'yep'}
-    NewUserAPIKeyTable(self.user, request_POST)
+    UserAPIKeysTable(self.user, request_POST)
     self.assertEqual(0, UserAPIKey.objects.filter(user=self.user).count())

@@ -116,6 +116,7 @@ function wire_up_ajax_save_text(
     var turn_off_edit_text_mode = function() {
       other_buttons.show();
       cell.find('.save-text,.cancel-save-text').hide();
+      feedback.hide();
     };
 
     if (!save_text_button.length) {

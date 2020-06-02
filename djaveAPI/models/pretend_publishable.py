@@ -1,3 +1,6 @@
+from djaveAPI.signals import publishable_post_save
+
+
 class PretendPublishable(object):
   def __init__(self, instance=None):
     self.instance = instance or self.__class__.new_instance()
@@ -31,6 +34,10 @@ class PretendPublishable(object):
 
   def save(self):
     self.instance.save()
+    publishable_post_save(sender=self.__class__, instance=self)
+
+  def published_object(self):
+    return self.instance
 
   def mark_deleted(self, nnow=None):
     raise NotImplementedError('mark_deleted')
@@ -41,6 +48,11 @@ class PretendPublishable(object):
 
   @classmethod
   def allowed(cls, api_key):
-    """ Return a query set that will only retrieve instances the api_key is
-    allowed to see. """
+    """ Return a query set that will only retrieve instances the given api_key
+    is allowed to see. """
     raise NotImplementedError('allowed')
+
+  def allowed_api_keys(self, api_key_type):
+    """ Return a list of API Keys of the given type with permission to this
+    object. This is how we figure out what webhooks we need to send. """
+    raise NotImplementedError('allowed_api_keys')

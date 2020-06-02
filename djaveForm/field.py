@@ -18,7 +18,7 @@ class Field(FormElement):
     self.required = required
     self.default = default
 
-    self.value = None
+    self._value = None
     self._value_set = False
     if value is not None and value != '':
       self.set_value(value)
@@ -27,34 +27,33 @@ class Field(FormElement):
 
   def set_value(self, value):
     if value == '':
-      self.value = None
+      self._value = None
     else:
-      self.value = value
+      self._value = value
     self._value_set = True
 
   def get_value(self):
     if not self._value_set:
       raise Exception(
           'You have to set the value of a field before you can get the value '
-          'of a field. You probably want to call set_form_data on the form '
-          'to do this.')
-    return self.value
+          'of a field. You probably want to call set_form_data on the form.')
+    return self._value
 
   def get_value_string(self):
     if self._value_set:
-      if self.value is not None:
-        return self.value
+      if self.get_value() is not None:
+        return self.get_value()
     elif self.default:
       return self.default
     return ''
 
   def get_value_or_default(self):
     if self._value_set:
-      return self.value
+      return self.get_value()
     return self.default
 
   def explain_why_not_valid(self):
-    if self.required and not self.value:
+    if self.required and not self.get_value():
       return 'Required'
 
   def is_valid(self):
@@ -65,9 +64,9 @@ class Field(FormElement):
     return not self.explain_why_not_valid()
 
   def as_csv(self):
-    if self.value is None:
+    if self.get_value() is None:
       return ''
-    return str(self.value)
+    return str(self.get_value())
 
   def as_html(self):
     widget_html = self.widget_html()
@@ -97,19 +96,19 @@ class SelectField(Field):
     super_invalid = super().explain_why_not_valid()
     if super_invalid:
       return super_invalid
-    if self.value:
+    if self.get_value():
       if not self.options:
         return 'This select has no options'
       for option in self.options:
         if self._is_selected_option(option):
           return
-      return '{} is not in the list of options'.format(self.value)
+      return '{} is not in the list of options'.format(self.get_value())
 
   def _is_selected_option(self, option):
     # option.id is probably an int because it probably came from objects, while
-    # self.value is probably a string when it comes from the browser but
+    # self.get_value() is probably a string when it comes from the browser but
     # probably an int when it comes from tests and business logic.
-    return self._value_set and str(option.id) == str(self.value)
+    return self._value_set and str(option.id) == str(self.get_value())
 
   def _is_default_option(self, option):
     return option.id == self.default
@@ -169,8 +168,8 @@ class DateField(HtmlInputField):
           'date object, or a string in the format yyyy-mm-dd')
 
   def as_csv(self):
-    if self.value is not None:
-      return self.value.strftime('%Y-%m-%d')
+    if self.get_value() is not None:
+      return self.get_value().strftime('%Y-%m-%d')
     return ''
 
   def input_type(self):
@@ -187,8 +186,18 @@ class SlugField(TextField):
     super_invalid = super().explain_why_not_valid()
     if super_invalid:
       return super_invalid
-    if re.compile(r'[^\w-]').findall(self.value):
+    if re.compile(r'[^\w-]').findall(self.get_value()):
       return 'You can only use letters, numbers, _ and -'
+
+
+class URLField(TextField):
+  def explain_why_not_valid(self):
+    super_invalid = super().explain_why_not_valid()
+    if super_invalid:
+      return super_invalid
+    if self.get_value():
+      if self.get_value().find('http') != 0:
+        return 'This should be a URL, like, https://whatever'
 
 
 class PositiveFloatField(HtmlInputField):
@@ -210,11 +219,12 @@ class PositiveFloatField(HtmlInputField):
     if super_invalid:
       return super_invalid
     try:
-      float(self.value)
+      float(self.get_value())
     except ValueError:
-      return 'I can not convert {} to a float'.format(html.escape(self.value))
-    if self.value < 0:
-      return '{} is less than 0'.format(self.value)
+      return 'I can not convert {} to a float'.format(
+          html.escape(self.get_value()))
+    if self.get_value() < 0:
+      return '{} is less than 0'.format(self.get_value())
 
   def input_type(self):
     return 'number'

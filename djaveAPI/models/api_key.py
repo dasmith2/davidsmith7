@@ -1,11 +1,24 @@
 """ By itself, an APIKey isn't much use. You're probably going to inherit from
 APIKey in order to describe some kind of scope. djaveAPI.models.user_api_key is
 an example. It's an API Key created at the user level.  """
+from importlib import import_module
 from secrets import token_urlsafe
 
+from django.conf import settings
 from django.contrib.auth.hashers import check_password, make_password
 from django.db import models
 from djaveClass.base_knows_child import BaseKnowsChild
+
+
+def api_key_types():
+  types = []
+  for type_str in settings.API_KEY_TYPES:
+    parts = type_str.split('.')
+    module_str = '.'.join(parts[:-1])
+    class_str = parts[-1]
+    module = import_module(module_str)
+    types.append(getattr(module, class_str))
+  return types
 
 
 def username_available(username):
@@ -34,14 +47,19 @@ class APIKey(BaseKnowsChild):
       'Because passwords are encrypted in the database, we need a username '
       'to look up the key.'))
 
-  hashed_password = models.CharField(max_length=100, help_text=(
-      'The password is salted and hashed. Then, if a hacker gains '
-      'readonly access to the database, they will at least be prevented from '
-      'immediately executing requests on behalf of teams.'))
   # Actually this isn't really true. If a hacker gainst readonly access to the
   # database, they can read the django_session table which stores unencrypted
   # session keys. With a valid session key, a hacker can be logged in and just
   # go make a new APIKey.
+  hashed_password = models.CharField(max_length=100, help_text=(
+      'The password is salted and hashed. Then, if a hacker gains '
+      'readonly access to the database, they will at least be prevented from '
+      'immediately executing requests on behalf of teams.'))
+
+  webhook_url = models.CharField(
+      max_length=400, null=False, blank=True, default='', help_text=(
+          'When any important object changes, what URL should we POST the new '
+          'object data to?'))
 
   def __init__(self, *args, **kwargs):
     self._plain_password = None
@@ -61,7 +79,7 @@ class APIKey(BaseKnowsChild):
           'passwords.')
     return self._plain_password
 
-  def user_can_delete_me(self, user):
-    raise NotImplementedError('user_can_delete_me')
+  def user_can_manage_me(self, user):
+    raise NotImplementedError('user_can_manage_me')
 
   objects = APIKeyManager()

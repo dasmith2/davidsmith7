@@ -1,17 +1,17 @@
 from django.shortcuts import render, reverse
-from djaveAPI.widgets.new_api_key_widget import NewAPIKeyWidget
-from djaveAPI.widgets.new_user_api_key_table import NewUserAPIKeyTable
+from djaveAPI.widgets.api_keys_widget import APIKeysWidget
+from djaveAPI.widgets.user_api_keys_table import UserAPIKeysTable
 from djaveLogin.calc_urls import get_logout_url
 
 from tracktime.views.util import tracktime_context
 
 
 def settings(request):
-  table = NewUserAPIKeyTable(request.user, request.POST)
+  table = UserAPIKeysTable(request.user, request.POST)
   description = (
       'User API Keys will retrieve data based on what you, the user, can '
       'see on the website.')
-  user_api_key_widget = NewAPIKeyWidget(
+  user_api_key_widget = APIKeysWidget(
       request, table, 'User API Keys', description)
 
   context = tracktime_context(

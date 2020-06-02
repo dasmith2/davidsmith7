@@ -2,7 +2,7 @@ from secrets import token_urlsafe
 
 from django.contrib.auth.models import User
 from django.shortcuts import reverse
-from djaveClass.rm_old_manager import RmOldManager
+from djaveClass.models.rm_old import RmOldManager, RmOld
 from djaveDT import now
 from djaveLogin.calc_urls import append_next_url
 from djaveURL import protocol_and_host
@@ -44,10 +44,9 @@ class LoginTokenManager(RmOldManager):
     return 7
 
 
-class LoginToken(models.Model):
+class LoginToken(RmOld):
   """ A login token represents a single opportunity for a particular user to
   log in. """
-  created = models.DateTimeField(auto_now_add=True)
   used = models.DateTimeField(null=True, blank=True, help_text=(
       'Each token is good for one use.'))
   user = models.ForeignKey(
