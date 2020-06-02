@@ -1,10 +1,10 @@
 from django.urls import path
 
 from tracktime.views import (
-    enter_time, delete_work_session, to_do, to_do_done, delete_to_do,
-    edit_description, to_do_for_another_project, project_work_summary,
-    project_work_report, projects, archived_projects, archive_project,
-    unarchive_project, rename_project, api_docs, settings)
+    enter_time, delete_work_session, to_do, to_do_done, to_do_not_done,
+    delete_to_do, edit_description, to_do_for_another_project,
+    project_work_summary, project_work_report, projects, archived_projects,
+    archive_project, unarchive_project, rename_project, api_docs, settings)
 
 
 tracktime_urls = [
@@ -24,6 +24,7 @@ tracktime_urls = [
         'delete_work_session', delete_work_session,
         name='delete_work_session'),
     path('to_do_done', to_do_done, name='to_do_done'),
+    path('to_do_not_done', to_do_not_done, name='to_do_not_done'),
     path('delete_to_do', delete_to_do, name='delete_to_do'),
     path('edit_description', edit_description, name='edit_description'),
 

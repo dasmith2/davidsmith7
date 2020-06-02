@@ -143,6 +143,8 @@ def obj_as_cell_content(obj):
     return obj
   if is_primitive(obj):
     return StringContent(str(obj))
+  if obj is None:
+    return StringContent('')
   if isinstance(obj, datetime):
     return tz_dt_to_str(obj)
   if isinstance(obj, timedelta):

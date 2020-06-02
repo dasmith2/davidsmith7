@@ -6,14 +6,59 @@ function focus_on_new_to_do() {
   $('.new_description').focus();
 }
 
-function setup_done_and_delete() {
-  var success = function(pk) {
-    remove_row(pk);
-    focus_on_new_to_do();
-  };
-  wire_up_ajax_button('button.done', '{{ to_do_done_url }}', success);
+function setup_done_delete_and_not_done() {
+  $('tr[data-pk]').each(function() {
+    // to_done so as not to conflict with the done button
+    if ($(this).hasClass('to_done')) {
+      put_row_in_done_mode($(this));
+    } else {
+      put_row_in_not_done_mode($(this));
+    }
+  });
+}
+
+function put_row_in_done_mode(row) {
+  row.addClass('to_done');
+  clear_buttons(row);
+  append_not_done_button(row);
+}
+
+function put_row_in_not_done_mode(row) {
+  row.removeClass('to_done');
+  clear_buttons(row);
+  append_done_button(row);
+  append_delete_button(row);
+}
+
+function clear_buttons(row) {
+  get_button_cell(row).empty();
+}
+
+function get_button_cell(row) {
+  return row.find('.buttons');
+}
+
+function append_done_button(row) {
+  var html = '<button type="button" class="done">Done</button>';
+  var button = $(html).appendTo(get_button_cell(row));
+  wire_up_ajax_button(button, '{{ to_do_done_url }}', function() {
+    put_row_in_done_mode(row);
+  });
+}
+
+function append_delete_button(row) {
+  var html = '<button type="button" class="delete">Delete</button>';
+  var button = $(html).appendTo(get_button_cell(row));
   wire_up_ajax_button(
-      'button.delete', '{{ delete_to_do_url }}', success, 'Delete?');
+      button, '{{ delete_to_do_url }}', remove_row, 'Delete?');
+}
+
+function append_not_done_button(row) {
+  var html = '<button type="button" class="not_done">Not done actually</button>';
+  var button = $(html).appendTo(get_button_cell(row));
+  wire_up_ajax_button(button, '{{ not_done_url }}', function() {
+    put_row_in_not_done_mode(row);
+  });
 }
 
 function setup_edit_description() {
@@ -22,12 +67,13 @@ function setup_edit_description() {
 }
 
 $(focus_on_new_to_do);
-$(setup_done_and_delete);
+$(setup_done_delete_and_not_done);
 $(setup_edit_description);
 </script>
 
 <style>
 table textarea { width: 100%; }
+table { margin-top: 20px; }
 textarea.edit_description {
   border-style: none;
   border-color: Transparent;
@@ -37,19 +83,19 @@ textarea.edit_description {
   height: 45px;
 }
 .row2 textarea.edit_description { background-color: #eee; }
+.to_done, .to_done textarea.edit_description { background-color: #dfd; }
 </style>
 {% endblock tracktime_head %}
 
 {% block tracktime_body %}
 
-{% if project %}
-  <h1>Project: {{ project.name }} {{ punch_out_button.as_html }}</h1>
-{% else %}
-  <h2>You have to be on the clock first</h2>
-{% endif %}
-
 <form method="POST">
   {% csrf_token %}
+  {% if project %}
+    <h1>Project: {{ project.name }} {{ punch_out_button.as_html }}</h1>
+  {% else %}
+    <h2>You have to be on the clock first</h2>
+  {% endif %}
   {% if project %}
     {% if stop_problem %}
       <div>{{ stop_problem.as_html }}</div>

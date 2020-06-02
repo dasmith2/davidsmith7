@@ -71,14 +71,17 @@ class DoneByUserInDateRangeTests(TestCase):
             self.user, date(2020, 1, 15), date(2020, 1, 16))))
 
 
-class NotDoneTests(TestCase):
-  def test_not_done(self):
+class NotLongDoneTests(TestCase):
+  def test_not_long_done(self):
     user = get_test_user()
 
     not_done = get_test_to_do(creator=user)
-    # Done. Should never show up.
+    recently_done = get_test_to_do(
+        done=to_tz_dt('2020-02-01 11:00'), creator=user, done_by=user)
+    # Done a long time ago. Should never show up.
     get_test_to_do(
         done=to_tz_dt('2020-01-01'), creator=user, done_by=user)
 
     self.assertEqual(
-        [not_done], list(ToDo.live.not_done(user)))
+        [not_done, recently_done],
+        list(ToDo.live.not_long_done(user, nnow=to_tz_dt('2020-02-01 12:00'))))

@@ -11,7 +11,6 @@ from tracktime.models.to_do import ToDo
 from tracktime.models.project_work_session import ProjectWorkSession
 from tracktime.widgets.punch_the_clock import PunchTheClockTable
 from tracktime.widgets.project_to_do_table import ProjectToDoTable
-from tracktime.widgets.project_work_report import project_work_report_url
 from tracktime.views.util import tracktime_context, TO_DO
 
 
@@ -35,8 +34,7 @@ def to_do(request):
     if punch_out_button.get_was_clicked(request.POST):
       if clock_running.can_stop():
         clock_running.stop()
-        return redirect(project_work_report_url(
-            project, date.today(), date.today()))
+        return redirect('enter_time')
       stop_problem = Problem(clock_running.explain_why_can_not_stop())
     to_do_table = ProjectToDoTable(
         user=request.user, project=project, form_data=request.POST)
@@ -54,6 +52,14 @@ def to_do_done(request):
   to_do = _ajax_to_do(request)
   to_do.done = now()
   to_do.done_by = request.user
+  to_do.save()
+
+
+@ajax_login_required
+def to_do_not_done(request):
+  to_do = _ajax_to_do(request)
+  to_do.done = None
+  to_do.done_by = None
   to_do.save()
 
 
@@ -89,5 +95,6 @@ def to_do_context(to_do_table, request, **kwargs):
   return tracktime_context(
       TO_DO, request, to_do_table=to_do_table,
       to_do_done_url=reverse(to_do_done),
+      not_done_url=reverse(to_do_not_done),
       delete_to_do_url=reverse(delete_to_do),
       edit_description_url=reverse('edit_description'), **kwargs)

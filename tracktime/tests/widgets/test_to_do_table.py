@@ -1,7 +1,7 @@
 from djaveDT import to_tz_dt
 from djaveForm.button import Button
 from djaveForm.field import TextAreaField
-from djaveTable.table import Row
+from djaveTable.table import Row, Cell
 from djaveTest import TestCase, get_test_user
 
 from tracktime.models.to_do import ToDo
@@ -39,7 +39,7 @@ class ToDoTableTests(TestCase):
     description = TextAreaField(
         'edit_description', default='Hello world!', required=False)
     table.rows[1].assertEqual(Row([
-        description, self._done_delete_buttons()], pk=to_do.pk))
+        description, Cell(None, classes=['buttons'])], pk=to_do.pk))
 
   def test_did(self):
     table = ToDoTable(self.user, {
@@ -58,9 +58,6 @@ class ToDoTableTests(TestCase):
     expected_description.set_value('')  # This causes "Required" to show
     table.rows[0].assertEqual(Row([
         expected_description, self._to_do_did_buttons()]))
-
-  def _done_delete_buttons(self):
-    return [Button('Done'), Button('Delete')]
 
   def _to_do_did_buttons(self):
     return [

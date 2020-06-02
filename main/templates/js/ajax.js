@@ -61,12 +61,13 @@ function remove_row(pk) {
   row_by_pk(pk).remove();
 }
 
-function wire_up_ajax_button(selector, action_url, success, confirm_question) {
+function wire_up_ajax_button(
+    selector_or_elt, action_url, success, confirm_question) {
   /* This is for buttons in tables where it's, like, one object per row, and
    * the user can click buttons that do things to the objects. confirm_question
    * is optional and is, like, 'Are you sure you want to delete this whatever?'
-   * */
-  $(selector).click(function() {
+   * selector_or_elt can be a string or a jQuery object. */
+  $(selector_or_elt).click(function() {
     var button = $(this).prop('disabled', true);
     var cell = button.parents('td');
     var pk = find_pk(button);
@@ -88,18 +89,19 @@ function wire_up_ajax_button(selector, action_url, success, confirm_question) {
 }
 
 function wire_up_ajax_save_text(
-    text_box_selector, action_url, text_field_name, success_callback) {
+    text_box_selector_or_elt, action_url, text_field_name, success_callback) {
   /* This is for text boxes in tables so you can edit names and descriptions
    * inline with AJAX. Once you start editing a text box, this hides all the
-   * other buttons and gives the user "Save" and "Cancel" buttons. */
+   * other buttons and gives the user "Save" and "Cancel" buttons.
+   * text_box_selector_or_elt can be a string or a jQuery object. */
   var get_other_buttons = function(text_box) {
     return text_box.parents('tr').find('button,.button');
   };
-  $(text_box_selector).each(function() {
+  $(text_box_selector_or_elt).each(function() {
     var text_box = $(this);
     text_box.attr('data-saved-text', text_box.val());
   });
-  $(text_box_selector).keyup(function(event) {
+  $(text_box_selector_or_elt).keyup(function(event) {
     /* Make sure all the buttons, variables, and functions are set up */
     var text_box = $(this);
     var feedback = get_feedback_elt_after(text_box);

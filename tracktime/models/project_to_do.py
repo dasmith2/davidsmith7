@@ -8,8 +8,8 @@ class ProjectToDoManager(ToDoManager):
   def select_related_list(self):
     return super().select_related_list() + ['project']
 
-  def not_done(self, creator, project=None):
-    filtered = super().not_done(creator)
+  def not_long_done(self, creator, project=None):
+    filtered = super().not_long_done(creator)
     if project:
       filtered = filtered.filter(project=project)
     return filtered

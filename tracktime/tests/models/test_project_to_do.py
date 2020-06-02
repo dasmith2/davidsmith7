@@ -22,4 +22,4 @@ class NotDoneTests(TestCase):
     get_test_project_to_do(project=project_2, creator=user)
 
     self.assertEqual(
-        [not_done_1], list(ProjectToDo.live.not_done(user, project_1)))
+        [not_done_1], list(ProjectToDo.live.not_long_done(user, project_1)))

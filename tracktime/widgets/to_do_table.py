@@ -2,7 +2,7 @@ from djaveDT import now
 from djaveForm.button import Button
 from djaveForm.form import Form
 from djaveForm.field import TextAreaField
-from djaveTable.table import Table
+from djaveTable.table import Table, Cell
 
 from tracktime.models.to_do import ToDo
 
@@ -46,8 +46,12 @@ class ToDoTable(Table):
     self.create_row(self.cells_for_enter_new())
 
   def setup_existing(self):
-    for to_do in self.get_not_done():
-      self.create_row(self.cells_for_existing(to_do), pk=to_do.pk)
+    for to_do in self.get_not_long_done():
+      classes = None
+      if to_do.done:
+        classes = ['to_done']  # So as not to conflict with the done button
+      self.create_row(
+          self.cells_for_existing(to_do), pk=to_do.pk, classes=classes)
 
   # From here on out it's stuff you probably want to override in your
   # FooToDoTable. See ProjectToDoTable for an example.
@@ -62,12 +66,10 @@ class ToDoTable(Table):
     return [self.form.description_field, [
         self.form.to_do_button, self.form.did_button]]
 
-  def get_not_done(self):
-    return ToDo.live.not_done(self.user)
+  def get_not_long_done(self):
+    return ToDo.live.not_long_done(self.user)
 
   def cells_for_existing(self, to_do):
-    done = Button('Done')
-    delete = Button('Delete')
     description = TextAreaField(
         'edit_description', default=to_do.description, required=False)
-    return [description, [done, delete]]
+    return [description, Cell(None, ['buttons'])]

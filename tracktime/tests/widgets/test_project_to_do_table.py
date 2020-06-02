@@ -1,6 +1,6 @@
 from djaveForm.button import Button
 from djaveForm.field import TextAreaField
-from djaveTable.table import Row
+from djaveTable.table import Row, Cell
 from djaveTest import TestCase, get_test_user
 from tracktime.fields import project_field
 from tracktime.models.project_to_do import ProjectToDo
@@ -42,11 +42,8 @@ class ProjectToDoTableTests(TestCase):
         TextAreaField('new_description', required=True),
         self._to_do_did_buttons()]))
     table.rows[1].assertEqual(Row(
-        ['My rad project', description, self._done_delete_buttons()],
+        ['My rad project', description, Cell(None, classes=['buttons'])],
         pk=to_do.pk))
-
-  def _done_delete_buttons(self):
-    return [Button('Done'), Button('Delete')]
 
   def _to_do_did_buttons(self):
     return [

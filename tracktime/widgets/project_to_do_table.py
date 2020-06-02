@@ -49,8 +49,8 @@ class ProjectToDoTable(ToDoTable):
     cells.extend(super().cells_for_enter_new())
     return cells
 
-  def get_not_done(self):
-    return ProjectToDo.live.not_done(self.user, self.project)
+  def get_not_long_done(self):
+    return ProjectToDo.live.not_long_done(self.user, self.project)
 
   def cells_for_existing(self, to_do):
     cells = []

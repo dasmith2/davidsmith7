@@ -5,7 +5,7 @@ from django.db import models
 from django.db.models import Q
 from djaveAPI.models.user_api_key import UserAPIKey
 from djaveAPI.models.publishable import Publishable, PublishableManager
-from djaveDT import beginning_of_day
+from djaveDT import beginning_of_day, now
 
 
 DELETED = 'DELETED'
@@ -14,9 +14,14 @@ OPEN = 'OPEN'
 
 
 class ToDoManager(PublishableManager):
-  def not_done(self, creator):
-    return self.filter(done=None, creator=creator).select_related(
-        *self.select_related_list()).order_by('-pk')
+  def not_long_done(self, creator, nnow=None):
+    """ This is what shows in tracktime.widgets.to_do_table. If you did
+    something recently, it still shows. """
+    nnow = nnow or now()
+    return self.filter(
+        Q(done=None) | Q(done__gte=nnow - timedelta(days=1)),
+        creator=creator).select_related(
+            *self.select_related_list()).order_by('-done', '-pk')
 
   def done_by_user_in_date_range(
       self, done_by, from_date, to_date, tz_str=None):
