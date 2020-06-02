@@ -1,38 +1,3 @@
-# The most important thing
-
-tl;dr; Clarity.
-
-I want to move quickly. I want to spin up new surprisingly functional sites
-fast. There's no silver bullet or shortcut there. I think in the end it's all
-about the fundamentals.
-
-The code has to make perfect sense. When you want to do something, you should
-be able to guess where exactly you need to go to fix the problem without even
-listing any files or anything.
-
-You have to name everything consistently. It's no good putting the EnterTime
-class in time_entry.py
-
-Don't get fancy in any particular file. Don't be lumping thousands of lines of
-features in a single file. Each file is a beautiful snowflake that, if
-anything, is a little underwhelming. Of course this is an art form, and depends
-heavily on good old fashioned encapsulation. When you write code, you're
-describing abstractions, and ideally those abstractions should make perfect
-sense. They should perfectly describe the world. They should be useful. They
-should be exquisitly crafted for use cases. Perfectly abstracted code is a joy
-to work with.
-
-Pay attention to how confused you feel. If you're confused, it's not your
-fault, it's the code's fault. Whatever questions you can think of, the code
-should answer in a straightforward manner.
-
-Commenting is an art form. When you feel a need to comment WHAT you're doing,
-that's a red flag that your code is confusing. But you most certainly should
-comment WHY you're doing it that way. If some bug caused you to tweak the code,
-but you don't document the story nearby, you're liable to forget why you did it
-that way and switch it to something "better" which is just the old system, and
-re-introduce the bug.
-
 # Setting up a new website
 
 This is my starting point for new Django projects on Heroku
@@ -53,7 +18,6 @@ You'll need to make some changes.
 
 1. Update the name, description, and repository in app.json
 1. Create a main/local_settings.py file
-1. You can delete the example app entirely
 
 You'll need to set up a database.
 
