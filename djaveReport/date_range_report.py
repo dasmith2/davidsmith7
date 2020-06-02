@@ -18,6 +18,11 @@ class DateRangeReport(FilteredReport):
     dynamic_filters = self._validate_filters(filters)
     use_filters = date_filters + dynamic_filters
     super().__init__(request_get, use_filters, contents)
+    if self.from_date_field.value_was_set() and (
+        self.to_date_field.value_was_set()) and (
+            self.from_date_field.get_value() > self.to_date_field.get_value()):
+      self.from_date_field.set_invalid_reason(
+          'It looks like "From" and "To" are in the wrong order')
 
   def from_date(self):
     return self.from_date_field.get_value_or_default()

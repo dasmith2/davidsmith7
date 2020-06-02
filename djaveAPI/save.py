@@ -58,6 +58,11 @@ def _set_fields(instance, request_POST, api_key, publishable_class=None):
       elif field.type in [FLOAT, INTEGER]:
         value = _float_or_integer(field, raw_value)
       elif field.type in [TEXT, CHAR]:
+        if field.max_length and len(raw_value) > field.max_length:
+          raise AjaxProblem((
+              '{} has a maximum length of {}. You sent a string with '
+              'length {}').format(
+                  field.name, field.max_length, len(raw_value)))
         value = raw_value
       elif field.type == BOOLEAN:
         value = _boolean(field, raw_value)

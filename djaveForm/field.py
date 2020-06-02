@@ -25,6 +25,8 @@ class Field(FormElement):
 
     self.label = label
 
+    self._custom_invalid_reason = None
+
   def set_value(self, value):
     if value == '':
       self._value = None
@@ -38,6 +40,9 @@ class Field(FormElement):
           'You have to set the value of a field before you can get the value '
           'of a field. You probably want to call set_form_data on the form.')
     return self._value
+
+  def value_was_set(self):
+    return self._value is not None
 
   def get_value_string(self):
     if self._value_set:
@@ -55,6 +60,11 @@ class Field(FormElement):
   def explain_why_not_valid(self):
     if self.required and not self.get_value():
       return 'Required'
+    if self._custom_invalid_reason:
+      return self._custom_invalid_reason
+
+  def set_invalid_reason(self, reason):
+    self._custom_invalid_reason = reason
 
   def is_valid(self):
     if not self._value_set:
