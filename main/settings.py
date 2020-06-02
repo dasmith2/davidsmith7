@@ -172,7 +172,7 @@ INSTALLED_APPS = [
 # explicit migrations to work. I did that by uncommenting "if TEST:" here,
 # briefly creating for example djaveAPI/tests/migrations, configuring
 # djaveAPI/tests/apps.py, then ./manage.py makemigrations
-if TEST:
+if TEST or IN_HEROKU_CI:
   INSTALLED_APPS.append('djaveAPI.tests.apps.DjaveAPITestsConfig')
 
 if DEBUG:
