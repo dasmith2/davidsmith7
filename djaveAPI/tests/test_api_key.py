@@ -1,5 +1,5 @@
 from django.contrib.auth.hashers import make_password
-from djaveTest import random_string
+from djaveTest.unit_test import random_string
 
 
 def set_api_key_stuff(api_key, **kwargs):

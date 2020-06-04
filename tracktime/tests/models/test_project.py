@@ -1,6 +1,6 @@
 from djaveAPI.tests.test_user_api_key import get_test_user_api_key
 from djaveDT import str_to_tz_dt
-from djaveTest import get_test_user, TestCase
+from djaveTest.unit_test import get_test_user, TestCase
 
 from tracktime.models.project import Project
 

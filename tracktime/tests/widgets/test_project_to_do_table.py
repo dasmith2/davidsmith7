@@ -1,7 +1,7 @@
 from djaveForm.button import Button
 from djaveForm.field import TextAreaField
 from djaveTable.table import Row, Cell
-from djaveTest import TestCase, get_test_user
+from djaveTest.unit_test import TestCase, get_test_user
 from tracktime.fields import project_field
 from tracktime.models.project_to_do import ProjectToDo
 from tracktime.tests.models.test_project import get_test_project

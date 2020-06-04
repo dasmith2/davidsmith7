@@ -5,8 +5,8 @@ from django.utils.dateparse import parse_datetime, parse_date
 from djaveAPI.discover_schema import (
     api_fields, DATE_TIME, DATE, FLOAT, INTEGER)
 from djaveAPI.paged_results import PAGE
+from djaveAPI.problem import Problem
 from djaveDT import to_tz_dt
-from djAveJAX import AjaxProblem
 
 
 def filter_model(model, api_key, request_GET):
@@ -38,12 +38,12 @@ def get_filters(model, request_GET):
       continue
     field_name, operator = field_operator(key)
     if field_name not in _available_filters:
-      raise AjaxProblem((
+      raise Problem((
           '{} is not an available filter on {}. The available filters are '
           '{}').format(
           field_name, model.__name__, ', '.join(_available_filters.keys())))
     if operator and operator not in AVAILABLE_OPERATORS:
-      raise AjaxProblem((
+      raise Problem((
           'You tried to filter on {}, but {} is not an available operator. '
           'The available operators are {}').format(
               key, operator, ', '.join(AVAILABLE_OPERATORS)))
@@ -73,7 +73,7 @@ def _parsed_value(field, value):
     else:
       raise Exception(
           'I dont know how to explain an example {}'.format(field.type))
-    raise AjaxProblem((
+    raise Problem((
         'Your {} filter is set to {}, which I was unable to parse. '
         'An example of something I can parse is '
         '{}').format(field.name, value, example))
@@ -102,7 +102,7 @@ def _parsed_value(field, value):
 
 def _filter_foreign_key(queryset, field, operator, value):
   if operator:
-    raise AjaxProblem((
+    raise Problem((
         'When it comes to foreign key filters, I only support a single '
         'id like {}=12345. A range filter like {}__{} is invalid.').format(
             field.name, field.name, operator))
@@ -111,7 +111,7 @@ def _filter_foreign_key(queryset, field, operator, value):
   try:
     value = int(value)
   except ValueError:
-    raise AjaxProblem((
+    raise Problem((
         'The {} filter should be an integer. You specified: '
         '{}').format(field.name, value))
   return queryset.filter(**{field.name: value})

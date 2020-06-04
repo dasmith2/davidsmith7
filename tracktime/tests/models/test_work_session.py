@@ -1,6 +1,6 @@
 from datetime import date, timedelta
 
-from djaveTest import TestCase, get_test_user
+from djaveTest.unit_test import TestCase, get_test_user
 from djaveDT import str_to_tz_dt, to_tz_dt, to_d
 
 from tracktime.models.work_session import (

@@ -2,7 +2,7 @@ from djaveAPI.models.user import User as DjaveAPIUser
 from djaveAPI.models.user_api_key import UserAPIKey
 from djaveAPI.tests.models import MyFakeModel
 from djaveAPI.tests.test_api_key import set_api_key_stuff
-from djaveTest import TestCase, get_test_user
+from djaveTest.unit_test import TestCase, get_test_user
 
 
 def get_test_user_api_key(**kwargs):

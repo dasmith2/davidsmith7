@@ -1,6 +1,6 @@
 import math
 
-from djAveJAX import AjaxProblem
+from djaveAPI.problem import Problem
 from djaveAPI.to_json import to_json_dict
 
 
@@ -25,9 +25,9 @@ def get_page(request_GET):
       try:
         page = int(page)
       except ValueError:
-        raise AjaxProblem('I expect page to be an integer')
+        raise Problem('I expect page to be an integer')
       if page < USE_FIRST_PAGE:
-        raise AjaxProblem(
+        raise Problem(
             'The page should be greater than or equal to {}'.format(
                 USE_FIRST_PAGE))
       return page

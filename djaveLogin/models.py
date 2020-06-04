@@ -11,8 +11,7 @@ from django.db import models
 
 def new_token(user):
   token = token_urlsafe()
-  LoginToken.objects.create(user=user, token=token)
-  return token
+  return LoginToken.objects.create(user=user, token=token)
 
 
 def new_login_url(user, request, next_url=None):
@@ -24,7 +23,7 @@ def new_login_url(user, request, next_url=None):
 
 def new_relative_login_url(user, next_url=None):
   """ If the given user goes to this url, they'll get logged in. """
-  url = reverse('djave_login', kwargs={'token': new_token(user)})
+  url = new_token(user).login_url()
   return append_next_url(url, next_url)
 
 
@@ -55,3 +54,6 @@ class LoginToken(RmOld):
   token = models.CharField(max_length=100, null=False, blank=False)
 
   objects = LoginTokenManager()
+
+  def login_url(self):
+    return reverse('djave_login', kwargs={'token': self.token})

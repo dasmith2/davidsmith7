@@ -8,7 +8,7 @@ from djaveAPI.post import post
 from djaveAPI.tests.models import MyFakeModel, get_test_my_fake_model
 from djaveAPI.tests.test_user_api_key import get_test_user_api_key
 from djaveDT import to_tz_dt
-from djaveTest import get_test_user, TestCase
+from djaveTest.unit_test import get_test_user, TestCase
 
 
 class PublishableTests(TestCase):

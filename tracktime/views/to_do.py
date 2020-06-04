@@ -3,9 +3,11 @@ from datetime import date
 from django.shortcuts import render, reverse, redirect
 from djaveDT import now
 from djaveForm.button import Button
-from djAveJAX import ajax_login_required, AjaxProblem, get_ajax_variable
+from djaveAPI.ajax_endpoint import ajax_endpoint_login_required
+from djaveAPI.problem import Problem as AjaxProblem
+from djaveAPI.get_request_variable import get_request_variable
 from djaveLogin.login_required import login_required
-from djaveTable.problem import Problem
+from djaveTable.problem import Problem as HtmlProblem
 
 from tracktime.models.to_do import ToDo
 from tracktime.models.project_work_session import ProjectWorkSession
@@ -35,7 +37,7 @@ def to_do(request):
       if clock_running.can_stop():
         clock_running.stop()
         return redirect('enter_time')
-      stop_problem = Problem(clock_running.explain_why_can_not_stop())
+      stop_problem = HtmlProblem(clock_running.explain_why_can_not_stop())
     to_do_table = ProjectToDoTable(
         user=request.user, project=project, form_data=request.POST)
   context = to_do_context(
@@ -47,7 +49,7 @@ def to_do(request):
   return render(request, 'to_do.html', context)
 
 
-@ajax_login_required
+@ajax_endpoint_login_required
 def to_do_done(request):
   to_do = _ajax_to_do(request)
   to_do.done = now()
@@ -55,7 +57,7 @@ def to_do_done(request):
   to_do.save()
 
 
-@ajax_login_required
+@ajax_endpoint_login_required
 def to_do_not_done(request):
   to_do = _ajax_to_do(request)
   to_do.done = None
@@ -63,20 +65,20 @@ def to_do_not_done(request):
   to_do.save()
 
 
-@ajax_login_required
+@ajax_endpoint_login_required
 def delete_to_do(request):
   _ajax_to_do(request).mark_deleted()
 
 
-@ajax_login_required
+@ajax_endpoint_login_required
 def edit_description(request):
   to_do = _ajax_to_do(request)
-  to_do.description = get_ajax_variable(request, 'description')
+  to_do.description = get_request_variable(request, 'description')
   to_do.save()
 
 
 def _ajax_to_do(request):
-  pk = get_ajax_variable(request, 'pk')
+  pk = get_request_variable(request, 'pk')
   to_do = ToDo.live.filter(pk=pk).first()
   if not to_do:
     raise AjaxProblem('There is no ToDo with pk {}'.format(pk))

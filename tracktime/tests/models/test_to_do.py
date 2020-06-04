@@ -2,7 +2,7 @@ from datetime import date
 
 from djaveAPI.tests.test_user_api_key import get_test_user_api_key
 from djaveDT import to_tz_dt
-from djaveTest import TestCase, get_test_user
+from djaveTest.unit_test import TestCase, get_test_user
 
 from tracktime.models.to_do import ToDo
 

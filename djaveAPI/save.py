@@ -6,7 +6,7 @@ from djaveAPI.discover_schema import (
     api_fields, use_publishable,
     DATE_TIME, DATE, FLOAT, INTEGER, TEXT, CHAR, BOOLEAN)
 from djaveAPI.models.user_api_key import UserAPIKey
-from djAveJAX import AjaxProblem
+from djaveAPI.problem import Problem
 from djaveDT import now
 
 
@@ -18,7 +18,7 @@ def update(instance, request_POST, api_key, publishable_class=None):
 def save_new(model, request_POST, api_key, publishable_class=None):
   explain_why_not = api_key.explain_why_can_not_create(model)
   if explain_why_not:
-    raise AjaxProblem(explain_why_not)
+    raise Problem(explain_why_not)
   return _set_fields(
       model(), request_POST, api_key, publishable_class=publishable_class)
 
@@ -44,7 +44,7 @@ def _set_fields(instance, request_POST, api_key, publishable_class=None):
           value = allowed(field.foreign_key_to, api_key).filter(
               pk=raw_value).first()
           if value is None:
-            raise AjaxProblem((
+            raise Problem((
                 'Either {} {} does not exist, or your API key does not have '
                 'access to it').format(
                     field.foreign_key_to.__name__, raw_value))
@@ -59,7 +59,7 @@ def _set_fields(instance, request_POST, api_key, publishable_class=None):
         value = _float_or_integer(field, raw_value)
       elif field.type in [TEXT, CHAR]:
         if field.max_length and len(raw_value) > field.max_length:
-          raise AjaxProblem((
+          raise Problem((
               '{} has a maximum length of {}. You sent a string with '
               'length {}').format(
                   field.name, field.max_length, len(raw_value)))
@@ -69,12 +69,12 @@ def _set_fields(instance, request_POST, api_key, publishable_class=None):
       else:
         raise Exception(field.type)
     if field.required and value in [None, '']:
-      raise AjaxProblem('{} is required'.format(field.name))
+      raise Problem('{} is required'.format(field.name))
     setattr(instance, field.name, value)
 
   why_invalid = instance.explain_why_invalid()
   if why_invalid:
-    raise AjaxProblem(why_invalid)
+    raise Problem(why_invalid)
   instance.save()
 
   return instance
@@ -101,7 +101,7 @@ def _date_or_date_time(field, raw_value):
     else:
       raise Exception(field.type)
     if not value:
-      raise AjaxProblem((
+      raise Problem((
           '{} is not a valid {}. I am looking for something more '
           'like {}').format(raw_value, field.type, example))
     return value
@@ -117,7 +117,8 @@ def _float_or_integer(field, raw_value):
       else:
         raise Exception(field.type)
     except ValueError:
-      raise AjaxProblem('{} is not a valid {}'.format(raw_value, field.type))
+      raise Problem(
+          '{} is not a valid {}'.format(raw_value, field.type))
 
 
 def _boolean(field, raw_value):

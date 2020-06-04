@@ -1,4 +1,4 @@
-from djaveTest import TestCase, get_test_user
+from djaveTest.unit_test import TestCase, get_test_user
 
 from tracktime.tests.models.test_project import get_test_project
 from tracktime.tests.models.test_to_do import get_test_to_do

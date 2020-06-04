@@ -2,7 +2,7 @@ from djaveDT import to_tz_dt
 from djaveForm.button import Button
 from djaveForm.field import TextAreaField
 from djaveTable.table import Row, Cell
-from djaveTest import TestCase, get_test_user
+from djaveTest.unit_test import TestCase, get_test_user
 
 from tracktime.models.to_do import ToDo
 from tracktime.widgets.to_do_table import ToDoTable

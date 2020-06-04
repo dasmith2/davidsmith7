@@ -3,7 +3,7 @@ from djaveTable.csv import csv_writer_and_response
 from djaveTable.cell_content import (
     CellContent, cell_contents_as_html, cell_contents_as_csv,
     obj_as_cell_content)
-from djaveTest import recursive_assert_equal
+from djaveTest.unit_test import recursive_assert_equal
 
 
 class Table(object):

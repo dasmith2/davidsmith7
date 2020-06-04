@@ -1,5 +1,5 @@
 from djaveAPI.models.api_key import APIKey
-from djaveTest import TestCase
+from djaveTest.unit_test import TestCase
 
 
 class APIKeyTests(TestCase):

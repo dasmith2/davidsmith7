@@ -14,7 +14,7 @@ from django.db import models
 from djaveAPI.models.publishable import Publishable
 from djaveAPI.models.user_api_key import UserAPIKey
 from djaveDT import to_tz_dt
-from djaveTest import get_test_user
+from djaveTest.unit_test import get_test_user
 
 
 class MyFakeModel(Publishable):

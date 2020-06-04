@@ -4,17 +4,44 @@ from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth.models import User
 from django.shortcuts import redirect, reverse, render
+from djaveAPI.ajax_endpoint import ajax_endpoint
+from djaveAPI.problem import Problem
 from djavError.models import log_error
 from djaveLogin.forms import LoginForm
 from djaveLogin.calc_urls import NEXT_URL
-from djaveLogin.models import new_login_url, append_next_url
+from djaveLogin.models import new_login_url, append_next_url, LoginToken
 from djaveURL import is_valid_url
 
 
+@ajax_endpoint
+def login_token(request):
+  """ This is for local webtests basically. I need to automatically log in
+  without actually checking email or examining the output of ./manage.py
+  runserver """
+  if settings.LOCAL:
+    if 'email' in request.GET:
+      email = request.GET['email']
+      user = User.objects.filter(email=email).first()
+      if user:
+        login_token = LoginToken.objects.filter(
+            user=user, used__isnull=True).first()
+        if login_token:
+          return {'token': login_token.token}
+        else:
+          raise Problem(
+              'User {} does not have an unused login token'.format(email))
+      else:
+        raise Problem('User with email {} does not exist'.format(email))
+    else:
+      raise Problem('I expect an email query string variable')
+  else:
+    raise Problem('This view is only for local development')
+
+
 def login(request, token=None):
-  # The user clicked a login link
   possible_used_up_token = False
   if token:
+    # The user clicked a login link
     user = auth.authenticate(request, token=token)
     if user:
       if user.is_active:

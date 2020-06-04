@@ -1,15 +1,15 @@
 from datetime import date
 
 from djaveDT import to_tz_dt
-from djAveJAX import AjaxProblem
-from djaveTest import TestCase
+from djaveTest.unit_test import TestCase
 
+from djaveAPI.problem import Problem
 from djaveAPI.save import update, save_new
 from djaveAPI.tests.models import (
     get_test_my_fake_model, ComplexFakeModel,
     get_test_complex_fake_model)
 from djaveAPI.tests.test_user_api_key import get_test_user_api_key
-from djaveTest import get_test_user
+from djaveTest.unit_test import get_test_user
 
 
 class SaveTests(TestCase):
@@ -36,7 +36,7 @@ class SaveTests(TestCase):
     self.request_POST['my_char'] = '0123456789' * 11
     try:
       save_new(ComplexFakeModel, self.request_POST, self.user_api_key)
-    except AjaxProblem as ex:
+    except Problem as ex:
       expected = (
           'my_char has a maximum length of 100. You sent a string with '
           'length 110')

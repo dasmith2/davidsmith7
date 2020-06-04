@@ -1,5 +1,5 @@
 from djaveAPI.models.user import unique_email_index_exists
-from djaveTest import TestCase, get_test_user
+from djaveTest.unit_test import TestCase, get_test_user
 
 
 class TestCreateEmailIndex(TestCase):

@@ -1,6 +1,8 @@
 from django.db.models import Q
 from django.shortcuts import reverse, render
-from djAveJAX import ajax_login_required, get_ajax_variable, AjaxProblem
+from djaveAPI.ajax_endpoint import ajax_endpoint_login_required
+from djaveAPI.problem import Problem
+from djaveAPI.get_request_variable import get_request_variable
 from djaveLogin.login_required import login_required
 
 from tracktime.models.project import Project
@@ -33,22 +35,22 @@ def projects_context(table, request, **kwargs):
   return context
 
 
-@ajax_login_required
+@ajax_endpoint_login_required
 def rename_project(request):
   project = get_ajax_project(request)
-  name = get_ajax_variable(request.POST, 'name')
+  name = get_request_variable(request.POST, 'name')
   if Project.all.filter(~Q(pk=project.pk), name=name).exists():
-    raise AjaxProblem('A project with this name already exists')
+    raise Problem('A project with this name already exists')
   project.name = name
   project.save()
 
 
-@ajax_login_required
+@ajax_endpoint_login_required
 def archive_project(request):
   get_ajax_project(request).mark_deleted()
 
 
-@ajax_login_required
+@ajax_endpoint_login_required
 def unarchive_project(request):
   project = get_ajax_project(request)
   project.deleted = None
@@ -56,8 +58,8 @@ def unarchive_project(request):
 
 
 def get_ajax_project(request):
-  pk = get_ajax_variable(request.POST, 'pk')
+  pk = get_request_variable(request.POST, 'pk')
   project = Project.all.filter(pk=pk).first()
   if not project:
-    raise AjaxProblem('This project does not exist')
+    raise Problem('This project does not exist')
   return project

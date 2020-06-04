@@ -2,7 +2,9 @@ from datetime import date, timedelta
 import json
 
 from django.shortcuts import render, reverse, redirect
-from djAveJAX import ajax_login_required, AjaxProblem, get_ajax_variable, OK
+from djaveAPI.ajax_endpoint import ajax_endpoint_login_required
+from djaveAPI.get_request_variable import get_request_variable
+from djaveAPI.problem import Problem
 from djaveLogin.login_required import login_required
 from djaveNav.date_roller import DateRoller
 from djaveURL import date_from_url
@@ -38,11 +40,10 @@ def enter_time(request):
   return render(request, 'enter_time.html', context)
 
 
-@ajax_login_required
+@ajax_endpoint_login_required
 def delete_work_session(request):
-  pk = get_ajax_variable(request.POST, 'pk', required=True)
+  pk = get_request_variable(request.POST, 'pk', required=True)
   work_session = ProjectWorkSession.live.filter(pk=pk).first()
   if not work_session:
-    raise AjaxProblem('This ProjectWorkSession does not exist')
+    raise Problem('This ProjectWorkSession does not exist')
   work_session.mark_deleted()
-  return OK

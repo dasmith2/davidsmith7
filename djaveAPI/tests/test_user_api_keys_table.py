@@ -6,7 +6,7 @@ from djaveAPI.widgets.user_api_keys_table import UserAPIKeysTable
 from djaveForm.button import Button
 from djaveForm.field import SlugField, URLField
 from djaveTable.table import Row
-from djaveTest import TestCase, get_test_user
+from djaveTest.unit_test import TestCase, get_test_user
 
 
 class TestUserAPIKeysTable(TestCase):

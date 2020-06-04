@@ -2,15 +2,17 @@
 requests. """
 import base64
 
+from djaveAPI.ajax_endpoint import ajax_endpoint
 from djaveAPI.models.api_key import APIKey
-from djAveJAX import ajax, problem_response, AjaxProblem
+from djaveAPI.response import problem_response
+from djaveAPI.problem import Problem
 
 
-class api_endpoint(ajax):
-  """ Unlike ajax_login_required in djAveJax, which assumes requests are being
-  sent by a logged in user, you'll use api_endpoint when requests are being
-  sent by a server that's using API Keys. It adds a second argument to your
-  view which is the API Key used to make the request, and turns off CSRF
+class api_endpoint(ajax_endpoint):
+  """ Unlike ajax_endpoint_login_required in djAveJax, which assumes requests
+  are being sent by a logged in user, you'll use api_endpoint when requests are
+  being sent by a server that's using API Keys. It adds a second argument to
+  your view which is the API Key used to make the request, and turns off CSRF
   protection. """
 
   def __init__(self, request, *args, **kwargs):
@@ -52,5 +54,5 @@ class api_endpoint(ajax):
       return self.response_as_ajax(
           self.view_function(
               request, api_key.as_child_class(), *args, **kwargs))
-    except AjaxProblem as ex:
-      return ex.get_problem_response()
+    except Problem as ex:
+      return problem_response(ex)
