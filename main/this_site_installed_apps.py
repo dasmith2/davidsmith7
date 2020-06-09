@@ -2,4 +2,5 @@
 
 THIS_SITE_INSTALLED_APPS = [
     'biscuits',
+    'invoice',
     'tracktime']

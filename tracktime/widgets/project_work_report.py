@@ -7,8 +7,8 @@ from djaveURL import dict_as_query
 
 from tracktime.fields import PROJECT, project_field
 from tracktime.models.project import Project
-from tracktime.models.project_to_do import ProjectToDo
-from tracktime.models.project_work_session import ProjectWorkSession
+from tracktime.models.project_work_session_description import (
+    ProjectWorkSessionDescriptions)
 from tracktime.widgets.work_report import (
     WorkReportContent, work_report_url_dict)
 
@@ -44,42 +44,15 @@ class ProjectWorkReportContent(WorkReportContent):
     self.project = project
     super().__init__(user, from_date, to_date, tz_str=tz_str)
 
-  def show_project(self):
-     return not self.project
-
-  def work_session_class(self):
-    return ProjectWorkSession
-
-  def to_do_class(self):
-    return ProjectToDo
-
-  def get_work_sessions(self):
-    work_sessions = super().get_work_sessions()
-    if self.project:
-      work_sessions = list(filter(
-          lambda x: x.project == self.project, work_sessions))
-    return work_sessions
-
-  def get_to_dos(self):
-    to_dos = super().get_to_dos()
-    if self.project:
-      to_dos = list(filter(lambda x: x.project == self.project, to_dos))
-    return to_dos
-
-  def time_description(self, work_session):
-    description = super().time_description(work_session)
-    if self.show_project():
-      description = '{} {}'.format(work_session.project.name, description)
-    return description
-
-  def to_do_description(self, to_do):
-    description = super().to_do_description(to_do)
-    if self.show_project():
-      description = '{} {}'.format(to_do.project.name, description)
-    return description
+  def get_work_session_descriptions_object(self):
+    return ProjectWorkSessionDescriptions(
+        project=self.project,
+        user=self.user,
+        from_date=self.from_date,
+        to_date=self.to_date,
+        tz_str=self.tz_str)
 
   def html_header(self):
-    total = round(self.total, 2)
     if self.project:
-      return '{}: {} hours'.format(self.project.name, total)
+      return '{}: {} hours'.format(self.project.name, self.get_total())
     return super().html_header()

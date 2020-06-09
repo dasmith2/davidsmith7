@@ -2,7 +2,7 @@ from datetime import date
 
 from django.shortcuts import reverse
 
-from tracktime.tests.widgets.test_case_with_data import TestCaseWithData
+from tracktime.tests.test_case_with_data import TestCaseWithData
 from tracktime.widgets.project_work_report import (
     project_work_report_url, ProjectWorkReport)
 

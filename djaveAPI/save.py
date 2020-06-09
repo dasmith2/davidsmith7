@@ -2,12 +2,14 @@ from datetime import date
 
 from django.contrib.auth.models import User
 from django.utils.dateparse import parse_datetime, parse_date
+from djaveAPI.currency_field import corresponding_currency_value
 from djaveAPI.discover_schema import (
     api_fields, use_publishable,
     DATE_TIME, DATE, FLOAT, INTEGER, TEXT, CHAR, BOOLEAN)
 from djaveAPI.models.user_api_key import UserAPIKey
 from djaveAPI.problem import Problem
 from djaveDT import now
+from djmoney.money import Money
 
 
 def update(instance, request_POST, api_key, publishable_class=None):
@@ -57,6 +59,9 @@ def _set_fields(instance, request_POST, api_key, publishable_class=None):
         value = _date_or_date_time(field, raw_value)
       elif field.type in [FLOAT, INTEGER]:
         value = _float_or_integer(field, raw_value)
+        currency = corresponding_currency_value(field, request_POST)
+        if currency:
+          value = Money(value, currency)
       elif field.type in [TEXT, CHAR]:
         if field.max_length and len(raw_value) > field.max_length:
           raise Problem((

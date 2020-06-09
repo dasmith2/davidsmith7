@@ -4,10 +4,8 @@
 {% endblock tracktime_head %}
 
 {% block tracktime_body %}
-<h2>{{ email }}</h2>
-<p>
-  <a href="{{ logout_url }}">Logout</a>
-</p>
+
+{{ djave_login_settings_widget }}
 
 {{ user_api_key_widget }}
 

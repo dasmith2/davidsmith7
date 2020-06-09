@@ -5,6 +5,10 @@ production. If you look in main/settings.py you'll see
 if TEST:
   INSTALLED_APPS.append('djaveAPI.tests.apps.DjaveAPITestsConfig')
 
+If you change these classes, you'll need to update the migrations. Go
+temporarily remove `if TEST`, ./manage.py makemigrations, then put `if TEST`
+back in.
+
 djaveAPI.tests.apps was a finicky thing to get right.
 """
 from datetime import date
@@ -15,6 +19,8 @@ from djaveAPI.models.publishable import Publishable
 from djaveAPI.models.user_api_key import UserAPIKey
 from djaveDT import to_tz_dt
 from djaveTest.unit_test import get_test_user
+from djmoney.money import Money
+from djmoney.models.fields import MoneyField
 
 
 class MyFakeModel(Publishable):
@@ -52,6 +58,7 @@ class ComplexFakeModel(Publishable):
   my_char = models.CharField(max_length=100)
   my_text = models.TextField()
   my_fake_model = models.ForeignKey(MyFakeModel, on_delete=models.CASCADE)
+  my_money = MoneyField(max_digits=10, decimal_places=2)
 
   def explain_why_invalid(self):
     if self.large_int and self.small_int > self.large_int:
@@ -76,7 +83,8 @@ def get_test_complex_fake_model(save=True, **kwargs):
       my_date_time=kwargs.get('my_date_time', to_tz_dt('2020-01-01 12:00')),
       my_char=kwargs.get('my_char', 'hello'),
       my_text=kwargs.get('my_text', 'world'),
-      my_fake_model=my_fake_model)
+      my_fake_model=my_fake_model,
+      my_money=kwargs.get('my_money', Money(100, 'USD')))
   if save:
     instance.save()
   return instance

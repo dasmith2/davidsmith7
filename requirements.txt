@@ -2,6 +2,7 @@ apscheduler
 boto3
 django
 django-heroku
+django-money
 djangorestframework
 djaveDT
 flake8

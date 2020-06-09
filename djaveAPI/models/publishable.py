@@ -11,6 +11,31 @@ class PublishableManager(models.Manager):
 class Publishable(models.Model):
   """ Have your models inherit from this class if you want your models to be
   published online as part of a REST-ish API. """
+
+  @classmethod
+  def allowed(cls, api_key):
+    """ Return a list of objects that the api_key is allowed to see. Well, not
+    a list exactly, a query set.
+
+    Let's say you have a Car model where every car has an owner. Now let's
+    say you create Owner level API keys. OK so if you call
+    Car.allowed(bobs_api_key) you probably want it to
+    return Car.all.filter(owner=Bob)
+
+    This function is used all over the place in the API to make sure nobody can
+    see or edit any object that they don't actually have access to, which is
+    why it has to be a query set. """
+    raise NotImplementedError('allowed {}'.format(cls))
+
+  def allowed_api_keys(self, api_key_type):
+    """ Return a list of api_keys that are allowed to see this particular
+    instance. So if you were to call bobs_car.allowed_api_keys(OwnerAPIKey)
+    you probably want it to return [bobs_api_key].
+
+    Pretty much the entire point of this function is to look up who we should
+    send webhooks to whenever we save a published object. """
+    raise NotImplementedError('allowed_api_keys {}'.format(self.__class__))
+
   deleted = models.DateTimeField(blank=True, null=True, help_text=(
       'When was this object "deleted"? Deleted objects '
       'should basically be ignored. By simply marking objects as deleted '
@@ -50,15 +75,6 @@ class Publishable(models.Model):
   @classmethod
   def get_model_fields_for_api(cls):
     return cls._meta.get_fields()
-
-  @classmethod
-  def allowed(cls, api_key):
-    """ Return a query set that will only retrieve instances the given api_key
-    is allowed to see. """
-    raise NotImplementedError('allowed {}'.format(cls))
-
-  def allowed_api_keys(self, api_key_type):
-    raise NotImplementedError('allowed_api_keys {}'.format(self.__class__))
 
   live = PublishableManager()
   all = models.Manager()

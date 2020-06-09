@@ -1,7 +1,7 @@
 from djaveTest.unit_test import TestCase, get_test_user
 
 from tracktime.tests.models.test_project import get_test_project
-from tracktime.tests.models.test_to_do import get_test_to_do
+from tracktime.tests.models.test_project_to_do import get_test_project_to_do
 from tracktime.tests.models.test_project_work_session import (
     get_test_project_work_session)
 
@@ -22,10 +22,16 @@ class TestCaseWithData(TestCase):
         user=self.user, project=self.project_1, hours=2.1, date='2020-01-15')
 
   def setup_to_dos(self):
-    self.to_do = get_test_to_do(
+    self.to_do = get_test_project_to_do(
         creator=self.user, project=self.project_1,
         description='Glue the arms on the manikin', done='2020-01-15 11:30',
         done_by=self.user)
+
+  def setup_everything(self):
+    self.setup_user()
+    self.setup_projects()
+    self.setup_work_sessions()
+    self.setup_to_dos()
 
   def setup_irrelevant_stuff(self):
     get_test_user(username='irrelevant_user')
@@ -42,9 +48,9 @@ class TestCaseWithData(TestCase):
         user=self.user, project=self.project_1, date='2020-01-15',
         started='2020-01-15 10:00', stopped=None)
 
-    get_test_to_do(  # Not done yet
+    get_test_project_to_do(  # Not done yet
         creator=self.user, project=self.project_1,
         description='Drink the leftover coffee')
-    get_test_to_do(  # Done a long time ago
+    get_test_project_to_do(  # Done a long time ago
         creator=self.user, done_by=self.user, project=self.project_1,
         description='I\'m going to not vote yes', done='2020-01-05')

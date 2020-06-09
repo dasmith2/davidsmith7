@@ -86,6 +86,12 @@ EMAIL_HOST_USER = MAILGUN_SMTP_LOGIN
 EMAIL_HOST_PASSWORD = MAILGUN_SMTP_PASSWORD
 
 
+""" Money stuff """
+from moneyed import USD
+DEFAULT_CURRENCY = USD
+PROJECT_CURRENCIES = [DEFAULT_CURRENCY]
+
+
 """ Network stuff. """
 # So, we want to avoid any environment BUT prod from messing with external
 # APIS. The last thing we want is, say, tests creating eroneous cleanings by

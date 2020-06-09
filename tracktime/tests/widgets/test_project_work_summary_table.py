@@ -4,7 +4,7 @@ from djaveTable.table import Row
 
 from tracktime.widgets.project_work_summary_table import (
     ProjectWorkSessionSummaryReport)
-from tracktime.tests.widgets.test_case_with_data import TestCaseWithData
+from tracktime.tests.test_case_with_data import TestCaseWithData
 
 
 class ProjectWorkSessionSummaryTableTests(TestCaseWithData):

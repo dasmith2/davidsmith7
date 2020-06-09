@@ -10,6 +10,7 @@ from djaveAPI.tests.models import (
     get_test_complex_fake_model)
 from djaveAPI.tests.test_user_api_key import get_test_user_api_key
 from djaveTest.unit_test import get_test_user
+from djmoney.money import Money
 
 
 class SaveTests(TestCase):
@@ -24,7 +25,9 @@ class SaveTests(TestCase):
         'my_date_time': '2020-05-28T12:00:00.000000-04:00',
         'my_char': 'Gourmet surprise',
         'my_text': 'for dinner',
-        'my_fake_model': self.other.pk}
+        'my_fake_model': self.other.pk,
+        'my_money': 100,
+        'my_money_currency': 'AUD'}
     self.user_api_key = get_test_user_api_key(user=user)
 
   def test_save_new(self):
@@ -60,3 +63,4 @@ class SaveTests(TestCase):
     self.assertEqual('Gourmet surprise', instance.my_char)
     self.assertEqual('for dinner', instance.my_text)
     self.assertEqual(self.other, instance.my_fake_model)
+    self.assertEqual(Money(100, 'AUD'), instance.my_money)

@@ -88,7 +88,7 @@ def api_fields(model):
       field_type = 'Integer'
     else:
       field_type = field_type.replace('Field', '')
-      if field_type == 'ForeignKey':
+      if field_type in ['ForeignKey', 'OneToOne']:
         try:
           field.get_prep_value(1)
         except ValueError:
@@ -97,6 +97,10 @@ def api_fields(model):
               'yet. See filter_model in djaveAPI.filters specifically')
         field_type = INTEGER
         foreign_key_to = field.related_model
+      if field_type == 'PositiveInteger':
+        field_type = INTEGER
+      if field_type == 'Decimal':
+        field_type = FLOAT
       if field_type == 'Char':
         max_length = field.max_length
       if field_type not in TYPES:

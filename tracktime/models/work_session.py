@@ -5,6 +5,7 @@ from datetime import timedelta
 
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models import Q
 from djaveAPI.models.user_api_key import UserAPIKey
 from djaveAPI.models.publishable import Publishable, PublishableManager
 from djaveDT import (
@@ -27,12 +28,13 @@ class WorkSessionManager(PublishableManager):
     return self.done_by_user_and_date_range(user, date, date, nnow=nnow)
 
   def done_by_user_and_date_range(self, user, from_date, to_date, nnow=None):
-    to_return = []
-    for work_session in self.filter(
-        user=user, date__gte=from_date, date__lte=to_date).select_related(
-            *self.select_related_list()).order_by('-pk'):
-      if work_session.status(nnow=nnow) == DONE:
-        to_return.append(work_session)
+    to_return = self.filter(
+        Q(started__isnull=True) | Q(stopped__isnull=False),
+        user=user).select_related(*self.select_related_list()).order_by('-pk')
+    if from_date:
+      to_return = to_return.filter(date__gte=from_date)
+    if to_date:
+      to_return = to_return.filter(date__lte=to_date)
     return to_return
 
   def select_related_list(self):
