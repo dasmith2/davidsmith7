@@ -121,6 +121,10 @@ class SelectField(Field):
     return self._value_set and str(option.id) == str(self.get_value())
 
   def _is_default_option(self, option):
+    """ SelectField is useful for picking an object. So it totally makes sense
+    to use an object as the default. """
+    if hasattr(self.default, 'id'):
+      return option.id == self.default.id
     return option.id == self.default
 
   def widget_html(self):
@@ -210,34 +214,85 @@ class URLField(TextField):
         return 'This should be a URL, like, https://whatever'
 
 
-class PositiveFloatField(HtmlInputField):
+class NumberField(HtmlInputField):
   def set_value(self, value):
-    if value in [None, ''] or isinstance(value, float):
+    if value in [None, ''] or isinstance(value, self.cast_function()):
       return super().set_value(value)
     if isinstance(value, str):
       try:
-        return super().set_value(float(value))
+        return super().set_value(self.cast_value(value))
       except ValueError:
-        raise Exception((
-            'I can not parse the string {} as a float in '
-            'field {}').format(html.escape(value), self.key()))
+        raise Exception('I can not parse {} as a {} in field {}'.format(
+            html.escape(value), self.cast_function().__name__, self.key()))
     raise Exception(
-        'You should set the value of a PositiveFloatField to a float')
+        'You should set the value of a {} to a {}'.format(
+            self.__class__.name, self.cast_function().__name__))
 
   def explain_why_not_valid(self):
     super_invalid = super().explain_why_not_valid()
     if super_invalid:
       return super_invalid
     try:
-      float(self.get_value())
+      self.cast_value(self.get_value())
     except ValueError:
-      return 'I can not convert {} to a float'.format(
-          html.escape(self.get_value()))
-    if self.get_value() < 0:
-      return '{} is less than 0'.format(self.get_value())
+      return 'I can not convert {} to a {}'.format(
+          html.escape(self.get_value()), self.cast_function().__name__)
 
   def input_type(self):
     return 'number'
 
   def additional_attrs_str(self):
-    return ' step="0.25" min="0"'
+    return ' step="{}"'.format(self.get_step())
+
+  def cast_value(self, value):
+    return self.cast_function()(value)
+
+  def cast_function(self):
+    raise NotImplementedError('cast_function')
+
+  def get_step(self):
+    raise NotImplementedError('get_step')
+
+
+class FloatField(NumberField):
+  def cast_function(self):
+    return float
+
+  def get_step(self):
+    return 0.01
+
+
+class IntField(NumberField):
+  def cast_function(self):
+    return int
+
+  def get_step(self):
+    return 1
+
+
+class PositiveNumberField(NumberField):
+  def explain_why_not_valid(self):
+    super_invalid = super().explain_why_not_valid()
+    if super_invalid:
+      return super_invalid
+    if self.get_value() < 0:
+      return '{} is less than 0'.format(self.get_value())
+
+  def additional_attrs_str(self):
+    return ' step="{}" min="0"'.format(self.get_step())
+
+
+class PositiveFloatField(PositiveNumberField):
+  def cast_function(self):
+    return float
+
+  def get_step(self):
+    return 0.01
+
+
+class PositiveIntField(PositiveNumberField):
+  def cast_function(self):
+    return int
+
+  def get_step(self):
+    return 1

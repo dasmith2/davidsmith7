@@ -1,10 +1,17 @@
 from django.urls import path
 
-from tracktime.views import (
-    enter_time, delete_work_session, to_do, to_do_done, to_do_not_done,
-    delete_to_do, edit_description, to_do_for_another_project,
-    project_work_summary, project_work_report, projects, archived_projects,
-    archive_project, unarchive_project, rename_project, api_docs, settings)
+from tracktime.views.api_docs import api_docs
+from tracktime.views.enter_time import enter_time, delete_work_session
+from tracktime.views.invoices import (
+    project_invoices, project_invoice, project_invoice_rule)
+from tracktime.views.projects import (
+    projects, archived_projects, archive_project, unarchive_project)
+from tracktime.views.report import (
+    project_work_summary, project_work_report)
+from tracktime.views.settings import settings
+from tracktime.views.to_do import (
+    to_do, to_do_done, to_do_not_done, delete_to_do,
+    to_do_for_another_project)
 
 
 tracktime_urls = [
@@ -20,20 +27,25 @@ tracktime_urls = [
         'project_work_report', project_work_report,
         name='project_work_report'),
 
+    path('invoices', project_invoices, name='project_invoices'),
+    path('invoice/<pk>', project_invoice, name='project_invoice'),
+    path('invoice_rule', project_invoice_rule, name='project_invoice_rule'),
+    path(
+        'invoice_rule/<pk>', project_invoice_rule,
+        name='project_invoice_rule'),
+
     path(
         'delete_work_session', delete_work_session,
         name='delete_work_session'),
     path('to_do_done', to_do_done, name='to_do_done'),
     path('to_do_not_done', to_do_not_done, name='to_do_not_done'),
     path('delete_to_do', delete_to_do, name='delete_to_do'),
-    path('edit_description', edit_description, name='edit_description'),
 
     path('projects', projects, name='projects'),
     path(
         'archived_projects', archived_projects,
         name='archived_projects'),
 
-    path('rename_project', rename_project, name='rename_project'),
     path('archive_project', archive_project, name='archive_project'),
     path('unarchive_project', unarchive_project, name='unarchive_project'),
 

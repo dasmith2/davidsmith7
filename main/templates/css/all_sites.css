@@ -12,12 +12,6 @@ h2 {
   font-weight: 500; margin: 60px 0px 0px 0px; color: #555; }
 h3 { color: #999; margin: 60px 0px 0px 0px; }
 
-.pad-top { margin: 60px 0px 0px 0px; }
-
-.problem { color: #f00; }
-.feedback { color: #f00; }
-.start-hidden { display: none; }
-
 table {
   border-collapse: collapse; border-left: 1px solid #999;
   border-top: 1px solid #999;
@@ -26,14 +20,29 @@ td { font-weight: 300; }
 th { font-weight: 500; color: #555; }
 td, th { border-right: 1px solid #999;
   border-bottom: 1px solid #999; padding: 10px; }
-th, .row2 { background-color: #eee; }
+th, .row2, .row2 textarea { background-color: #eee; }
 
-form { margin: 20px 0px 0px 0px; }
+table textarea {
+  border-style: none; border-color: Transparent; overflow: auto; resize: none;
+  width: 300px; height: 45px;
+}
 
 pre {
   margin: 10px 0px 0px 0px; background-color: #eee; border: 1px solid #999;
   padding: 10px; font-size: 14px; box-shadow: 4px 4px 2px grey; }
 
+input[type="number"] { width: 100px; }
+
+.problem { color: #f00; }
+.feedback { color: #f00; }
+.start-hidden { display: none; }
+.editing, .editing textarea { background-color: #ffb; }
+
+.margin-top { margin: 60px 0px 0px 0px; }
+.margin-top-half, form { margin: 20px 0px 0px 0px; }
+.pad-half { padding: 20px; }
+
+/* Buttons */
 button, .button, input[type="submit"], input[type="button"], a.button {
   background: #79aec8;
   padding: 10px 15px;
@@ -42,7 +51,9 @@ button, .button, input[type="submit"], input[type="button"], a.button {
   color: #fff;
   cursor: pointer;
   box-shadow: 4px 4px 2px grey;
-  margin: 3px 3px 3px 0px;}
+  margin: 3px 3px 3px 0px;
+  font-size: 15px;
+  font-weight: 400; }
 button:active, .button:active, input[type=submit]:active, input[type=button]:active,
 button:focus, .button:focus, input[type=submit]:focus, input[type=button]:focus,
 button:hover, .button:hover, input[type=submit]:hover, input[type=button]:hover {
@@ -50,3 +61,27 @@ button:hover, .button:hover, input[type=submit]:hover, input[type=button]:hover 
 button[disabled], .button[disabled], input[type=submit][disabled], input[type=button][disabled] {
   opacity: 0.4;
   background: #999;}
+a.button { text-decoration: none; }
+
+/* Tooltips */
+.tooltip {
+  position: relative; display: inline-block; border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden; background-color: #555; color: #fff;
+  text-align: center; border-radius: 6px; padding: 10px;
+  position: absolute; z-index: 1; bottom: 125%;
+  left: 10%; opacity: 0; transition: opacity 0.3s; width: 200px;
+}
+
+.tooltip .tooltiptext::after {
+  content: ""; position: absolute; top: 100%; left: 10%;
+  margin-left: -5px; border-width: 5px; border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}

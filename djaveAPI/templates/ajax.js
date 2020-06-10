@@ -1,0 +1,212 @@
+/* AJAX stuff */
+function ok(response) {
+  return response['OK'];
+}
+
+function show_problem(response, feedback_or_append_to) {
+  var feedback;
+  if (feedback_or_append_to.hasClass('feedback')) {
+    feedback = feedback_or_append_to;
+  } else {
+    feedback = get_feedback_elt_append(feedback_or_append_to);
+  }
+  if (response['problem']) {
+    feedback.text(response['problem']).show();
+    return true;
+  } else {
+    feedback.hide();
+    return false;
+  }
+}
+
+function post(url, data, success) {
+  return $.post(url, add_csrf_token(data), success).fail(function() {
+    alert('Server error :(');
+  });
+}
+
+/* csrf token stuff */
+function add_csrf_token(data) {
+  data['csrfmiddlewaretoken'] = get_csrf_token();
+  return data;
+}
+
+function before_send_delete() {
+  // https://stackoverflow.com/questions/13089613/ajax-csrf-and-delete
+  return function(xhr) {
+    xhr.setRequestHeader("X-CSRFToken", get_csrf_token());
+  };
+}
+
+function get_csrf_token() {
+  return $('input[name=csrfmiddlewaretoken]').val();
+}
+
+/* Stuff that comes up when I'm enabling tables for AJAX */
+
+function find_pk($element) {
+  // Search up the dom for a data-pk attribute. So you might do something like
+  // my_button.click(function() { var pk = find_pk($(this)); });
+  if ($element.attr('data-pk')) {
+    return $element.attr('data-pk');
+  }
+  return $element.parents('[data-pk]').attr('data-pk');
+}
+
+function row_by_pk(pk) {
+  return $('tr[data-pk=' + pk + ']');
+}
+
+function remove_row(pk) {
+  row_by_pk(pk).remove();
+}
+
+function wire_up_ajax_button(
+    selector_or_elt, action_url, success, confirm_question) {
+  /* This is for buttons in tables where it's, like, one object per row, and
+   * the user can click buttons that do things to the objects. confirm_question
+   * is optional and is, like, 'Are you sure you want to delete this whatever?'
+   * selector_or_elt can be a string or a jQuery object. */
+  $(selector_or_elt).click(function() {
+    var button = $(this).prop('disabled', true);
+    var buttons_cell = button.parents('td');
+    var pk = find_pk(button);
+    var post_data = {'pk': pk};
+    if (!confirm_question || confirm(confirm_question)) {
+      post(action_url, post_data, function(response) {
+        if (!show_problem(response, buttons_cell)) {
+          success(pk);
+        }
+        button.prop('disabled', false);
+      }).fail(function(data) {
+        alert('Server error :(');
+        button.prop('disabled', false);
+      });
+    } else {
+      button.prop('disabled', false);
+    }
+  });
+}
+
+var all_elts = function(row) {
+  // Wait to calculate this so all columns that want to edit get a chance
+  // to wire up.
+  return row.find('[data-saved-value]');
+};
+
+var other_buttons = function(row) {
+  return row.find('button,.button');
+};
+
+var buttons_cell = function(row) {
+  return other_buttons(row).parents('td');
+};
+
+var turn_on_edit_mode = function(row) {
+  other_buttons(row).hide();
+  buttons_cell(row).find('.save-field,.cancel-save-field').show().prop(
+      'disabled', false);
+  row.addClass('editing');
+};
+
+var turn_off_edit_mode = function(row) {
+  other_buttons(row).show();
+  buttons_cell(row).find('.save-field,.cancel-save-field').hide();
+  row.removeClass('editing');
+};
+
+var calc_edit_mode = function(row) {
+  var got_all_elts = all_elts(row);
+  var any_editing = false;
+  for (var i = 0; i < got_all_elts.length; i++) {
+    any_editing = any_editing || is_editing($(got_all_elts[i]));
+  }
+  if (any_editing) {
+    turn_on_edit_mode(row);
+  } else {
+    turn_off_edit_mode(row);
+  }
+};
+
+var is_editing = function(elt) {
+  return elt.attr('data-saved-value') != elt.val()
+};
+
+function wire_up_ajax_save_field(selector_or_elt, model_name, field_name) {
+  /* This is for text boxes or whatever in tables so you can edit inline with
+   * AJAX. Once you start editing, this hides all the other buttons and gives
+   * the user "Save" and "Cancel" buttons. selector_or_elt can be a string or a
+   * jQuery object. Closures are a little tricky here because I want the same
+   * save button to save all editing fields. */
+  $(selector_or_elt).each(function() {
+    var elt = $(this);
+    elt.attr('data-saved-value', elt.val());
+    elt.attr('data-model-name', model_name);
+    elt.attr('data-field-name', field_name);
+  });
+
+  var handle_row_maybe_changed = function(event) {
+    /* This is, like, an on_change event for the entire row. Element level
+     * stuff should be done in a loop over all_elts. */
+    var row = $(this).parents('tr');
+    var save_button = buttons_cell(row).find('.save-field');
+    var cancel_save_button = buttons_cell(row).find('.cancel-save-field');
+
+    if (!save_button.length) {
+      var save_html = '<button class="save-field" type="button">Save</button>';
+      save_button = $(save_html).appendTo(buttons_cell(row)).hide();
+      var cancel_html =
+          '<button class="cancel-save-field" type="button">Cancel</button>';
+      cancel_save_button = $(cancel_html).appendTo(buttons_cell(row)).hide();
+
+      save_button.click(function() {
+        save_button.prop('disabled', true);
+        cancel_save_button.prop('disabled', true);
+
+        var possibly_save = function(elt) {
+          var feedback = get_feedback_elt_after(elt);
+          var model_name = elt.attr('data-model-name');
+          var field_name = elt.attr('data-field-name');
+          var data = {
+              pk: find_pk(row), model_name: model_name, field_name: field_name,
+              new_value: elt.val()};
+          post('{{ update_field_url }}', data, function(response) {
+            if (!show_problem(response, feedback)) {
+              feedback.show().text('Saved!');
+              elt.attr('data-saved-value', elt.val());
+              // The save button disappears and you lose your tab location
+              // otherwise.
+              elt.focus();
+              window.setTimeout(function() {
+                feedback.text('');
+              }, 1000);
+            }
+            calc_edit_mode(row);
+          }).fail(function() {
+            feedback.show().text('Server error :(');
+          });
+        };
+
+        all_elts(row).each(function() {
+          if (is_editing($(this))) {
+            possibly_save($(this));
+          }
+        });
+      });
+
+      cancel_save_button.click(function() {
+        var got_all_elts = all_elts(row);
+        for (var i = 0; i < got_all_elts.length; i++) {
+          var elt = $(got_all_elts[i]);
+          elt.val(elt.attr('data-saved-value'));
+        }
+        calc_edit_mode(row);
+      });
+    }
+
+    /* Actually respond to the event. */
+    calc_edit_mode(row);
+  };
+
+  $(selector_or_elt).keyup(handle_row_maybe_changed);
+}

@@ -7,15 +7,25 @@ class FormElement(CellContent):
   """ A FormElement is a button or html input that can be rendered in the cell
   of a djaveTable, and when the form submits, the FormElement will be
   represented in the data that goes to the server. """
-  def __init__(self, key_prefix, pk):
+  def __init__(self, key_prefix, pk, additional_attrs=None):
     self.key_prefix = key_prefix
     self.pk = pk
+    self.additional_attrs = additional_attrs
 
   def key(self):
+    """ This is the html key used for stuff like <input name={{ key }}> """
     if self.key_prefix:
       if self.pk:
         return '{}_{}'.format(self.key_prefix, self.pk)
       return self.key_prefix
+    return ''
+
+  def additional_attrs_str(self):
+    if self.additional_attrs:
+      linear = []
+      for key, value in self.additional_attrs:
+        linear.append('{}="{}"'.format(key, value))
+      return ' {}'.format(' '.join(linear))
     return ''
 
   @abstractmethod

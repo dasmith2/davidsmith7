@@ -36,6 +36,20 @@ class Publishable(models.Model):
     send webhooks to whenever we save a published object. """
     raise NotImplementedError('allowed_api_keys {}'.format(self.__class__))
 
+  def user_allowed(self, user):
+    """ Return True if the given user is allowed to modify this instance. This
+    is pretty much needed for djaveAPI.views.update_field which is a beautiful
+    abstract tool for modifying objects field by field via AJAX, which makes it
+    easy to create fully editable tables of information. """
+    raise NotImplementedError('user_allowed {}'.format(self.__class__))
+
+  def explain_why_invalid(self):
+    """ If you have anything more complicated than required fields in your
+    class, you'll want to override this function to prevent bad data coming in
+    through the API, and to prevent users from updating objects via AJAX to bad
+    values. """
+    return
+
   deleted = models.DateTimeField(blank=True, null=True, help_text=(
       'When was this object "deleted"? Deleted objects '
       'should basically be ignored. By simply marking objects as deleted '
@@ -53,12 +67,6 @@ class Publishable(models.Model):
         'webhook, how will they ever find out it was deleted? Use '
         'mark_deleted instead.')
 
-  def explain_why_invalid(self):
-    """ If you have anything more complicated than required fields in your
-    class, you'll want to override this function to prevent bad data coming in
-    through the API. """
-    return
-
   def save(self, *args, **kwargs):
     if self.explain_why_invalid():
       raise Exception(self.explain_why_invalid())
@@ -73,7 +81,7 @@ class Publishable(models.Model):
     return cls()
 
   @classmethod
-  def get_model_fields_for_api(cls):
+  def get_model_fields(cls):
     return cls._meta.get_fields()
 
   live = PublishableManager()

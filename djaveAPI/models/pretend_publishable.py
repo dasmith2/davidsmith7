@@ -30,7 +30,7 @@ class PretendPublishable(object):
     return super().__getattr__(name)
 
   def field_names(self):
-    return [f.name for f in self.__class__.get_model_fields_for_api()]
+    return [f.name for f in self.__class__.get_model_fields()]
 
   def save(self):
     self.instance.save()
@@ -43,8 +43,8 @@ class PretendPublishable(object):
     raise NotImplementedError('mark_deleted')
 
   @classmethod
-  def get_model_fields_for_api(cls):
-    raise NotImplementedError('get_model_fields_for_api')
+  def get_model_fields(cls):
+    raise NotImplementedError('get_model_fields')
 
   @classmethod
   def allowed(cls, api_key):

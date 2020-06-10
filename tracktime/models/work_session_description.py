@@ -32,6 +32,18 @@ class WorkSessionDescriptions(object):
   def get_work_session_descriptions(self):
     return self._work_session_descriptions
 
+  def earliest_date(self):
+    descriptions = self.get_work_session_descriptions()
+    if not descriptions:
+      raise Exception(
+          'There are no work sessions so I cant tell you when the earliest '
+          'was. Check has_work_session_descriptions first.')
+    earliest = None
+    for description in descriptions:
+      if not earliest or earliest > description.work_session.date:
+        earliest = description.work_session.date
+    return earliest
+
   def get_total(self):
     return self._total
 

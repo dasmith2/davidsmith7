@@ -62,8 +62,7 @@ function append_not_done_button(row) {
 }
 
 function setup_edit_description() {
-  wire_up_ajax_save_text(
-      '.edit_description', '{{ edit_description_url }}', 'description');
+  wire_up_ajax_save_field('.edit_description', 'ToDo', 'description');
 }
 
 $(focus_on_new_to_do);
@@ -74,15 +73,6 @@ $(setup_edit_description);
 <style>
 table textarea { width: 100%; }
 table { margin-top: 20px; }
-textarea.edit_description {
-  border-style: none;
-  border-color: Transparent;
-  overflow: auto;
-  resize: none;
-  width: 300px;
-  height: 45px;
-}
-.row2 textarea.edit_description { background-color: #eee; }
 .to_done, .to_done textarea.edit_description { background-color: #dfd; }
 </style>
 {% endblock tracktime_head %}

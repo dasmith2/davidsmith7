@@ -59,10 +59,11 @@ class Form(object):
               form_element.__class__))
 
   def to_query_string(self):
-    return dict_as_query(self.to_query_dict())
+    return dict_as_query(self.to_dict())
 
-  def to_query_dict(self):
-    query_dict = {}
+  def to_dict(self):
+    _dict = {}
     for form_element in self.form_elements:
-      query_dict[form_element.key()] = form_element.get_value_or_default()
-    return query_dict
+      if isinstance(form_element, Field):
+        _dict[form_element.key()] = form_element.get_value_or_default()
+    return _dict

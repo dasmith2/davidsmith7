@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+from djaveClass.one_to_one_or_none_field import OneToOneOrNoneField
 
 from tracktime.models.project import Project
 
@@ -21,5 +22,5 @@ def set_latest_project(user, project):
 
 class LatestProject(models.Model):
   """ Remember the latest project a user started the clock on. """
-  user = models.OneToOneField(User, on_delete=models.CASCADE)
+  user = OneToOneOrNoneField(User, on_delete=models.CASCADE)
   project = models.ForeignKey(Project, on_delete=models.CASCADE)

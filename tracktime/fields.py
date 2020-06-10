@@ -4,6 +4,10 @@ from tracktime.models.project import Project
 from tracktime.models.latest_project import get_latest_project
 
 
+# I do `project_id` instead of `project` because that makes this line from
+# invoice_rule_table work correctly:
+# self.instance.__dict__.update(self.form.to_dict())
+
 PROJECT = 'project'
 
 

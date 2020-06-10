@@ -32,6 +32,11 @@ class Project(Publishable):
       raise Exception('I dont know which {} are allowed'.format(
           api_key_type.__class__))
 
+  def explain_why_invalid(self):
+    if Project.all.filter(
+        ~Q(pk=self.pk), creator=self.creator, name=name).exists():
+      raise Problem('You already have a project with this name')
+
   def __repr__(self):
     return '<Project {}: {}>'.format(self.pk, self.name)
 

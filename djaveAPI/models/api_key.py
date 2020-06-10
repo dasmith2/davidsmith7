@@ -8,6 +8,7 @@ from django.conf import settings
 from django.contrib.auth.hashers import check_password, make_password
 from django.db import models
 from djaveClass.models.base_knows_child import BaseKnowsChild
+from djaveForm.field import URLField
 
 
 def api_key_types():
@@ -79,7 +80,15 @@ class APIKey(BaseKnowsChild):
           'passwords.')
     return self._plain_password
 
-  def user_can_manage_me(self, user):
-    raise NotImplementedError('user_can_manage_me')
+  def user_allowed(self, user):
+    raise NotImplementedError('user_allowed')
+
+  def explain_why_invalid(self):
+    super_explain = super().explain_why_invalid()
+    if super_explain:
+      return super_explain
+    url_field = URLField('webhook_url', required=False)
+    url_field.set_value(api_key.webhook_url)
+    return url_field.explain_why_not_valid()
 
   objects = APIKeyManager()

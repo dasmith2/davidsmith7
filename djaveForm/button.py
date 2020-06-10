@@ -7,10 +7,10 @@ from djaveForm.form_element import FormElement
 class Button(FormElement):
   def __init__(
       self, text, key_prefix=None, pk=None, button_type='button',
-      css_class=None):
+      css_class=None, additional_attrs=None):
+    key_prefix = key_prefix or re.compile(r'[^\w]').sub('', text).lower()
+    super().__init__(key_prefix, pk, additional_attrs=additional_attrs)
     self.text = text
-    self.key_prefix = key_prefix or re.compile(r'[^\w]').sub('', text).lower()
-    self.pk = pk
     self.button_type = button_type
     self.css_class = css_class or key_prefix
 
@@ -44,6 +44,7 @@ class Button(FormElement):
     if self.key():
       name_attr = ' name="{}" value="{}"'.format(self.key(), self.key())
     return mark_safe((
-        '<button type="{}"{}{}>'
+        '<button type="{}"{}{}{}>'
         '{}</button>').format(
-            self.button_type, css_class_str, name_attr, self.text))
+            self.button_type, css_class_str, name_attr,
+            self.additional_attrs_str(), self.text))

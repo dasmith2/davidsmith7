@@ -11,7 +11,7 @@ function setup_unarchive() {
 }
 
 function setup_name_change() {
-  wire_up_ajax_save_text('.edit_name', '{{ rename_project_url }}', 'name');
+  wire_up_ajax_save_field('.edit_name', 'Project', 'name');
 }
 
 {% block call_setup_functions %}
@@ -33,7 +33,7 @@ table { margin-top: 60px; }
   {{ table.as_html }}
 </form>
 
-<div class="pad-top">
+<div class="margin-top">
   <a href="{{ archived_projects_url }}">See archived projects</a>
 </div>
 {% endblock tracktime_body %}

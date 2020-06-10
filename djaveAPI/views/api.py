@@ -1,34 +1,12 @@
 import json
 
-from django.shortcuts import render
-from djaveAPI.ajax_endpoint import ajax_endpoint_login_required
 from djaveAPI.api_endpoint import api_endpoint
-from djaveAPI.discover_schema import publishable_model_from_name
+from djaveAPI.find_models import publishable_model_from_name
 from djaveAPI.filters import filter_model, get_filters
-from djaveAPI.get_request_variable import get_request_variable
-from djaveAPI.model_api_docs import model_api_docs
-from djaveAPI.models.api_key import APIKey
 from djaveAPI.paged_results import paged_results, get_page
 from djaveAPI.problem import Problem
 from djaveAPI.save import update, save_new, delete
 from djaveAPI.to_json import to_json_dict
-from djaveAPI.widgets.api_keys_widget import APIKeysWidget
-from djaveAPI.widgets.user_api_keys_table import UserAPIKeysTable
-from djaveForm.field import URLField
-from djaveURL import protocol_and_host
-
-
-def generic_api_docs(request, model_names):
-  model_docs = api_doc_contents(request, model_names)
-  return render(request, 'api_docs.html', context={'model_docs': model_docs})
-
-
-def api_doc_contents(request, model_names):
-  api_root_url = protocol_and_host(request)
-  model_docs = []
-  for model_name in model_names:
-    model_docs.append(model_api_docs(model_name, api_root_url))
-  return model_docs
 
 
 @api_endpoint
@@ -89,42 +67,3 @@ def _get_model(model_name):
     raise Problem(
         'There is no {} API'.format(model_name), status_code=404)
   return model
-
-
-def user_api_keys(request):
-  table = UserAPIKeysTable(request.user, request.POST)
-  description = (
-      'User API Keys will retrieve data based on what you, the user, can '
-      'see on the website.')
-  widget = APIKeysWidget(
-      request, table, 'User API Keys', description)
-  context = {'the_one_thing_on_this_page': widget}
-  return render(request, 'this_site.html', context)
-
-
-@ajax_endpoint_login_required
-def delete_key(request):
-  _ajax_api_key(request).delete()
-
-
-@ajax_endpoint_login_required
-def update_webhook_url(request):
-  api_key = _ajax_api_key(request)
-  api_key.webhook_url = get_request_variable(request.POST, 'webhook_url')
-  url_field = URLField('webhook_url', required=False)
-  url_field.set_value(api_key.webhook_url)
-  why_not_valid = url_field.explain_why_not_valid()
-  if why_not_valid:
-    raise Problem(why_not_valid)
-  api_key.save()
-
-
-def _ajax_api_key(request):
-  pk = get_request_variable(request.POST, 'pk')
-  api_key = APIKey.objects.filter(pk=pk).first()
-  if not api_key:
-    raise Problem('This API Key does not exist')
-  api_key = api_key.as_child_class()
-  if not api_key.user_can_manage_me(request.user):
-    raise Problem('You do not have permission to manage this key')
-  return api_key

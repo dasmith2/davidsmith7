@@ -1,0 +1,20 @@
+<h1>Invoice ID: {{ invoice.invoice_id }}</h1>
+
+<form method="POST">
+  {% csrf_token %}
+  {{ invoice_table.as_html }}
+</form>
+
+<h2>Line items</h2>
+
+<form method="POST">
+  {% csrf_token %}
+  {{ invoice_line_items_table.as_html }}
+</form>
+<script>
+wire_up_ajax_save_field(
+    '.describe_service', 'InvoiceLineItem', 'describe_service');
+wire_up_ajax_save_field(
+    '.amount_calculation', 'InvoiceLineItem', 'amount_calculation');
+wire_up_ajax_save_field('.amount', 'InvoiceLineItem', 'amount');
+</script>

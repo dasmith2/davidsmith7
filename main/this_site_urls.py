@@ -1,7 +1,7 @@
 from django.urls import include, path
 
-from tracktime.urls import tracktime_urls
 from biscuits.urls import biscuit_patterns
+from tracktime.urls import tracktime_urls
 
 
 this_site_urls = [

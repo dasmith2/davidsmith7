@@ -37,3 +37,16 @@ class BaseKnowsChild(models.Model):
 
   class Meta:
     abstract = True
+
+
+class BaseKnowsChildTransition(BaseKnowsChild):
+  """ This class is to help you turn an existing class into a BaseKnowsChild
+  class. Start by adding BaseKnowsChildTransition as a base class to your
+  existing class, go populatethe child_class field on all existing instances,
+  then change the base class to BaseKnowsChild. """
+  child_class = models.ForeignKey(
+      ContentType, editable=False, on_delete=models.PROTECT, null=True,
+      blank=True)
+
+  class Meta:
+    abstract = True

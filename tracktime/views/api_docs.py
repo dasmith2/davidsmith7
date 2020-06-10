@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from djaveAPI.views import api_doc_contents
+from djaveAPI.views.docs import api_doc_contents
 
 from tracktime.views.util import tracktime_context, SETTINGS
 

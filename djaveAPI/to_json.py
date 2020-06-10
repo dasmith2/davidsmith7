@@ -1,7 +1,7 @@
 """ Turn an object into JSON suitable for publishing in an API. """
 from djaveAPI.currency_field import corresponding_currency_field_name
-from djaveAPI.discover_schema import (
-    api_fields, use_publishable, DATE_TIME, DATE)
+from djaveAPI.find_models import use_publishable
+from djaveClass.model_fields import model_fields, DATE_TIME, DATE
 from djmoney.money import Money
 
 
@@ -13,7 +13,7 @@ def to_json_dict(instance, publishable_class=None):
       instance, publishable_class=publishable_class)
 
   as_dict = {TYPE: model.__name__}
-  for field in api_fields(model):
+  for field in model_fields(model):
     value = None
     if field.foreign_key_to:
       value = getattr(instance, '{}_id'.format(field.name))

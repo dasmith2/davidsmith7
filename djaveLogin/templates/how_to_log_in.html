@@ -19,7 +19,7 @@ $(function() {
   {% endif %}
 
 
-  <form method="POST" class="pad-top" action="{{ post_to }}">
+  <form method="POST" class="margin-top" action="{{ post_to }}">
     {% csrf_token %}
     <label>Email: {{ email_text_box }}</label>
     {{ email_me_button }}

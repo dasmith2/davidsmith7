@@ -32,7 +32,7 @@ class User(PretendPublishable):
         'website.')
 
   @classmethod
-  def get_model_fields_for_api(cls):
+  def get_model_fields(cls):
     model_fields = []
     for model_field in DjangoUser._meta.get_fields():
       if model_field.name in ['id', 'email', 'is_active']:

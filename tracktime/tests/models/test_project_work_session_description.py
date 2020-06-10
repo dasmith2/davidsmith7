@@ -10,7 +10,7 @@ from tracktime.tests.models.test_project_invoice_line_item import (
 class ProjectWorkSessionDescriptionsTests(TestCaseWithData):
   def test_get_work_sessions(self):
     self.setup_everything()
-    get_test_project_invoice_line_item(
+    line_item = get_test_project_invoice_line_item(
         project_work_session=self.work_session_1)
 
     descriptions = ProjectWorkSessionDescriptions(
@@ -25,3 +25,8 @@ class ProjectWorkSessionDescriptionsTests(TestCaseWithData):
         include_invoiced=False)
     self.assertEqual(
         [self.work_session_2], list(descriptions.get_work_sessions()))
+
+    line_item.mark_deleted()
+    self.assertEqual(
+        set([self.work_session_1, self.work_session_2]),
+        set(list(descriptions.get_work_sessions())))

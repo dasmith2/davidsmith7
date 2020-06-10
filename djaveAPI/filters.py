@@ -2,9 +2,9 @@ from collections import namedtuple
 from datetime import date
 
 from django.utils.dateparse import parse_datetime, parse_date
-from djaveAPI.discover_schema import (
-    api_fields, DATE_TIME, DATE, FLOAT, INTEGER)
 from djaveAPI.paged_results import PAGE
+from djaveClass.model_fields import (
+    model_fields, DATE_TIME, DATE, FLOAT, INTEGER)
 from djaveAPI.problem import Problem
 from djaveDT import to_tz_dt
 
@@ -53,7 +53,7 @@ def get_filters(model, request_GET):
 
 def available_filters(model):
   to_return = {}
-  for field in api_fields(model):
+  for field in model_fields(model):
     if field.can_filter:
       to_return[field.name] = field
   return to_return

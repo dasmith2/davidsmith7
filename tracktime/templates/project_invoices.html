@@ -1,0 +1,28 @@
+{% extends "tracktime_base.html" %}
+
+{% block tracktime_head %}
+{% endblock tracktime_head %}
+
+{% block tracktime_body %}
+
+<h2>Invoice rules</h2>
+{% if project_invoice_rules_table.has_rules %}
+  <form method="POST">
+    {% csrf_token %}
+    {{ project_invoice_rules_table.as_html }}
+  </form>
+{% else %}
+  <div>
+    {{ project_invoice_rules_table.create_new_button }}
+  </div>
+{% endif %}
+
+<h2>Invoices</h2>
+
+{% if project_invoices_table.has_invoices %}
+  {{ project_invoices_table.as_html }}
+{% else %}
+  <p>None yet</p>
+{% endif %}
+
+{% endblock tracktime_body %}

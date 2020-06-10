@@ -4,14 +4,14 @@ from djaveDT import to_tz_dt
 from djaveTest.unit_test import get_test_user
 from djmoney.money import Money
 
-from tracktime.models.auto_invoice_config import AutoInvoiceConfig
+from tracktime.models.project_invoice_rule import ProjectInvoiceRule
 from tracktime.models.project_invoice_line_item import (
     project_invoice_line_items)
 from tracktime.tests.models.test_project import get_test_project
 from tracktime.tests.test_case_with_data import TestCaseWithData
 
 
-def get_test_auto_invoice_config(**kwargs):
+def get_test_project_invoice_rule(**kwargs):
   project = kwargs.get('project', None)
   if not project:
     project = get_test_project(**kwargs)
@@ -24,7 +24,7 @@ def get_test_auto_invoice_config(**kwargs):
       'make_payment_to', 'Make payment to Dave at 1 Dave St., Apt. Dave')
   default_line_item_description = kwargs.get(
       'default_line_item_description', 'Programming work')
-  return AutoInvoiceConfig.objects.create(
+  return ProjectInvoiceRule.objects.create(
       project=project,
       created_by=created_by,
       hourly_rate=Money(100, 'USD'),
@@ -37,13 +37,18 @@ def get_test_auto_invoice_config(**kwargs):
 
 
 class CreateInvoiceTests(TestCaseWithData):
-  def test_create_invoice(self):
+  def setUp(self):
     self.setup_everything()
+    super().setUp()
 
-    auto_invoice_config = get_test_auto_invoice_config(
+  def test_create_invoice(self):
+    self.create_invoice()
+
+  def create_invoice(self):
+    project_invoice_rule = get_test_project_invoice_rule(
         project=self.project_1, created_by=self.user,
         first_billable_day=date(2020, 1, 15))
-    invoice = auto_invoice_config.create_invoice(
+    invoice = project_invoice_rule.create_invoice(
         nnow=to_tz_dt('2020-02-01 12:00'))
     self.assertTrue(invoice.invoice_id.find('abc') == 0)
     self.assertTrue(len(invoice.invoice_id) == 10)
@@ -74,12 +79,19 @@ class CreateInvoiceTests(TestCaseWithData):
         describe_service='Programming work',
         amount=Money('210', 'USD'),
         amount_calculation='2.1 hrs * $100.00 / hr')
+    return invoice
+
+  def test_recreate_invoice(self):
+    self.create_invoice().mark_deleted()
+    self.create_invoice()
 
 
 class CreateNothingTests(TestCaseWithData):
-  def test_nothing_to_bill_no_invoice_created(self):
+  def test_nothing_to_bill_creates_empty_invoice(self):
     self.setup_everything()
 
-    self.assertIsNone(get_test_auto_invoice_config(
+    invoice = get_test_project_invoice_rule(
         project=self.project_1, user=self.user,
-        first_billable_day=date(2020, 1, 16)).create_invoice())
+        first_billable_day=date(2020, 1, 16)).create_invoice()
+
+    self.assertEqual(Money(0, 'USD'), invoice.total)

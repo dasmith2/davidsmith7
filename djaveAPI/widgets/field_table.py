@@ -1,4 +1,4 @@
-from djaveAPI.discover_schema import api_fields, TEXT, CHAR
+from djaveClass.model_fields import model_fields, TEXT, CHAR
 from djaveTable.table import Table
 
 
@@ -6,7 +6,7 @@ def field_table(model):
   table = Table([
       'Field', 'Type', 'Description', 'Can filter', 'Required',
       'Not editable'])
-  for field in api_fields(model):
+  for field in model_fields(model):
     field_type = field.type
     if field_type == CHAR:
       field_type = '{}, max length {}'.format(TEXT, field.max_length)

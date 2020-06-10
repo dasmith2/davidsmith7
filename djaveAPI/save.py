@@ -3,11 +3,11 @@ from datetime import date
 from django.contrib.auth.models import User
 from django.utils.dateparse import parse_datetime, parse_date
 from djaveAPI.currency_field import corresponding_currency_value
-from djaveAPI.discover_schema import (
-    api_fields, use_publishable,
-    DATE_TIME, DATE, FLOAT, INTEGER, TEXT, CHAR, BOOLEAN)
+from djaveAPI.find_models import use_publishable
 from djaveAPI.models.user_api_key import UserAPIKey
 from djaveAPI.problem import Problem
+from djaveClass.model_fields import (
+    model_fields, DATE_TIME, DATE, FLOAT, INTEGER, TEXT, CHAR, BOOLEAN)
 from djaveDT import now
 from djmoney.money import Money
 
@@ -35,7 +35,7 @@ def _set_fields(instance, request_POST, api_key, publishable_class=None):
   model, instance = use_publishable(
       instance, publishable_class=publishable_class)
 
-  for field in api_fields(model):
+  for field in model_fields(model):
     if not field.editable:
       continue
     value = None

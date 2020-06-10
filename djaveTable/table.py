@@ -7,9 +7,7 @@ from djaveTest.unit_test import recursive_assert_equal
 
 
 class Table(object):
-  def __init__(
-      self, headers=None, rows=None, classes=[],
-      title=None):
+  def __init__(self, headers=None, rows=None, classes=[], title=None):
     self.headers = headers  # headers can be strings or Cells or nothing.
     self.rows = rows or []
     self.classes = classes
@@ -68,11 +66,18 @@ class Table(object):
     to_return.append('</table>')
     return mark_safe('\n'.join(to_return))
 
+  """ I used to do this, but then I found out that __repr__ was getting called
+  3 times and __str__ was getting called 1 time, for a total of 4 calls to
+  self.as_html per request. I believe this has something to do with template
+  rendering. So now you must {{ my_table.as_html }} which correctly does one
+  self.as_html per request.
+
   def __str__(self):
     return self.as_html()
 
   def __repr__(self):
     return self.as_html()
+  """
 
   def _rows_html(self):
     to_return = []

@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta, time
 
+from django.utils.safestring import mark_safe
 from djaveDT import tz_dt_to_str, time_to_time_str
+from djmoney.money import Money
 
 
 class CellContent(object):
@@ -20,14 +22,32 @@ class CellContent(object):
     return self.as_html()
 
 
-class InHref(CellContent):
-  def __init__(self, cell_contents, url):
-    self.cell_contents = cell_contents
-    self.url = url
+class Tooltip(CellContent):
+  def __init__(self, label, help_text):
+    self.label = label
+    self.help_text = help_text
 
   def as_html(self):
-    return '<a href="{}">{}</a>'.format(
-        self.url, cell_contents_as_html(self.cell_contents))
+    template = (
+        '<div class="tooltip">{}<span class="tooltiptext">{}</span></div>')
+    return template.format(self.label, self.help_text)
+
+  def as_csv(self):
+    return self.label
+
+
+class InHref(CellContent):
+  def __init__(self, cell_contents, url, classes=[]):
+    self.cell_contents = cell_contents
+    self.url = url
+    self.classes = classes
+
+  def as_html(self):
+    classes_str = ''
+    if self.classes:
+      classes_str = ' class="{}"'.format(' '.join(self.classes))
+    return mark_safe('<a href="{}"{}>{}</a>'.format(
+        self.url, classes_str, cell_contents_as_html(self.cell_contents)))
 
   def as_csv(self):
     return cell_contents_as_csv(self.cell_contents)
@@ -155,5 +175,7 @@ def obj_as_cell_content(obj):
   if isinstance(obj, list):
     return CellContentList([
         obj_as_cell_content(cell_content) for cell_content in obj])
+  if isinstance(obj, Money):
+    return StringContent(str(obj))
   raise Exception('I am not sure how to turn a {} into a CellContent'.format(
       obj.__class__))

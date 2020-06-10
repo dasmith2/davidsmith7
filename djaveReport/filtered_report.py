@@ -30,7 +30,7 @@ class FilteredReport(object):
     return Form(self._filters).to_query_string()
 
   def get_query_dict(self):
-    return Form(self._filters).to_query_dict()
+    return Form(self._filters).to_dict()
 
   def _validate_filters(self, filters):
     if filters is None:

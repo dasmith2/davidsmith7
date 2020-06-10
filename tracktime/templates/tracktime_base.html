@@ -7,11 +7,10 @@
 
 {% block this_site_body %}
 
-{{ nav.as_html|safe }}
+{{ nav.as_html }}
 
 {% block tracktime_body %}
+  {{ the_one_thing_on_the_page.as_html }}
 {% endblock tracktime_body %}
-
-{{ the_one_thing_on_the_page.as_html }}
 
 {% endblock this_site_body %}

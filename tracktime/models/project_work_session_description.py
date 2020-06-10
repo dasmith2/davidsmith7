@@ -1,3 +1,5 @@
+from django.db.models import Q
+
 from tracktime.models.work_session_description import WorkSessionDescriptions
 from tracktime.models.project_work_session import ProjectWorkSession
 from tracktime.models.project_to_do import ProjectToDo
@@ -22,7 +24,8 @@ class ProjectWorkSessionDescriptions(WorkSessionDescriptions):
       work_sessions = work_sessions.filter(project=self.project)
     if not self.include_invoiced:
       work_sessions = work_sessions.filter(
-          projectinvoicelineitem__isnull=True)
+          Q(projectinvoicelineitem__isnull=True) | Q(
+              projectinvoicelineitem__deleted__isnull=False))
     return work_sessions
 
   def get_to_dos(self, work_sessions):

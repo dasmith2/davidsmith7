@@ -1,15 +1,16 @@
 from django.urls import path
 
-from djaveAPI.views import (
-    list_or_save_new, get_or_save_existing, delete_key, user_api_keys,
-    update_webhook_url)
+from djaveAPI.views.api import list_or_save_new, get_or_save_existing
+from djaveAPI.views.keys import delete_key, user_api_keys
+from djaveAPI.views.update_field import update_field
 
 
 djave_api_urls = [
     path('delete_key', delete_key, name='delete_key'),
-    path('update_webhook_url', update_webhook_url, name='update_webhook_url'),
 
     path('user_api_keys', user_api_keys, name='user_api_keys'),
+
+    path('update_field', update_field, name='update_field'),
 
     # These patterns capture quite a lot so they have to come last.
     path('<model_name>', list_or_save_new, name='list_or_save_new'),

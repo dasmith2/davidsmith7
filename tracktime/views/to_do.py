@@ -70,13 +70,6 @@ def delete_to_do(request):
   _ajax_to_do(request).mark_deleted()
 
 
-@ajax_endpoint_login_required
-def edit_description(request):
-  to_do = _ajax_to_do(request)
-  to_do.description = get_request_variable(request, 'description')
-  to_do.save()
-
-
 def _ajax_to_do(request):
   pk = get_request_variable(request, 'pk')
   to_do = ToDo.live.filter(pk=pk).first()
@@ -98,5 +91,4 @@ def to_do_context(to_do_table, request, **kwargs):
       TO_DO, request, to_do_table=to_do_table,
       to_do_done_url=reverse(to_do_done),
       not_done_url=reverse(to_do_not_done),
-      delete_to_do_url=reverse(delete_to_do),
-      edit_description_url=reverse('edit_description'), **kwargs)
+      delete_to_do_url=reverse(delete_to_do), **kwargs)

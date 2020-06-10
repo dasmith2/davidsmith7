@@ -4,12 +4,12 @@ import json
 
 from django.shortcuts import reverse
 from django.template import loader
-from djaveAPI.discover_schema import (
-    api_fields, publishable_model_from_name, DATE_TIME, DATE, INTEGER, FLOAT,
-    TEXT, CHAR, BOOLEAN)
+from djaveAPI.find_models import publishable_model_from_name
 from djaveAPI.paged_results import construct_paged_results
 from djaveAPI.to_json import TYPE
 from djaveAPI.widgets.field_table import field_table
+from djaveClass.model_fields import (
+    model_fields, DATE_TIME, DATE, INTEGER, FLOAT, TEXT, CHAR, BOOLEAN)
 from djaveDT import to_tz_dt
 from djaveURL import dict_as_query
 
@@ -118,7 +118,7 @@ def _base_url(api_root_url, model):
 
 def example_values(model, exclude=[], exclude_uneditable=True):
   values = {}
-  for field in api_fields(model):
+  for field in model_fields(model):
     if field.name in exclude:
       continue
     if exclude_uneditable and not field.editable:
@@ -143,7 +143,7 @@ def example_values_str(model, exclude=[], exclude_uneditable=True):
 
 def example_filters(model):
   filters = {}
-  for field in api_fields(model):
+  for field in model_fields(model):
     if field.can_filter:
       name = field.name
       name__gte = '{}__gte'.format(name)
