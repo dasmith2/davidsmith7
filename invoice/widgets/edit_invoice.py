@@ -1,7 +1,7 @@
 from django.template.loader import render_to_string
 
 from invoice.widgets.invoice_table import InvoiceTable
-from invoice.widgets.invoice_line_items_table import InvoiceLineItemsTable
+from invoice.widgets.line_items_table import LineItemsTable
 
 
 class EditInvoice(object):
@@ -9,7 +9,7 @@ class EditInvoice(object):
     self.request = request
     self.invoice = invoice
     self.invoice_table = InvoiceTable(request.POST, invoice)
-    self.invoice_line_items_table = InvoiceLineItemsTable(invoice)
+    self.line_items_table = LineItemsTable(invoice)
 
   def deleted(self):
     return self.invoice_table.deleted()
@@ -18,5 +18,5 @@ class EditInvoice(object):
     context = {
         'invoice': self.invoice,
         'invoice_table': self.invoice_table,
-        'invoice_line_items_table': self.invoice_line_items_table}
+        'line_items_table': self.line_items_table}
     return render_to_string('edit_invoice.html', context, request=self.request)

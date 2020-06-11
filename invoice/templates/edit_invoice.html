@@ -9,5 +9,5 @@
 
 <form method="POST">
   {% csrf_token %}
-  {{ invoice_line_items_table.as_html }}
+  {{ line_items_table.as_html }}
 </form>

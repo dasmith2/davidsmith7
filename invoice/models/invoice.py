@@ -52,7 +52,7 @@ class Invoice(Publishable, BaseKnowsChildTransition):
       'date'))
 
   def mark_deleted(self, nnow=None):
-    for line_item in self.invoicelineitem_set.all():
+    for line_item in self.lineitem_set.all():
       line_item.as_child_class().mark_deleted(nnow=nnow)
     super().mark_deleted(nnow=nnow)
 

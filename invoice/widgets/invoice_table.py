@@ -21,6 +21,6 @@ class InvoiceTable(EditTable):
     self.add_final_row()
 
   def handle_delete_click(self):
-    for line_item in self.invoice.invoicelineitem_set.all():
+    for line_item in self.invoice.lineitem_set.all():
       line_item.as_child_class().mark_deleted()
     self.invoice.as_child_class().mark_deleted()

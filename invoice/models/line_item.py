@@ -7,7 +7,7 @@ from djmoney.models.fields import MoneyField
 from invoice.models.invoice import Invoice
 
 
-class InvoiceLineItem(Publishable, BaseKnowsChild):
+class LineItem(Publishable, BaseKnowsChild):
   invoice = models.ForeignKey(Invoice, on_delete=models.PROTECT)
   describe_service = models.TextField(help_text=(
       'What did somebody do that was worth charging money for?'))

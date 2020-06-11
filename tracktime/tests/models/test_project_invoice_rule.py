@@ -5,8 +5,8 @@ from djaveTest.unit_test import get_test_user
 from djmoney.money import Money
 
 from tracktime.models.project_invoice_rule import ProjectInvoiceRule
-from tracktime.models.project_invoice_line_item import (
-    project_invoice_line_items)
+from tracktime.models.project_line_item import (
+    project_line_items)
 from tracktime.tests.models.test_project import get_test_project
 from tracktime.tests.test_case_with_data import TestCaseWithData
 
@@ -65,7 +65,7 @@ class CreateInvoiceTests(TestCaseWithData):
     self.assertEqual(date(2020, 1, 15), invoice.service_from)
     self.assertEqual(date(2020, 2, 1), invoice.service_to)
 
-    line_items = project_invoice_line_items(invoice)
+    line_items = project_line_items(invoice)
     self.assertEqual(2, line_items.count())
     line_items.get(
         project_work_session=self.work_session_1,

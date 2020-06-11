@@ -9,7 +9,7 @@ from djmoney.models.fields import MoneyField
 from invoice.models.invoice import get_an_invoice_id
 from tracktime.models.project import Project
 from tracktime.models.project_invoice import ProjectInvoice
-from tracktime.models.project_invoice_line_item import ProjectInvoiceLineItem
+from tracktime.models.project_line_item import ProjectLineItem
 from tracktime.models.project_work_session_description import (
     ProjectWorkSessionDescriptions)
 
@@ -72,13 +72,13 @@ class ProjectInvoiceRule(models.Model):
       describe_service = '\n'.join(description.to_do_descriptions)
       if not describe_service:
         describe_service = self.default_line_item_description
-      # A ProjectInvoiceLineItem may exist already. The user could have made an
+      # A ProjectLineItem may exist already. The user could have made an
       # invoice, "deleted" the invoice, then recreated the invoice. Because
-      # ProjectInvoice and ProjectInvoiceLineItems are published on the API,
+      # ProjectInvoice and ProjectLineItems are published on the API,
       # they don't actually get deleted.
-      line_item = ProjectInvoiceLineItem()
-      if description.work_session.projectinvoicelineitem_or_none:
-        line_item = description.work_session.projectinvoicelineitem
+      line_item = ProjectLineItem()
+      if description.work_session.projectlineitem_or_none:
+        line_item = description.work_session.projectlineitem
         line_item.deleted = None
       else:
         line_item.project_work_session = description.work_session

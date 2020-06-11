@@ -24,8 +24,8 @@ class ProjectWorkSessionDescriptions(WorkSessionDescriptions):
       work_sessions = work_sessions.filter(project=self.project)
     if not self.include_invoiced:
       work_sessions = work_sessions.filter(
-          Q(projectinvoicelineitem__isnull=True) | Q(
-              projectinvoicelineitem__deleted__isnull=False))
+          Q(projectlineitem__isnull=True) | Q(
+              projectlineitem__deleted__isnull=False))
     return work_sessions
 
   def get_to_dos(self, work_sessions):

@@ -3,7 +3,7 @@ from djmoney.money import Money
 from invoice.tests.models.test_invoice import get_test_invoice
 
 
-def set_invoice_line_item_stuff(instance, **kwargs):
+def set_line_item_stuff(instance, **kwargs):
   invoice = kwargs.get('invoice', None)
   if not invoice:
     invoice = get_test_invoice(**kwargs)
