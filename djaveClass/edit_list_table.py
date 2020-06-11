@@ -3,6 +3,7 @@
 
 from djaveTable.table import Table
 
+
 class EditListTable(Table):
   def __init__(self, model, *args, **kwargs):
     self.model = model

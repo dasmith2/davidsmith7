@@ -18,7 +18,7 @@ class ProjectInvoiceRule(models.Model):
   project = models.ForeignKey(Project, on_delete=models.CASCADE, help_text=(
       'When you run this rule, it will create an Invoice for the work you '
       'did on this project.'))
-  created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+  creator = models.ForeignKey(User, on_delete=models.CASCADE)
   hourly_rate = MoneyField(max_digits=10, decimal_places=2, help_text=(
       'How much should I charge per hour you spent on this project?'))
   first_billable_day = models.DateField(
@@ -45,7 +45,7 @@ class ProjectInvoiceRule(models.Model):
 
   @classmethod
   def allowed_by_user(cls, user):
-    return cls.objects.filter(created_by=user).select_related('project')
+    return cls.objects.filter(creator=user).select_related('project')
 
   def create_invoice(self, nnow=None):
     nnow = nnow or now()
@@ -97,7 +97,7 @@ class ProjectInvoiceRule(models.Model):
         project=self.project,
         invoice_id=get_an_invoice_id(self.invoice_id_prefix),
         make_payment_to=self.make_payment_to,
-        created_by=self.created_by,
+        creator=self.creator,
         email_to=self.email_to,
         net_days=self.net_days,
         total=total,
@@ -110,5 +110,5 @@ class ProjectInvoiceRule(models.Model):
     to_date = nnow.date()
     tz_str = settings.TIME_ZONE
     return ProjectWorkSessionDescriptions(
-        self.project, self.created_by, from_date, to_date, tz_str,
+        self.project, self.creator, from_date, to_date, tz_str,
         include_invoiced=False)

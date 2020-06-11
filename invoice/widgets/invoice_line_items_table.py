@@ -1,7 +1,6 @@
 from djaveClass.edit_list_table import EditListTable
 from djaveForm.button import Button
 from djaveForm.field import TextAreaField, TextField, FloatField
-from djaveTable.table import Table
 
 from invoice.models.invoice_line_item import InvoiceLineItem
 

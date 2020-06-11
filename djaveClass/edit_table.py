@@ -1,7 +1,6 @@
 """ This table is for editing a single instance. It does one row per field.
 It's got helptext. """
 
-from django.utils.safestring import mark_safe
 from djaveClass.model_fields import model_fields
 from djaveForm.button import Button
 from djaveForm.default_widget import default_widget

@@ -18,9 +18,9 @@ class InvoiceLineItem(Publishable, BaseKnowsChild):
 
   @classmethod
   def allowed_by_user(cls, user):
-    return cls.all.filter(invoice__created_by=user)
+    return cls.all.filter(invoice__creator=user)
 
   def allowed_api_keys(self, api_key_type):
     if api_key_type is UserAPIKey:
-      return UserAPIKey.objects.filter(user=self.invoice.created_by)
+      return UserAPIKey.objects.filter(user=self.invoice.creator)
     raise Exception('I dont know how to check which {} can see this Invoice')

@@ -24,7 +24,7 @@ class Invoice(Publishable, BaseKnowsChildTransition):
       'This shows in the upper left hand corner of the Invoice. Explain '
       'who you are an how to pay you.'))
 
-  created_by = models.ForeignKey(
+  creator = models.ForeignKey(
       User, related_name='created_invoice', on_delete=models.PROTECT,
       help_text='Who sent this Invoice?')
 
@@ -76,9 +76,9 @@ class Invoice(Publishable, BaseKnowsChildTransition):
 
   @classmethod
   def allowed_by_user(cls, user):
-    return cls.all.filter(created_by=user)
+    return cls.all.filter(creator=user)
 
   def allowed_api_keys(self, api_key_type):
     if api_key_type is UserAPIKey:
-      return UserAPIKey.objects.filter(user=self.created_by)
+      return UserAPIKey.objects.filter(user=self.creator)
     raise Exception('I dont know how to check which {} can see this Invoice')

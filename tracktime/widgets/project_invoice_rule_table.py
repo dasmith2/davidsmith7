@@ -24,4 +24,4 @@ class ProjectInvoiceRuleTable(EditTable):
     self.add_final_row()
 
   def init_new(self):
-    return ProjectInvoiceRule(created_by=self.user)
+    return ProjectInvoiceRule(creator=self.user)
