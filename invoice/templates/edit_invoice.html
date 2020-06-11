@@ -11,10 +11,3 @@
   {% csrf_token %}
   {{ invoice_line_items_table.as_html }}
 </form>
-<script>
-wire_up_ajax_save_field(
-    '.describe_service', 'InvoiceLineItem', 'describe_service');
-wire_up_ajax_save_field(
-    '.amount_calculation', 'InvoiceLineItem', 'amount_calculation');
-wire_up_ajax_save_field('.amount', 'InvoiceLineItem', 'amount');
-</script>

@@ -7,7 +7,7 @@ function focus_on_new_to_do() {
 }
 
 function setup_done_delete_and_not_done() {
-  $('tr[data-pk]').each(function() {
+  $('tr[data-id]').each(function() {
     // to_done so as not to conflict with the done button
     if ($(this).hasClass('to_done')) {
       put_row_in_done_mode($(this));

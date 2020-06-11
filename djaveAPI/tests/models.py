@@ -70,11 +70,11 @@ class ComplexFakeModel(Publishable):
     return api_key_type.objects.all()
 
 
-def get_test_complex_fake_model(save=True, **kwargs):
+def get_test_complex_fake_model(**kwargs):
   my_fake_model = kwargs.get('my_fake_model', None)
   if not my_fake_model:
     my_fake_model = get_test_my_fake_model(**kwargs)
-  instance = ComplexFakeModel(
+  return ComplexFakeModel.live.create(
       small_int=kwargs.get('small_int', 10),
       large_int=kwargs.get('large_int', 20),
       my_date=kwargs.get('my_date', date(2020, 1, 1)),
@@ -83,6 +83,3 @@ def get_test_complex_fake_model(save=True, **kwargs):
       my_text=kwargs.get('my_text', 'world'),
       my_fake_model=my_fake_model,
       my_money=kwargs.get('my_money', Money(100, 'USD')))
-  if save:
-    instance.save()
-  return instance

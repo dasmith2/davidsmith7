@@ -23,8 +23,11 @@ td, th { border-right: 1px solid #999;
 th, .row2, .row2 textarea, .row2 input[type="text"] { background-color: #eee; }
 
 table textarea {
-  overflow: auto; width: 300px; height: 45px;
+  overflow: auto; width: 300px; height: 45px; 
 }
+table textarea, table input {
+  border: 1px solid #999; border-radius: 3px; padding: 5px;
+  box-shadow: 2px 2px 1px grey; }
 
 pre {
   margin: 10px 0px 0px 0px; background-color: #eee; border: 1px solid #999;
@@ -35,7 +38,7 @@ input[type="number"] { width: 100px; }
 .problem { color: #f00; }
 .feedback { color: #f00; }
 .start-hidden { display: none; }
-.editing, .editing textarea, .editing input[type="text"] { background-color: #ffb; }
+.editing { background-color: #ffb; }
 
 .margin-top { margin: 60px 0px 0px 0px; }
 .margin-top-half, form { margin: 20px 0px 0px 0px; }

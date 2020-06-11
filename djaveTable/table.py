@@ -1,3 +1,5 @@
+""" This is an HTML table. It's for displaying things and that's it. Don't get
+fancy.  """
 from django.utils.safestring import mark_safe
 from djaveTable.csv import csv_writer_and_response
 from djaveTable.cell_content import (
@@ -7,11 +9,15 @@ from djaveTest.unit_test import recursive_assert_equal
 
 
 class Table(object):
-  def __init__(self, headers=None, rows=None, classes=[], title=None):
+  def __init__(
+      self, headers=None, rows=None, classes=[], title=None, js=None,
+      additional_attrs=None):
     self.headers = headers  # headers can be strings or Cells or nothing.
     self.rows = rows or []
     self.classes = classes
     self.title = title
+    self.js = js
+    self.additional_attrs = additional_attrs or {}
 
   def create_row(
       self, cells=None, additional_attrs=None, classes=None, pk=None):
@@ -41,13 +47,21 @@ class Table(object):
     return response
 
   def as_html(self):
-    classes_str = ''
+    table_start = []
+    for key, value in self.additional_attrs.items():
+      table_start.append('{}="{}"'.format(key, value))
     if self.classes:
-      classes_str = ' class="{}"'.format(' '.join(self.classes))
+      table_start.append('class="{}"'.format(' '.join(self.classes)))
+    table_start_str = '<table>'
+    if table_start:
+      table_start_str = '<table {}>'.format(' '.join(table_start))
+
     title = ''
     if self.title:
       title = '<h3>{}</h3>'.format(self.title)
-    to_return = [title, '<table{}>'.format(classes_str)]
+
+    to_return = [title, table_start_str]
+
     if self.headers:
       to_return.extend([
           '  <thead>',
@@ -64,6 +78,10 @@ class Table(object):
     to_return.extend(self._rows_html())
 
     to_return.append('</table>')
+    if self.js:
+      if self.js.strip().find('<script>') != 0:
+        self.js = '<script>\n{}\n</script>'.format(self.js)
+      to_return.append(self.js)
     return mark_safe('\n'.join(to_return))
 
   """ I used to do this, but then I found out that __repr__ was getting called
@@ -169,7 +187,7 @@ class Row(object):
     self.additional_attrs = additional_attrs or {}
     self.pk = pk
     if pk is not None:
-      self.additional_attrs['data-pk'] = pk
+      self.additional_attrs['data-id'] = pk
 
   def __str__(self):
     return self.__repr__()

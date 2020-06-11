@@ -18,7 +18,7 @@ class SaveTests(TestCase):
     super().setUp()
     user = get_test_user()
     self.other = get_test_my_fake_model(name='Other', user=user)
-    self.request_POST = {
+    self.request_data = {
         'small_int': 1,
         'large_int': 2,
         'my_date': '2020-05-28',
@@ -31,14 +31,14 @@ class SaveTests(TestCase):
     self.user_api_key = get_test_user_api_key(user=user)
 
   def test_save_new(self):
-    instance = save_new(ComplexFakeModel, self.request_POST, self.user_api_key)
-    self._test_matches_self_request_POST(instance)
+    instance = save_new(ComplexFakeModel, self.request_data, self.user_api_key)
+    self._test_matches_self_request_data(instance)
     self.assertTrue(instance.pk > 0)
 
   def test_block_save_when_violate_max_length(self):
-    self.request_POST['my_char'] = '0123456789' * 11
+    self.request_data['my_char'] = '0123456789' * 11
     try:
-      save_new(ComplexFakeModel, self.request_POST, self.user_api_key)
+      save_new(ComplexFakeModel, self.request_data, self.user_api_key)
     except Problem as ex:
       expected = (
           'my_char has a maximum length of 100. You sent a string with '
@@ -46,15 +46,38 @@ class SaveTests(TestCase):
       self.assertEqual(expected, ex.message)
 
   def test_update(self):
-    instance = get_test_complex_fake_model(save=True)
+    instance = get_test_complex_fake_model()
     self.assertEqual(instance, update(
-        instance, self.request_POST, self.user_api_key))
-    self._test_matches_self_request_POST(instance)
+        instance, self.request_data, self.user_api_key))
+    self._test_matches_self_request_data(instance)
 
     instance.refresh_from_db()
     self.assertEqual(1, instance.small_int)
 
-  def _test_matches_self_request_POST(self, instance):
+  def test_update_single_field(self):
+    instance = get_test_complex_fake_model(small_int=10, large_int=20)
+    update(instance, {'small_int': 11}, self.user_api_key)
+    instance.refresh_from_db()
+    self.assertEqual(11, instance.small_int)
+    self.assertEqual(20, instance.large_int)
+
+  def test_update_required_to_nothing_causes_error(self):
+    instance = get_test_complex_fake_model()
+    try:
+      update(instance, {'small_int': None}, self.user_api_key)
+      self.fail('This should have caused a Required problem')
+    except Problem:
+      pass
+
+  def test_failing_to_specify_required_in_new_causes_error(self):
+    del self.request_data['small_int']
+    try:
+      save_new(ComplexFakeModel, self.request_data, self.user_api_key)
+      self.fail('This should have caused a Required problem')
+    except Problem:
+      pass
+
+  def _test_matches_self_request_data(self, instance):
     self.assertEqual(1, instance.small_int)
     self.assertEqual(2, instance.large_int)
     self.assertEqual(date(2020, 5, 28), instance.my_date)

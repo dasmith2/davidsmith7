@@ -44,17 +44,24 @@ function get_csrf_token() {
 
 /* Stuff that comes up when I'm enabling tables for AJAX */
 
-function find_pk($element) {
-  // Search up the dom for a data-pk attribute. So you might do something like
-  // my_button.click(function() { var pk = find_pk($(this)); });
-  if ($element.attr('data-pk')) {
-    return $element.attr('data-pk');
+function find_id($element) {
+  // Search up the dom for a data-id attribute. So you might do something like
+  // my_button.click(function() { var pk = find_id($(this)); });
+  if ($element.attr('data-id')) {
+    return $element.attr('data-id');
   }
-  return $element.parents('[data-pk]').attr('data-pk');
+  return $element.parents('[data-id]').attr('data-id');
+}
+
+function find_model($element) {
+  if ($element.attr('data-model')) {
+    return $element.attr('data-model');
+  }
+  return $element.parents('[data-model]').attr('data-model');
 }
 
 function row_by_pk(pk) {
-  return $('tr[data-pk=' + pk + ']');
+  return $('tr[data-id=' + pk + ']');
 }
 
 function remove_row(pk) {
@@ -70,7 +77,7 @@ function wire_up_ajax_button(
   $(selector_or_elt).click(function() {
     var button = $(this).prop('disabled', true);
     var buttons_cell = button.parents('td');
-    var pk = find_pk(button);
+    var pk = find_id(button);
     var post_data = {'pk': pk};
     if (!confirm_question || confirm(confirm_question)) {
       post(action_url, post_data, function(response) {
@@ -109,10 +116,21 @@ var turn_on_edit_mode = function(row) {
   row.addClass('editing');
 };
 
+var SAVED = 'Saved!';
+
 var turn_off_edit_mode = function(row) {
   other_buttons(row).show();
   buttons_cell(row).find('.save-field,.cancel-save-field').hide();
   row.removeClass('editing');
+  // Maybe you tried to blank out a field, hit save, got a required error,
+  // typed your original back in, that turns off edit mode, but we should now
+  // hide the required message. On the other hand, if you just successfully
+  // clicked save, we don't want to instantly remove the "Saved!" message.
+  row.find('.feedback').each(function() {
+    if ($(this).text() != SAVED) {
+      $(this).hide();
+    }
+  });
 };
 
 var calc_edit_mode = function(row) {
@@ -132,7 +150,7 @@ var is_editing = function(elt) {
   return elt.attr('data-saved-value') != elt.val()
 };
 
-function wire_up_ajax_save_field(selector_or_elt, model_name, field_name) {
+function wire_up_ajax_save_field(selector_or_elt, field_name) {
   /* This is for text boxes or whatever in tables so you can edit inline with
    * AJAX. Once you start editing, this hides all the other buttons and gives
    * the user "Save" and "Cancel" buttons. selector_or_elt can be a string or a
@@ -141,7 +159,6 @@ function wire_up_ajax_save_field(selector_or_elt, model_name, field_name) {
   $(selector_or_elt).each(function() {
     var elt = $(this);
     elt.attr('data-saved-value', elt.val());
-    elt.attr('data-model-name', model_name);
     elt.attr('data-field-name', field_name);
   });
 
@@ -163,34 +180,46 @@ function wire_up_ajax_save_field(selector_or_elt, model_name, field_name) {
         save_button.prop('disabled', true);
         cancel_save_button.prop('disabled', true);
 
-        var possibly_save = function(elt) {
-          var feedback = get_feedback_elt_after(elt);
-          var model_name = elt.attr('data-model-name');
-          var field_name = elt.attr('data-field-name');
-          var data = {
-              pk: find_pk(row), model_name: model_name, field_name: field_name,
-              new_value: elt.val()};
-          post('{{ update_field_url }}', data, function(response) {
-            if (!show_problem(response, feedback)) {
-              feedback.show().text('Saved!');
-              elt.attr('data-saved-value', elt.val());
-              // The save button disappears and you lose your tab location
-              // otherwise.
-              elt.focus();
-              window.setTimeout(function() {
-                feedback.text('');
-              }, 1000);
+        var data = {id: find_id(row), type: find_model(row)};
+
+        var got_all_elts = all_elts(row);
+        var first_feedback = null;
+        var last_edited_elt = null;
+        for (var i = 0; i < got_all_elts.length; i++) {
+          var elt = $(got_all_elts[i]);
+          if (is_editing(elt)) {
+            if (first_feedback === null) {
+              first_feedback = get_feedback_elt_after(elt);
             }
-            calc_edit_mode(row);
-          }).fail(function() {
-            feedback.show().text('Server error :(');
-          });
+            data[elt.attr('data-field-name')] = elt.val()
+            last_edited_elt = elt;
+          }
+        }
+
+        var handle_elt_was_saved = function(elt) {
+          var feedback = get_feedback_elt_after(elt);
+          feedback.show().text(SAVED);
+          elt.attr('data-saved-value', elt.val());
+          window.setTimeout(function() {
+            feedback.text('');
+          }, 1000);
         };
 
-        all_elts(row).each(function() {
-          if (is_editing($(this))) {
-            possibly_save($(this));
+        post('{{ update_field_url }}', data, function(response) {
+          if (!show_problem(response, first_feedback)) {
+            for (var i = 0; i < got_all_elts.length; i++) {
+              var elt = $(got_all_elts[i]);
+              if (is_editing(elt)) {
+                handle_elt_was_saved(elt);
+              }
+            }
+            // The save button disappears and you lose your tab location
+            // otherwise.
+            last_edited_elt.focus();
           }
+          calc_edit_mode(row);
+        }).fail(function() {
+          first_feedback.show().text('Server error :(');
         });
       });
 
@@ -210,4 +239,5 @@ function wire_up_ajax_save_field(selector_or_elt, model_name, field_name) {
   };
 
   $(selector_or_elt).keyup(handle_row_maybe_changed);
+  $(selector_or_elt).click(handle_row_maybe_changed);
 }

@@ -1,5 +1,5 @@
-""" This djaveTable comes with functions that can help you display a table
-specifically for editing an instance of a model. """
+""" This table is for editing a single instance. It does one row per field.
+It's got helptext. """
 
 from django.utils.safestring import mark_safe
 from djaveClass.model_fields import model_fields
@@ -36,17 +36,13 @@ class EditTable(Table):
     self._saved = False
     self._deleted = False
 
-    super().__init__()
+    super().__init__(js=WIRE_UP_CONFIRM_DELETE)
 
     self.add_rows()
     self.handle_clicks()
 
   def add_rows(self):
     raise NotImplementedError('add_rows')
-
-  def as_html(self):
-    return mark_safe(
-        '{}\n{}'.format(super().as_html(), WIRE_UP_CONFIRM_DELETE))
 
   def is_valid(self):
     return self.form.is_valid()

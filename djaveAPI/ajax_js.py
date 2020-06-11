@@ -3,5 +3,5 @@ from django.template.loader import render_to_string
 
 
 def ajax_js():
-  context = {'update_field_url': reverse('update_field')}
+  context = {'update_field_url': reverse('ajax_update')}
   return render_to_string('ajax.js', context)

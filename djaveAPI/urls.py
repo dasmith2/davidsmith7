@@ -1,5 +1,6 @@
 from django.urls import path
 
+from djaveAPI.views.ajax_update import ajax_update
 from djaveAPI.views.api import list_or_save_new, get_or_save_existing
 from djaveAPI.views.keys import delete_key, user_api_keys
 
@@ -9,7 +10,10 @@ djave_api_urls = [
 
     path('user_api_keys', user_api_keys, name='user_api_keys'),
 
-    # These patterns capture quite a lot so they have to come last.
+    path('ajax_update', ajax_update, name='ajax_update'),
+
+    # These patterns capture quite a lot so they have to come last. They're for
+    # the API.
     path('<model_name>', list_or_save_new, name='list_or_save_new'),
     path(
         '<model_name>/<pk>', get_or_save_existing,

@@ -36,8 +36,10 @@ def _set_fields(instance, request_data, credentials, publishable_class=None):
   for field in model_fields(model):
     if not field.editable:
       continue
+    specified = field.name in request_data
     value = None
-    if field.name in request_data:
+
+    if specified:
       raw_value = request_data[field.name]
       if field.foreign_key_to:
         if raw_value:
@@ -69,9 +71,18 @@ def _set_fields(instance, request_data, credentials, publishable_class=None):
         value = _boolean(field, raw_value)
       else:
         raise Exception(field.type)
-    if field.required and value in [None, '']:
-      raise Problem('{} is required'.format(field.name))
-    setattr(instance, field.name, value)
+
+    if field.required:
+      required_error = False
+      if specified:
+        required_error = value in [None, '']
+      else:
+        required_error = getattr(instance, field.name) in [None, '']
+      if required_error:
+        raise Problem('"{}" is required'.format(field.display_name))
+
+    if specified:
+      setattr(instance, field.name, value)
 
   why_invalid = instance.explain_why_invalid()
   if why_invalid:
