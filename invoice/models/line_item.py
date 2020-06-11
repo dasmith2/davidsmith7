@@ -2,9 +2,18 @@ from djaveAPI.models.publishable import Publishable
 from djaveAPI.models.user_api_key import UserAPIKey
 from djaveClass.models.base_knows_child import BaseKnowsChild
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from djmoney.models.fields import MoneyField
 
 from invoice.models.invoice import Invoice
+
+
+@receiver(post_save)
+def save_profile(sender, instance, **kwargs):
+  if issubclass(sender, LineItem):
+    instance.invoice.calculate_total()
+
 
 
 class LineItem(Publishable, BaseKnowsChild):

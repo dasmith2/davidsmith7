@@ -64,12 +64,6 @@ class PublishableInterface(object):
     itself. It's only more complicated with PretendPublishable. """
     raise NotImplementedError('published_object')
 
-  def delete(self):
-    raise Exception(
-        'If you actually delete a record and the consumer misses the '
-        'webhook, how will they ever find out it was deleted? Use '
-        'mark_deleted instead.')
-
   @classmethod
   def new_instance(cls):
     raise NotImplementedError('new_instance')

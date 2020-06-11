@@ -8,6 +8,7 @@ from djaveAPI.models.user_api_key import UserAPIKey
 from djaveClass.models.base_knows_child import BaseKnowsChildTransition
 from djaveDT import now
 from djmoney.models.fields import MoneyField
+from djmoney.money import Money
 
 
 def get_an_invoice_id(invoice_id_prefix):
@@ -55,6 +56,13 @@ class Invoice(Publishable, BaseKnowsChildTransition):
     for line_item in self.lineitem_set.all():
       line_item.as_child_class().mark_deleted(nnow=nnow)
     super().mark_deleted(nnow=nnow)
+
+  def calculate_total(self):
+    self.total = Money(0, 'USD')
+    for line_item in self.lineitem_set.all():
+      if not line_item.deleted:
+        self.total += line_item.amount
+    self.save()
 
   def status(self, nnow=None):
     if self.paid:

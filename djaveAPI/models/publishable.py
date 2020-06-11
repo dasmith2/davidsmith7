@@ -19,6 +19,12 @@ class Publishable(models.Model, PublishableInterface):
       'instead of actually deleting them, I make it much simpler for you to '
       'write code that notices when objects in the API become deleted.'))
 
+  def delete(self):
+    raise Exception(
+        'If you actually delete a record and the consumer misses the '
+        'webhook, how will they ever find out it was deleted? Use '
+        'mark_deleted instead.')
+
   def mark_deleted(self, nnow=None):
     nnow = nnow or now()
     self.deleted = nnow

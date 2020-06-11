@@ -12,7 +12,7 @@ from djaveTable.problem import Problem
 class Field(FormElement):
   # You can put djaveForm fields in djaveTables.
   def __init__(
-      self, key_prefix, required=False, default=None, pk=None, value=None,
+      self, key_prefix, required=True, default=None, pk=None, value=None,
       label=None):
     super().__init__(key_prefix, pk)
     self.required = required

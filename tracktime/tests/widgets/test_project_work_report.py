@@ -29,3 +29,17 @@ class ProjectWorkReportTests(TestCaseWithData):
     self.assertEqual(expected_sessions, report_content.get_descriptions())
     self.assertTrue(html.find('Jan 15, 2020, 2.1 hours') >= 0)
     self.assertEqual(3.2, report_content.get_total())
+
+
+class ProjectWorkReportUrlTests(TestCaseWithData):
+  def test_project_work_report_url(self):
+    self.setup_projects()
+    expected_url = reverse('project_work_report') + '?project=' + str(
+        self.project_1.pk)
+    got_url = project_work_report_url(self.project_1)
+    self.assertEqual(expected_url, got_url)
+
+    expected_url += '&from_date=2020-01-15'
+    got_url = project_work_report_url(
+        self.project_1, from_date=date(2020, 1, 15))
+    self.assertEqual(expected_url, got_url)

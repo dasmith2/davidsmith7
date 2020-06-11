@@ -46,7 +46,7 @@ function get_csrf_token() {
 
 function find_id($element) {
   // Search up the dom for a data-id attribute. So you might do something like
-  // my_button.click(function() { var pk = find_id($(this)); });
+  // my_button.click(function() { var id = find_id($(this)); });
   if ($element.attr('data-id')) {
     return $element.attr('data-id');
   }
@@ -60,12 +60,12 @@ function find_model($element) {
   return $element.parents('[data-model]').attr('data-model');
 }
 
-function row_by_pk(pk) {
-  return $('tr[data-id=' + pk + ']');
+function row_by_pk(id) {
+  return $('tr[data-id=' + id + ']');
 }
 
-function remove_row(pk) {
-  row_by_pk(pk).remove();
+function remove_row(id) {
+  row_by_pk(id).remove();
 }
 
 function wire_up_ajax_button(
@@ -76,13 +76,15 @@ function wire_up_ajax_button(
    * selector_or_elt can be a string or a jQuery object. */
   $(selector_or_elt).click(function() {
     var button = $(this).prop('disabled', true);
+    window.delete_button = button; // DO NOT SUBMIT
+    var model = find_model(button);
     var buttons_cell = button.parents('td');
-    var pk = find_id(button);
-    var post_data = {'pk': pk};
+    var id = find_id(button);
+    var post_data = {id: id, type: model};
     if (!confirm_question || confirm(confirm_question)) {
       post(action_url, post_data, function(response) {
         if (!show_problem(response, buttons_cell)) {
-          success(pk);
+          success(id);
         }
         button.prop('disabled', false);
       }).fail(function(data) {
@@ -93,6 +95,11 @@ function wire_up_ajax_button(
       button.prop('disabled', false);
     }
   });
+}
+
+function wire_up_ajax_delete_button(selector_or_elt, confirm_question) {
+  wire_up_ajax_button(
+      selector_or_elt, '{{ ajax_delete_url }}', remove_row, confirm_question);
 }
 
 var all_elts = function(row) {
@@ -205,7 +212,7 @@ function wire_up_ajax_save_field(selector_or_elt, field_name) {
           }, 1000);
         };
 
-        post('{{ update_field_url }}', data, function(response) {
+        post('{{ ajax_update_url }}', data, function(response) {
           if (!show_problem(response, first_feedback)) {
             for (var i = 0; i < got_all_elts.length; i++) {
               var elt = $(got_all_elts[i]);

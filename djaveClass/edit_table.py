@@ -35,7 +35,9 @@ class EditTable(Table):
     self._saved = False
     self._deleted = False
 
-    super().__init__(js=WIRE_UP_CONFIRM_DELETE)
+    question = 'Delete this {}?'.format(model.__name__)
+    confirm_delete_js = WIRE_UP_CONFIRM_DELETE.replace('Delete?', question)
+    super().__init__(js=confirm_delete_js)
 
     self.add_rows()
     self.handle_clicks()
@@ -74,7 +76,10 @@ class EditTable(Table):
     return self.saved()
 
   def handle_delete_click(self):
-    self.instance.delete()
+    if hasattr(self.instance, 'mark_deleted'):
+      self.instance.mark_deleted()
+    else:
+      self.instance.delete()
     self._deleted = True
 
   def _get_model_field_key(self, field_key):

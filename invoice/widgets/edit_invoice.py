@@ -9,7 +9,7 @@ class EditInvoice(object):
     self.request = request
     self.invoice = invoice
     self.invoice_table = InvoiceTable(request.POST, invoice)
-    self.line_items_table = LineItemsTable(invoice)
+    self.line_items_table = LineItemsTable(request.POST, invoice)
 
   def deleted(self):
     return self.invoice_table.deleted()

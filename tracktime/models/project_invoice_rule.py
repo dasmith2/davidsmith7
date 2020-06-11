@@ -47,6 +47,11 @@ class ProjectInvoiceRule(models.Model):
   def allowed_by_user(cls, user):
     return cls.objects.filter(creator=user).select_related('project')
 
+  @classmethod
+  def allowed_by_user_live(cls, user):
+    # When you delete a ProjectInvoiceRule, you actually do delete it.
+    return cls.allowed_by_user(user)
+
   def create_invoice(self, nnow=None):
     nnow = nnow or now()
     descriptions = self._get_descriptions(nnow=nnow)
