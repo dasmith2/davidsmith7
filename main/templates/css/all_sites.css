@@ -20,11 +20,10 @@ td { font-weight: 300; }
 th { font-weight: 500; color: #555; }
 td, th { border-right: 1px solid #999;
   border-bottom: 1px solid #999; padding: 10px; }
-th, .row2, .row2 textarea { background-color: #eee; }
+th, .row2, .row2 textarea, .row2 input[type="text"] { background-color: #eee; }
 
 table textarea {
-  border-style: none; border-color: Transparent; overflow: auto; resize: none;
-  width: 300px; height: 45px;
+  overflow: auto; width: 300px; height: 45px;
 }
 
 pre {
@@ -36,7 +35,7 @@ input[type="number"] { width: 100px; }
 .problem { color: #f00; }
 .feedback { color: #f00; }
 .start-hidden { display: none; }
-.editing, .editing textarea { background-color: #ffb; }
+.editing, .editing textarea, .editing input[type="text"] { background-color: #ffb; }
 
 .margin-top { margin: 60px 0px 0px 0px; }
 .margin-top-half, form { margin: 20px 0px 0px 0px; }

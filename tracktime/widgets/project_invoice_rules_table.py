@@ -20,7 +20,7 @@ class ProjectInvoiceRulesTable(Table):
     return self._has_rules
 
   def add_rule_rows(self):
-    for rule in ProjectInvoiceRule.allowed_for_user_live(self.user):
+    for rule in ProjectInvoiceRule.allowed_by_user_live(self.user):
       self._has_rules = True
       href = reverse('project_invoice_rule', kwargs={'pk': rule.pk})
       create_new_invoice_button = Button(

@@ -7,6 +7,7 @@ from secrets import token_urlsafe
 from django.conf import settings
 from django.contrib.auth.hashers import check_password, make_password
 from django.db import models
+from djaveAPI.models.credentials import CredentialsInterface
 from djaveClass.models.base_knows_child import BaseKnowsChild
 from djaveForm.field import URLField
 
@@ -43,7 +44,7 @@ class APIKeyManager(models.Manager):
       return api_key
 
 
-class APIKey(BaseKnowsChild):
+class APIKey(BaseKnowsChild, CredentialsInterface):
   username = models.CharField(unique=True, max_length=100, help_text=(
       'Because passwords are encrypted in the database, we need a username '
       'to look up the key.'))
@@ -80,15 +81,12 @@ class APIKey(BaseKnowsChild):
           'passwords.')
     return self._plain_password
 
-  def user_allowed(self, user):
-    raise NotImplementedError('user_allowed')
-
   def explain_why_invalid(self):
     super_explain = super().explain_why_invalid()
     if super_explain:
       return super_explain
     url_field = URLField('webhook_url', required=False)
-    url_field.set_value(api_key.webhook_url)
+    url_field.set_value(self.webhook_url)
     return url_field.explain_why_not_valid()
 
   objects = APIKeyManager()

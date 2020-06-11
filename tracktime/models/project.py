@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models import Q
 from djaveAPI.models.user_api_key import UserAPIKey
 from djaveAPI.models.publishable import Publishable
 
@@ -18,24 +19,18 @@ class Project(Publishable):
     return 'Users track time against Projects.'
 
   @classmethod
-  def allowed(cls, api_key):
-    if isinstance(api_key, UserAPIKey):
-      return cls.all.filter(creator=api_key.user)
-    else:
-      raise Exception(
-          'I do not know how to handle {} api keys'.format(api_key.__class__))
+  def allowed_by_user(cls, user):
+    return cls.all.filter(creator=user)
 
   def allowed_api_keys(self, api_key_type):
     if api_key_type is UserAPIKey:
       return UserAPIKey.objects.filter(user=self.creator)
-    else:
-      raise Exception('I dont know which {} are allowed'.format(
-          api_key_type.__class__))
+    raise Exception('I dont know how to check which {} can see this Project')
 
   def explain_why_invalid(self):
     if Project.all.filter(
-        ~Q(pk=self.pk), creator=self.creator, name=name).exists():
-      raise Problem('You already have a project with this name')
+        ~Q(pk=self.pk), creator=self.creator, name=self.name).exists():
+      return 'You already have a project with this name'
 
   def __repr__(self):
     return '<Project {}: {}>'.format(self.pk, self.name)

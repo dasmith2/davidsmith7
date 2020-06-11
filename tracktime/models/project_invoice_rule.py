@@ -44,7 +44,7 @@ class ProjectInvoiceRule(models.Model):
       'How many days after the Invoice is sent is it due?'))
 
   @classmethod
-  def allowed_for_user_live(cls, user):
+  def allowed_by_user(cls, user):
     return cls.objects.filter(created_by=user).select_related('project')
 
   def create_invoice(self, nnow=None):

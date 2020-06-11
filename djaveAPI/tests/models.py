@@ -28,10 +28,8 @@ class MyFakeModel(Publishable):
   user = models.ForeignKey(User, on_delete=models.CASCADE)
 
   @classmethod
-  def allowed(cls, api_key):
-    if isinstance(api_key, UserAPIKey):
-      return cls.all.filter(user=api_key.user)
-    raise Exception(api_key.__class__)
+  def allowed_by_user(cls, user):
+    return cls.all.filter(user=user)
 
   @classmethod
   def new_instance(cls):
@@ -65,7 +63,7 @@ class ComplexFakeModel(Publishable):
       return 'small_int should be less than large_int'
 
   @classmethod
-  def allowed(cls, api_key):
+  def allowed_by_user(cls, user):
     return cls.objects.all()
 
   def allowed_api_keys(self, api_key_type):

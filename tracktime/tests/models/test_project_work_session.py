@@ -1,6 +1,6 @@
+from djaveAPI.models.credentials import UserCredentials
 from djaveAPI.tests.test_user_api_key import get_test_user_api_key
 from djaveTest.unit_test import TestCase, get_test_user
-
 
 from tracktime.models.project_work_session import ProjectWorkSession
 from tracktime.tests.models.test_project import get_test_project
@@ -22,4 +22,12 @@ class AllowedTests(TestCase):
     work_session = get_test_project_work_session(user=user, hours=1)
     get_test_project_work_session(hours=1)  # Different user
     api_key = get_test_user_api_key(user=user)
-    self.assertEqual([work_session], list(ProjectWorkSession.allowed(api_key)))
+    self.assertEqual(
+        [work_session], list(api_key.allowed_list(ProjectWorkSession)))
+    self.assertEqual(
+        [work_session], list(ProjectWorkSession.allowed_by_key(api_key)))
+    self.assertEqual(
+        [work_session], list(ProjectWorkSession.allowed_by_user(user)))
+    self.assertEqual(
+        [work_session],
+        list(UserCredentials(user).allowed_list(ProjectWorkSession)))

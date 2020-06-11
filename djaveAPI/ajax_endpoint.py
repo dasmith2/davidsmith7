@@ -8,7 +8,8 @@ class ajax_endpoint(object):
   JsonResponse({'problem': 'Things bad!'}) when the view
   raises Problem('Things bad!') If the view returns data, return
   JsonResponse(data). If the view returns a JsonResponse, simply return the
-  JsonResponse. """
+  JsonResponse. If the view returns nothing, return, like,
+  JsonResponse({'OK': True}, status_code=200) """
   def __init__(self, view_function):
     self.view_function = view_function
 

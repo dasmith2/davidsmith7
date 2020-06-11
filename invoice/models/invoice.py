@@ -75,15 +75,8 @@ class Invoice(Publishable, BaseKnowsChildTransition):
     super().save(*args, **kwargs)
 
   @classmethod
-  def allowed(cls, api_key):
-    if isinstance(api_key, UserAPIKey):
-      return cls.all.filter(created_by=api_key.user)
-    raise Exception('I dont know which Invoices a {} is allowed to see'.format(
-        api_key.__class__))
-
-  @classmethod
-  def allowed_for_user_live(cls, user):
-    return cls.live.filter(created_by=user)
+  def allowed_by_user(cls, user):
+    return cls.all.filter(created_by=user)
 
   def allowed_api_keys(self, api_key_type):
     if api_key_type is UserAPIKey:

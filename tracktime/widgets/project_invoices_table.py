@@ -19,7 +19,7 @@ class ProjectInvoicesTable(Table):
     return self._has_invoices
 
   def add_invoice_rows(self):
-    for invoice in ProjectInvoice.allowed_for_user_live(self.user):
+    for invoice in ProjectInvoice.allowed_by_user_live(self.user):
       self._has_invoices = True
       url = reverse('project_invoice', kwargs={'pk': invoice.pk})
       invoice_id = InHref(invoice.invoice_id, url)

@@ -17,14 +17,8 @@ class InvoiceLineItem(Publishable, BaseKnowsChild):
       'Describe the exact forumula used to arrive at the amount'))
 
   @classmethod
-  def allowed(cls, api_key):
-    if isinstance(api_key, UserAPIKey):
-      return cls.all.filter(invoice__created_by=api_key.user)
-    raise Exception('I dont know which Invoices a {} is allowed to see'.format(
-        api_key.__class__))
-
-  def user_allowed(self, user):
-    return self.invoice.created_by == user
+  def allowed_by_user(cls, user):
+    return cls.all.filter(invoice__created_by=user)
 
   def allowed_api_keys(self, api_key_type):
     if api_key_type is UserAPIKey:

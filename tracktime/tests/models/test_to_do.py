@@ -37,7 +37,10 @@ class AllowedTests(TestCase):
     to_do_2 = get_test_to_do(done_by=user, done='2020-01-15')
     get_test_to_do()  # Other user
     api_key = get_test_user_api_key(user=user)
-    self.assertEqual(set([to_do_1, to_do_2]), set(ToDo.allowed(api_key)))
+    expected = set([to_do_1, to_do_2])
+    self.assertEqual(expected, set(ToDo.allowed_by_user(user)))
+    self.assertEqual(expected, set(ToDo.allowed_by_key(api_key)))
+    self.assertEqual(expected, set(api_key.allowed_list(ToDo)))
 
 
 class DoneByUserInDateRangeTests(TestCase):

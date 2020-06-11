@@ -121,12 +121,8 @@ class WorkSession(Publishable):
           'stop time')
 
   @classmethod
-  def allowed(cls, api_key):
-    if isinstance(api_key, UserAPIKey):
-      return cls.all.filter(user=api_key.user)
-    else:
-      raise Exception(
-          'I do not know how to handle {} api keys'.format(api_key.__class__))
+  def allowed_by_user(cls, user):
+    return cls.all.filter(user=user)
 
   def allowed_api_keys(self, api_key_type):
     if api_key_type is UserAPIKey:

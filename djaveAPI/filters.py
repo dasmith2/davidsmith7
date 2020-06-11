@@ -10,7 +10,7 @@ from djaveDT import to_tz_dt
 
 
 def filter_model(model, api_key, request_GET):
-  queryset = model.allowed(api_key)
+  queryset = api_key.allowed_list(model)
   for _filter in get_filters(model, request_GET):
     field = _filter.filter_field
     if field.foreign_key_to:

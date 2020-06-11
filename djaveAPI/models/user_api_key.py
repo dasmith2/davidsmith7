@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 from djaveAPI.models.api_key import APIKey, APIKeyManager
+from djaveAPI.models.credentials import HasUserCredentialsInterface
 
 
 class UserAPIKeyManager(APIKeyManager):
@@ -15,13 +16,14 @@ class UserAPIKeyManager(APIKeyManager):
     return super().create_key(username, user=user)
 
 
-class UserAPIKey(APIKey):
+class UserAPIKey(APIKey, HasUserCredentialsInterface):
   user = models.ForeignKey(User, on_delete=models.CASCADE)
 
   objects = UserAPIKeyManager()
 
-  def user_allowed(self, user):
-    return self.user == user
+  @classmethod
+  def allowed_by_user(cls, user):
+    return UserAPIKey.objects.filter(user=user)
 
   def explain_why_can_not_create(self, of_model):
     if isinstance(of_model.new_instance(), User):

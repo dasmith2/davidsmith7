@@ -30,7 +30,7 @@ def project_invoice(request, pk=None):
   invoice = None
   if pk:
     invoice = get_object_or_404(
-        Invoice.allowed_for_user_live(request.user), pk=pk)
+        Invoice.allowed_by_user_live(request.user), pk=pk)
 
   the_one_thing_on_the_page = None
   if not invoice.paid:
@@ -50,7 +50,7 @@ def project_invoice_rule(request, pk=None):
   invoice_rule = None
   if pk:
     invoice_rule = get_object_or_404(
-        ProjectInvoiceRule.allowed_for_user_live(request.user), pk=pk)
+        ProjectInvoiceRule.allowed_by_user_live(request.user), pk=pk)
 
   table = ProjectInvoiceRuleTable(request.user, request.POST, invoice_rule)
   if table.saved() or table.deleted():

@@ -195,6 +195,7 @@ function wire_up_ajax_save_field(selector_or_elt, model_name, field_name) {
       });
 
       cancel_save_button.click(function() {
+        row.find('.feedback').hide();
         var got_all_elts = all_elts(row);
         for (var i = 0; i < got_all_elts.length; i++) {
           var elt = $(got_all_elts[i]);

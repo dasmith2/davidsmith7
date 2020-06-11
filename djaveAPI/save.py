@@ -1,10 +1,8 @@
 from datetime import date
 
-from django.contrib.auth.models import User
 from django.utils.dateparse import parse_datetime, parse_date
 from djaveAPI.currency_field import corresponding_currency_value
 from djaveAPI.find_models import use_publishable
-from djaveAPI.models.user_api_key import UserAPIKey
 from djaveAPI.problem import Problem
 from djaveClass.model_fields import (
     model_fields, DATE_TIME, DATE, FLOAT, INTEGER, TEXT, CHAR, BOOLEAN)
@@ -12,17 +10,17 @@ from djaveDT import now
 from djmoney.money import Money
 
 
-def update(instance, request_POST, api_key, publishable_class=None):
+def update(instance, request_data, credentials, publishable_class=None):
   return _set_fields(
-      instance, request_POST, api_key, publishable_class=publishable_class)
+      instance, request_data, credentials, publishable_class=publishable_class)
 
 
-def save_new(model, request_POST, api_key, publishable_class=None):
-  explain_why_not = api_key.explain_why_can_not_create(model)
+def save_new(model, request_data, credentials, publishable_class=None):
+  explain_why_not = credentials.explain_why_can_not_create(model)
   if explain_why_not:
     raise Problem(explain_why_not)
   return _set_fields(
-      model(), request_POST, api_key, publishable_class=publishable_class)
+      model(), request_data, credentials, publishable_class=publishable_class)
 
 
 def delete(instance, publishable_class=None):
@@ -31,7 +29,7 @@ def delete(instance, publishable_class=None):
   instance.mark_deleted()
 
 
-def _set_fields(instance, request_POST, api_key, publishable_class=None):
+def _set_fields(instance, request_data, credentials, publishable_class=None):
   model, instance = use_publishable(
       instance, publishable_class=publishable_class)
 
@@ -39,11 +37,11 @@ def _set_fields(instance, request_POST, api_key, publishable_class=None):
     if not field.editable:
       continue
     value = None
-    if field.name in request_POST:
-      raw_value = request_POST[field.name]
+    if field.name in request_data:
+      raw_value = request_data[field.name]
       if field.foreign_key_to:
         if raw_value:
-          value = allowed(field.foreign_key_to, api_key).filter(
+          value = credentials.allowed_list(field.foreign_key_to).filter(
               pk=raw_value).first()
           if value is None:
             raise Problem((
@@ -51,15 +49,13 @@ def _set_fields(instance, request_POST, api_key, publishable_class=None):
                 'access to it').format(
                     field.foreign_key_to.__name__, raw_value))
           if not isinstance(value, field.foreign_key_to):
-            raise Exception(
-                '{} allowed function should return {}, not {}'.format(
-                    field.foreign_key_to, field.foreign_key_to,
-                    value.__class__))
+            raise Exception('value should be a {}, not {}'.format(
+                field.foreign_key_to, value.__class__))
       elif field.type in [DATE, DATE_TIME]:
         value = _date_or_date_time(field, raw_value)
       elif field.type in [FLOAT, INTEGER]:
         value = _float_or_integer(field, raw_value)
-        currency = corresponding_currency_value(field, request_POST)
+        currency = corresponding_currency_value(field, request_data)
         if currency:
           value = Money(value, currency)
       elif field.type in [TEXT, CHAR]:
@@ -83,16 +79,6 @@ def _set_fields(instance, request_POST, api_key, publishable_class=None):
   instance.save()
 
   return instance
-
-
-def allowed(model, api_key):
-  if hasattr(model, 'allowed'):
-    return model.allowed(api_key)
-  if isinstance(api_key, UserAPIKey) and model is User:
-    return User.objects.filter(pk=api_key.user.pk)
-  raise Exception(
-      'I dont know how to pull back a list of allowed {} by {}'.format(
-          model.__name__, api_key.__class__.__name__))
 
 
 def _date_or_date_time(field, raw_value):

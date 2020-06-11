@@ -1,4 +1,5 @@
 from django.http import HttpRequest
+from djaveAPI.models.credentials import UserCredentials
 from djaveAPI.problem import Problem
 
 
@@ -13,10 +14,9 @@ def get_obj_from_request_pk(request, model):
     raise Problem('{} {} does not exist'.format(model.__name__, pk))
   if hasattr(instance, 'as_child_class'):
     instance = instance.as_child_class()
-  if hasattr(instance, 'user_allowed'):
-    if not instance.user_allowed(request.user):
-      raise Problem('You do not have permission to manage this {}'.format(
-          model.__name__))
+  if not UserCredentials(request.user).allowed_instance(instance):
+    raise Problem('You do not have permission to manage this {}'.format(
+        model.__name__))
   return instance
 
 

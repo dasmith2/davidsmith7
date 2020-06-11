@@ -1,9 +1,6 @@
-from django.db.models import Q
 from django.shortcuts import reverse, render
 from djaveAPI.ajax_endpoint import ajax_endpoint_login_required
-from djaveAPI.problem import Problem
-from djaveAPI.get_request_variable import (
-    get_request_variable, get_obj_from_request_pk)
+from djaveAPI.get_request_variable import get_obj_from_request_pk
 from djaveLogin.login_required import login_required
 
 from tracktime.models.project import Project

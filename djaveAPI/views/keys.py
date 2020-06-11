@@ -2,7 +2,6 @@ from django.shortcuts import render
 from djaveAPI.ajax_endpoint import ajax_endpoint_login_required
 from djaveAPI.get_request_variable import get_obj_from_request_pk
 from djaveAPI.models.api_key import APIKey
-from djaveAPI.problem import Problem
 from djaveAPI.widgets.api_keys_widget import APIKeysWidget
 from djaveAPI.widgets.user_api_keys_table import UserAPIKeysTable
 
