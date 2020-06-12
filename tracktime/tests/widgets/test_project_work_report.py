@@ -1,6 +1,10 @@
 from datetime import date
 
-from tracktime.widgets.project_work_report import ProjectWorkReportContent
+from django.shortcuts import reverse
+from djaveURL import full_path_as_url_and_query_dict
+
+from tracktime.widgets.project_work_report import (
+    ProjectWorkReportContent, project_work_report_url)
 from tracktime.models.work_session_description import WorkSessionDescription
 from tracktime.tests.test_case_with_data import TestCaseWithData
 
@@ -37,9 +41,13 @@ class ProjectWorkReportUrlTests(TestCaseWithData):
     expected_url = reverse('project_work_report') + '?project=' + str(
         self.project_1.pk)
     got_url = project_work_report_url(self.project_1)
-    self.assertEqual(expected_url, got_url)
+    self.assertEqual(
+        full_path_as_url_and_query_dict(expected_url),
+        full_path_as_url_and_query_dict(got_url))
 
     expected_url += '&from_date=2020-01-15'
     got_url = project_work_report_url(
         self.project_1, from_date=date(2020, 1, 15))
-    self.assertEqual(expected_url, got_url)
+    self.assertEqual(
+        full_path_as_url_and_query_dict(expected_url),
+        full_path_as_url_and_query_dict(got_url))

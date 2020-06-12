@@ -3,8 +3,8 @@ from djaveAPI.signals import publishable_post_save
 
 
 class PretendPublishable(PublishableInterface):
-  def __init__(self, instance=None):
-    self.instance = instance or self.__class__.new_instance()
+  def __init__(self, instance):
+    self.instance = instance
 
   def __setattr__(self, name, value):
     if name in self.field_names():
@@ -26,3 +26,12 @@ class PretendPublishable(PublishableInterface):
 
   def published_object(self):
     return self.instance
+
+  @classmethod
+  def get_model_fields(cls):
+    raise NotImplementedError('get_model_fields {}'.format(cls))
+
+  @classmethod
+  def actually_publishing(cls):
+    """ What actual model does this pretend class put in the API? """
+    raise NotImplementedError('actually_publishing {}'.format(cls))

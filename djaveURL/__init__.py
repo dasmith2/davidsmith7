@@ -1,3 +1,4 @@
+from collections import namedtuple
 from datetime import datetime, date
 from urllib.parse import urlparse, parse_qsl, urlencode
 
@@ -62,14 +63,20 @@ def date_from_url(request_get_full_path):
   return url_str_to_date(date_str)
 
 
-def query_as_dict(request_get_full_path):
-  # request_get_full_path can be a request object or a string.
+URLAndQueryDict = namedtuple('URLAndQuery', 'url query_dict')
+
+
+def full_path_as_url_and_query_dict(request_get_full_path):
   path = get_full_path_from_request(request_get_full_path)
   url = urlparse(path)
   path = url.path  # /dashboard/
   query_str = url.query  # date=2018-02-15&building_id=1
-  # {'day': '2018-02-15', 'building_id': '1'}
-  return dict(parse_qsl(query_str))
+  return URLAndQueryDict(path, dict(parse_qsl(query_str)))
+
+
+def query_as_dict(request_get_full_path):
+  # request_get_full_path can be a request object or a string.
+  return full_path_as_url_and_query_dict(request_get_full_path).query_dict
 
 
 def dict_as_query(query_dict):

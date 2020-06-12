@@ -21,9 +21,12 @@ class EditListTable(Table):
           "wire_up_ajax_save_field('.{}', '{}');".format(column, column))
     self._append_js('\n'.join(entries))
 
-  def wire_up_delete_ajax(self, selector, confirm_question):
-    confirm_question = confirm_question.replace(
-        "'", r"\'").replace('\n', r'\n')
+  def wire_up_delete_ajax(self, selector, confirm_question=None):
+    if not confirm_question:
+      confirm_question = 'Delete {}?'.format(self.model.__name__)
+    else:
+      confirm_question = confirm_question.replace(
+          "'", r"\'").replace('\n', r'\n')
     new_js = "wire_up_ajax_delete_button('{}', '{}');".format(
         selector, confirm_question)
     self._append_js(new_js)

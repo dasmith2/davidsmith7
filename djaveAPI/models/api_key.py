@@ -7,7 +7,7 @@ from secrets import token_urlsafe
 from django.conf import settings
 from django.contrib.auth.hashers import check_password, make_password
 from django.db import models
-from djaveAPI.models.credentials import CredentialsInterface
+from djaveAllowed.credentials import CredentialsInterface
 from djaveClass.models.base_knows_child import BaseKnowsChild
 from djaveForm.field import URLField
 

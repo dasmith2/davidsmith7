@@ -22,13 +22,14 @@ class TestUserAPIKeysTable(TestCase):
     expected_row = Row([
         SlugField('username', required=True),
         '',
-        URLField('webhook_url', required=False),
+        URLField('new_webhook_url', required=False),
         Button('Create', button_type='submit')])
     table.rows[0].assertEqual(expected_row)
 
   def save_new(self):
     request_POST = {
-        'username': 'asdf', 'webhook_url': 'https://whatever', 'save': 'yep'}
+        'username': 'asdf', 'new_webhook_url': 'https://whatever',
+        'save': 'yep'}
     return UserAPIKeysTable(self.user, request_POST)
 
   def test_save_new(self):
@@ -45,7 +46,7 @@ class TestUserAPIKeysTable(TestCase):
         r"again:<br><br><b>[\w-]{10}")
     self.assertTrue(description_tester.findall(row.cells[1]))
     webhook_field = URLField(
-        'update_webhook_url', required=False, default='https://whatever')
+        'webhook_url', required=False, default='https://whatever')
     self.assertEqual(webhook_field, row.cells[2])
     self.assertEqual(Button('Delete'), row.cells[3])
     self.assertEqual(api_key.pk, row.pk)

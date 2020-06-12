@@ -10,8 +10,9 @@ function show_problem(response, feedback_or_append_to) {
   } else {
     feedback = get_feedback_elt_append(feedback_or_append_to);
   }
-  if (response['problem']) {
-    feedback.text(response['problem']).show();
+  var problem = problem_in_response(response);
+  if (problem) {
+    feedback.text(problem).show();
     return true;
   } else {
     feedback.hide();
@@ -19,9 +20,17 @@ function show_problem(response, feedback_or_append_to) {
   }
 }
 
+function problem_in_response(response) {
+  if (response.responseJSON) {
+    // You need this for .fail(function(response) { ...
+    response = response.responseJSON;
+  }
+  return response['problem'];
+}
+
 function post(url, data, success) {
-  return $.post(url, add_csrf_token(data), success).fail(function() {
-    alert('Server error :(');
+  return $.post(url, add_csrf_token(data), success).fail(function(response) {
+    console.log(problem_in_response(response));
   });
 }
 
@@ -88,7 +97,6 @@ function wire_up_ajax_button(
         }
         button.prop('disabled', false);
       }).fail(function(data) {
-        alert('Server error :(');
         button.prop('disabled', false);
       });
     } else {
@@ -225,8 +233,11 @@ function wire_up_ajax_save_field(selector_or_elt, field_name) {
             last_edited_elt.focus();
           }
           calc_edit_mode(row);
-        }).fail(function() {
-          first_feedback.show().text('Server error :(');
+        }).fail(function(response) {
+          window.response = response; // DO NOT SUBMIT
+          if (!show_problem(response, first_feedback)) {
+            first_feedback.show().text('Server error :(');
+          }
         });
       });
 

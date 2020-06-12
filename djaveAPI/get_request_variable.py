@@ -1,5 +1,5 @@
 from django.http import HttpRequest
-from djaveAPI.models.credentials import UserCredentials
+from djaveAllowed.credentials import UserCredentials
 from djaveAPI.problem import Problem
 
 

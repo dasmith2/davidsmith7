@@ -31,10 +31,6 @@ class MyFakeModel(Publishable):
   def allowed_by_user(cls, user):
     return cls.all.filter(user=user)
 
-  @classmethod
-  def new_instance(cls):
-    return cls()
-
   def allowed_api_keys(self, api_key_type):
     if api_key_type is UserAPIKey:
       return api_key_type.objects.filter(user=self.user)

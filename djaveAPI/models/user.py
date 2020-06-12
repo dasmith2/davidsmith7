@@ -15,10 +15,6 @@ from djaveAPI.signals import publishable_post_save
 
 
 class User(PretendPublishable):
-  @classmethod
-  def new_instance(cls):
-    return DjangoUser()
-
   """ Since I don't have control over Django's User class, I can't make it
   inherit from publishable. """
   def mark_deleted(self, nnow=None):
@@ -38,6 +34,10 @@ class User(PretendPublishable):
       if model_field.name in ['id', 'email', 'is_active']:
         model_fields.append(model_field)
     return model_fields
+
+  @classmethod
+  def actually_publishing(cls):
+    return DjangoUser
 
   @classmethod
   def allowed_by_user(cls, user):

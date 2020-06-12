@@ -39,7 +39,7 @@ class AllowedTests(TestCase):
     api_key = get_test_user_api_key(user=user)
     expected = set([to_do_1, to_do_2])
     self.assertEqual(expected, set(ToDo.allowed_by_user(user)))
-    self.assertEqual(expected, set(ToDo.allowed_by_key(api_key)))
+    self.assertEqual(expected, set(ToDo.allowed_by_credentials(api_key)))
     self.assertEqual(expected, set(api_key.allowed_list(ToDo)))
 
 

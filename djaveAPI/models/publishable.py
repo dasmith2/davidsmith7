@@ -40,14 +40,6 @@ class Publishable(models.Model, PublishableInterface):
     return self
 
   @classmethod
-  def new_instance(cls):
-    return cls()
-
-  @classmethod
-  def get_model_fields(cls):
-    return cls._meta.get_fields()
-
-  @classmethod
   def allowed_by_user_live(cls, user):
     return cls.allowed_by_user(user).filter(deleted__isnull=True)
 

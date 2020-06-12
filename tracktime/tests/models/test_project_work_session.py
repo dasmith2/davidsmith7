@@ -1,4 +1,4 @@
-from djaveAPI.models.credentials import UserCredentials
+from djaveAllowed.credentials import UserCredentials
 from djaveAPI.tests.test_user_api_key import get_test_user_api_key
 from djaveTest.unit_test import TestCase, get_test_user
 
@@ -25,7 +25,8 @@ class AllowedTests(TestCase):
     self.assertEqual(
         [work_session], list(api_key.allowed_list(ProjectWorkSession)))
     self.assertEqual(
-        [work_session], list(ProjectWorkSession.allowed_by_key(api_key)))
+        [work_session],
+        list(ProjectWorkSession.allowed_by_credentials(api_key)))
     self.assertEqual(
         [work_session], list(ProjectWorkSession.allowed_by_user(user)))
     self.assertEqual(

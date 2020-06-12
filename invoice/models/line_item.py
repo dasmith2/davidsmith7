@@ -15,7 +15,6 @@ def save_profile(sender, instance, **kwargs):
     instance.invoice.calculate_total()
 
 
-
 class LineItem(Publishable, BaseKnowsChild):
   invoice = models.ForeignKey(Invoice, on_delete=models.PROTECT)
   describe_service = models.TextField(help_text=(

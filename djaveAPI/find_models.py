@@ -7,22 +7,15 @@ from djaveAPI.models.pretend_publishable import PretendPublishable
 from djaveClass.find_models import models_in_app
 
 
-def use_publishable(instance, publishable_class=None):
+def use_model_instance_for_api(instance, publishable_class=None):
   """ Returns a (model, instance) tuple. The entire point of this is wiring
   Django's user model into the API. """
-  model = None
+  model = instance.__class__
   if publishable_class:
     model = publishable_class
     if issubclass(model, PretendPublishable) and not isinstance(
         instance, PretendPublishable):
       instance = model(instance)
-  elif isinstance(instance, (Publishable, PretendPublishable)):
-    model = instance.__class__
-  else:
-    raise Exception(
-        '{} is not a Publishable class, so I need you to tell me what '
-        'PretendPublishable class I should use.'.format(
-            instance.__class__.__name__))
   return model, instance
 
 

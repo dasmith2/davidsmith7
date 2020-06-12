@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User as DjangoUser
 from djaveAPI.models.user import User as DjaveAPIUser
 from djaveAPI.models.user_api_key import UserAPIKey
 from djaveAPI.tests.models import MyFakeModel
@@ -22,5 +23,6 @@ class UserAPIKeyTests(TestCase):
 
   def test_explain_why_can_not_create(self):
     key = get_test_user_api_key()
+    self.assertTrue(bool(key.explain_why_can_not_create(DjangoUser)))
     self.assertTrue(bool(key.explain_why_can_not_create(DjaveAPIUser)))
     self.assertFalse(bool(key.explain_why_can_not_create(MyFakeModel)))

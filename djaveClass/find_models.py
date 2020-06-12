@@ -14,6 +14,8 @@ def model_from_name(model_name, subclass_of=None):
   for model in all_models(subclass_of=subclass_of):
     if model.__name__ == model_name:
       return model
+  raise Exception('I was unable to find the {} model, subclass_of {}'.format(
+      model_name, subclass_of))
 
 
 def all_models(subclass_of=None):

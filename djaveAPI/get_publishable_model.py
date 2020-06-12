@@ -2,7 +2,7 @@ from djaveAPI.find_models import publishable_model_from_name
 from djaveAPI.problem import Problem
 
 
-def get_model(model_name):
+def get_publishable_model(model_name):
   model = publishable_model_from_name(model_name)
   if not model:
     raise Problem(

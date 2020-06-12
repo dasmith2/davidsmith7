@@ -2,7 +2,6 @@ from datetime import date
 
 from django.utils.dateparse import parse_datetime, parse_date
 from djaveAPI.currency_field import corresponding_currency_value
-from djaveAPI.find_models import use_publishable
 from djaveAPI.problem import Problem
 from djaveClass.model_fields import (
     model_fields, DATE_TIME, DATE, FLOAT, INTEGER, TEXT, CHAR, BOOLEAN)
@@ -10,30 +9,19 @@ from djaveDT import now
 from djmoney.money import Money
 
 
-def update(instance, request_data, credentials, publishable_class=None):
-  return _set_fields(
-      instance, request_data, credentials, publishable_class=publishable_class)
+def update(instance, request_data, credentials):
+  return _set_fields(instance, request_data, credentials)
 
 
-def save_new(model, request_data, credentials, publishable_class=None):
+def save_new(model, request_data, credentials):
   explain_why_not = credentials.explain_why_can_not_create(model)
   if explain_why_not:
     raise Problem(explain_why_not)
-  return _set_fields(
-      model(), request_data, credentials, publishable_class=publishable_class)
+  return _set_fields(model(), request_data, credentials)
 
 
-def delete(instance, publishable_class=None):
-  model, instance = use_publishable(
-      instance, publishable_class=publishable_class)
-  instance.mark_deleted()
-
-
-def _set_fields(instance, request_data, credentials, publishable_class=None):
-  model, instance = use_publishable(
-      instance, publishable_class=publishable_class)
-
-  for field in model_fields(model):
+def _set_fields(instance, request_data, credentials):
+  for field in model_fields(instance.__class__):
     if not field.editable:
       continue
     specified = field.name in request_data

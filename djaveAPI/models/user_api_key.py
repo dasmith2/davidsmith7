@@ -1,7 +1,8 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User as DjangoUser
 from django.db import models
 from djaveAPI.models.api_key import APIKey, APIKeyManager
-from djaveAPI.models.credentials import HasUserCredentialsInterface
+from djaveAllowed.allowed_model import AllowedModel
+from djaveAllowed.credentials import HasUserCredentialsInterface
 
 
 class UserAPIKeyManager(APIKeyManager):
@@ -16,8 +17,8 @@ class UserAPIKeyManager(APIKeyManager):
     return super().create_key(username, user=user)
 
 
-class UserAPIKey(APIKey, HasUserCredentialsInterface):
-  user = models.ForeignKey(User, on_delete=models.CASCADE)
+class UserAPIKey(APIKey, HasUserCredentialsInterface, AllowedModel):
+  user = models.ForeignKey(DjangoUser, on_delete=models.CASCADE)
 
   objects = UserAPIKeyManager()
 
@@ -26,7 +27,8 @@ class UserAPIKey(APIKey, HasUserCredentialsInterface):
     return UserAPIKey.objects.filter(user=user)
 
   def explain_why_can_not_create(self, of_model):
-    if isinstance(of_model.new_instance(), User):
+    from djaveAPI.models.user import User as DjaveAPIUser
+    if issubclass(of_model, (DjangoUser, DjaveAPIUser)):
       return (
           'User level API keys only have access to a single user. They are '
           'not powerful enough to create new users.')
