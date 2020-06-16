@@ -5,7 +5,7 @@ from django.db import models
 from django.db.models import Q
 from djaveAPI.models.publishable import Publishable, LivePublishableManager
 from djaveAPI.models.user_api_key import UserAPIKey
-from djaveClass.models.base_knows_child import BaseKnowsChildTransition
+from djaveClass.models.base_knows_child import BaseKnowsChild
 from djaveDT import now, dt_to_d_str, d_to_str
 from djmoney.models.fields import MoneyField
 from djmoney.money import Money
@@ -33,7 +33,7 @@ class LiveInvoiceManager(LivePublishableManager):
         Q(paid__isnull=True) | Q(paid__gte=paid_cutoff)).order_by('-pk')
 
 
-class Invoice(Publishable, BaseKnowsChildTransition):
+class Invoice(Publishable, BaseKnowsChild):
   invoice_id = models.CharField(max_length=100, unique=True, help_text=(
       'A unique string that identifies an Invoice. I know that Invoices '
       'already have an id, but that id doesn\'t include a prefix string '
