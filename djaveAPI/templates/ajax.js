@@ -85,7 +85,6 @@ function wire_up_ajax_button(
    * selector_or_elt can be a string or a jQuery object. */
   $(selector_or_elt).click(function() {
     var button = $(this).prop('disabled', true);
-    window.delete_button = button; // DO NOT SUBMIT
     var model = find_model(button);
     var buttons_cell = button.parents('td');
     var pk = find_pk(button);
@@ -234,7 +233,6 @@ function wire_up_ajax_save_field(selector_or_elt, field_name) {
           }
           calc_edit_mode(row);
         }).fail(function(response) {
-          window.response = response; // DO NOT SUBMIT
           if (!show_problem(response, first_feedback)) {
             first_feedback.show().text('Server error :(');
           }
