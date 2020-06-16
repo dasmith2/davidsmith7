@@ -1,4 +1,5 @@
 from django.db import models
+from djaveAllowed.models import Allowed
 from djaveAPI.models.publishable_interface import PublishableInterface
 from djaveAPI.signals import publishable_post_save
 from djaveDT import now
@@ -12,7 +13,7 @@ class LivePublishableManager(models.Manager):
     return self.model.filter_allowed_by_user(user, self.get_queryset())
 
 
-class Publishable(models.Model, PublishableInterface):
+class Publishable(Allowed, PublishableInterface):
   """ Have your models inherit from this class if you want your models to be
   published online as part of a REST-ish API. """
 

@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User as DjangoUser
 from django.db import models
 from djaveAPI.models.api_key import APIKey, APIKeyManager
-from djaveAllowed.allowed_model import AllowedModel
+from djaveAllowed.models import Allowed
 from djaveAllowed.credentials import HasUserCredentialsInterface
 
 
@@ -17,7 +17,7 @@ class UserAPIKeyManager(APIKeyManager):
     return super().create_key(username, user=user)
 
 
-class UserAPIKey(APIKey, HasUserCredentialsInterface, AllowedModel):
+class UserAPIKey(APIKey, HasUserCredentialsInterface, Allowed):
   user = models.ForeignKey(DjangoUser, on_delete=models.CASCADE)
 
   objects = UserAPIKeyManager()

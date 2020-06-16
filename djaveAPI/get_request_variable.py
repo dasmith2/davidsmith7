@@ -1,5 +1,5 @@
 from django.http import HttpRequest
-from djaveAllowed.allowed_model import AllowedModel
+from djaveAllowed.models import Allowed
 from djaveAllowed.credentials import UserCredentials
 from djaveAPI.get_instance import get_instance
 from djaveAPI.problem import Problem
@@ -18,7 +18,7 @@ def get_request_ajax_obj(request, model=None, pk=None):
     # this is AJAX and you can do AJAX calls on objects that aren't necessarily
     # in the API. The only thing you actually need here is a model I can check
     # permission on.
-    model = model_from_name(model_name, AllowedModel)
+    model = model_from_name(model_name, Allowed)
   credentials = UserCredentials(request.user)
 
   # model.live is really handy for pulling back a list of active objects. This

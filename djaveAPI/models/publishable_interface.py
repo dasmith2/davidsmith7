@@ -1,7 +1,4 @@
-from djaveAllowed.allowed_model import AllowedModel
-
-
-class PublishableInterface(AllowedModel):
+class PublishableInterface(object):
   """ By Publishable I mean, it's possible to put this type in the API.
   PretendPublishable and Publishable need to be different base classes. """
 
@@ -22,6 +19,3 @@ class PublishableInterface(AllowedModel):
     instance is really refering too? In the case of Publishable, it's just
     itself. It's only more complicated with PretendPublishable. """
     raise NotImplementedError('published_object')
-
-  class Meta:
-    abstract = True

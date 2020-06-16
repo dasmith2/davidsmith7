@@ -1,8 +1,9 @@
+from djaveAllowed.models import AllowedInterface
 from djaveAPI.models.publishable_interface import PublishableInterface
 from djaveAPI.signals import publishable_post_save
 
 
-class PretendPublishable(PublishableInterface):
+class PretendPublishable(AllowedInterface, PublishableInterface):
   def __init__(self, instance):
     self.instance = instance
 

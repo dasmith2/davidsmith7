@@ -3,7 +3,7 @@ from datetime import date
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
-from djaveAllowed.allowed_model import AllowedModel
+from djaveAllowed.models import Allowed
 from djaveDT import now
 from djmoney.models.fields import MoneyField
 
@@ -15,7 +15,7 @@ from tracktime.models.project_work_session_description import (
     ProjectWorkSessionDescriptions)
 
 
-class ProjectInvoiceRule(models.Model, AllowedModel):
+class ProjectInvoiceRule(Allowed):
   project = models.ForeignKey(Project, on_delete=models.CASCADE, help_text=(
       'When you run this rule, it will create an Invoice for the work you '
       'did on this project.'))
