@@ -31,6 +31,10 @@ def dt_to_str(tz_dt):
   return ''.join([dt_to_date_str(tz_dt), ', ', dt_to_time_str(tz_dt)])
 
 
+def dt_to_d_str(tz_dt, tz_str=None):
+  return d_to_str(tz_dt_to_tz_dt(tz_dt, tz_str=tz_str))
+
+
 def dt_to_date_str(tz_dt):
   return d_to_str(tz_dt.date())
 

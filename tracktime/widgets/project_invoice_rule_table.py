@@ -18,7 +18,6 @@ class ProjectInvoiceRuleTable(EditTable):
         'first_billable_day',
         'invoice_id_prefix',
         'make_payment_to',
-        'email_to',
         'default_line_item_description',
         'net_days')
     self.add_final_row()

@@ -1,0 +1,46 @@
+{% comment %}I anticipate this HTML being dropped into the body of emails,
+hence all the inlined css {% endcomment %}
+
+{{ open_div }}
+  {{ open_table }}
+    <tr>
+      {{ open_cell }}Invoice #</td>
+      {{ open_cell }}{{ invoice_id }}</td>
+    </tr>
+    <tr>
+      {{ open_cell }}{{ service_dates_label }}</td>
+      {{ open_cell }}{{ service_dates_str }}</td>
+    </tr>
+    <tr>
+      {{ open_cell }}Invoice date</td>
+      {{ open_cell }}
+        {% if invoice_date %}
+          {{ invoice_date }}
+        {% elif mark_sent_button %}
+          <style>
+            {% include "css/button.css" %}
+          </style>
+          <form method="POST" style="margin: 0px;">{% csrf_token %}{{ mark_sent_button }}</form>
+        {% endif %}
+      </td>
+    </tr>
+    {% if due %}
+      <tr>
+        {{ open_cell }}Due</td>
+        {{ open_cell }}{{ due }}</td>
+      </tr>
+    {% endif %}
+    <tr>
+      {{ open_cell }}Invoice sent to</td>
+      {{ open_cell }}{{ sent_to }}</td>
+    </tr>
+    <tr>
+      {{ open_cell }}Make payment to</td>
+      {{ open_cell }}{{ make_payable_to }}</td>
+    </tr>
+  </table>
+
+  {{ open_div }}
+    {{ view_line_items.as_html }}
+  </div>
+</div>

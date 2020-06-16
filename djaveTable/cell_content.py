@@ -1,7 +1,7 @@
-from datetime import datetime, timedelta, time
+from datetime import datetime, date, timedelta, time
 
 from django.utils.safestring import mark_safe
-from djaveDT import tz_dt_to_str, time_to_time_str
+from djaveDT import tz_dt_to_str, time_to_time_str, d_to_str
 from djmoney.money import Money
 
 
@@ -30,10 +30,27 @@ class Tooltip(CellContent):
   def as_html(self):
     template = (
         '<div class="tooltip">{}<span class="tooltiptext">{}</span></div>')
-    return template.format(self.label, self.help_text)
+    return mark_safe(template.format(self.label, self.help_text))
 
   def as_csv(self):
     return self.label
+
+
+class DisappearingFeedback(CellContent):
+  """ This is pretty much so I can briefly display "Saved!" on the page when
+  the user clicks a Save button which causes a POST. """
+  def __init__(self, text='Saved!', html_finder=None):
+    self.text = text
+    self.html_finder = html_finder or 'hide_soon'
+
+  def as_html(self):
+    template = (
+        '<span class="feedback {}">{}</span>'
+        '<script>'
+        'setTimeout(function() {{ $(".{}").hide(); }}, 1000);'
+        '</script>')
+    return mark_safe(template.format(
+        self.html_finder, self.text, self.html_finder))
 
 
 class InHref(CellContent):
@@ -167,6 +184,8 @@ def obj_as_cell_content(obj):
     return StringContent('')
   if isinstance(obj, datetime):
     return tz_dt_to_str(obj)
+  if isinstance(obj, date):
+    return d_to_str(obj)
   if isinstance(obj, timedelta):
     # Trim off microseconds.
     return str(timedelta(days=obj.days, seconds=obj.seconds))

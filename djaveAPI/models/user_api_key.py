@@ -23,8 +23,8 @@ class UserAPIKey(APIKey, HasUserCredentialsInterface, AllowedModel):
   objects = UserAPIKeyManager()
 
   @classmethod
-  def allowed_by_user(cls, user):
-    return UserAPIKey.objects.filter(user=user)
+  def filter_allowed_by_user(cls, user, query_set):
+    return query_set.filter(user=user)
 
   def explain_why_can_not_create(self, of_model):
     from djaveAPI.models.user import User as DjaveAPIUser

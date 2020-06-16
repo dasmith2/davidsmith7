@@ -8,5 +8,6 @@ class ProjectInvoice(Invoice):
   project = models.ForeignKey(Project, on_delete=models.PROTECT)
 
   @classmethod
-  def allowed_by_user(cls, user):
-    return super().allowed_by_user(user).select_related('project')
+  def filter_allowed_by_user(cls, user, query_set):
+    return super().filter_allowed_by_user(
+        user, query_set).select_related('project')

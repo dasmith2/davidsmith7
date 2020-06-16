@@ -28,7 +28,6 @@ class AllowedTests(TestCase):
     get_test_project()  # Different creator
 
     self.assertEqual([project], list(Project.allowed_by_user(user)))
-    self.assertEqual([project], list(Project.allowed_by_credentials(api_key)))
     self.assertEqual([project], list(api_key.allowed_list(Project)))
     self.assertEqual(
         [project], list(UserCredentials(user).allowed_list(Project)))

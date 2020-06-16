@@ -4,9 +4,12 @@ from djaveAPI.signals import publishable_post_save
 from djaveDT import now
 
 
-class PublishableManager(models.Manager):
+class LivePublishableManager(models.Manager):
   def get_queryset(self):
-    return super().get_queryset().filter(deleted__isnull=True)
+    return self.model.filter_live(super().get_queryset())
+
+  def allowed_by_user(self, user):
+    return self.model.filter_allowed_by_user(user, self.get_queryset())
 
 
 class Publishable(models.Model, PublishableInterface):
@@ -31,8 +34,6 @@ class Publishable(models.Model, PublishableInterface):
     self.save()
 
   def save(self, *args, **kwargs):
-    if self.explain_why_invalid():
-      raise Exception(self.explain_why_invalid())
     super().save(*args, **kwargs)
     publishable_post_save.send(sender=self.__class__, instance=self)
 
@@ -40,11 +41,11 @@ class Publishable(models.Model, PublishableInterface):
     return self
 
   @classmethod
-  def allowed_by_user_live(cls, user):
-    return cls.allowed_by_user(user).filter(deleted__isnull=True)
+  def filter_live(cls, query_set):
+    return query_set.filter(deleted__isnull=True)
 
-  live = PublishableManager()
-  all = models.Manager()
+  live = LivePublishableManager()
+  objects = models.Manager()
 
   class Meta:
     abstract = True

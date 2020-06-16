@@ -28,8 +28,8 @@ class MyFakeModel(Publishable):
   user = models.ForeignKey(User, on_delete=models.CASCADE)
 
   @classmethod
-  def allowed_by_user(cls, user):
-    return cls.all.filter(user=user)
+  def filter_allowed_by_user(cls, user, query_set):
+    return query_set.filter(user=user)
 
   def allowed_api_keys(self, api_key_type):
     if api_key_type is UserAPIKey:
@@ -41,7 +41,8 @@ def get_test_my_fake_model(**kwargs):
   user = kwargs.get('user', None)
   if not user:
     user = get_test_user()
-  return MyFakeModel.all.create(name=kwargs.get('name', 'Testname'), user=user)
+  return MyFakeModel.objects.create(
+      name=kwargs.get('name', 'Testname'), user=user)
 
 
 class ComplexFakeModel(Publishable):
@@ -59,8 +60,8 @@ class ComplexFakeModel(Publishable):
       return 'small_int should be less than large_int'
 
   @classmethod
-  def allowed_by_user(cls, user):
-    return cls.objects.all()
+  def filter_allowed_by_user(cls, user, query_set):
+    return query_set
 
   def allowed_api_keys(self, api_key_type):
     return api_key_type.objects.all()

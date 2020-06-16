@@ -20,6 +20,8 @@ def get_test_project_invoice_rule(**kwargs):
   if not creator:
     creator = get_test_user(**kwargs)
 
+  sent_to = kwargs.get(
+      'sent_to', 'Sent to some client or another, LLC')
   make_payment_to = kwargs.get(
       'make_payment_to', 'Make payment to Dave at 1 Dave St., Apt. Dave')
   default_line_item_description = kwargs.get(
@@ -30,8 +32,8 @@ def get_test_project_invoice_rule(**kwargs):
       hourly_rate=Money(100, 'USD'),
       first_billable_day=kwargs.get('first_billable_day', date(2020, 1, 1)),
       invoice_id_prefix=kwargs.get('invoice_id_prefix', 'abc'),
+      sent_to=sent_to,
       make_payment_to=make_payment_to,
-      email_to=kwargs.get('email_to', 'email@invoice.to'),
       default_line_item_description=default_line_item_description,
       net_days=kwargs.get('net_days', 30))
 
@@ -51,13 +53,12 @@ class CreateInvoiceTests(TestCaseWithData):
     invoice = project_invoice_rule.create_invoice(
         nnow=to_tz_dt('2020-02-01 12:00'))
     self.assertTrue(invoice.invoice_id.find('abc') == 0)
-    self.assertTrue(len(invoice.invoice_id) == 10)
+    self.assertEqual('Sent to some client or another, LLC', invoice.sent_to)
     self.assertEqual(
         'Make payment to Dave at 1 Dave St., Apt. Dave',
         invoice.make_payment_to)
     self.assertEqual(self.user, invoice.creator)
     self.assertIsNone(invoice.sent)
-    self.assertEqual('email@invoice.to', invoice.email_to)
     self.assertEqual(30, invoice.net_days)
     self.assertIsNone(invoice.due)
     self.assertIsNone(invoice.paid)

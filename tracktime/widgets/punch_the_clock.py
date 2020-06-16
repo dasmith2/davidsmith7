@@ -124,7 +124,7 @@ class PunchTheClockTable(Table):
     columns = ['Project', '']
     if display_started_column:
       columns = ['Project', 'Started', '']
-    super().__init__(columns)
+    super().__init__(columns, classes=['margin-top-half'])
 
     if a_clock_can_be_stopped:
       stop_form.display(self)

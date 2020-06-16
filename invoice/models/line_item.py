@@ -25,8 +25,8 @@ class LineItem(Publishable, BaseKnowsChild):
       'Describe the exact forumula used to arrive at the amount'))
 
   @classmethod
-  def allowed_by_user(cls, user):
-    return cls.all.filter(invoice__creator=user)
+  def filter_allowed_by_user(cls, user, query_set):
+    return query_set.filter(invoice__creator=user)
 
   def allowed_api_keys(self, api_key_type):
     if api_key_type is UserAPIKey:

@@ -53,13 +53,13 @@ function get_csrf_token() {
 
 /* Stuff that comes up when I'm enabling tables for AJAX */
 
-function find_id($element) {
-  // Search up the dom for a data-id attribute. So you might do something like
-  // my_button.click(function() { var id = find_id($(this)); });
-  if ($element.attr('data-id')) {
-    return $element.attr('data-id');
+function find_pk($element) {
+  // Search up the dom for a data-pk attribute. So you might do something like
+  // my_button.click(function() { var pk = find_pk($(this)); });
+  if ($element.attr('data-pk')) {
+    return $element.attr('data-pk');
   }
-  return $element.parents('[data-id]').attr('data-id');
+  return $element.parents('[data-pk]').attr('data-pk');
 }
 
 function find_model($element) {
@@ -69,12 +69,12 @@ function find_model($element) {
   return $element.parents('[data-model]').attr('data-model');
 }
 
-function row_by_pk(id) {
-  return $('tr[data-id=' + id + ']');
+function row_by_pk(pk) {
+  return $('tr[data-pk=' + pk + ']');
 }
 
-function remove_row(id) {
-  row_by_pk(id).remove();
+function remove_row(pk) {
+  row_by_pk(pk).remove();
 }
 
 function wire_up_ajax_button(
@@ -88,12 +88,12 @@ function wire_up_ajax_button(
     window.delete_button = button; // DO NOT SUBMIT
     var model = find_model(button);
     var buttons_cell = button.parents('td');
-    var id = find_id(button);
-    var post_data = {id: id, type: model};
+    var pk = find_pk(button);
+    var post_data = {pk: pk, type: model};
     if (!confirm_question || confirm(confirm_question)) {
       post(action_url, post_data, function(response) {
         if (!show_problem(response, buttons_cell)) {
-          success(id);
+          success(pk);
         }
         button.prop('disabled', false);
       }).fail(function(data) {
@@ -195,7 +195,7 @@ function wire_up_ajax_save_field(selector_or_elt, field_name) {
         save_button.prop('disabled', true);
         cancel_save_button.prop('disabled', true);
 
-        var data = {id: find_id(row), type: find_model(row)};
+        var data = {pk: find_pk(row), type: find_model(row)};
 
         var got_all_elts = all_elts(row);
         var first_feedback = null;

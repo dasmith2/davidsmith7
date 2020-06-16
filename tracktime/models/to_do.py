@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Q
 from djaveAPI.models.user_api_key import UserAPIKey
-from djaveAPI.models.publishable import Publishable, PublishableManager
+from djaveAPI.models.publishable import Publishable, LivePublishableManager
 from djaveDT import beginning_of_day, now
 
 
@@ -13,7 +13,7 @@ DONE = 'DONE'
 OPEN = 'OPEN'
 
 
-class ToDoManager(PublishableManager):
+class ToDoManager(LivePublishableManager):
   def not_long_done(self, creator, nnow=None):
     """ This is what shows in tracktime.widgets.to_do_table. If you did
     something recently, it still shows. """
@@ -50,8 +50,8 @@ class ToDo(Publishable):
   live = ToDoManager()
 
   @classmethod
-  def allowed_by_user(cls, user):
-    return cls.all.filter(Q(creator=user) | Q(done_by=user))
+  def filter_allowed_by_user(cls, user, query_set):
+    return query_set.filter(Q(creator=user) | Q(done_by=user))
 
   def allowed_api_keys(self, api_key_type):
     if api_key_type is UserAPIKey:

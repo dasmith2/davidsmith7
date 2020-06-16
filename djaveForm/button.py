@@ -4,6 +4,9 @@ from django.utils.safestring import mark_safe
 from djaveForm.form_element import FormElement
 
 
+BUTTON_SPACER = '<div style="button_spacer"></div>'
+
+
 class Button(FormElement):
   def __init__(
       self, text, key_prefix=None, pk=None, button_type='button',

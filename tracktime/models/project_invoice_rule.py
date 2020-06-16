@@ -3,6 +3,7 @@ from datetime import date
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
+from djaveAllowed.allowed_model import AllowedModel
 from djaveDT import now
 from djmoney.models.fields import MoneyField
 
@@ -14,7 +15,7 @@ from tracktime.models.project_work_session_description import (
     ProjectWorkSessionDescriptions)
 
 
-class ProjectInvoiceRule(models.Model):
+class ProjectInvoiceRule(models.Model, AllowedModel):
   project = models.ForeignKey(Project, on_delete=models.CASCADE, help_text=(
       'When you run this rule, it will create an Invoice for the work you '
       'did on this project.'))
@@ -29,11 +30,13 @@ class ProjectInvoiceRule(models.Model):
   invoice_id_prefix = models.CharField(max_length=10, help_text=(
       'Every Invoice you make with this rule will get a unique id. That '
       'unique id will start with what you put here.'))
+  sent_to = models.TextField(blank=False, null=False, help_text=(
+      'This is labeled "Sent to" in the upper left of the Invoice. Explain '
+      'who the client is in this Invoice.'))
   make_payment_to = models.TextField(help_text=(
-      'This shows in the upper left hand corner of the invoice. Explain '
-      'who you are an how to pay you.'))
-  email_to = models.CharField(max_length=200, help_text=(
-      'When you click send, where should I email the Invoice?'))
+      'This is labeled "Make payable to" in the upper left of the Invoice. '
+      'Explain who the service provider is in this Invoice, and how to '
+      'pay them.'))
   default_line_item_description = models.TextField(help_text=(
       'When you "Enter time", you create a Work Session. That Work Session '
       'gets turned into an Invoice Line Item whose description is everything '
@@ -44,13 +47,13 @@ class ProjectInvoiceRule(models.Model):
       'How many days after the Invoice is sent is it due?'))
 
   @classmethod
-  def allowed_by_user(cls, user):
-    return cls.objects.filter(creator=user).select_related('project')
+  def filter_live(cls, query_set):
+    # When you delete a ProjectInvoiceRule, you actually do delete it.
+    return query_set
 
   @classmethod
-  def allowed_by_user_live(cls, user):
-    # When you delete a ProjectInvoiceRule, you actually do delete it.
-    return cls.allowed_by_user(user)
+  def filter_allowed_by_user(cls, user, query_set):
+    return query_set.filter(creator=user).select_related('project')
 
   def create_invoice(self, nnow=None):
     nnow = nnow or now()
@@ -101,9 +104,9 @@ class ProjectInvoiceRule(models.Model):
     return ProjectInvoice.live.create(
         project=self.project,
         invoice_id=get_an_invoice_id(self.invoice_id_prefix),
+        sent_to=self.sent_to,
         make_payment_to=self.make_payment_to,
         creator=self.creator,
-        email_to=self.email_to,
         net_days=self.net_days,
         total=total,
         service_from=service_from,

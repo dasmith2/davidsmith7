@@ -10,13 +10,14 @@ from djaveTest.unit_test import recursive_assert_equal
 
 class Table(object):
   def __init__(
-      self, headers=None, rows=None, classes=[], title=None, js=None,
+      self, headers=None, rows=None, classes=[], title=None, js=None, css=None,
       additional_attrs=None):
     self.headers = headers  # headers can be strings or Cells or nothing.
     self.rows = rows or []
     self.classes = classes
     self.title = title
     self.js = js
+    self.css = css
     self.additional_attrs = additional_attrs or {}
 
   def create_row(
@@ -78,11 +79,19 @@ class Table(object):
     to_return.extend(self._rows_html())
 
     to_return.append('</table>')
-    if self.js:
-      if self.js.strip().find('<script>') != 0:
-        self.js = '<script>\n{}\n</script>'.format(self.js)
-      to_return.append(self.js)
+    self._js_or_css_helper('script', self.js, to_return)
+    self._js_or_css_helper('style', self.css, to_return)
     return mark_safe('\n'.join(to_return))
+
+  def _js_or_css_helper(self, tag_name, this_content, content_list):
+    if this_content:
+      open_tag = '<{}>'.format(tag_name)
+      close_tag = '</{}>'.format(tag_name)
+      if this_content.strip().find(open_tag) != 0:
+        content_list.append(
+            '{}\n{}\n{}'.format(open_tag, this_content, close_tag))
+      else:
+        content_list.append(this_content)
 
   """ I used to do this, but then I found out that __repr__ was getting called
   3 times and __str__ was getting called 1 time, for a total of 4 calls to
@@ -187,7 +196,7 @@ class Row(object):
     self.additional_attrs = additional_attrs or {}
     self.pk = pk
     if pk is not None:
-      self.additional_attrs['data-id'] = pk
+      self.additional_attrs['data-pk'] = pk
 
   def __str__(self):
     return self.__repr__()

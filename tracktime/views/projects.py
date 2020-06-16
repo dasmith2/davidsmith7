@@ -1,6 +1,6 @@
 from django.shortcuts import reverse, render
 from djaveAPI.ajax_endpoint import ajax_endpoint_login_required
-from djaveAPI.get_request_variable import get_obj_from_request_pk
+from djaveAPI.get_request_variable import get_request_ajax_obj
 from djaveLogin.login_required import login_required
 
 from tracktime.models.project import Project
@@ -34,11 +34,11 @@ def projects_context(table, request, **kwargs):
 
 @ajax_endpoint_login_required
 def archive_project(request):
-  get_obj_from_request_pk(request, Project).mark_deleted()
+  get_request_ajax_obj(request, Project).mark_deleted()
 
 
 @ajax_endpoint_login_required
 def unarchive_project(request):
-  project = get_obj_from_request_pk(request, Project)
+  project = get_request_ajax_obj(request, Project)
   project.deleted = None
   project.save()

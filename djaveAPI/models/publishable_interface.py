@@ -22,3 +22,6 @@ class PublishableInterface(AllowedModel):
     instance is really refering too? In the case of Publishable, it's just
     itself. It's only more complicated with PretendPublishable. """
     raise NotImplementedError('published_object')
+
+  class Meta:
+    abstract = True

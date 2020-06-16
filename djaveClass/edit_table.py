@@ -6,7 +6,7 @@ from djaveForm.button import Button
 from djaveForm.default_widget import default_widget
 from djaveForm.form import Form
 from djaveTable.table import Table, Cell
-from djaveTable.cell_content import Tooltip
+from djaveTable.cell_content import Tooltip, DisappearingFeedback
 from djmoney.money import Money
 
 
@@ -22,11 +22,12 @@ $(function() {
 
 
 class EditTable(Table):
-  def __init__(self, model, request_data, instance=None):
+  def __init__(self, model, request_data, instance=None, extra_buttons=None):
     self.model = model
     self.model_fields = model_fields(model)
     self.request_data = request_data
     self.instance = instance
+    self.extra_buttons = extra_buttons
 
     self.save_button = Button('Save', button_type='submit')
     self.delete_button = Button('Delete', button_type='delete')
@@ -39,8 +40,11 @@ class EditTable(Table):
     confirm_delete_js = WIRE_UP_CONFIRM_DELETE.replace('Delete?', question)
     super().__init__(js=confirm_delete_js)
 
+    self.buttons_cell = Cell([], additional_attrs={'colspan': 2})
     self.add_rows()
     self.handle_clicks()
+    if self.saved():
+      self.buttons_cell.cell_contents.append(DisappearingFeedback())
 
   def add_rows(self):
     raise NotImplementedError('add_rows')
@@ -101,8 +105,10 @@ class EditTable(Table):
     buttons = [self.save_button]
     if self.instance:
       buttons.append(self.delete_button)
-    create_new_cell = Cell(buttons, additional_attrs={'colspan': 2})
-    self.create_row([create_new_cell])
+    if self.extra_buttons:
+      buttons.extend(self.extra_buttons)
+    self.buttons_cell.cell_contents.extend(buttons)
+    self.create_row([self.buttons_cell])
 
   def add_field_rows(self, *field_names):
     for field_name in field_names:

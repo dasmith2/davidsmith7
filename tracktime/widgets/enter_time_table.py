@@ -28,7 +28,7 @@ class EnterTimeTable(Table):
     self.day = day
     self.user = user
     self.form_data = form_data
-    super().__init__()
+    super().__init__(classes=['margin-top-half'])
 
     # This might save a new one if the form is valid so it has to go before we
     # load this user's WorkSessions.

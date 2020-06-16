@@ -11,6 +11,9 @@ class EditInvoice(object):
     self.invoice_table = InvoiceTable(request.POST, invoice)
     self.line_items_table = LineItemsTable(request.POST, invoice)
 
+  def redirect_to(self):
+    return self.invoice_table.redirect_to
+
   def deleted(self):
     return self.invoice_table.deleted()
 

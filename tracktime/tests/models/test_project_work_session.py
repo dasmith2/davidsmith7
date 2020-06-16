@@ -25,9 +25,6 @@ class AllowedTests(TestCase):
     self.assertEqual(
         [work_session], list(api_key.allowed_list(ProjectWorkSession)))
     self.assertEqual(
-        [work_session],
-        list(ProjectWorkSession.allowed_by_credentials(api_key)))
-    self.assertEqual(
         [work_session], list(ProjectWorkSession.allowed_by_user(user)))
     self.assertEqual(
         [work_session],

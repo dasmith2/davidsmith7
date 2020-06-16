@@ -35,35 +35,19 @@ pre {
 
 input[type="number"] { width: 100px; }
 
+form { margin: 0px; padding: 0px; }
+
 .problem { color: #f00; }
 .feedback { color: #f00; }
 .start-hidden { display: none; }
 .editing { background-color: #ffb; }
 
 .margin-top { margin: 60px 0px 0px 0px; }
-.margin-top-half, form { margin: 20px 0px 0px 0px; }
+.margin-top-half { margin: 20px 0px 0px 0px; }
 .pad-half { padding: 20px; }
 
 /* Buttons */
-button, .button, input[type="submit"], input[type="button"], a.button {
-  background: #79aec8;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 4px;
-  color: #fff;
-  cursor: pointer;
-  box-shadow: 4px 4px 2px grey;
-  margin: 3px 3px 3px 0px;
-  font-size: 15px;
-  font-weight: 400; }
-button:active, .button:active, input[type=submit]:active, input[type=button]:active,
-button:focus, .button:focus, input[type=submit]:focus, input[type=button]:focus,
-button:hover, .button:hover, input[type=submit]:hover, input[type=button]:hover {
-  background: #609ab6;}
-button[disabled], .button[disabled], input[type=submit][disabled], input[type=button][disabled] {
-  opacity: 0.4;
-  background: #999;}
-a.button { text-decoration: none; }
+{% include "css/button.css" %}
 
 /* Tooltips */
 .tooltip {

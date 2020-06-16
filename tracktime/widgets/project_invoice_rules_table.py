@@ -20,7 +20,7 @@ class ProjectInvoiceRulesTable(Table):
     return self._has_rules
 
   def add_rule_rows(self):
-    for rule in ProjectInvoiceRule.allowed_by_user_live(self.user):
+    for rule in ProjectInvoiceRule.allowed_by_user(self.user):
       self._has_rules = True
       href = reverse('project_invoice_rule', kwargs={'pk': rule.pk})
       create_new_invoice_button = Button(
@@ -36,5 +36,5 @@ class ProjectInvoiceRulesTable(Table):
         'Create new rule', reverse('project_invoice_rule'), classes=['button'])
     create_new_cell = Cell(
         self.create_new_button,
-        additional_attrs={'colspan': len(self.headers)}, classes=['pad-half'])
+        additional_attrs={'colspan': len(self.headers)})
     self.create_row([create_new_cell])

@@ -1,23 +1,30 @@
 from django.http import HttpRequest
+from djaveAllowed.allowed_model import AllowedModel
 from djaveAllowed.credentials import UserCredentials
+from djaveAPI.get_instance import get_instance
 from djaveAPI.problem import Problem
+from djaveClass.find_models import model_from_name
 
 
-def get_obj_from_request_pk(request, model):
-  pk = get_request_variable(request, 'pk')
-  instance = model.live.filter(pk=pk).first()
-  if not instance:
-    # Don't status_code=404 because that causes ./manage.py runserver to chuck
-    # any helpful information and simply display `Not Found:
-    # /api/update_field`. Returning a 200 status code gives the user interface
-    # a chance to display this helpful message.
-    raise Problem('{} {} does not exist'.format(model.__name__, pk))
-  if hasattr(instance, 'as_child_class'):
-    instance = instance.as_child_class()
-  if not UserCredentials(request.user).allowed_instance(instance):
-    raise Problem('You do not have permission to manage this {}'.format(
-        model.__name__))
-  return instance
+def get_request_ajax_obj(request, model=None, pk=None):
+  if not pk:
+    pk = get_request_variable(request, 'pk')
+  model_name = None
+  if model:
+    model_name = model.__name__
+  else:
+    model_name = get_request_variable(request.POST, 'type')
+    # I'm very intentionally NOT using djaveAPI.get_publishable_model because
+    # this is AJAX and you can do AJAX calls on objects that aren't necessarily
+    # in the API. The only thing you actually need here is a model I can check
+    # permission on.
+    model = model_from_name(model_name, AllowedModel)
+  credentials = UserCredentials(request.user)
+
+  # model.live is really handy for pulling back a list of active objects. This
+  # requires a single object and I don't want to outsmart myself, so I'm just
+  # using model.objects
+  return get_instance(model_name, model.objects, pk, credentials)
 
 
 def get_request_variable(data, variable_name, required=True):

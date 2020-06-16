@@ -1,18 +1,36 @@
 from datetime import timedelta
-from random import randint
 
 from django.contrib.auth.models import User
 from django.db import models
-from djaveAPI.models.publishable import Publishable
+from django.db.models import Q
+from djaveAPI.models.publishable import Publishable, LivePublishableManager
 from djaveAPI.models.user_api_key import UserAPIKey
 from djaveClass.models.base_knows_child import BaseKnowsChildTransition
-from djaveDT import now
+from djaveDT import now, dt_to_d_str, d_to_str
 from djmoney.models.fields import MoneyField
 from djmoney.money import Money
 
 
-def get_an_invoice_id(invoice_id_prefix):
-  return '{}{}'.format(invoice_id_prefix, randint(1000000, 2000000))
+def get_an_invoice_id(invoice_id_prefix, nnow=None):
+  nnow = nnow or now()
+  date_part = nnow.date().strftime('%Y%m%d')
+  next_attempt = '{}{}'.format(invoice_id_prefix, date_part)
+  attempt = 1
+  while Invoice.objects.filter(invoice_id=next_attempt).exists():
+    attempt += 1
+    next_attempt = '{}{}_{}'.format(invoice_id_prefix, date_part, attempt)
+  return next_attempt
+
+
+class LiveInvoiceManager(LivePublishableManager):
+  def get_important_invoices(self, user, nnow=None):
+    """ This goes in a table titled "Unpaid invoices" but it's really, like,
+    unpaid or recently paid invoices, but it's really, like, important
+    invoices. """
+    nnow = nnow or now()
+    paid_cutoff = nnow - timedelta(days=2)
+    return self.allowed_by_user(user).filter(
+        Q(paid__isnull=True) | Q(paid__gte=paid_cutoff)).order_by('-pk')
 
 
 class Invoice(Publishable, BaseKnowsChildTransition):
@@ -21,9 +39,12 @@ class Invoice(Publishable, BaseKnowsChildTransition):
       'already have an id, but that id doesn\'t include a prefix string '
       'and accountants seem to like that.'))
 
+  sent_to = models.TextField(blank=False, null=False, help_text=(
+      'This is labeled "Sent to" in the upper left of the Invoice. Explain '
+      'who the client is.'))
   make_payment_to = models.TextField(help_text=(
-      'This shows in the upper left hand corner of the Invoice. Explain '
-      'who you are an how to pay you.'))
+      'This is labeled "Make payment to" in the upper left of the Invoice. '
+      'Explain who the service provider is, and how to pay them.'))
 
   creator = models.ForeignKey(
       User, related_name='created_invoice', on_delete=models.PROTECT,
@@ -33,11 +54,9 @@ class Invoice(Publishable, BaseKnowsChildTransition):
       'When was this Invoice created?'))
   sent = models.DateTimeField(null=True, blank=True, help_text=(
       'When was this Invoice sent out?'))
-  email_to = models.CharField(max_length=200, help_text=(
-      'Who should this Invoice be emailed to?'))
   net_days = models.PositiveIntegerField(help_text=(
       'How many days after the Invoice is sent is it due?'))
-  due = models.DateTimeField(null=True, blank=True, help_text=(
+  due = models.DateField(null=True, blank=True, help_text=(
       'When is this Invoice due? This field is set automatically on save '
       'according to sent and net_days'))
   paid = models.DateTimeField(null=True, blank=True, help_text=(
@@ -66,27 +85,29 @@ class Invoice(Publishable, BaseKnowsChildTransition):
 
   def status(self, nnow=None):
     if self.paid:
-      return 'Paid'
+      return 'Paid {}'.format(dt_to_d_str(self.paid))
     elif self.sent:
       if self.past_due(nnow=nnow):
-        return 'Past due'
-      return 'Sent'
-    return 'New'
+        return 'Late. Due {}'.format(d_to_str(self.due))
+      return 'Due {}'.format(d_to_str(self.due))
+    return 'Created {}'.format(dt_to_d_str(self.created))
 
   def past_due(self, nnow=None):
     nnow = nnow or now()
-    return self.due and self.due < nnow
+    return self.due and self.due < nnow.date()
 
   def save(self, *args, **kwargs):
-    if self.sent:
-      self.due = self.sent + timedelta(days=self.net_days)
+    if self.sent and not self.due:
+      self.due = (self.sent + timedelta(days=self.net_days)).date()
     super().save(*args, **kwargs)
 
   @classmethod
-  def allowed_by_user(cls, user):
-    return cls.all.filter(creator=user)
+  def filter_allowed_by_user(cls, user, query_set):
+    return query_set.filter(creator=user)
 
   def allowed_api_keys(self, api_key_type):
     if api_key_type is UserAPIKey:
       return UserAPIKey.objects.filter(user=self.creator)
     raise Exception('I dont know how to check which {} can see this Invoice')
+
+  live = LiveInvoiceManager()

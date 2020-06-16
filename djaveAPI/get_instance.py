@@ -1,23 +1,16 @@
 from djaveAPI.problem import Problem
-from djaveAPI.models.pretend_publishable import PretendPublishable
 
 
-def get_instance(model, pk, credentials):
-  instance = None
-  try:
-    find_with_model = model
-    if issubclass(model, PretendPublishable):
-      find_with_model = model.actually_publishing()
-    instance = credentials.allowed_list(find_with_model).filter(pk=pk).first()
-    if issubclass(model, PretendPublishable):
-      instance = model(instance)
-  except ValueError as ex:
-    # "Field 'id' expected a number but got 'a'."
-    if ex.args[0].find('number'):
-      raise Problem('{} is not a valid integer'.format(pk), 400)
+def get_instance(model_name, manager, pk, credentials):
+  """ This is abstract enough you can use it for AJAX and for the API. It's
+  good to use it to get that credentials check and child class check in there.
+  """
+  instance = manager.filter(pk=pk).first()
   if not instance:
-    raise Problem((
-        'Either there is no {} with id {}, or your credentials '
-        'do not have permission to access it.').format(
-            model.__name__, pk), 404)
+    raise Problem('{} {} does not exist'.format(model_name, pk), 404)
+  if hasattr(instance, 'as_child_class'):
+    instance = instance.as_child_class()
+  if not credentials.allowed_instance(instance):
+    raise Problem('You do not have permission to manage this {}'.format(
+        model_name))
   return instance

@@ -23,7 +23,7 @@ class FormElement(CellContent):
   def additional_attrs_str(self):
     if self.additional_attrs:
       linear = []
-      for key, value in self.additional_attrs:
+      for key, value in self.additional_attrs.items():
         linear.append('{}="{}"'.format(key, value))
       return ' {}'.format(' '.join(linear))
     return ''

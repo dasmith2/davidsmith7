@@ -1,5 +1,6 @@
 from djaveAPI.api_endpoint import api_endpoint
 from djaveAPI.filters import filter_model, get_filters
+from djaveAPI.models.pretend_publishable import PretendPublishable
 from djaveAPI.paged_results import paged_results, get_page
 from djaveAPI.get_instance import get_instance
 from djaveAPI.get_publishable_model import get_publishable_model
@@ -36,9 +37,30 @@ def get_or_save_existing(request, api_key, model_name, pk):
         'When getting or saving a single {}, no filters are valid. You '
         'specified {}').format(model_name, ', '.join(filter_field_names)), 400)
 
-  instance = get_instance(model, pk, api_key)
+  instance = get_instance(model_name, model.objects, pk, api_key)
   if request.method == 'POST':
     update(instance, get_posted_json(request), api_key)
   elif request.method == 'DELETE':
     instance.mark_deleted()
   return to_json_dict(instance, model)
+
+
+def get_request_api_obj(model, pk, credentials):
+  instance = None
+  try:
+    find_with_model = model
+    if issubclass(model, PretendPublishable):
+      find_with_model = model.actually_publishing()
+    instance = credentials.allowed_list(find_with_model).filter(pk=pk).first()
+    if issubclass(model, PretendPublishable):
+      instance = model(instance)
+  except ValueError as ex:
+    # "Field 'id' expected a number but got 'a'."
+    if ex.args[0].find('number'):
+      raise Problem('{} is not a valid integer'.format(pk), 400)
+  if not instance:
+    raise Problem((
+        'Either there is no {} with id {}, or your credentials '
+        'do not have permission to access it.').format(
+            model.__name__, pk), 404)
+  return instance

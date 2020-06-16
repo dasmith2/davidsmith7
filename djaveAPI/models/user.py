@@ -40,12 +40,12 @@ class User(PretendPublishable):
     return DjangoUser
 
   @classmethod
-  def allowed_by_user(cls, user):
-    return DjangoUser.objects.filter(pk=user.pk)
+  def filter_live(cls, query_set):
+    return query_set.filter(is_active=True)
 
   @classmethod
-  def allowed_by_user_live(cls, user):
-    return cls.allowed_by_user(user).filter(is_active=True)
+  def allowed_by_user(cls, user):
+    return DjangoUser.objects.filter(pk=user.pk)
 
   def allowed_api_keys(self, api_key_type):
     if api_key_type is UserAPIKey:

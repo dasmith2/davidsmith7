@@ -1,9 +1,9 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404, reverse
 from djaveLogin.login_required import login_required
 
 from invoice.models.invoice import Invoice
 from invoice.widgets.edit_invoice import EditInvoice
-from invoice.widgets.display_invoice import DisplayInvoice
+from invoice.widgets.view_invoice import ViewInvoice
 from tracktime.models.project_invoice_rule import ProjectInvoiceRule
 from tracktime.views.util import tracktime_context, INVOICES
 from tracktime.widgets.project_invoice_rule_table import (
@@ -26,23 +26,37 @@ def project_invoices(request):
 
 
 @login_required
-def project_invoice(request, pk=None):
-  invoice = None
-  if pk:
-    invoice = get_object_or_404(
-        Invoice.allowed_by_user_live(request.user), pk=pk)
+def edit_project_invoice(request, pk=None):
+  invoice = _get_invoice(request, pk=pk)
+  if invoice.paid:
+    return redirect(reverse('view_project_invoice', kwargs={'pk': invoice.pk}))
 
   the_one_thing_on_the_page = None
-  if not invoice.paid:
-    the_one_thing_on_the_page = EditInvoice(request, invoice)
-    if the_one_thing_on_the_page.deleted():
-      return redirect('project_invoices')
-  else:
-    the_one_thing_on_the_page = DisplayInvoice(invoice)
+  the_one_thing_on_the_page = EditInvoice(request, invoice)
+  if the_one_thing_on_the_page.deleted():
+    return redirect('project_invoices')
+  elif the_one_thing_on_the_page.redirect_to():
+    return redirect(the_one_thing_on_the_page.redirect_to())
 
   context = tracktime_context(
       INVOICES, request, the_one_thing_on_the_page=the_one_thing_on_the_page)
   return render(request, 'tracktime_base.html', context)
+
+
+@login_required
+def view_project_invoice(request, pk=None):
+  invoice = _get_invoice(request, pk=pk)
+
+  view_invoice = ViewInvoice(invoice, request)
+
+  context = tracktime_context(
+      INVOICES, request, the_one_thing_on_the_page=view_invoice)
+
+  return render(request, 'tracktime_base.html', context)
+
+
+def _get_invoice(request, pk=None):
+  return get_object_or_404(Invoice.allowed_by_user_live(request.user), pk=pk)
 
 
 @login_required

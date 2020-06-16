@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Q
 from djaveAPI.models.user_api_key import UserAPIKey
-from djaveAPI.models.publishable import Publishable, PublishableManager
+from djaveAPI.models.publishable import Publishable, LivePublishableManager
 from djaveDT import (
     now, d_to_str, time_to_time_str, tz_dt_to_tz_dt,
     tz_dt_to_str, beginning_of_day)
@@ -23,7 +23,7 @@ ABANDONED = 'ABANDONED'
 IN_PROGRESS = 'IN_PROGRESS'
 
 
-class WorkSessionManager(PublishableManager):
+class WorkSessionManager(LivePublishableManager):
   def done_by_user_and_date(self, user, date, nnow=None):
     return self.done_by_user_and_date_range(user, date, date, nnow=nnow)
 
@@ -121,8 +121,8 @@ class WorkSession(Publishable):
           'stop time')
 
   @classmethod
-  def allowed_by_user(cls, user):
-    return cls.all.filter(user=user)
+  def filter_allowed_by_user(cls, user, query_set):
+    return query_set.filter(user=user)
 
   def allowed_api_keys(self, api_key_type):
     if api_key_type is UserAPIKey:

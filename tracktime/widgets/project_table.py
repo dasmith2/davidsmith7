@@ -46,7 +46,8 @@ class ArchivedProjectTable(BaseProjectTable):
     self.setup_deleted()
 
   def setup_deleted(self):
-    for project in Project.all.filter(deleted__isnull=False).order_by('name'):
+    for project in Project.objects.filter(
+        deleted__isnull=False).order_by('name'):
       self.create_row_for_existing(project, 'Un-archive')
 
 
@@ -68,5 +69,5 @@ class NewProjectNameField(TextField):
     reason = super().explain_why_not_valid()
     if reason:
       return reason
-    if Project.all.filter(name=self.get_value()).exists():
+    if Project.objects.filter(name=self.get_value()).exists():
       return 'A project with this name exists already'

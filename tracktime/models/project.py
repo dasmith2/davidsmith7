@@ -19,8 +19,8 @@ class Project(Publishable):
     return 'Users track time against Projects.'
 
   @classmethod
-  def allowed_by_user(cls, user):
-    return cls.all.filter(creator=user)
+  def filter_allowed_by_user(cls, user, query_set):
+    return query_set.filter(creator=user)
 
   def allowed_api_keys(self, api_key_type):
     if api_key_type is UserAPIKey:
@@ -28,7 +28,7 @@ class Project(Publishable):
     raise Exception('I dont know how to check which {} can see this Project')
 
   def explain_why_invalid(self):
-    if Project.all.filter(
+    if Project.objects.filter(
         ~Q(pk=self.pk), creator=self.creator, name=self.name).exists():
       return 'You already have a project with this name'
 
