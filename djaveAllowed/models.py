@@ -44,5 +44,11 @@ class Allowed(models.Model, AllowedInterface):
   you want to publish in the API, or any model you want to be able to edit with
   reusable AJAX tools in the web user interface. """
 
+  def save(self, *args, **kwargs):
+    why_invalid = self.explain_why_invalid()
+    if why_invalid:
+      raise Exception(why_invalid)
+    super().save(*args, **kwargs)
+
   class Meta:
     abstract = True
