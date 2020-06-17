@@ -25,14 +25,14 @@ class ProjectInvoiceRule(Allowed):
   first_billable_day = models.DateField(
       default=date(2000, 1, 1), help_text=(
           'Every work session that hasn\'t been billed for yet that occurs '
-          'after this cutoff date will go in an Invoice when you run this '
+          'on or after this date will go in an Invoice when you run this '
           'rule.'))
   invoice_id_prefix = models.CharField(max_length=10, help_text=(
       'Every Invoice you make with this rule will get a unique id. That '
       'unique id will start with what you put here.'))
   sent_to = models.TextField(blank=False, null=False, help_text=(
       'This is labeled "Sent to" in the upper left of the Invoice. Explain '
-      'who the client is in this Invoice.'))
+      'who the customer is in this Invoice.'))
   make_payment_to = models.TextField(help_text=(
       'This is labeled "Make payable to" in the upper left of the Invoice. '
       'Explain who the service provider is in this Invoice, and how to '
@@ -114,7 +114,7 @@ class ProjectInvoiceRule(Allowed):
 
   def _get_descriptions(self, nnow=None):
     nnow = nnow or now()
-    from_date = None
+    from_date = self.first_billable_day
     to_date = nnow.date()
     tz_str = settings.TIME_ZONE
     return ProjectWorkSessionDescriptions(

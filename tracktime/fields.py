@@ -11,20 +11,20 @@ from tracktime.models.latest_project import get_latest_project
 PROJECT = 'project'
 
 
-def project_field(user=None, label=None):
+def project_field(user=None, label=None, required=True):
   default = None
-  if user:
+  if user and required:
     latest_project = get_latest_project(user)
     if latest_project:
       default = latest_project.pk
   field = SelectField(
-      key_prefix=PROJECT, options=project_options(), required=True,
+      key_prefix=PROJECT, options=project_options(user), required=required,
       default=default, label=label)
   return field
 
 
-def project_options():
-  projects = Project.live.order_by('name')
+def project_options(user):
+  projects = Project.live.allowed_by_user(user).order_by('name')
   return [Option(project.pk, project.name) for project in projects]
 
 

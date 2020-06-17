@@ -1,8 +1,9 @@
+from djaveClass.edit_list_table import EditListTable
 from djaveDT import now
 from djaveForm.button import Button
 from djaveForm.form import Form
 from djaveForm.field import TextAreaField
-from djaveTable.table import Table, Cell
+from djaveTable.table import Cell
 
 from tracktime.models.to_do import ToDo
 
@@ -21,14 +22,16 @@ class ToDoForm(Form):
     return self.description_field.get_value()
 
 
-class ToDoTable(Table):
+class ToDoTable(EditListTable):
   def __init__(self, user, form_data, nnow=None):
-    super().__init__()
+    super().__init__(ToDo)
     self.user = user
     self.form_data = form_data
 
     self.setup_enter_new(nnow=nnow)
     self.setup_existing()
+
+    self.wire_up_edit_ajax('description')
 
   def setup_enter_new(self, nnow=None):
     nnow = nnow or now()
@@ -71,5 +74,5 @@ class ToDoTable(Table):
 
   def cells_for_existing(self, to_do):
     description = TextAreaField(
-        'edit_description', default=to_do.description, required=False)
+        'description', default=to_do.description, required=False)
     return [description, Cell(None, ['buttons'])]

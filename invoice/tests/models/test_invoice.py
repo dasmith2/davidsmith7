@@ -3,7 +3,8 @@ from djaveDT import to_tz_dt
 from djaveTest.unit_test import random_string, get_test_user, TestCase
 from djmoney.money import Money
 
-from invoice.models.invoice import Invoice, get_an_invoice_id
+from invoice.models.invoice import (
+    Invoice, get_an_invoice_id, CREATED, DUE, LATE, PAID)
 
 
 def get_test_invoice(**kwargs):
@@ -32,6 +33,8 @@ def set_invoice_stuff(invoice, **kwargs):
   invoice.service_from = kwargs.get('service_from', date(2020, 1, 1))
   invoice.service_to = kwargs.get('service_to', date(2020, 2, 1))
   invoice.save()
+  if 'created' in kwargs:
+    Invoice.objects.filter(pk=invoice.pk).update(created=kwargs['created'])
   return invoice
 
 
@@ -65,3 +68,40 @@ class ImportantInvoicesTests(TestCase):
         [new, sent, past_due, recently_paid],
         list(Invoice.live.get_important_invoices(
             user, nnow=to_tz_dt('2020-01-15 12:00'))))
+
+
+class GetInvoicesTests(TestCase):
+  def test_get_invoices(self):
+    user = get_test_user()
+
+    created = get_test_invoice(
+        creator=user, created=to_tz_dt('2020-01-01 12:00'))
+    due = get_test_invoice(
+        creator=user, created=to_tz_dt('2020-01-01 12:00'),
+        sent=to_tz_dt('2020-01-15 12:00'), net_days=10)
+    late = get_test_invoice(
+        creator=user, created=to_tz_dt('2020-01-01 12:00'),
+        sent=to_tz_dt('2020-01-01 12:00'), net_days=10)
+    paid = get_test_invoice(
+        creator=user, created=to_tz_dt('2020-01-01 12:00'),
+        sent=to_tz_dt('2020-01-01 12:00'), paid=to_tz_dt('2020-01-15 12:00'))
+
+    self.assertFalse(
+        Invoice.live.get_invoices(user, created_to=date(2019, 12, 25)))
+    self.assertFalse(
+        Invoice.live.get_invoices(user, created_from=date(2020, 1, 25)))
+    self.assertEqual(
+        [created, due, late, paid],
+        list(Invoice.live.get_invoices(
+            user, created_from=date(2019, 12, 25),
+            created_to=date(2020, 1, 25))))
+
+    nnow = to_tz_dt('2020-01-15 12:00')
+    self.assertEqual([created], list(
+        Invoice.live.get_invoices(user, status=CREATED)))
+    self.assertEqual([due], list(
+        Invoice.live.get_invoices(user, status=DUE, nnow=nnow)))
+    self.assertEqual([late], list(
+        Invoice.live.get_invoices(user, status=LATE, nnow=nnow)))
+    self.assertEqual([paid], list(
+        Invoice.live.get_invoices(user, status=PAID)))

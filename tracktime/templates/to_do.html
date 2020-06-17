@@ -49,31 +49,25 @@ function append_done_button(row) {
 function append_delete_button(row) {
   var html = '<button type="button" class="delete">Delete</button>';
   var button = $(html).appendTo(get_button_cell(row));
-  wire_up_ajax_button(
-      button, '{{ delete_to_do_url }}', remove_row, 'Delete?');
+  wire_up_ajax_delete_button(button, 'Delete To Do?')
 }
 
 function append_not_done_button(row) {
-  var html = '<button type="button" class="not_done">Not done actually</button>';
+  var html =
+      '<button type="button" class="not_done">Not done actually</button>';
   var button = $(html).appendTo(get_button_cell(row));
   wire_up_ajax_button(button, '{{ not_done_url }}', function() {
     put_row_in_not_done_mode(row);
   });
 }
 
-function setup_edit_description() {
-  wire_up_ajax_save_field('.edit_description', 'ToDo', 'description');
-}
-
 $(focus_on_new_to_do);
 $(setup_done_delete_and_not_done);
-$(setup_edit_description);
 </script>
 
 <style>
-table textarea { width: 100%; }
 table { margin-top: 20px; }
-.to_done, .to_done textarea.edit_description { background-color: #dfd; }
+.to_done, .to_done textarea.description { background-color: #dfd; }
 </style>
 {% endblock tracktime_head %}
 

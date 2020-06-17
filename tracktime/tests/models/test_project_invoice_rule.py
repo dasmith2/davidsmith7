@@ -92,7 +92,7 @@ class CreateNothingTests(TestCaseWithData):
     self.setup_everything()
 
     invoice = get_test_project_invoice_rule(
-        project=self.project_1, user=self.user,
+        project=self.project_1, creator=self.user,
         first_billable_day=date(2020, 1, 16)).create_invoice()
 
     self.assertEqual(Money(0, 'USD'), invoice.total)

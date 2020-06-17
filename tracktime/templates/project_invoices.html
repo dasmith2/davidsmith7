@@ -2,7 +2,7 @@
 
 {% block tracktime_body %}
 
-<h2>Invoice rules</h2>
+<h2>{{ invoice_rules_header }}</h2>
 {% if project_invoice_rules_table.has_rules %}
   <form method="POST">
     {% csrf_token %}
@@ -14,12 +14,18 @@
   </div>
 {% endif %}
 
-<h2>Unpaid invoices</h2>
+<h2>{{ the_word_unpaid }} invoices</h2>
 
 {% if project_invoices_table.has_invoices %}
   {{ project_invoices_table.as_html }}
 {% else %}
   <p>None yet</p>
+{% endif %}
+
+{% if invoices_exist %}
+<div class="margin-top-half">
+  <a href="{{ all_invoices_url }}">See all invoices</a>
+</div>
 {% endif %}
 
 {% endblock tracktime_body %}

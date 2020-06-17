@@ -37,7 +37,7 @@ class ToDoTableTests(TestCase):
     self.assertEqual(to_do_count_before + 1, ToDo.live.count())
     to_do = ToDo.live.filter(creator=self.user).first()
     description = TextAreaField(
-        'edit_description', default='Hello world!', required=False)
+        'description', default='Hello world!', required=False)
     table.rows[1].assertEqual(Row([
         description, Cell(None, classes=['buttons'])], pk=to_do.pk))
 

@@ -1,4 +1,5 @@
 from datetime import timedelta
+import re
 
 from django.contrib.auth.models import User
 from django.db import models
@@ -6,9 +7,17 @@ from django.db.models import Q
 from djaveAPI.models.publishable import Publishable, LivePublishableManager
 from djaveAPI.models.user_api_key import UserAPIKey
 from djaveClass.models.base_knows_child import BaseKnowsChild
-from djaveDT import now, dt_to_d_str, d_to_str
+from djaveDT import now, dt_to_d_str, d_to_str, midnight_from_date
 from djmoney.models.fields import MoneyField
 from djmoney.money import Money
+
+
+CREATED = 'Created'
+DUE = 'Due'
+LATE = 'Late'
+PAID = 'Paid'
+
+STATUSES = [CREATED, DUE, LATE, PAID]
 
 
 def get_an_invoice_id(invoice_id_prefix, nnow=None):
@@ -31,6 +40,25 @@ class LiveInvoiceManager(LivePublishableManager):
     paid_cutoff = nnow - timedelta(days=2)
     return self.allowed_by_user(user).filter(
         Q(paid__isnull=True) | Q(paid__gte=paid_cutoff)).order_by('-pk')
+
+  def get_invoices(
+      self, user, created_from=None, created_to=None, status=None, nnow=None):
+    nnow = nnow or now()
+    qs = self.allowed_by_user(user)
+    if created_from:
+      qs = qs.filter(created__gte=midnight_from_date(created_from))
+    if created_to:
+      cutoff = midnight_from_date(created_to) + timedelta(days=1)
+      qs = qs.filter(created__lte=cutoff)
+    if status == CREATED:
+      qs = qs.filter(sent__isnull=True)
+    elif status == DUE:
+      qs = qs.filter(paid__isnull=True, due__gte=nnow)
+    elif status == LATE:
+      qs = qs.filter(paid__isnull=True, due__lte=nnow)
+    elif status == PAID:
+      qs = qs.filter(paid__isnull=False)
+    return qs.order_by('pk')
 
 
 class Invoice(Publishable, BaseKnowsChild):
@@ -84,6 +112,9 @@ class Invoice(Publishable, BaseKnowsChild):
     self.save()
 
   def status(self, nnow=None):
+    return re.compile(r'^\w+').findall(self.status_with_date(nnow=nnow))[0]
+
+  def status_with_date(self, nnow=None):
     if self.paid:
       return 'Paid {}'.format(dt_to_d_str(self.paid))
     elif self.sent:

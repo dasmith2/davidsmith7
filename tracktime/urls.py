@@ -3,16 +3,15 @@ from django.urls import path
 from tracktime.views.api_docs import api_docs
 from tracktime.views.enter_time import enter_time, delete_work_session
 from tracktime.views.invoices import (
-    project_invoices, edit_project_invoice, view_project_invoice,
-    project_invoice_rule)
+    project_invoices, all_project_invoices, edit_project_invoice,
+    view_project_invoice, project_invoice_rule)
 from tracktime.views.projects import (
     projects, archived_projects, archive_project, unarchive_project)
 from tracktime.views.report import (
     project_work_summary, project_work_report)
 from tracktime.views.settings import settings
 from tracktime.views.to_do import (
-    to_do, to_do_done, to_do_not_done, delete_to_do,
-    to_do_for_another_project)
+    to_do, to_do_done, to_do_not_done, to_do_for_another_project)
 
 
 tracktime_urls = [
@@ -29,6 +28,7 @@ tracktime_urls = [
         name='project_work_report'),
 
     path('invoices', project_invoices, name='project_invoices'),
+    path('all_invoices', all_project_invoices, name='all_project_invoices'),
     path(
         'invoice/edit/<pk>', edit_project_invoice,
         name='edit_project_invoice'),
@@ -45,7 +45,6 @@ tracktime_urls = [
         name='delete_work_session'),
     path('to_do_done', to_do_done, name='to_do_done'),
     path('to_do_not_done', to_do_not_done, name='to_do_not_done'),
-    path('delete_to_do', delete_to_do, name='delete_to_do'),
 
     path('projects', projects, name='projects'),
     path(

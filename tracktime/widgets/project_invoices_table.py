@@ -21,6 +21,7 @@ class ProjectInvoicesTable(InvoicesTable):
     return 'view_invoice'
 
   def add_invoice_row(self, invoice, buttons, row_class):
-    self.create_row([
+    cells = [
         invoice.invoice_id, invoice.project.name, invoice.total,
-        invoice.status(), Cell(buttons)], classes=[row_class], pk=invoice.pk)
+        invoice.status_with_date(), Cell(buttons)]
+    self.create_row(cells, classes=[row_class], pk=invoice.pk)

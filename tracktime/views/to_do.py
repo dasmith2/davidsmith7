@@ -65,11 +65,6 @@ def to_do_not_done(request):
   to_do.save()
 
 
-@ajax_endpoint_login_required
-def delete_to_do(request):
-  _ajax_to_do(request).mark_deleted()
-
-
 def _ajax_to_do(request):
   pk = get_request_variable(request, 'pk')
   to_do = ToDo.live.filter(pk=pk).first()
@@ -90,5 +85,4 @@ def to_do_context(to_do_table, request, **kwargs):
   return tracktime_context(
       TO_DO, request, to_do_table=to_do_table,
       to_do_done_url=reverse(to_do_done),
-      not_done_url=reverse(to_do_not_done),
-      delete_to_do_url=reverse(delete_to_do), **kwargs)
+      not_done_url=reverse(to_do_not_done), **kwargs)

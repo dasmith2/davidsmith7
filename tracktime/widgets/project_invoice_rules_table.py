@@ -27,9 +27,11 @@ class ProjectInvoiceRulesTable(Table):
           'Create new invoice', button_type='submit', pk=rule.pk)
       if create_new_invoice_button.get_was_clicked(self.request_POST):
         rule.create_invoice()
+      buttons = [
+          InHref('Edit', href, classes=['button']), create_new_invoice_button]
       self.create_row([
-          InHref(rule.project.name, href), '{} / hr'.format(rule.hourly_rate),
-          create_new_invoice_button])
+          rule.project.name, '{} / hr'.format(rule.hourly_rate),
+          buttons])
 
   def add_final_row(self):
     self.create_new_button = InHref(

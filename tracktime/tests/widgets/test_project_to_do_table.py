@@ -12,8 +12,8 @@ from tracktime.widgets.project_to_do_table import ProjectToDoTable
 class ProjectToDoTableTests(TestCase):
   def setUp(self):
     super().setUp()
-    self.project = get_test_project(name='My rad project')
     self.user = get_test_user()
+    self.project = get_test_project(name='My rad project', creator=self.user)
 
     get_test_project_to_do(  # Other project
         description='two', creator=self.user, project=get_test_project())
@@ -36,7 +36,7 @@ class ProjectToDoTableTests(TestCase):
         creator=self.user, project=self.project,
         description='Hello world!', done__isnull=True).first()
     description = TextAreaField(
-        'edit_description', default='Hello world!', required=False)
+        'description', default='Hello world!', required=False)
     table.rows[0].assertEqual(Row([
         project_field(self.user),
         TextAreaField('new_description', required=True),

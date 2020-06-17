@@ -11,8 +11,8 @@ class TestCaseWithData(TestCase):
     self.user = get_test_user()
 
   def setup_projects(self):
-    self.project_1 = get_test_project(name='Project 1')
-    self.project_2 = get_test_project(name='Project 2')
+    self.project_1 = get_test_project(name='Project 1', creator=self.user)
+    self.project_2 = get_test_project(name='Project 2', creator=self.user)
 
   def setup_work_sessions(self):
     self.work_session_1 = get_test_project_work_session(

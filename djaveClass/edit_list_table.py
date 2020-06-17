@@ -14,11 +14,19 @@ class EditListTable(Table):
 
     super().__init__(*args, **kwargs)
 
-  def wire_up_edit_ajax(self, columns):
+  def wire_up_edit_ajax(self, column_or_columns, selector_or_selectors=None):
+    if isinstance(column_or_columns, str):
+      column_or_columns = [column_or_columns]
+    if isinstance(selector_or_selectors, str):
+      selector_or_selectors = [selector_or_selectors]
+
     entries = []
-    for column in columns:
+    for i, column in enumerate(column_or_columns):
+      selector = '.{}'.format(column)
+      if selector_or_selectors and len(selector_or_selectors) >= i:
+        selector = selector_or_selectors[i]
       entries.append(
-          "wire_up_ajax_save_field('.{}', '{}');".format(column, column))
+          "wire_up_ajax_save_field('{}', '{}');".format(selector, column))
     self._append_js('\n'.join(entries))
 
   def wire_up_delete_ajax(self, selector, confirm_question=None):
