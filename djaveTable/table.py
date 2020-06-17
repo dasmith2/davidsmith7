@@ -1,7 +1,6 @@
 """ This is an HTML table. It's for displaying things and that's it. Don't get
 fancy.  """
 from django.utils.safestring import mark_safe
-from djaveTable.csv import csv_writer_and_response
 from djaveTable.cell_content import (
     CellContent, cell_contents_as_html, cell_contents_as_csv,
     obj_as_cell_content)
@@ -11,14 +10,15 @@ from djaveTest.unit_test import recursive_assert_equal
 class Table(object):
   def __init__(
       self, headers=None, rows=None, classes=[], title=None, js=None, css=None,
-      additional_attrs=None):
+      additional_attrs=None, post_table_buttons=None):
     self.headers = headers  # headers can be strings or Cells or nothing.
     self.rows = rows or []
     self.classes = classes
     self.title = title
-    self.js = js
+    self.js = js or ''
     self.css = css
     self.additional_attrs = additional_attrs or {}
+    self.post_table_buttons = post_table_buttons or []
 
   def create_row(
       self, cells=None, additional_attrs=None, classes=None, pk=None):
@@ -28,24 +28,22 @@ class Table(object):
     self.rows.append(row)
     return row
 
-  def csv_response(self, file_name):
-    writer, response = csv_writer_and_response(file_name)
+  def write_csv(self, writer):
     header_row = []
     for header in self.headers:
       if isinstance(header, Cell):
         header_row.append(header.as_csv())
       else:
-        header_row.append(header)
+        header_row.append(cell_contents_as_csv(header))
     writer.writerow(header_row)
     for row in self.rows:
       csv_row = []
       for cell in row.cells:
-        if isinstance(cell, [Cell, CellContent]):
+        if isinstance(cell, (Cell, CellContent)):
           csv_row.append(cell.as_csv())
         else:
-          csv_row.append(cell)
+          csv_row.append(cell_contents_as_csv(cell))
       writer.writerow(csv_row)
-    return response
 
   def as_html(self):
     table_start = []
@@ -79,8 +77,18 @@ class Table(object):
     to_return.extend(self._rows_html())
 
     to_return.append('</table>')
+
+    if self.post_table_buttons:
+      to_return.append(
+          '<div class="margin-top-half post-table-button-wrapper '
+          'spread-buttons">')
+      for button in self.post_table_buttons:
+        to_return.append(button.as_html())
+      to_return.append('</div>')
+
     self._js_or_css_helper('script', self.js, to_return)
     self._js_or_css_helper('style', self.css, to_return)
+
     return mark_safe('\n'.join(to_return))
 
   def _js_or_css_helper(self, tag_name, this_content, content_list):

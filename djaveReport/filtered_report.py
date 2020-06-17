@@ -2,6 +2,8 @@ from django.template import loader
 from djaveForm.button import Button
 from djaveForm.form import Form
 from djaveForm.form_element import FormElement
+from djaveTable.cell_content import Paragraph
+from djaveTable.table import Table
 
 
 class FilteredReport(object):
@@ -15,8 +17,13 @@ class FilteredReport(object):
 
   def as_html(self):
     template = loader.get_template('filtered_report.html')
+    use_contents = self._contents
+    if len(self._contents) == 0 or (
+        len(self._contents) == 1 and isinstance(self._contents[0], Table) and (
+            len(self._contents[0].rows) == 0)):
+      use_contents = [Paragraph('Nothing to report')]
     context = {
-        'filters': self._filters, 'contents': self._contents,
+        'filters': self._filters, 'contents': use_contents,
         'report_button': self.report_button}
     return template.render(context)
 

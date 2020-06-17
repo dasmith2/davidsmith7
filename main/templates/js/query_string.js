@@ -40,11 +40,15 @@ function get_query_string_obj(search) {
 }
 
 function refresh_with_query_string(query_str_or_obj) {
+  window.location = current_url_with_query_string(query_str_or_obj);
+}
+
+function current_url_with_query_string(query_str_or_obj) {
   var str = query_str_or_obj;
   if (typeof(query_str_or_obj) == 'object') {
     str = query_string_obj_to_str(strip_empty_values(query_str_or_obj));
   }
-  window.location = window.location.pathname + str;
+  return window.location.pathname + str;
 }
 
 function strip_empty_values(query_string_obj) {

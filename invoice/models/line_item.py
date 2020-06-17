@@ -1,4 +1,4 @@
-from djaveAPI.models.publishable import Publishable
+from djaveAPI.models.publishable import Publishable, LivePublishableManager
 from djaveAPI.models.user_api_key import UserAPIKey
 from djaveClass.models.base_knows_child import BaseKnowsChild
 from django.db import models
@@ -13,6 +13,12 @@ from invoice.models.invoice import Invoice
 def save_profile(sender, instance, **kwargs):
   if issubclass(sender, LineItem):
     instance.invoice.calculate_total()
+
+
+class LiveLineItemManager(LivePublishableManager):
+  def get_line_items_from_invoices(self, invoices):
+    return self.filter(invoice__in=invoices).select_related(
+        'invoice').order_by('invoice')
 
 
 class LineItem(Publishable, BaseKnowsChild):
@@ -32,3 +38,5 @@ class LineItem(Publishable, BaseKnowsChild):
     if api_key_type is UserAPIKey:
       return UserAPIKey.objects.filter(user=self.invoice.creator)
     raise Exception('I dont know how to check which {} can see this Invoice')
+
+  live = LiveLineItemManager()

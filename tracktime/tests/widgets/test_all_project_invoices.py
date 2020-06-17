@@ -12,4 +12,4 @@ class AllProjectInvoicesTests(TestCase):
     get_test_project_invoice(
         creator=user, created=to_tz_dt('2020-01-14'))
     all_invoices = AllProjectInvoices(user, {}, to_tz_dt('2020-01-15 12:00'))
-    self.assertEqual(1, len(all_invoices.all_invoices_table.rows))
+    self.assertEqual(1, len(all_invoices.table.rows))

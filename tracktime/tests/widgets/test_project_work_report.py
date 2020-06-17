@@ -37,6 +37,7 @@ class ProjectWorkReportTests(TestCaseWithData):
 
 class ProjectWorkReportUrlTests(TestCaseWithData):
   def test_project_work_report_url(self):
+    self.setup_user()
     self.setup_projects()
     expected_url = reverse('project_work_report') + '?project=' + str(
         self.project_1.pk)

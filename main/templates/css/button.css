@@ -17,3 +17,7 @@ button[disabled], .button[disabled], input[type=submit][disabled], input[type=bu
   opacity: 0.4;
   background: #999;}
 a.button { text-decoration: none; display: inline-block; }
+/* Normally the buttons are pretty tight together, but sometimes you want them
+ * to breath a little. */
+.spread-buttons button, .spread-buttons a.button, .spread-buttons a, .spread-buttons input {
+    margin-right: 20px; }

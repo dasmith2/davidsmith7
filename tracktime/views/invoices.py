@@ -1,6 +1,8 @@
+
 from django.shortcuts import render, redirect, get_object_or_404, reverse
 from djaveLogin.login_required import login_required
 from djaveTable.cell_content import Tooltip
+from djaveCSV import CanCSVResponse, CanCSV
 
 from invoice.models.invoice import Invoice
 from invoice.widgets.edit_invoice import EditInvoice
@@ -9,6 +11,7 @@ from tracktime.models.project_invoice import ProjectInvoice
 from tracktime.models.project_invoice_rule import ProjectInvoiceRule
 from tracktime.views.util import tracktime_context, INVOICES
 from tracktime.widgets.all_project_invoices import AllProjectInvoices
+from tracktime.widgets.all_project_line_items import AllProjectLineItems
 from tracktime.widgets.project_invoice_rule_table import (
     ProjectInvoiceRuleTable)
 from tracktime.widgets.project_invoice_rules_table import (
@@ -49,12 +52,23 @@ def project_invoices(request):
 
 
 @login_required
+@CanCSV
 def all_project_invoices(request):
-  all_invoices = AllProjectInvoices(request.user, request.GET)
+  report = AllProjectInvoices(request.user, request.GET)
   context = tracktime_context(
-      INVOICES, request,
-      the_one_thing_on_the_page=all_invoices)
-  return render(request, 'tracktime_base.html', context)
+      INVOICES, request, the_one_thing_on_the_page=report)
+  return CanCSVResponse(
+      'tracktime_base.html', context, report.table, 'invoices.csv')
+
+
+@login_required
+@CanCSV
+def project_line_items(request):
+  report = AllProjectLineItems(request.user, request.GET)
+  context = tracktime_context(
+      INVOICES, request, the_one_thing_on_the_page=report, title='Line items')
+  return CanCSVResponse(
+      'tracktime_base.html', context, report.table, 'line_items.csv')
 
 
 @login_required

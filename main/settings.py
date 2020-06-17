@@ -168,6 +168,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'djaveAPI',
+    'djaveCSV',
     'djavError',
     'djaveLogin',
     'djaveReport',

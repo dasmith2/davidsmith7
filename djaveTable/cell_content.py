@@ -1,7 +1,7 @@
 from datetime import datetime, date, timedelta, time
 
 from django.utils.safestring import mark_safe
-from djaveDT import tz_dt_to_str, time_to_time_str, d_to_str
+from djaveDT import tz_dt_to_str, time_to_time_str, d_to_str, tz_dt_to_tz_dt
 from djmoney.money import Money
 
 
@@ -89,6 +89,11 @@ class StringContent(CellContent):
     return self.the_string
 
 
+class Paragraph(StringContent):
+  def as_html(self):
+    return mark_safe('<p>{}</p>'.format(super().as_html()))
+
+
 class Img(CellContent):
   def __init__(self, img_src):
     self.img_src = img_src
@@ -161,17 +166,17 @@ def cell_contents_as_html(cell_contents):
 
 def cell_contents_as_csv(cell_contents):
   to_return = []
-  for cell_content in _cell_contents_as_list(cell_contents):
+  for cell_content in _cell_contents_as_list(cell_contents, csv=True):
     to_return.append(cell_content.as_csv())
   return ''.join(to_return)
 
 
-def _cell_contents_as_list(cell_contents):
+def _cell_contents_as_list(cell_contents, csv=False):
   if not isinstance(cell_contents, list):
-    return _cell_contents_as_list([cell_contents])
+    return _cell_contents_as_list([cell_contents], csv=csv)
   to_return = []
   for cell_content in cell_contents:
-    to_return.append(obj_as_cell_content(cell_content))
+    to_return.append(obj_as_cell_content(cell_content, csv=csv))
   return to_return
 
 
@@ -179,22 +184,31 @@ def is_primitive(obj):
   return isinstance(obj, (int, str, bool, float))
 
 
-def obj_as_cell_content(obj):
+def obj_as_cell_content(obj, csv=False):
   if isinstance(obj, CellContent):
     return obj
   if is_primitive(obj):
-    return StringContent(str(obj))
+    if csv:
+      return StringContent(str(obj).replace('\n', ' '))
+    else:
+      return StringContent(str(obj))
   if obj is None:
     return StringContent('')
   if isinstance(obj, datetime):
-    return tz_dt_to_str(obj)
+    if csv:
+      return StringContent(tz_dt_to_tz_dt(obj).isoformat())
+    else:
+      return StringContent(tz_dt_to_str(obj))
   if isinstance(obj, date):
-    return d_to_str(obj)
+    if csv:
+      return StringContent(obj.isoformat())
+    else:
+      return StringContent(d_to_str(obj))
   if isinstance(obj, timedelta):
     # Trim off microseconds.
-    return str(timedelta(days=obj.days, seconds=obj.seconds))
+    return StringContent(str(timedelta(days=obj.days, seconds=obj.seconds)))
   if isinstance(obj, time):
-    return time_to_time_str(obj)
+    return StringContent(time_to_time_str(obj))
   if isinstance(obj, list):
     return CellContentList([
         obj_as_cell_content(cell_content) for cell_content in obj])

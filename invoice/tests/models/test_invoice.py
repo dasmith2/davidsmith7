@@ -35,6 +35,7 @@ def set_invoice_stuff(invoice, **kwargs):
   invoice.save()
   if 'created' in kwargs:
     Invoice.objects.filter(pk=invoice.pk).update(created=kwargs['created'])
+    invoice.refresh_from_db()
   return invoice
 
 
