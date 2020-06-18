@@ -6,10 +6,10 @@ from tracktime.fields import project_field
 from tracktime.models.project_to_do import ProjectToDo
 from tracktime.tests.models.test_project import get_test_project
 from tracktime.tests.models.test_project_to_do import get_test_project_to_do
-from tracktime.widgets.project_to_do_table import ProjectToDoTable
+from tracktime.widgets.project_to_dos_table import ProjectToDosTable
 
 
-class ProjectToDoTableTests(TestCase):
+class ProjectToDosTableTests(TestCase):
   def setUp(self):
     super().setUp()
     self.user = get_test_user()
@@ -19,19 +19,20 @@ class ProjectToDoTableTests(TestCase):
         description='two', creator=self.user, project=get_test_project())
 
   def test_new_to_do(self):
-    ProjectToDoTable(self.user, self.project, {
+    ProjectToDosTable(self.user, {
         'new_description': 'Hello world!',
-        'todo': 'yep'})
+        'todo': 'yep'}, project=self.project)
     ProjectToDo.live.filter(
         creator=self.user, project=self.project,
         description='Hello world!', done__isnull=True).first()
 
   def test_new_to_do_all_projects(self):
-    table = ProjectToDoTable(
-        self.user, None, {
-            'new_description': 'Hello world!',
-            'project': self.project.pk,
-            'todo': 'yep'})
+    table = ProjectToDosTable(self.user, {
+        'new_description': 'Hello world!',
+        'project': self.project.pk,
+        'todo': 'yep'})
+    table.populate_rows()
+
     to_do = ProjectToDo.live.filter(
         creator=self.user, project=self.project,
         description='Hello world!', done__isnull=True).first()

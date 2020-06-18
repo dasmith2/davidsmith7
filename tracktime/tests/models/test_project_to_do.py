@@ -12,14 +12,13 @@ def get_test_project_to_do(**kwargs):
   return set_to_do_stuff(ProjectToDo(project=project), **kwargs)
 
 
-class NotDoneTests(TestCase):
-  def test_not_done(self):
-    project_1 = get_test_project(name='Time Tracker')
-    project_2 = get_test_project(name='Davespace')
+class FilterTests(TestCase):
+  def test_filter_project(self):
     user = get_test_user()
+    project = get_test_project()
+    project_to_do = get_test_project_to_do(project=project, creator=user)
+    get_test_project_to_do(project=get_test_project(), creator=user)
 
-    not_done_1 = get_test_project_to_do(project=project_1, creator=user)
-    get_test_project_to_do(project=project_2, creator=user)
-
-    self.assertEqual(
-        [not_done_1], list(ProjectToDo.live.not_long_done(user, project_1)))
+    to_dos = ProjectToDo.live.allowed_by_user(user)
+    self.assertEqual([project_to_do], list(
+        ProjectToDo.live.filter_project(to_dos, project)))

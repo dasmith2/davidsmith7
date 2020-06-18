@@ -84,7 +84,7 @@ table { margin-top: 20px; }
     {% if stop_problem %}
       <div>{{ stop_problem.as_html }}</div>
     {% endif %}
-    {{ to_do_table.as_html }}
+    {{ to_dos_table.as_html }}
   {% else %}
     {{ punch_in_table.as_html }}
   {% endif %}

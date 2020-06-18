@@ -11,7 +11,7 @@ from tracktime.models.latest_project import get_latest_project
 PROJECT = 'project'
 
 
-def project_field(user=None, label=None, required=True):
+def project_field(user, label=None, required=True):
   default = None
   if user and required:
     latest_project = get_latest_project(user)

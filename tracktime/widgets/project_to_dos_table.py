@@ -2,7 +2,7 @@ from tracktime.fields import project_field
 from tracktime.models.latest_project import set_latest_project
 from tracktime.models.project import Project
 from tracktime.models.project_to_do import ProjectToDo
-from tracktime.widgets.to_do_table import ToDoForm, ToDoTable
+from tracktime.widgets.to_dos_table import ToDoForm, ToDosTable
 
 
 class ProjectToDoForm(ToDoForm):
@@ -19,10 +19,8 @@ class ProjectToDoForm(ToDoForm):
     return fields
 
 
-class ProjectToDoTable(ToDoTable):
-  def __init__(self, user, project, form_data, nnow=None):
-    """ If project is None, show a project column and pull to do items from all
-    projects. """
+class ProjectToDosTable(ToDosTable):
+  def __init__(self, user, form_data, project=None, nnow=None):
     self.project = project
     super().__init__(user, form_data, nnow=nnow)
 
@@ -31,6 +29,14 @@ class ProjectToDoTable(ToDoTable):
 
   def get_form(self):
     return ProjectToDoForm(self.user, do_all_projects=self.do_all_projects())
+
+  def get_headers(self):
+    headers = []
+    if self.should_filter_created():
+      if not self.project:
+        headers.append('Project')
+      headers.extend(['Description', 'Created', ''])
+    return headers
 
   def create_to_do(self):
     project = self.project
@@ -49,8 +55,17 @@ class ProjectToDoTable(ToDoTable):
     cells.extend(super().cells_for_enter_new())
     return cells
 
-  def get_not_long_done(self):
-    return ProjectToDo.live.not_long_done(self.user, self.project)
+  def get_to_dos(self):
+    to_dos = super().get_to_dos()
+
+    manager = self.to_do_class().live
+    if self.project:
+      to_dos = manager.filter_project(to_dos, self.project)
+
+    return to_dos
+
+  def to_do_class(self):
+    return ProjectToDo
 
   def cells_for_existing(self, to_do):
     cells = []

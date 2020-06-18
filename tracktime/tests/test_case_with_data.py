@@ -24,8 +24,7 @@ class TestCaseWithData(TestCase):
   def setup_to_dos(self):
     self.to_do = get_test_project_to_do(
         creator=self.user, project=self.project_1,
-        description='Glue the arms on the manikin', done='2020-01-15 11:30',
-        done_by=self.user)
+        description='Glue the arms on the manikin', done='2020-01-15 11:30')
 
   def setup_everything(self):
     self.setup_user()
@@ -52,5 +51,5 @@ class TestCaseWithData(TestCase):
         creator=self.user, project=self.project_1,
         description='Drink the leftover coffee')
     get_test_project_to_do(  # Done a long time ago
-        creator=self.user, done_by=self.user, project=self.project_1,
+        creator=self.user, project=self.project_1,
         description='I\'m going to not vote yes', done='2020-01-05')

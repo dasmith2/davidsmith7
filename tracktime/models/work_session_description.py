@@ -112,12 +112,15 @@ class WorkSessionDescriptions(object):
     return self.to_do_class()
 
   def get_to_dos(self, work_sessions):
-    # Don't use self.from_date because that's optional.
+    manager = self._to_do_class().live
     if not work_sessions:
-      return self._to_do_class().live.none()
+      return manager.none()
+
+    # Don't use self.from_date because that's optional.
     from_date = min([work_session.date for work_session in work_sessions])
-    return self._to_do_class().live.done_by_user_in_date_range(
-        self.user, from_date, self.to_date)
+
+    to_dos = manager.allowed_by_user(self.user)
+    return manager.filter_done(to_dos, from_date, self.to_date)
 
   def time_description(self, work_session):
     return work_session.describe_time_span(self.tz_str)

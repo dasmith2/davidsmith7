@@ -6,33 +6,57 @@ from django.db.models import Q
 from djaveAPI.models.user_api_key import UserAPIKey
 from djaveAPI.models.publishable import Publishable, LivePublishableManager
 from djaveDT import beginning_of_day, now
+from djaveForm.field import SelectField, Option
 
 
-DELETED = 'DELETED'
-DONE = 'DONE'
-OPEN = 'OPEN'
+DONE = 'Done'
+NOT_DONE = 'Not done'
+
+
+def get_status_filter():
+  options = [Option(status, status) for status in [DONE, NOT_DONE]]
+  return SelectField(
+      key_prefix='to_do_status', options=options, required=False,
+      label='Status')
 
 
 class ToDoManager(LivePublishableManager):
-  def not_long_done(self, creator, nnow=None):
-    """ This is what shows in tracktime.widgets.to_do_table. If you did
-    something recently, it still shows. """
-    nnow = nnow or now()
-    return self.filter(
-        Q(done=None) | Q(done__gte=nnow - timedelta(days=1)),
-        creator=creator).select_related(
-            *self.select_related_list()).order_by('-done', '-pk')
+  def order_for_doing(self, qs):
+    return qs.select_related(
+        *self.select_related_list()).order_by('-done', '-pk')
 
-  def done_by_user_in_date_range(
-      self, done_by, from_date, to_date, tz_str=None):
-    from_dt = beginning_of_day(from_date, tz_str=tz_str)
-    to_dt = beginning_of_day(to_date + timedelta(days=1), tz_str=tz_str)
-    return self.filter(
-        done_by=done_by, done__gte=from_dt, done__lte=to_dt).select_related(
+  def order_for_all(self, qs):
+    return qs.select_related(
         *self.select_related_list()).order_by('-pk')
 
+  def filter_not_long_done(self, qs, nnow=None):
+    """ This is what shows in tracktime.widgets.to_dos_table. If you did
+    something recently, it still shows. """
+    nnow = nnow or now()
+    return qs.filter(Q(done=None) | Q(done__gte=nnow - timedelta(days=1)))
+
+  def filter_created(self, qs, from_date, to_date, tz_str=None):
+    (from_dt, to_dt) = self._from_dt_to_dt(from_date, to_date, tz_str=tz_str)
+    return qs.filter(created__gte=from_dt, created__lte=to_dt)
+
+  def filter_done(self, qs, from_date, to_date, tz_str=None):
+    (from_dt, to_dt) = self._from_dt_to_dt(from_date, to_date, tz_str=tz_str)
+    return qs.filter(done__gte=from_dt, done__lte=to_dt)
+
+  def filter_status(self, qs, status):
+    if status == DONE:
+      return qs.filter(done__isnull=False)
+    elif status == NOT_DONE:
+      return qs.filter(done__isnull=True)
+    raise Exception(status)
+
+  def _from_dt_to_dt(self, from_date, to_date, tz_str=None):
+    return (
+        beginning_of_day(from_date, tz_str=tz_str),
+        beginning_of_day(to_date + timedelta(days=1), tz_str=tz_str))
+
   def select_related_list(self):
-    return ['creator', 'done_by']
+    return ['creator']
 
 
 class ToDo(Publishable):
@@ -43,31 +67,19 @@ class ToDo(Publishable):
   creator = models.ForeignKey(
       User, on_delete=models.PROTECT, related_name='creator', help_text=(
           'Who created this ToDo?'))
-  done_by = models.ForeignKey(
-      User, on_delete=models.PROTECT, related_name='done_by', null=True,
-      blank=True, help_text='Who completed this ToDo?')
 
   live = ToDoManager()
 
   @classmethod
   def filter_allowed_by_user(cls, user, query_set):
-    return query_set.filter(Q(creator=user) | Q(done_by=user))
+    return query_set.filter(creator=user)
 
   def allowed_api_keys(self, api_key_type):
     if api_key_type is UserAPIKey:
-      users = set([self.creator])
-      if self.done_by:
-        users.add(self.done_by)
-      return UserAPIKey.objects.filter(user__in=users)
+      return UserAPIKey.objects.filter(user=self.creator)
     else:
       raise Exception('I dont know which {} are allowed'.format(
           api_key_type.__class__))
-
-  def explain_why_invalid(self):
-    if int(bool(self.done)) + int(bool(self.done_by)) == 1:
-      return ((
-          'A done ToDo should say done_by and done. You specified '
-          '{} and {} respectively').format(self.done, self.done_by))
 
   @classmethod
   def model_description(cls):

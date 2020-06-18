@@ -12,7 +12,8 @@ from djaveTable.problem import Problem as HtmlProblem
 from tracktime.models.to_do import ToDo
 from tracktime.models.project_work_session import ProjectWorkSession
 from tracktime.widgets.punch_the_clock import PunchTheClockTable
-from tracktime.widgets.project_to_do_table import ProjectToDoTable
+from tracktime.widgets.project_to_dos_table import ProjectToDosTable
+from tracktime.widgets.all_project_to_dos import AllProjectToDos
 from tracktime.views.util import tracktime_context, TO_DO
 
 
@@ -28,7 +29,7 @@ def to_do(request):
       'Punch out', key_prefix='punch_out_on_to_do', button_type='submit')
 
   project = None
-  to_do_table = None
+  to_dos_table = None
   clock_running = ProjectWorkSession.live.get_clock_running(user=request.user)
   stop_problem = ''
   if clock_running:
@@ -38,10 +39,11 @@ def to_do(request):
         clock_running.stop()
         return redirect('enter_time')
       stop_problem = HtmlProblem(clock_running.explain_why_can_not_stop())
-    to_do_table = ProjectToDoTable(
-        user=request.user, project=project, form_data=request.POST)
+    to_dos_table = ProjectToDosTable(
+        user=request.user, form_data=request.POST, project=project)
+    to_dos_table.populate_rows()
   context = to_do_context(
-      to_do_table, request, project=project,
+      to_dos_table, request, project=project,
       punch_in_table=punch_in_table,
       punch_out_button=punch_out_button,
       stop_problem=stop_problem,
@@ -53,7 +55,6 @@ def to_do(request):
 def to_do_done(request):
   to_do = _ajax_to_do(request)
   to_do.done = now()
-  to_do.done_by = request.user
   to_do.save()
 
 
@@ -61,7 +62,6 @@ def to_do_done(request):
 def to_do_not_done(request):
   to_do = _ajax_to_do(request)
   to_do.done = None
-  to_do.done_by = None
   to_do.save()
 
 
@@ -75,14 +75,13 @@ def _ajax_to_do(request):
 
 @login_required
 def to_do_for_another_project(request):
-  to_do_table = ProjectToDoTable(
-      user=request.user, project=None, form_data=request.POST)
-  context = to_do_context(to_do_table, request)
+  all_project_to_dos = AllProjectToDos(request)
+  context = to_do_context(all_project_to_dos, request)
   return render(request, 'to_do_for_another_project.html', context)
 
 
-def to_do_context(to_do_table, request, **kwargs):
+def to_do_context(to_dos_table, request, **kwargs):
   return tracktime_context(
-      TO_DO, request, to_do_table=to_do_table,
+      TO_DO, request, to_dos_table=to_dos_table,
       to_do_done_url=reverse(to_do_done),
       not_done_url=reverse(to_do_not_done), **kwargs)
