@@ -1,16 +1,22 @@
 from datetime import datetime
 from django.conf import settings
+from django.db import connection
 
-from djavError.models import Error, LongRequest
+from djavError.models import Error, LongRequest, TooManyQueriesRequest
 
 
-def TrackRequestTimeMiddleware(get_response):
+def TrackRequestTimeAndQueriesMiddleware(get_response):
   def middleware(request):
     start = datetime.now()
+    start_query_count = len(connection.queries)
+
     response = get_response(request)
+
+    query_count = len(connection.queries) - start_query_count
     duration_delta = datetime.now() - start
     duration_seconds = (
         duration_delta.seconds + duration_delta.microseconds / 1000000)
+
     if duration_seconds > settings.MAX_ALLOWED_REQUEST_TIME:
       method = request.method
       variables = None
@@ -18,11 +24,26 @@ def TrackRequestTimeMiddleware(get_response):
         variables = request.GET
       elif method == 'POST':
         variables = request.POST
-      LongRequest.objects.create(
-          path=request.path, duration=duration_seconds, method=method,
-          variables=variables)
-    return response
+      existing = LongRequest.objects.filter(
+          path=request.path, method=method, variables=variables).first()
+      if existing:
+        existing.increment(duration_seconds)
+      else:
+        LongRequest.objects.create(
+            path=request.path, total_duration=duration_seconds, method=method,
+            variables=variables)
 
+    if query_count > settings.MAX_ALLOWED_DB_QUERIES:
+      existing = TooManyQueriesRequest.objects.filter(
+          path=request.path, method=method, variables=variables).first()
+      if existing:
+        existing.increment(query_count)
+      else:
+        TooManyQueriesRequest.objects.create(
+            path=request.path, total_query_count=query_count, method=method,
+            variables=variables)
+
+    return response
   return middleware
 
 

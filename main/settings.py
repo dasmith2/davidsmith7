@@ -103,6 +103,8 @@ NETWORK_WRITES_OK = PROD and NETWORK_READS_OK
 
 # Notifications for requests that take too long
 MAX_ALLOWED_REQUEST_TIME = 0.5  # seconds
+# Or do too many database queries
+MAX_ALLOWED_DB_QUERIES = 10
 
 
 """ URL stuff. """
@@ -198,6 +200,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'djavError.middleware.TrackRequestTimeAndQueriesMiddleware',
+    'djavError.middleware.LogExceptionsMiddleware'
 ]
 
 if DEBUG:

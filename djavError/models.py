@@ -216,11 +216,8 @@ class LongRequestManager(RmOldManager):
         count=1)
 
 
-class LongRequest(models.Model):
-  """ Requests that took too long. """
+class ProblemRequest(models.Model):
   path = models.CharField(max_length=300)
-  total_duration = models.DecimalField(
-      decimal_places=3, max_digits=10, help_text=('In seconds.'))
   method = models.CharField(max_length=10)
   variables = models.TextField(
       help_text='request.POST or request.GET, depending on the method')
@@ -228,10 +225,45 @@ class LongRequest(models.Model):
   latest = models.DateTimeField()
   count = models.PositiveIntegerField(default=1)
 
+  def increment(self):
+    self.count += 1
+    self.latest = now()
+    self.save()
+
+  def save(self, *args, **kwargs):
+    if not self.latest:
+      self.latest = now()
+    super().save(*args, **kwargs)
+
+  class Meta:
+    abstract = True
+
+
+class LongRequest(ProblemRequest):
+  """ Requests that took too long. """
+  total_duration = models.DecimalField(
+      decimal_places=3, max_digits=10, help_text=('In seconds.'))
+
   objects = LongRequestManager()
+
+  def increment(self, duration):
+    self.total_duration += duration
+    super().increment()
+
+  def average_duration(self):  # In seconds.
+    return self.total_duration / self.count
 
   class Meta:
     ordering = ('-created',)
 
-  def average_duration(self):  # In seconds.
-    return self.total_duration / self.count
+
+class TooManyQueriesRequest(ProblemRequest):
+  total_query_count = models.PositiveIntegerField(help_text=(
+      'How many database queries happened in these requests?'))
+
+  def increment(self, query_count):
+    self.total_query_count += query_count
+    super().increment()
+
+  def average_query_count(self):
+    return self.total_query_count / self.count
