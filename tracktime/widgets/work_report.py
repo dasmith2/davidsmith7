@@ -34,8 +34,8 @@ class WorkReportContent(object):
   def get_descriptions(self):
     return self.work_session_descriptions.get_work_session_descriptions()
 
-  def get_total(self):
-    return round(self.work_session_descriptions.get_total(), 2)
+  def get_total_hours(self):
+    return round(self.work_session_descriptions.get_total_hours(), 2)
 
   def as_html(self):
     template = loader.get_template('work_report.html')
@@ -45,4 +45,4 @@ class WorkReportContent(object):
     return template.render(context)
 
   def html_header(self):
-    return 'Total: {} hours'.format(self.get_total())
+    return 'Total: {} hours'.format(self.get_total_hours())

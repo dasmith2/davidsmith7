@@ -1,5 +1,3 @@
-from django.db.models import Q
-
 from tracktime.models.work_session_description import WorkSessionDescriptions
 from tracktime.models.project_work_session import ProjectWorkSession
 from tracktime.models.project_to_do import ProjectToDo
@@ -18,14 +16,21 @@ class ProjectWorkSessionDescriptions(WorkSessionDescriptions):
   def show_project(self):
      return not self.project
 
+  def get_work_session_descriptions(self):
+    if self.include_invoiced:
+      return self._work_session_descriptions
+    to_return = []
+    for wsd in self._work_session_descriptions:
+      if wsd.work_session.projectlineitem_or_none is None or (
+          wsd.work_session.projectlineitem.deleted):
+        to_return.append(wsd)
+    return to_return
+
   def get_work_sessions(self):
-    work_sessions = super().get_work_sessions()
+    work_sessions = super().get_work_sessions().select_related(
+        'projectlineitem')
     if self.project:
       work_sessions = work_sessions.filter(project=self.project)
-    if not self.include_invoiced:
-      work_sessions = work_sessions.filter(
-          Q(projectlineitem__isnull=True) | Q(
-              projectlineitem__deleted__isnull=False))
     return work_sessions
 
   def get_to_dos(self, work_sessions):

@@ -54,5 +54,5 @@ class ProjectWorkReportContent(WorkReportContent):
 
   def html_header(self):
     if self.project:
-      return '{}: {} hours'.format(self.project.name, self.get_total())
+      return '{}: {} hours'.format(self.project.name, self.get_total_hours())
     return super().html_header()

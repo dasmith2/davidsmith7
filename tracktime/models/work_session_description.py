@@ -20,7 +20,7 @@ class WorkSessionDescriptions(object):
     self.to_date = to_date
     self.tz_str = tz_str
 
-    self._calc_work_session_descriptions_and_total()
+    self._calc_work_session_descriptions()
 
   def has_work_session_descriptions(self):
     return bool(self.get_work_session_descriptions())
@@ -44,11 +44,13 @@ class WorkSessionDescriptions(object):
         earliest = description.work_session.date
     return earliest
 
-  def get_total(self):
-    return self._total
+  def get_total_hours(self):
+    total_hours = 0.0
+    for wsd in self.get_work_session_descriptions():
+      total_hours += wsd.work_session.hours
+    return total_hours
 
-  def _calc_work_session_descriptions_and_total(self):
-    self._total = 0.0
+  def _calc_work_session_descriptions(self):
     self._work_session_descriptions = []
 
     work_session_i = 0
@@ -85,8 +87,6 @@ class WorkSessionDescriptions(object):
         on_work_session = WorkSessionDescription(
             work_session, self.time_description(work_session), [])
         self._work_session_descriptions.append(on_work_session)
-        if work_session.hours:
-          self._total += work_session.hours
 
     self._work_session_descriptions.reverse()
 

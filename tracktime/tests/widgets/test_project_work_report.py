@@ -32,7 +32,7 @@ class ProjectWorkReportTests(TestCaseWithData):
     expected_sessions = [punched_session, manual_session]
     self.assertEqual(expected_sessions, report_content.get_descriptions())
     self.assertTrue(html.find('Jan 15, 2020, 2.1 hours') >= 0)
-    self.assertEqual(3.2, report_content.get_total())
+    self.assertEqual(3.2, report_content.get_total_hours())
 
 
 class ProjectWorkReportUrlTests(TestCaseWithData):
