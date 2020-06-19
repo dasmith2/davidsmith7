@@ -19,9 +19,7 @@ class Publishable(Allowed, PublishableInterface):
 
   deleted = models.DateTimeField(blank=True, null=True, help_text=(
       'When was this object "deleted"? Deleted objects '
-      'should basically be ignored. By simply marking objects as deleted '
-      'instead of actually deleting them, I make it much simpler for you to '
-      'write code that notices when objects in the API become deleted.'))
+      'should basically be ignored.'))
 
   def delete(self):
     raise Exception(

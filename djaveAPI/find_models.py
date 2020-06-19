@@ -35,3 +35,4 @@ def publishable_model_from_name(model_name):
   for model in publishable_models():
     if model.__name__ == model_name:
       return model
+  raise Exception('Unable to find {}'.format(model_name))

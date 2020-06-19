@@ -18,7 +18,12 @@ def list_or_save_new(request, api_key, model_name):
         model, filter_model(model, api_key, request.GET),
         page=get_page(request.GET))
   elif request.method in ['POST', 'PUT']:
-    instance = save_new(model, get_posted_json(request), api_key)
+    data = get_posted_json(request)
+    if 'id' in data:
+      raise Problem(
+          'When saving a new {}, you should not specify an id'.format(
+              model_name))
+    instance = save_new(model, data, api_key)
     return to_json_dict(instance, model)
   else:
     raise Problem((

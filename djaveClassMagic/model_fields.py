@@ -32,6 +32,8 @@ def model_fields(model, specific_field=None):
       continue
     if isinstance(field, ManyToOneRel):
       continue
+    if 'child_class' == name:
+      continue
 
     can_filter = field.db_index
     help_text = field.help_text
@@ -65,9 +67,16 @@ def model_fields(model, specific_field=None):
         field_type = FLOAT
       if field_type == CHAR:
         max_length = field.max_length
+      if field_type in [CHAR, TEXT] and field.blank:
+        required = False
       if field_type not in TYPES:
         raise Exception(
             'I am not familiar with the {} type'.format(field_type))
+
+      if name.find('_currency') > 0:
+        required = True
+        editable = True
+        help_text = '"USD" typically'
 
     field = ModelField(
         name, _display_name(name), help_text, can_filter, field_type,

@@ -17,6 +17,18 @@ class LiveProjectLineItemManager(LiveLineItemManager):
 
 class ProjectLineItem(LineItem):
   project_work_session = OneToOneOrNoneField(
-      ProjectWorkSession, on_delete=models.PROTECT)
+      ProjectWorkSession, on_delete=models.PROTECT, help_text=(
+          'Which ProjectWorkSession does this ProjectLineItem represent? '
+          'There may be only 1 ProjectLineItem per ProjectWorkSession, '
+          'meaning that a single ProjectWorkSession may appear in 1 Invoice '
+          'at most.'))
+
+  @classmethod
+  def model_description(cls):
+    return (
+        'A ProjectLineItem links a ProjectWorkSession to a ProjectInvoice. '
+        'describe_service starts as the descriptions of the ProjectToDos that '
+        'were marked "Done" during or immediately after the '
+        'ProjectWorkSession.')
 
   live = LiveProjectLineItemManager()

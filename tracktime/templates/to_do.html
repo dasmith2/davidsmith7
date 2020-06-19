@@ -78,7 +78,7 @@ table { margin-top: 20px; }
   {% if project %}
     <h1>Project: {{ project.name }} {{ punch_out_button.as_html }}</h1>
   {% else %}
-    <h2>You have to be on the clock first</h2>
+    <h2>You should be on the clock first</h2>
   {% endif %}
   {% if project %}
     {% if stop_problem %}
@@ -95,7 +95,7 @@ table { margin-top: 20px; }
     {% if project %}
       Wait, I thought of something I need to do for another project
     {% else %}
-      Let me "To do" all projects at once without punching in
+      But you can "To do" without punching in
     {% endif %}
   </a>
 </div>

@@ -14,9 +14,9 @@ from djaveDT import to_tz_dt
 from djaveURL import dict_as_query
 
 
-def model_api_docs(model_name, api_root_url):
+def docs(model_name, api_root_url):
   model = publishable_model_from_name(model_name)
-  template = loader.get_template('model_api_docs.html')
+  template = loader.get_template('docs.html')
   model_description = None
   if hasattr(model, 'model_description'):
     model_description = model.model_description()
@@ -27,10 +27,11 @@ def model_api_docs(model_name, api_root_url):
   model_plural_name = '{}s'.format(model_name)
   context = {
       'model_name': model_name,
+      'model_name_lower': model_name.lower(),
       'model_plural_name': model_plural_name,
       'model_description': model_description,
       'fields_table': field_table(model),
-      'examples': model_api_examples(model, api_root_url)}
+      'examples': examples(model, api_root_url)}
   return template.render(context)
 
 
@@ -40,7 +41,7 @@ GET_PREFIX = 'curl -u <api_key_username>:<api_key_password> {}'
 POST_PREFIX = GET_PREFIX.format('-H "Content-Type: application/json" {}')
 
 
-def model_api_examples(model, api_root_url):
+def examples(model, api_root_url):
   list_url = _base_url(api_root_url, model)
   filter_query_dict = example_filters(model)
   filter_query_dict['page'] = 1
@@ -183,6 +184,8 @@ def _example_value(field):
   elif field.type == FLOAT:
     return 100.1
   elif field.type in [TEXT, CHAR]:
+    if field.name.find('_currency') > 0:
+      return 'USD'
     return 'Hello'
   elif field.type == BOOLEAN:
     return True

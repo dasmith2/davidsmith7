@@ -25,4 +25,10 @@ class ProjectInvoice(Invoice):
     return super().filter_allowed_by_user(
         user, query_set).select_related('project')
 
+  @classmethod
+  def model_description(cls):
+    return (
+        'A ProjectInvoice is an Invoice for time tracked against a Project. '
+        'A ProjectInvoice is made up of ProjectLineItems.')
+
   live = LiveProjectInvoiceManager()

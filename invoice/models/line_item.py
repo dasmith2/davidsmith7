@@ -27,8 +27,9 @@ class LineItem(Publishable, BaseKnowsChild):
       'What did somebody do that was worth charging money for?'))
   amount = MoneyField(max_digits=10, decimal_places=2, help_text=(
       'How much should be charged for this Line Item?'))
-  amount_calculation = models.TextField(help_text=(
-      'Describe the exact forumula used to arrive at the amount'))
+  amount_calculation = models.TextField(
+      null=False, blank=True, default='', help_text=(
+          'Describe the exact forumula used to arrive at the amount'))
 
   @classmethod
   def filter_allowed_by_user(cls, user, query_set):
