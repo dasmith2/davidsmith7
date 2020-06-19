@@ -1,5 +1,5 @@
 from django.shortcuts import reverse
-from djaveClass.edit_table import EditTable
+from djaveClassMagic.edit_table import EditTable
 from djaveForm.button import Button
 
 from invoice.models.invoice import Invoice

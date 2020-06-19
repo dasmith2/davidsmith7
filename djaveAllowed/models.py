@@ -32,9 +32,10 @@ class AllowedInterface(object):
     return cls.filter_live(cls.allowed_by_user(user))
 
   def explain_why_invalid(self):
-    """ If you have anything more complicated than required fields in your
-    class, you'll want to override this function to prevent bad data coming in
-    through the API or through AJAX. """
+    """ If you need to validate anything more complicated than required fields,
+    basic type checking, or who-has-permission-to-see-what, you'll want to
+    override this function to prevent bad data coming in through the API, or
+    through AJAX, or through the class magic edit table. """
     return
 
 

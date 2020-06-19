@@ -7,7 +7,7 @@ import time
 from django.conf import settings
 from django.shortcuts import reverse
 from djaveAPI.status_codes import is_server_error
-from djaveClass.find_models import all_models
+from djaveClassMagic.find_models import all_models
 from djaveLogin.calc_urls import append_next_url, NEXT_URL
 from djaveReport.date_range_report import FROM_DATE, TO_DATE
 from djaveURL import dict_as_query

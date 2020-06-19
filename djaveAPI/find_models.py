@@ -4,7 +4,7 @@ the documentation and the API itself. """
 from django.conf import settings
 from djaveAPI.models.publishable import Publishable
 from djaveAPI.models.pretend_publishable import PretendPublishable
-from djaveClass.find_models import models_in_app
+from djaveClassMagic.find_models import models_in_app
 
 
 def use_model_instance_for_api(instance, publishable_class=None):

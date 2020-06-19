@@ -25,7 +25,7 @@ class ProjectWorkReport(DateRangeReport):
     nnow = nnow or now()
     default_from_date = nnow.date() - timedelta(days=7)
     default_to_date = nnow.date()
-    project_select = project_field(label='Project')
+    project_select = project_field(user, label='Project')
     super().__init__(
         default_from_date, default_to_date, request_get,
         filters=[project_select])

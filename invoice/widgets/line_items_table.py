@@ -1,4 +1,4 @@
-from djaveClass.edit_list_table import EditListTable
+from djaveClassMagic.edit_list_table import EditListTable
 from djaveForm.button import Button
 from djaveForm.field import TextAreaField, TextField, FloatField
 from djaveForm.form import Form

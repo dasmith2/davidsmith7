@@ -1,4 +1,4 @@
-from djaveClass.edit_table import EditTable
+from djaveClassMagic.edit_table import EditTable
 
 from tracktime.fields import project_field
 from tracktime.models.project_invoice_rule import ProjectInvoiceRule

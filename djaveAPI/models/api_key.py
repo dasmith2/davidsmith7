@@ -8,7 +8,7 @@ from django.conf import settings
 from django.contrib.auth.hashers import check_password, make_password
 from django.db import models
 from djaveAllowed.credentials import CredentialsInterface
-from djaveClass.models.base_knows_child import BaseKnowsChild
+from djaveClassMagic.models.base_knows_child import BaseKnowsChild
 from djaveForm.field import URLField
 
 

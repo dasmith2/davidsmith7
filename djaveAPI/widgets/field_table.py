@@ -1,4 +1,4 @@
-from djaveClass.model_fields import model_fields, TEXT, CHAR
+from djaveClassMagic.model_fields import model_fields, TEXT, CHAR
 from djaveTable.table import Table
 
 

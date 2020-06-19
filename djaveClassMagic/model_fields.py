@@ -63,7 +63,7 @@ def model_fields(model, specific_field=None):
         field_type = INTEGER
       if field_type == 'Decimal':
         field_type = FLOAT
-      if field_type == 'Char':
+      if field_type == CHAR:
         max_length = field.max_length
       if field_type not in TYPES:
         raise Exception(

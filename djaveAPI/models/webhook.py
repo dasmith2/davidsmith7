@@ -6,7 +6,7 @@ from djaveAPI.models.pretend_publishable import PretendPublishable
 from djaveAPI.post import post
 from djaveAPI.signals import publishable_post_save
 from djaveAPI.to_json import to_json_dict
-from djaveClass.models.rm_old import RmOld, RmOldManager
+from djaveClassMagic.models.rm_old import RmOld, RmOldManager
 from djaveDT import now
 from djaveThread.background_command import background_command
 from django.core.exceptions import AppRegistryNotReady

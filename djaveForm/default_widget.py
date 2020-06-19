@@ -1,4 +1,4 @@
-from djaveClass.model_fields import (
+from djaveClassMagic.model_fields import (
     ModelField, DATE, FLOAT, INTEGER, TEXT, CHAR)
 from djaveForm.field import (
     DateField, PositiveFloatField, PositiveIntField, TextAreaField, TextField)
@@ -7,7 +7,8 @@ from djaveForm.field import (
 def default_widget(model_field):
   if not isinstance(model_field, ModelField):
     raise Exception((
-        'I expect model_field to be a djaveClass.model_fields.ModelField, '
+        'I expect model_field to be a '
+        'djaveClassMagic.model_fields.ModelField, '
         'not a {}').format(model_field.__class__))
 
   required = model_field.required

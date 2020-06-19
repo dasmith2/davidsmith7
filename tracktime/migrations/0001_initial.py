@@ -7,7 +7,7 @@ import django.db.models.deletion
 import django.db.models.manager
 import djaveAPI.models.publishable_interface
 import djaveAllowed.models
-import djaveClass.one_to_one_or_none_field
+import djaveClassMagic.one_to_one_or_none_field
 import djmoney.models.fields
 
 
@@ -115,7 +115,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('project', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='tracktime.Project')),
-                ('user', djaveClass.one_to_one_or_none_field.OneToOneOrNoneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('user', djaveClassMagic.one_to_one_or_none_field.OneToOneOrNoneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
         ),
         migrations.CreateModel(
@@ -150,7 +150,7 @@ class Migration(migrations.Migration):
             name='ProjectLineItem',
             fields=[
                 ('lineitem_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='invoice.LineItem')),
-                ('project_work_session', djaveClass.one_to_one_or_none_field.OneToOneOrNoneField(on_delete=django.db.models.deletion.PROTECT, to='tracktime.ProjectWorkSession')),
+                ('project_work_session', djaveClassMagic.one_to_one_or_none_field.OneToOneOrNoneField(on_delete=django.db.models.deletion.PROTECT, to='tracktime.ProjectWorkSession')),
             ],
             options={
                 'abstract': False,

@@ -3,7 +3,7 @@ from datetime import date
 
 from django.utils.dateparse import parse_datetime, parse_date
 from djaveAPI.paged_results import PAGE
-from djaveClass.model_fields import (
+from djaveClassMagic.model_fields import (
     model_fields, DATE_TIME, DATE, FLOAT, INTEGER)
 from djaveAPI.problem import Problem
 from djaveDT import to_tz_dt

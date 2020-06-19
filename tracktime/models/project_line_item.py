@@ -1,5 +1,5 @@
 from django.db import models
-from djaveClass.one_to_one_or_none_field import OneToOneOrNoneField
+from djaveClassMagic.one_to_one_or_none_field import OneToOneOrNoneField
 
 from invoice.models.line_item import LineItem, LiveLineItemManager
 from tracktime.models.project_work_session import ProjectWorkSession

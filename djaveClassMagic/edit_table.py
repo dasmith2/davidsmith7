@@ -1,12 +1,12 @@
 """ This table is for editing a single instance. It does one row per field.
 It's got helptext. """
 
-from djaveClass.model_fields import model_fields
+from djaveClassMagic.model_fields import model_fields
 from djaveForm.button import Button
 from djaveForm.default_widget import default_widget
 from djaveForm.form import Form
 from djaveTable.table import Table, Cell
-from djaveTable.cell_content import Tooltip, DisappearingFeedback
+from djaveTable.cell_content import Tooltip, DisappearingFeedback, Feedback
 from djmoney.money import Money
 
 
@@ -38,7 +38,7 @@ class EditTable(Table):
 
     question = 'Delete this {}?'.format(model.__name__)
     confirm_delete_js = WIRE_UP_CONFIRM_DELETE.replace('Delete?', question)
-    super().__init__(js=confirm_delete_js)
+    super().__init__(js=confirm_delete_js, classes=['margin-top'])
 
     self.buttons_cell = Cell([], additional_attrs={'colspan': 2})
     self.add_rows()
@@ -75,8 +75,12 @@ class EditTable(Table):
         # SelectField which makes sure the user chose a value that we sent to
         # them.
         setattr(self.instance, self._get_model_field_key(key), value)
-      self.instance.save()
-      self._saved = True
+      why_invalid = self.instance.explain_why_invalid()
+      if why_invalid:
+        self.buttons_cell.cell_contents.append(Feedback(why_invalid))
+      else:
+        self.instance.save()
+        self._saved = True
     return self.saved()
 
   def handle_delete_click(self):

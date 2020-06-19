@@ -3,7 +3,7 @@ from datetime import date
 from django.utils.dateparse import parse_datetime, parse_date
 from djaveAPI.currency_field import corresponding_currency_value
 from djaveAPI.problem import Problem
-from djaveClass.model_fields import (
+from djaveClassMagic.model_fields import (
     model_fields, DATE_TIME, DATE, FLOAT, INTEGER, TEXT, CHAR, BOOLEAN)
 from djaveDT import now
 from djmoney.money import Money

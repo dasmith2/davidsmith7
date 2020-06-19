@@ -6,7 +6,7 @@ from django.db import models
 from django.db.models import Q
 from djaveAPI.models.publishable import Publishable, LivePublishableManager
 from djaveAPI.models.user_api_key import UserAPIKey
-from djaveClass.models.base_knows_child import BaseKnowsChild
+from djaveClassMagic.models.base_knows_child import BaseKnowsChild
 from djaveDT import now, dt_to_d_str, d_to_str, midnight_from_date
 from djmoney.models.fields import MoneyField
 from djmoney.money import Money

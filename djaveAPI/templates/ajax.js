@@ -29,9 +29,7 @@ function problem_in_response(response) {
 }
 
 function post(url, data, success) {
-  return $.post(url, add_csrf_token(data), success).fail(function(response) {
-    console.log(problem_in_response(response));
-  });
+  return $.post(url, add_csrf_token(data), success);
 }
 
 /* csrf token stuff */
@@ -89,13 +87,17 @@ function wire_up_ajax_button(
     var buttons_cell = button.parents('td');
     var pk = find_pk(button);
     var post_data = {pk: pk, type: model};
+
     if (!confirm_question || confirm(confirm_question)) {
       post(action_url, post_data, function(response) {
         if (!show_problem(response, buttons_cell)) {
           success(pk);
         }
         button.prop('disabled', false);
-      }).fail(function(data) {
+      }).fail(function(response) {
+        if (!show_problem(response, buttons_cell)) {
+          get_feedback_elt_append(buttons_cell).text('Server error :(').show();
+        }
         button.prop('disabled', false);
       });
     } else {

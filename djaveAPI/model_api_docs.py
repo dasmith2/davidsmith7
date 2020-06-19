@@ -8,7 +8,7 @@ from djaveAPI.find_models import publishable_model_from_name
 from djaveAPI.paged_results import construct_paged_results
 from djaveAPI.to_json import TYPE
 from djaveAPI.widgets.field_table import field_table
-from djaveClass.model_fields import (
+from djaveClassMagic.model_fields import (
     model_fields, DATE_TIME, DATE, INTEGER, FLOAT, TEXT, CHAR, BOOLEAN)
 from djaveDT import to_tz_dt
 from djaveURL import dict_as_query

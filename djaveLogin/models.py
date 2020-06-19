@@ -2,7 +2,7 @@ from secrets import token_urlsafe
 
 from django.contrib.auth.models import User
 from django.shortcuts import reverse
-from djaveClass.models.rm_old import RmOldManager, RmOld
+from djaveClassMagic.models.rm_old import RmOldManager, RmOld
 from djaveDT import now
 from djaveLogin.calc_urls import append_next_url
 from djaveURL import protocol_and_host

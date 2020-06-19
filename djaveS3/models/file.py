@@ -30,7 +30,7 @@ from abc import abstractmethod
 
 from django.core.exceptions import ValidationError
 from django.db import models
-from djaveClass import BaseKnowsChild
+from djaveClassMagic import BaseKnowsChild
 from djaveS3.models.bucket import Bucket
 from djaveS3.public_file_url import public_file_url
 

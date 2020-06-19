@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
-from djaveClass.one_to_one_or_none_field import OneToOneOrNoneField
+from djaveClassMagic.one_to_one_or_none_field import OneToOneOrNoneField
 
 from tracktime.models.project import Project
 

@@ -1,7 +1,7 @@
 from django.db import models
 
 from djavError.models import Error
-from djaveClass import RmOldManager
+from djaveClassMagic import RmOldManager
 
 
 class LoggedCommandManager(RmOldManager):

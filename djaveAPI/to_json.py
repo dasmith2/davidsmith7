@@ -1,7 +1,7 @@
 """ Turn an object into JSON suitable for publishing in an API. """
 from djaveAPI.currency_field import corresponding_currency_field_name
 from djaveAPI.find_models import use_model_instance_for_api
-from djaveClass.model_fields import model_fields, DATE_TIME, DATE
+from djaveClassMagic.model_fields import model_fields, DATE_TIME, DATE
 from djmoney.money import Money
 
 

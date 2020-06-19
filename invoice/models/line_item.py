@@ -1,6 +1,6 @@
 from djaveAPI.models.publishable import Publishable, LivePublishableManager
 from djaveAPI.models.user_api_key import UserAPIKey
-from djaveClass.models.base_knows_child import BaseKnowsChild
+from djaveClassMagic.models.base_knows_child import BaseKnowsChild
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver

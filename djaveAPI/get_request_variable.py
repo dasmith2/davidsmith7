@@ -3,7 +3,7 @@ from djaveAllowed.models import Allowed
 from djaveAllowed.credentials import UserCredentials
 from djaveAPI.get_instance import get_instance
 from djaveAPI.problem import Problem
-from djaveClass.find_models import model_from_name
+from djaveClassMagic.find_models import model_from_name
 
 
 def get_request_ajax_obj(request, model=None, pk=None):

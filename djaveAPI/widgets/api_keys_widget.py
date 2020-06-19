@@ -1,6 +1,6 @@
 from django.template import loader
 from djaveAPI.models.api_key import username_available
-from djaveClass.edit_list_table import EditListTable
+from djaveClassMagic.edit_list_table import EditListTable
 from djaveForm.button import Button
 from djaveForm.field import SlugField, URLField
 from djaveForm.form import Form

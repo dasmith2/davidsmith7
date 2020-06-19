@@ -1,4 +1,5 @@
 from datetime import date
+import re
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -27,6 +28,13 @@ class ProjectInvoiceRule(Allowed):
           'Every work session that hasn\'t been billed for yet that occurs '
           'on or after this date will go in an Invoice when you run this '
           'rule.'))
+  # So, I could make this a SlugField. But I would need to update
+  # djaveClassMagic.model_filed.ModelField to include a, like, is_slug
+  # attribute, which feels like polluting an abstract idea with details about a
+  # particular type or something. Plus, SlugField implies a db index, which I
+  # don't want here. So now I think the simplest and easiest thing is to just
+  # stick with the rule that explain_why_invalid is for anything more
+  # complicated than required fields, basic type checking, and permission.
   invoice_id_prefix = models.CharField(max_length=10, help_text=(
       'Every Invoice you make with this rule will get a unique id. That '
       'unique id will start with what you put here.'))
@@ -54,6 +62,15 @@ class ProjectInvoiceRule(Allowed):
   @classmethod
   def filter_allowed_by_user(cls, user, query_set):
     return query_set.filter(creator=user).select_related('project')
+
+  def explain_why_invalid(self):
+    super_why = super().explain_why_invalid()
+    if super_why:
+      return super_why
+    if re.compile(r'[^\w-]').findall(self.invoice_id_prefix):
+      return (
+          'The "Invoice id prefix" may contain only '
+          'letters, numbers, -, and _')
 
   def create_invoice(self, nnow=None):
     nnow = nnow or now()

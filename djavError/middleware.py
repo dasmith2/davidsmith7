@@ -17,13 +17,14 @@ def TrackRequestTimeAndQueriesMiddleware(get_response):
     duration_seconds = (
         duration_delta.seconds + duration_delta.microseconds / 1000000)
 
+    method = request.method
+    variables = None
+    if method == 'GET':
+      variables = request.GET
+    elif method == 'POST':
+      variables = request.POST
+
     if duration_seconds > settings.MAX_ALLOWED_REQUEST_TIME:
-      method = request.method
-      variables = None
-      if method == 'GET':
-        variables = request.GET
-      elif method == 'POST':
-        variables = request.POST
       existing = LongRequest.objects.filter(
           path=request.path, method=method, variables=variables).first()
       if existing:
