@@ -27,6 +27,9 @@ class Publishable(Allowed, PublishableInterface):
         'webhook, how will they ever find out it was deleted? Use '
         'mark_deleted instead.')
 
+  def destroy(self):
+    return super().delete()
+
   def mark_deleted(self, nnow=None):
     nnow = nnow or now()
     self.deleted = nnow

@@ -1,7 +1,15 @@
 from django.db import models
-from tracktime.models.work_session import WorkSessionManager, WorkSession
+from django.dispatch import receiver
+from djaveClassMagic.signals import destroy_user
 
+from tracktime.models.work_session import WorkSessionManager, WorkSession
 from tracktime.models.project import Project
+
+
+@receiver(destroy_user, sender=Project)
+def destroy_user_project_work_sessions(sender, destroy_object=None, **kwargs):
+  for project_work_session in destroy_object.projectworksession_set.all():
+    project_work_session.destroy()
 
 
 class ProjectWorkSessionManager(WorkSessionManager):

@@ -1,8 +1,17 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Q
+from django.dispatch import receiver
 from djaveAPI.models.user_api_key import UserAPIKey
 from djaveAPI.models.publishable import Publishable
+from djaveClassMagic.signals import destroy_user
+
+
+@receiver(destroy_user, sender=User)
+def destroy_user_projects(sender, destroy_object=None, **kwargs):
+  for project in Project.objects.filter(creator=destroy_object):
+    destroy_user.send(sender=Project, destroy_object=project)
+    project.destroy()
 
 
 class Project(Publishable):

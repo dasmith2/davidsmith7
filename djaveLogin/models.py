@@ -62,6 +62,11 @@ def use_token_and_return_user(token_str, nnow=None):
     if existing.user:
       return existing.user
     elif existing.email:
+      # This just makes sign up links work as log in links, which is especially
+      # handy for developing the web demo.
+      existing_user = User.objects.filter(email=existing.email).first()
+      if existing_user:
+        return existing_user
       return User.objects.create(email=existing.email, username=existing.email)
     raise Exception(
         'LoginToken {} has neither user nor email'.format(existing.pk))

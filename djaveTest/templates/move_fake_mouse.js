@@ -9,11 +9,11 @@ function px_to_int(px) {
 }
 
 function move_mouse(x, y) {
+  window.done_moving_fake_mouse = false;
   var mouse = get_mouse();
   var frame = function() {
     var mtop = px_to_int(mouse.css('top'));
     var mleft = px_to_int(mouse.css('left'));
-    console.log(x + ', ' + y + ', ' + mleft + ', ' + mtop);
     if (mtop == y && mleft == x) {
       window.done_moving_fake_mouse = true;
       clearInterval(window.move_mouse_id);

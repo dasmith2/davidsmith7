@@ -23,17 +23,21 @@ def login_token(request):
   if settings.LOCAL:
     if 'email' in request.GET:
       email = request.GET['email']
+      login_token = None
+
       user = User.objects.filter(email=email).first()
       if user:
         login_token = LoginToken.objects.filter(
             user=user, used__isnull=True).first()
-        if login_token:
-          return {'token': login_token.token}
-        else:
-          raise Problem(
-              'User {} does not have an unused login token'.format(email))
       else:
-        raise Problem('User with email {} does not exist'.format(email))
+        login_token = LoginToken.objects.filter(
+            email=email, used__isnull=True).first()
+
+      if login_token:
+        return {'token': login_token.token}
+      else:
+        raise Problem(
+            'I could not find an unused token for {}'.format(email))
     else:
       raise Problem('I expect an email query string variable')
   else:

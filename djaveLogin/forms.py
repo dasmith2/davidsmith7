@@ -9,7 +9,7 @@ class LoginForm(Form):
     button_text = 'Email me a {} link'.format(
         'login' if login_mode else 'sign up')
     self.email_me_button = Button(
-        button_text, button_type='submit')
+        button_text, key_prefix='email_me', button_type='submit')
     super().__init__([self.email_text_box, self.email_me_button])
 
     self._email = None

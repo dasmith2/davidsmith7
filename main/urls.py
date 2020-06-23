@@ -29,4 +29,7 @@ urlpatterns = [
 
 if settings.DEBUG:
   import debug_toolbar
-  urlpatterns += [path('', include(debug_toolbar.urls))]
+  from djaveTest.urls import djaveTest_urls
+  urlpatterns += [
+      path('', include(debug_toolbar.urls)),
+      path('', include(djaveTest_urls))]

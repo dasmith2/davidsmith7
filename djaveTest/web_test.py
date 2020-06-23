@@ -41,6 +41,14 @@ class WebTest(object):
 
   def pre_run(self):
     from selenium import webdriver
+    # I WISH I could use just regular old Chrome purely because it has a
+    # beautiful speaking voice for the demo. Buuuut you aren't allowed to use
+    # Chrome exactly, you have to use Chromium or something, which ships with
+    # no voices. The sparse help I could find online about this was about
+    # hooking Chromium up to espeak, but espeak sounds just as bad as Firefox.
+    # So as far as I can tell, there's no way to use Chrome's beautiful
+    # speaking voice in my demos :( self.driver =
+    # webdriver.Chrome(service_args=['--enable-speech-dispatcher'])
     self.driver = webdriver.Firefox()
 
   def close_driver(self):
@@ -99,19 +107,20 @@ class WebTest(object):
     # ./manage.py my_web_test --server=https://stage.hihoward.com
     return 'http://127.0.0.1:8000'
 
-  def sleep(self, seconds):
+  def wait(self, seconds):
     """ Seconds can be a float """
     time.sleep(seconds)
 
-  def wait_for_closure(self, closure, error_message=None, wait_for_seconds=5):
+  def wait_closure(self, closure, error_message=None, wait_seconds=10):
     attempts = 0
     poll_interval = 0.1
-    max_attempts = wait_for_seconds / poll_interval
-    while attempts < max_attempts and not closure():
-      time.sleep(poll_interval)
+    max_attempts = wait_seconds / poll_interval
+    while attempts < max_attempts:
+      if closure():
+        return
+      self.wait(poll_interval)
       attempts += 1
-    if not closure():
-      raise Exception(error_message or 'Closure was never True')
+    raise Exception(error_message or 'Closure was never True')
 
   def wait_for_class(self, class_name):
     from selenium.webdriver.common.by import By
@@ -191,11 +200,21 @@ class WebTest(object):
     self.driver.find_element_by_class_name('emailmealoginlink').click()
     self.click_login_link(email_address)
 
+  def click_sign_up_link(self, email_address):
+    self._click_login_or_sign_up_helper(email_address, 'djave_sign_up')
+
   def click_login_link(self, email_address):
+    self._click_login_or_sign_up_helper(email_address, 'djave_login')
+
+  def _click_login_or_sign_up_helper(self, email_address, view_name):
     find_login_token_url = '{}?email={}'.format(
         self.server_plus_reverse('login_token'), email_address)
     token = requests.get(find_login_token_url).json()['token']
+    next_url = None
     next_url_finder = re.compile('{}=(.+)'.format(NEXT_URL))
-    next_url = next_url_finder.findall(self.driver.current_url)[0]
-    login_url = self.server_plus_reverse('djave_login', token=token)
-    self.go_to_url(append_next_url(login_url, next_url))
+    found = next_url_finder.findall(self.driver.current_url)
+    if found:
+      next_url = found[0]
+    login_url = append_next_url(
+        self.server_plus_reverse(view_name, token=token), next_url)
+    self.go_to_url(login_url)

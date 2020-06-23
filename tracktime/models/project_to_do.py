@@ -1,7 +1,15 @@
 from django.db import models
+from django.dispatch import receiver
+from djaveClassMagic.signals import destroy_user
 
 from tracktime.models.project import Project
 from tracktime.models.to_do import ToDo, ToDoManager
+
+
+@receiver(destroy_user, sender=Project)
+def destroy_user_project_to_dos(sender, destroy_object=None, **kwargs):
+  for project_to_do in destroy_object.projecttodo_set.all():
+    project_to_do.destroy()
 
 
 class ProjectToDoManager(ToDoManager):
