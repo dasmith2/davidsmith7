@@ -58,4 +58,4 @@ tracktime_urls = [
     path('unarchive_project', unarchive_project, name='unarchive_project'),
 
     path('settings', settings, name='settings_tracktime'),
-    path('api_docs', api_docs, name='api_docs')]
+    path('api_docs', api_docs, name='tracktime_api_docs')]

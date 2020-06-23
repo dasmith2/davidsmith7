@@ -21,6 +21,7 @@ def enter_time(request):
   punch_the_clock_table = None
   punch_the_clock_table = PunchTheClockTable(
       user=request.user, day=day, form_data=request.POST)
+  projects_exist = punch_the_clock_table.has_projects
   if punch_the_clock_table.started_clock_on_project:
     return redirect('to_do')
   if day != date.today():
@@ -36,7 +37,8 @@ def enter_time(request):
       date_roller=date_roller,
       punch_the_clock_table=punch_the_clock_table,
       enter_time_table=enter_time_table,
-      total_hours_per_date=json.dumps(totals))
+      total_hours_per_date=json.dumps(totals),
+      projects_exist=projects_exist)
   return render(request, 'enter_time.html', context)
 
 

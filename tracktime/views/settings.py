@@ -20,5 +20,5 @@ def settings(request):
       'settings_tracktime', request,
       user_api_key_widget=user_api_key_widget,
       djave_login_settings_widget=djave_login_settings_widget,
-      api_docs_url=reverse('api_docs'))
+      api_docs_url=reverse('tracktime_api_docs'))
   return render(request, 'settings_tracktime.html', context)

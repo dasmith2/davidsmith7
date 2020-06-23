@@ -18,6 +18,7 @@ class BaseProjectTable(Table):
 
 class ProjectTable(BaseProjectTable):
   def __init__(self, user, request_post):
+    self.user = user
     self.new_project_form = NewProjectForm()
     if request_post:
       self.new_project_form.set_form_data(request_post)
@@ -36,17 +37,18 @@ class ProjectTable(BaseProjectTable):
         self.new_project_form.save_new_button])
 
   def setup_existing(self):
-    for project in Project.live.order_by('name'):
+    for project in Project.live.allowed_by_user(self.user).order_by('name'):
       self.create_row_for_existing(project, 'Archive')
 
 
 class ArchivedProjectTable(BaseProjectTable):
-  def __init__(self):
+  def __init__(self, user):
+    self.user = user
     super().__init__()
     self.setup_deleted()
 
   def setup_deleted(self):
-    for project in Project.objects.filter(
+    for project in Project.allowed_by_user(self.user).filter(
         deleted__isnull=False).order_by('name'):
       self.create_row_for_existing(project, 'Un-archive')
 

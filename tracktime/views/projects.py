@@ -19,7 +19,7 @@ def projects(request):
 
 @login_required
 def archived_projects(request):
-  context = projects_context(ArchivedProjectTable(), request)
+  context = projects_context(ArchivedProjectTable(request.user), request)
   return render(request, 'archived_projects.html', context)
 
 

@@ -77,27 +77,31 @@ table { margin-top: 20px; }
   {% csrf_token %}
   {% if project %}
     <h1>Project: {{ project.name }} {{ punch_out_button.as_html }}</h1>
-  {% else %}
+  {% elif punch_in_table.has_projects %}
     <h2>You should be on the clock first</h2>
+  {% else %}
+    <h2>You need a Project first</h2>
   {% endif %}
   {% if project %}
     {% if stop_problem %}
       <div>{{ stop_problem.as_html }}</div>
     {% endif %}
     {{ to_dos_table.as_html }}
-  {% else %}
+  {% elif punch_in_table.has_projects %}
     {{ punch_in_table.as_html }}
   {% endif %}
 </form>
 
-<div class="margin-top">
-  <a href="{{ to_do_for_another_project_url }}">
-    {% if project %}
-      Wait, I thought of something I need to do for another project
-    {% else %}
-      But you can "To do" without punching in
-    {% endif %}
-  </a>
-</div>
+{% if project or punch_in_table.has_projects %}
+  <div class="margin-top">
+    <a href="{{ to_do_for_another_project_url }}">
+      {% if project %}
+        Wait, I thought of something I need to do for another project
+      {% else %}
+        But you can "To do" without punching in
+      {% endif %}
+    </a>
+  </div>
+{% endif %}
 
 {% endblock tracktime_body %}

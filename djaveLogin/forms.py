@@ -4,10 +4,12 @@ from djaveForm.form import Form
 
 
 class LoginForm(Form):
-  def __init__(self, request_POST):
+  def __init__(self, request_POST, login_mode=True):
     self.email_text_box = TextField('email', required=True)
+    button_text = 'Email me a {} link'.format(
+        'login' if login_mode else 'sign up')
     self.email_me_button = Button(
-        'Email me a login link', button_type='submit')
+        button_text, button_type='submit')
     super().__init__([self.email_text_box, self.email_me_button])
 
     self._email = None

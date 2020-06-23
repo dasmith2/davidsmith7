@@ -8,8 +8,10 @@ from djaveAPI.ajax_endpoint import ajax_endpoint
 from djaveAPI.problem import Problem
 from djavError.models import log_error
 from djaveLogin.forms import LoginForm
-from djaveLogin.calc_urls import NEXT_URL
-from djaveLogin.models import new_login_url, append_next_url, LoginToken
+from djaveLogin.calc_urls import NEXT_URL, append_next_url
+from djaveLogin.models import (
+    new_login_url, new_sign_up_url, LoginToken, new_token_str)
+from djaveLogin.widgets.sign_up_email import SignUpEmail
 from djaveURL import is_valid_url
 
 
@@ -38,7 +40,15 @@ def login_token(request):
     raise Problem('This view is only for local development')
 
 
+def sign_up(request, token=None):
+  return login_sign_up_helper(request, token=token, login_mode=False)
+
+
 def login(request, token=None):
+  return login_sign_up_helper(request, token=token, login_mode=True)
+
+
+def login_sign_up_helper(request, token=None, login_mode=True):
   possible_used_up_token = False
   if token:
     # The user clicked a login link
@@ -48,37 +58,47 @@ def login(request, token=None):
         auth.login(request, user)
         ten_years = 10 * 365 * 24 * 60 * 60
         request.session.set_expiry(ten_years)
-        return redirect(_post_login_url(request))
+        if login_mode:
+          return redirect(_post_login_url(request))
+        else:
+          return redirect(settings.GO_TO_VIEW_AFTER_SIGN_UP)
       else:
         return render(request, 'inactive_user.html')
     else:
       possible_used_up_token = True
 
-  # The user may want to send themselves a login link
-  form = LoginForm(request.POST)
+  # The user may want to send themselves a login or sign up link
+  form = LoginForm(request.POST, login_mode=login_mode)
   send_to_email = form.get_email()
   if send_to_email:
     user = User.objects.filter(email=send_to_email).first()
+    next_url = _next_url(request)
+    send_url = None
     if user:
-      login_url = new_login_url(user, request, next_url=_next_url(request))
-      if settings.LOCAL:
-        print('Pretend I sent an email to {} with this login link:\n{}'.format(
-            send_to_email, login_url))
-      else:
-        raise Exception('I dont know how to send an email to users yet!!')
-    form = LoginForm(None)
+      send_url = new_login_url(user, request, next_url=next_url)
+    else:
+      send_url = new_sign_up_url(send_to_email, request)
+    if settings.LOCAL:
+      print('\n{}\n'.format(send_url))
+    else:
+      raise Exception('I dont know how to send an email to users yet!!')
+    form = LoginForm(None, login_mode=login_mode)
 
   # If the user tried to log in but used an expired token, they'll stay stuck
   # on this page and get a friendly message to generate a new link. So they're
   # about to submit a form with a new email address, but the useless token is
   # still in the URL at that point.
-  post_to = _login_url_no_token(request)
-  return render(request, 'how_to_log_in.html', context={
+  login_url = _login_url_no_token(request)
+  sign_up_url = reverse('djave_sign_up')
+  post_to = login_url if login_mode else sign_up_url
+  default_header = 'Login' if login_mode else 'Sign up'
+  return render(request, 'sign_up_or_log_in.html', context={
       'email_text_box': form.email_text_box,
       'email_me_button': form.email_me_button,
       'email_sent_to': send_to_email,
       'possible_used_up_token': possible_used_up_token,
-      'post_to': post_to})
+      'post_to': post_to,
+      'default_header': default_header})
 
 
 def logout(request):
@@ -103,3 +123,16 @@ def _post_login_url(request):
     else:
       log_error('Got a weird next_url', next_url, sys.exc_info())
   return '/'
+
+
+def sign_up_email_preview(request):
+  token = new_token_str()
+  fake_relative = reverse('djave_sign_up', kwargs={'token': token})
+  fake_url = 'https://TrackTime.TECH{}'.format(fake_relative)
+  to = request.GET.get('to', 'example@gmail.com')
+  email = SignUpEmail(fake_url, to)
+  context = {
+      'to': to,
+      'subject': email.subject(),
+      'email': email.preview_html()}
+  return render(request, 'djaveLogin_email_preview.html', context)

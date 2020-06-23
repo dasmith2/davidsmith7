@@ -1,6 +1,8 @@
 # Put settings that are particular to this specific site here instead of in
 # settings.py
 
+GO_TO_VIEW_AFTER_SIGN_UP = 'projects'
+
 
 # Amazon S3 test buckets. Replace these!
 from djaveS3.bucket_config import BucketConfig

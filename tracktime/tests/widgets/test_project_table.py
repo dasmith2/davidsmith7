@@ -28,12 +28,13 @@ class ProjectTableTests(TestCase):
   def test_archive(self):
     self.test_save_new()
     self.assertEqual(2, len(ProjectTable(self.user, None).rows))
-    self.assertEqual(0, len(ArchivedProjectTable().rows))
+    self.assertEqual(0, len(ArchivedProjectTable(self.user).rows))
     self.project.mark_deleted()
     self.assertEqual(1, len(ProjectTable(self.user, None).rows))
-    self.assertEqual(1, len(ArchivedProjectTable().rows))
+    self.assertEqual(1, len(ArchivedProjectTable(self.user).rows))
 
-    self.assert_project_row(ArchivedProjectTable().rows[0], 'Un-archive')
+    self.assert_project_row(
+        ArchivedProjectTable(self.user).rows[0], 'Un-archive')
 
   def assert_project_row(self, got_row, archive_action):
     name_field = TextField('edit_name', default='Time Tracker!')

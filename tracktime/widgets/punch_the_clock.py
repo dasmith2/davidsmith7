@@ -14,10 +14,12 @@ from tracktime.models.latest_project import set_latest_project
 class StartTheClockForm(Form):
   StartTheClockButton = namedtuple('StartTheClockButton', 'button project')
 
-  def __init__(self):
+  def __init__(self, user):
     self.start_the_clock_buttons = []
     form_buttons = []
-    for project in Project.live.order_by('name'):
+    self.has_projects = False
+    for project in Project.live.allowed_by_user(user).order_by('name'):
+      self.has_projects = True
       form_button = Button(
           'Start the clock', pk=project.pk, button_type='submit')
       form_buttons.append(form_button)
@@ -88,7 +90,8 @@ class PunchTheClockTable(Table):
 
     stop_form = None
 
-    start_form = StartTheClockForm()
+    start_form = StartTheClockForm(user)
+    self.has_projects = start_form.has_projects
     self.started_clock_on_project = None
     if start_form.a_button_was_clicked(form_data):
       start_form.set_form_data(form_data)
@@ -96,7 +99,6 @@ class PunchTheClockTable(Table):
           user, nnow=nnow)
 
     a_clock_can_be_stopped = False
-
     abandoned = []
     for work_session in ProjectWorkSession.live.get_clock_never_stopped(
         user, nnow=nnow):

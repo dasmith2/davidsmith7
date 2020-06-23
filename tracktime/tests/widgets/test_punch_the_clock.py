@@ -14,8 +14,8 @@ class PunchTheClockTableTests(TestCase):
   def setUp(self):
     super().setUp()
     self.user = get_test_user()
-    self.project_1 = get_test_project(name='Project 1')
-    self.project_2 = get_test_project(name='Project 2')
+    self.project_1 = get_test_project(name='Project 1', creator=self.user)
+    self.project_2 = get_test_project(name='Project 2', creator=self.user)
     self.clicked_start_at = str_to_tz_dt('2020-01-15 11:00')
 
   def test_not_started_yet(self):

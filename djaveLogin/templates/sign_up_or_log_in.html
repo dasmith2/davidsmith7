@@ -13,9 +13,9 @@ $(function() {
     <h1>Expired link</h1>
     <p>No worries, just send yourself a new one.</p>
   {% elif email_sent_to %}
-    <h1>Check {{ email_sent_to }} for a login link</h1>
+    <h1>Check {{ email_sent_to }}</h1>
   {% else %}
-    <h1>Login</h1>
+    <h1>{{ default_header }}</h1>
   {% endif %}
 
 

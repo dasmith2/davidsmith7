@@ -60,6 +60,9 @@ if EMAIL_ERRORS_TO:
 # You'll probably need to override this in this_site_settings
 SERVER_EMAIL = 'server@davespace.tech'
 
+# You'll probably want to override this in this_site_settings.py
+GO_TO_VIEW_AFTER_SIGN_UP = '/'
+
 # There are two huge different use cases for email. One is emailing staff
 # members about internal things, such as emailing software developers about
 # server errors. The other use case is emailing users, which must be handled

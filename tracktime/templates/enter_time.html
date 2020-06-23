@@ -10,34 +10,37 @@
 
 {{ date_roller.as_html|safe }}
 
-{% if punch_the_clock_table %}
-  <h2>Punch the clock</h2>
+{% if projects_exist %}
+  {% if punch_the_clock_table %}
+    <h2>Punch the clock</h2>
 
-  <form method="POST" class="punch_the_clock">
+    <form method="POST" class="punch_the_clock">
+      {% csrf_token %}
+      {{ punch_the_clock_table.as_html|safe }}
+    </form>
+
+    <h2>Or enter time manually</h2>
+  {% else %}
+  <div class="margin-top"></div>
+  {% endif %}
+
+  <form method="POST" class="enter_time">
     {% csrf_token %}
-    {{ punch_the_clock_table.as_html|safe }}
+    {{ enter_time_table.as_html|safe }}
   </form>
 
-  <h2>Or enter time manually</h2>
+  <script>
+  function wire_up_delete() {
+    wire_up_ajax_button('button.delete', '{{ delete_work_session_url }}', remove_row);
+  }
+  $(wire_up_delete);
+
+  $(function() {
+    var total_hours_per_date = {{ total_hours_per_date|safe }};
+    append_day_info_to_date_roller(total_hours_per_date);
+  });
+  </script>
 {% else %}
-<div class="margin-top"></div>
+  <h2>You need a Project first</h2>
 {% endif %}
-
-<form method="POST" class="enter_time">
-  {% csrf_token %}
-  {{ enter_time_table.as_html|safe }}
-</form>
-
-<script>
-function wire_up_delete() {
-  wire_up_ajax_button('button.delete', '{{ delete_work_session_url }}', remove_row);
-}
-$(wire_up_delete);
-
-$(function() {
-  var total_hours_per_date = {{ total_hours_per_date|safe }};
-  append_day_info_to_date_roller(total_hours_per_date);
-});
-</script>
-
 {% endblock tracktime_body %}
