@@ -78,7 +78,7 @@ table { margin-top: 20px; }
   {% if project %}
     <h1>Project: {{ project.name }} {{ punch_out_button.as_html }}</h1>
   {% elif punch_in_table.has_projects %}
-    <h2>You should be on the clock first</h2>
+    <h2>You SHOULD be on the clock first</h2>
   {% else %}
     <h2>You need a Project first</h2>
   {% endif %}
@@ -94,12 +94,8 @@ table { margin-top: 20px; }
 
 {% if project or punch_in_table.has_projects %}
   <div class="margin-top">
-    <a href="{{ to_do_for_another_project_url }}">
-      {% if project %}
-        Wait, I thought of something I need to do for another project
-      {% else %}
-        But you can "To do" without punching in
-      {% endif %}
+    <a href="{{ to_do_for_another_project_url }}" class="all_tasks">
+      See all Tasks without punching in
     </a>
   </div>
 {% endif %}

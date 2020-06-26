@@ -289,17 +289,21 @@ def get_readable_duration(ttimedelta):
       parts.append('day')
     else:
       parts.append('days')
-  seconds = ttimedelta.seconds
-  if seconds == 0:
+  total_seconds = ttimedelta.seconds
+  if total_seconds == 0:
     return '0 seconds'
-  hours = math.floor(seconds / 3600)
-  minutes = round((seconds % 3600) / 60)
+  hours = math.floor(total_seconds / 3600)
+  minutes = round((total_seconds % 3600) / 60)
+  seconds = total_seconds % 60
   if hours > 0:
     parts.append(str(hours))
-    parts.append('hours' if hours != 1 else 'hour')
+    parts.append('hour' if hours == 1 else 'hours')
   if minutes > 0:
     parts.append(str(minutes))
-    parts.append('minutes' if minutes != 1 else 'minute')
+    parts.append('minute' if minutes == 1 else 'minutes')
+  if seconds > 0:
+    parts.append(str(seconds))
+    parts.append('second' if seconds == 1 else 'seconds')
   return ' '.join(parts)
 
 

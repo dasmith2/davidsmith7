@@ -4,22 +4,22 @@ from djaveAPI.get_request_variable import get_request_ajax_obj
 from djaveLogin.login_required import login_required
 
 from tracktime.models.project import Project
-from tracktime.widgets.project_table import (
-    ProjectTable, ArchivedProjectTable)
+from tracktime.widgets.projects_table import (
+    ProjectsTable, ArchivedProjectsTable)
 from tracktime.views.util import tracktime_context, PROJECTS
 
 
 @login_required
 def projects(request):
   context = projects_context(
-      ProjectTable(request.user, request.POST), request,
+      ProjectsTable(request.user, request.POST), request,
       archived_projects_url=reverse('archived_projects'))
   return render(request, 'projects.html', context)
 
 
 @login_required
 def archived_projects(request):
-  context = projects_context(ArchivedProjectTable(request.user), request)
+  context = projects_context(ArchivedProjectsTable(request.user), request)
   return render(request, 'archived_projects.html', context)
 
 

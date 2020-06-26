@@ -27,14 +27,17 @@ class ProjectWorkSessionSummaryTable(Table):
   def __init__(self, user, from_date, to_date, current_query_dict):
     super().__init__(['Project', 'Hours'])
 
-    self.projects = self.get_projects(
+    what_i_did_per_projects = self.get_what_i_did_per_projects(
         user, from_date, to_date, current_query_dict)
-    for project in self.projects:
-      self.create_row([
-          project.name,
-          InHref(project.hours, project.hours_breakdown_url)])
+    for what_i_did_per_project in what_i_did_per_projects:
+      css_class = 'details_{}'.format(what_i_did_per_project.project.pk)
+      href = InHref(
+          what_i_did_per_project.hours,
+          what_i_did_per_project.hours_breakdown_url, classes=[css_class])
+      self.create_row([what_i_did_per_project.name, href])
 
-  def get_projects(self, user, from_date, to_date, current_query_dict):
+  def get_what_i_did_per_projects(
+      self, user, from_date, to_date, current_query_dict):
     projects = {}
     work_sessions = ProjectWorkSession.live.done_by_user_and_date_range(
         user, from_date, to_date)
@@ -50,6 +53,7 @@ class ProjectWorkSessionSummaryTable(Table):
 
 class WhatIDidPerProject(object):
   def __init__(self, project, current_query_dict):
+    self.project = project
     self.name = project.name
     self.hours = 0.0
     # This is why the WhatIDidPerProject filters should be exactly the same as

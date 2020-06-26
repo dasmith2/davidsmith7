@@ -16,7 +16,8 @@ from tracktime.models.project_invoice import ProjectInvoice
 class AllProjectInvoicesTable(Table):
   def __init__(self, user):
     see_line_items_button = InHref(
-        'See all line items', reverse('project_line_items'))
+        'See all line items', reverse('project_line_items'),
+        classes=['all_line_items'])
     super().__init__([
         'Invoice ID', 'Project', 'Status', 'Total', 'Created', 'Sent', 'Due',
         'Paid'], post_table_buttons=[see_line_items_button])

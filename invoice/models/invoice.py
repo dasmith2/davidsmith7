@@ -4,12 +4,21 @@ import re
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Q
+from django.dispatch import receiver
 from djaveAPI.models.publishable import Publishable, LivePublishableManager
 from djaveAPI.models.user_api_key import UserAPIKey
 from djaveClassMagic.models.base_knows_child import BaseKnowsChild
+from djaveClassMagic.signals import destroy_user
 from djaveDT import now, dt_to_d_str, d_to_str, midnight_from_date
 from djmoney.models.fields import MoneyField
 from djmoney.money import Money
+
+
+@receiver(destroy_user, sender=User)
+def destroy_user_invoices(sender, destroy_object=None, **kwargs):
+  for invoice in destroy_object.createdinvoice_set.all():
+    destroy_user.send(sender=Invoice, destroy_object=invoice)
+    invoice.as_child_class().destroy()
 
 
 CREATED = 'Created'
@@ -75,7 +84,7 @@ class Invoice(Publishable, BaseKnowsChild):
       'Explain who the service provider is, and how to pay them.'))
 
   creator = models.ForeignKey(
-      User, related_name='created_invoice', on_delete=models.PROTECT,
+      User, related_name='createdinvoice_set', on_delete=models.PROTECT,
       help_text='Who sent this Invoice?')
 
   created = models.DateTimeField(auto_now_add=True, help_text=(
@@ -122,6 +131,10 @@ class Invoice(Publishable, BaseKnowsChild):
         return 'Late. Due {}'.format(d_to_str(self.due))
       return 'Due {}'.format(d_to_str(self.due))
     return 'Created {}'.format(dt_to_d_str(self.created))
+
+  def add_to_json(self, existing_json):
+    existing_json['status'] = self.status()
+    existing_json['status_with_date'] = self.status_with_date()
 
   def past_due(self, nnow=None):
     nnow = nnow or now()

@@ -98,7 +98,7 @@ def view_project_invoice(request, pk=None):
   context = tracktime_context(
       INVOICES, request, the_one_thing_on_the_page=view_invoice)
 
-  return render(request, 'tracktime_base.html', context)
+  return render(request, 'blank.html', context)
 
 
 def _get_invoice(request, pk=None):

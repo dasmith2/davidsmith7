@@ -1,6 +1,6 @@
 from djaveClassMagic.edit_list_table import EditListTable
 from djaveForm.button import Button
-from djaveForm.field import TextAreaField, TextField, FloatField
+from djaveForm.field import TextAreaField, TextField, MoneyField
 from djaveForm.form import Form
 from djmoney.money import Money
 
@@ -17,7 +17,7 @@ class LineItemForm(Form):
   def __init__(self, invoice):
     self.invoice = invoice
     self.description = TextAreaField('new_description')
-    self.amount = FloatField('new_amount')
+    self.amount = MoneyField('new_amount')
     self.save_button = Button('New manual Line Item', button_type='submit')
     super().__init__([self.description, self.amount, self.save_button])
 
@@ -39,7 +39,8 @@ class LineItemsTable(EditListTable):
         self.form = LineItemForm(invoice)
 
     super().__init__(
-        LineItem, ['Description', 'Calculation', 'Amount', ''])
+        LineItem, ['Description', 'Calculation', 'Amount', ''],
+        classes=['margin-top-half'])
 
     self.create_top_row()
     self.create_line_item_rows()
@@ -62,7 +63,7 @@ class LineItemsTable(EditListTable):
           DESCRIBE_SERVICE, default=line_item.describe_service)
       calculation = TextField(
           AMOUNT_CALCULATION, default=line_item.amount_calculation)
-      amount = FloatField(AMOUNT, default=line_item.amount.amount)
+      amount = MoneyField(AMOUNT, default=line_item.amount.amount)
       button = Button('Remove')
       if is_manual:
         button = Button('Delete', key_prefix='delete_line_item')

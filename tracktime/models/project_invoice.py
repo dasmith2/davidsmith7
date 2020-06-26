@@ -1,7 +1,17 @@
 from django.db import models
+from django.dispatch import receiver
+from djaveClassMagic.signals import destroy_user
 
 from invoice.models.invoice import Invoice, LiveInvoiceManager
 from tracktime.models.project import Project
+
+
+@receiver(destroy_user, sender=Project)
+def destroy_user_project_line_items(sender, destroy_object=None, **kwargs):
+  for project_invoice in destroy_object.projectinvoice_set.all():
+    destroy_user.send(sender=ProjectInvoice, destroy_object=project_invoice)
+    destroy_user.send(sender=Invoice, destroy_object=project_invoice)
+    project_invoice.destroy()
 
 
 class LiveProjectInvoiceManager(LiveInvoiceManager):

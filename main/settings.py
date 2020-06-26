@@ -16,6 +16,8 @@ LOCAL = DEBUG
 STAGE = os.environ.get('STAGE', default='False') == 'True'
 PROD = os.environ.get('PROD', default='False') == 'True'
 TEST = 'test' in sys.argv
+WEB_TEST = 'main.web_test_settings' in sys.argv
+USE_DEBUG_TOOLBAR = DEBUG and not WEB_TEST
 RUNSERVER = 'runserver' in sys.argv
 GUNICORN = 'gunicorn' in sys.argv
 WEB = RUNSERVER or GUNICORN
@@ -188,7 +190,7 @@ INSTALLED_APPS = [
 if TEST or IN_HEROKU_CI:
   INSTALLED_APPS.append('djaveAPI.tests.apps.DjaveAPITestsConfig')
 
-if DEBUG:
+if USE_DEBUG_TOOLBAR:
   # I try to keep things out of requirements.txt that aren't necessary in the
   # server enviroment because Heroku likes to choke unexpectedly and with
   # unhelpful messages depending on requirements. Locally you'll want to do
@@ -207,7 +209,7 @@ MIDDLEWARE = [
     'djavError.middleware.LogExceptionsMiddleware'
 ]
 
-if DEBUG:
+if USE_DEBUG_TOOLBAR:
   MIDDLEWARE.append('debug_toolbar.middleware.DebugToolbarMiddleware')
 
 

@@ -20,6 +20,15 @@ function show_problem(response, feedback_or_append_to) {
   }
 }
 
+function alert_problem(response) {
+  var problem = problem_in_response(response);
+  if (problem) {
+    alert(problem);
+    return true;
+  }
+  return false;
+}
+
 function problem_in_response(response) {
   if (response.responseJSON) {
     // You need this for .fail(function(response) { ...
@@ -127,7 +136,7 @@ var buttons_cell = function(row) {
 
 var turn_on_edit_mode = function(row) {
   other_buttons(row).hide();
-  buttons_cell(row).find('.save-field,.cancel-save-field').show().prop(
+  buttons_cell(row).find('.save-row,.cancel-save-row').show().prop(
       'disabled', false);
   row.addClass('editing');
 };
@@ -136,7 +145,7 @@ var SAVED = 'Saved!';
 
 var turn_off_edit_mode = function(row) {
   other_buttons(row).show();
-  buttons_cell(row).find('.save-field,.cancel-save-field').hide();
+  buttons_cell(row).find('.save-row,.cancel-save-row').hide();
   row.removeClass('editing');
   // Maybe you tried to blank out a field, hit save, got a required error,
   // typed your original back in, that turns off edit mode, but we should now
@@ -182,14 +191,14 @@ function wire_up_ajax_save_field(selector_or_elt, field_name) {
     /* This is, like, an on_change event for the entire row. Element level
      * stuff should be done in a loop over all_elts. */
     var row = $(this).parents('tr');
-    var save_button = buttons_cell(row).find('.save-field');
-    var cancel_save_button = buttons_cell(row).find('.cancel-save-field');
+    var save_button = buttons_cell(row).find('.save-row');
+    var cancel_save_button = buttons_cell(row).find('.cancel-save-row');
 
     if (!save_button.length) {
-      var save_html = '<button class="save-field" type="button">Save</button>';
+      var save_html = '<button class="save-row" type="button">Save</button>';
       save_button = $(save_html).appendTo(buttons_cell(row)).hide();
       var cancel_html =
-          '<button class="cancel-save-field" type="button">Cancel</button>';
+          '<button class="cancel-save-row" type="button">Cancel</button>';
       cancel_save_button = $(cancel_html).appendTo(buttons_cell(row)).hide();
 
       save_button.click(function() {

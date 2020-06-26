@@ -45,14 +45,16 @@ def login_token(request):
 
 
 def sign_up(request, token=None):
-  return login_sign_up_helper(request, token=token, login_mode=False)
+  return login_sign_up_helper(
+      request, 'sign_up.html', token=token, login_mode=False)
 
 
 def login(request, token=None):
-  return login_sign_up_helper(request, token=token, login_mode=True)
+  return login_sign_up_helper(
+      request, 'sign_up_or_log_in.html', token=token, login_mode=True)
 
 
-def login_sign_up_helper(request, token=None, login_mode=True):
+def login_sign_up_helper(request, template, token=None, login_mode=True):
   possible_used_up_token = False
   if token:
     # The user clicked a login link
@@ -96,7 +98,7 @@ def login_sign_up_helper(request, token=None, login_mode=True):
   sign_up_url = reverse('djave_sign_up')
   post_to = login_url if login_mode else sign_up_url
   default_header = 'Login' if login_mode else 'Sign up'
-  return render(request, 'sign_up_or_log_in.html', context={
+  return render(request, template, context={
       'email_text_box': form.email_text_box,
       'email_me_button': form.email_me_button,
       'email_sent_to': send_to_email,

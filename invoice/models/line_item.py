@@ -1,12 +1,19 @@
 from djaveAPI.models.publishable import Publishable, LivePublishableManager
 from djaveAPI.models.user_api_key import UserAPIKey
 from djaveClassMagic.models.base_knows_child import BaseKnowsChild
+from djaveClassMagic.signals import destroy_user
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from djmoney.models.fields import MoneyField
 
 from invoice.models.invoice import Invoice
+
+
+@receiver(destroy_user, sender=Invoice)
+def destroy_user_line_items(sender, destroy_object=None, **kwargs):
+  for line_item in destroy_object.lineitem_set.all():
+    line_item.as_child_class().destroy()
 
 
 @receiver(post_save)

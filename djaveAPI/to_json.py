@@ -27,4 +27,6 @@ def to_json_dict(instance, publishable_class=None):
         value = float(value.amount)
         as_dict[corresponding_currency_field_name(field)] = currency
     as_dict[field.name] = value
+  if hasattr(instance, 'add_to_json'):
+    instance.add_to_json(as_dict)
   return as_dict

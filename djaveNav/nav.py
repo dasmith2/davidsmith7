@@ -1,4 +1,5 @@
 from collections import namedtuple
+import re
 
 from django.shortcuts import reverse
 from django.template.loader import render_to_string
@@ -6,7 +7,7 @@ from django.template.loader import render_to_string
 
 NavItem = namedtuple('NavItem', 'view_name display')
 NavItemCurrentOrNot = namedtuple(
-    'NavItemCurrentOrNot', 'url display is_current')
+    'NavItemCurrentOrNot', 'url display is_current css_class')
 
 
 class Nav(object):
@@ -19,9 +20,12 @@ class Nav(object):
       is_current = nav_item.view_name == current_view_name or (
           nav_item.display == current_view_name)
       found_current = found_current or is_current
+      css_class = '{}_nav'.format(
+          re.compile(r'[^\w]').sub('', nav_item.display.lower()))
       self.nav_items_current_or_not.append(
           NavItemCurrentOrNot(
-              reverse(nav_item.view_name), nav_item.display, is_current))
+              reverse(nav_item.view_name), nav_item.display, is_current,
+              css_class))
     if not found_current:
       raise Exception(
           'I was unable to find {} in the nav_list'.format(current_view_name))

@@ -16,9 +16,12 @@ class InvoicesTable(Table):
     self._has_invoices = False
     self.add_invoice_rows()
 
+    context = {
+        'mark_invoice_paid_url': reverse('mark_invoice_paid'),
+        'ajax_get_url': reverse('ajax_get')}
     self.js = render_to_string(
         'invoices_table.js',
-        context={'mark_invoice_paid_url': reverse('mark_invoice_paid')})
+        context=context)
     self.css = render_to_string('invoice_row_color.css')
 
   def get_invoices(self, nnow=None):
@@ -40,7 +43,7 @@ class InvoicesTable(Table):
         view_text = 'View'
 
       view_url = reverse(self.view_invoice_view_name(), kwargs=button_kwargs)
-      view_button = InHref(view_text, view_url, classes=['button'])
+      view_button = InHref(view_text, view_url, classes=['button view'])
 
       buttons = [view_button]
       if not invoice.paid:

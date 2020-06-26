@@ -20,7 +20,7 @@ td { font-weight: 300; }
 th { font-weight: 500; color: #555; }
 td, th { border-right: 1px solid #999;
   border-bottom: 1px solid #999; padding: 10px; }
-th, .row2, .row2 textarea, .row2 input[type="text"] { background-color: #eee; }
+th, .row2 { background-color: #eee; }
 
 table textarea { overflow: auto; width: 240px; height: 57px; }
 table textarea, table input {
@@ -44,6 +44,8 @@ form { margin: 0px; padding: 0px; }
 .margin-top-half { margin: 20px 0px 0px 0px; }
 .pad-half { padding: 20px; }
 
+.max-width, p, ul { max-width: 480px; }
+
 /* Buttons */
 {% include "css/button.css" %}
 
@@ -66,7 +68,7 @@ form { margin: 0px; padding: 0px; }
   border-color: #555 transparent transparent transparent;
 }
 
-.tooltip:hover .tooltiptext {
+.tooltip:hover .tooltiptext, .tooltip.hover .tooltiptext {
   visibility: visible;
   opacity: 1;
 }

@@ -17,6 +17,7 @@ class ProjectInvoiceRuleTable(EditTable):
         'hourly_rate',
         'first_billable_day',
         'invoice_id_prefix',
+        'sent_to',
         'make_payment_to',
         'default_line_item_description',
         'net_days')

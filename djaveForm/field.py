@@ -262,6 +262,11 @@ class FloatField(NumberField):
     return 0.01
 
 
+class MoneyField(FloatField):
+  def widget_html(self):
+    return '${}'.format(super().widget_html())
+
+
 class IntField(NumberField):
   def cast_function(self):
     return int

@@ -1,14 +1,14 @@
+from djaveClassMagic.edit_list_table import EditListTable
 from djaveForm.button import Button
 from djaveForm.field import TextField
 from djaveForm.form import Form
-from djaveTable.table import Table
 
 from tracktime.models.project import Project
 
 
-class BaseProjectTable(Table):
+class BaseProjectsTable(EditListTable):
   def __init__(self):
-    super().__init__(['Name', ''])
+    super().__init__(Project, ['Name', ''])
 
   def create_row_for_existing(self, project, archive_action):
     name_field = TextField('edit_name', default=project.name)
@@ -16,7 +16,7 @@ class BaseProjectTable(Table):
     self.create_row([name_field, archive_button], pk=project.pk)
 
 
-class ProjectTable(BaseProjectTable):
+class ProjectsTable(BaseProjectsTable):
   def __init__(self, user, request_post):
     self.user = user
     self.new_project_form = NewProjectForm()
@@ -41,7 +41,7 @@ class ProjectTable(BaseProjectTable):
       self.create_row_for_existing(project, 'Archive')
 
 
-class ArchivedProjectTable(BaseProjectTable):
+class ArchivedProjectsTable(BaseProjectsTable):
   def __init__(self, user):
     self.user = user
     super().__init__()

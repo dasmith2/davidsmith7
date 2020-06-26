@@ -129,7 +129,7 @@ class WebTest(object):
     WebDriverWait(self.driver, 10).until(
         expected_conditions.presence_of_element_located(
             (By.CLASS_NAME, class_name)))
-    return self.driver.find_element_by_class_name(class_name)
+    return self.find(class_name)
 
   def wait_for_xpath(self, xpath):
     from selenium.webdriver.common.by import By
@@ -185,6 +185,20 @@ class WebTest(object):
     below = scrolled_to + screen_height >= element.location['y']
     return above and below
 
+  def scroll_to_bottom(self):
+    self._scroll('document.body.scrollHeight');
+
+  def scroll_to_element(self, element_or_clue):
+    element = self.get_element(element_or_clue)
+    self._scroll(str(element.location['y']));
+
+  def _scroll(self, scrollTop):
+    script = (
+        "$('html, body').animate("
+        "{scrollTop: " + scrollTop + "}, 800);")
+    self.driver.execute_script(script)
+    self.wait(.8)
+
   def img_path(self, img_file_name):
     this_dir = os.path.dirname(os.path.realpath(__file__))
     app_dir = Path(this_dir).parent.as_posix()
@@ -196,9 +210,12 @@ class WebTest(object):
     id_upload.send_keys(img_path)
 
   def login(self, email_address):
-    self.driver.find_element_by_class_name('email').send_keys(email_address)
-    self.driver.find_element_by_class_name('emailmealoginlink').click()
+    self.find('email').send_keys(email_address)
+    self.find('emailmealoginlink').click()
     self.click_login_link(email_address)
+
+  def enter_date(self, element, date):
+    element.send_keys(date.isoformat())
 
   def click_sign_up_link(self, email_address):
     self._click_login_or_sign_up_helper(email_address, 'djave_sign_up')
@@ -218,3 +235,55 @@ class WebTest(object):
     login_url = append_next_url(
         self.server_plus_reverse(view_name, token=token), next_url)
     self.go_to_url(login_url)
+
+  def find(self, clue):
+    return self.finds(clue)[0]
+
+  def finds(self, clue, raise_exception_if_not_found=True, attempt=0):
+    elts = self.driver.find_elements_by_class_name(clue)
+    if len(elts):
+      return elts
+    elts = self.driver.find_elements_by_name(clue)
+    if len(elts):
+      return elts
+    elts = self.driver.find_elements_by_id(clue)
+    if len(elts):
+      return elts
+    elts = self.driver.find_elements_by_tag_name(clue)
+    if len(elts):
+      return elts
+    if raise_exception_if_not_found:
+      if attempt == 3:
+        raise Exception('I was unable to find {}'.format(clue))
+      time.sleep(.5)
+      return self.finds(
+          clue, raise_exception_if_not_found=raise_exception_if_not_found,
+          attempt=attempt + 1)
+
+  def find_with_value(self, clue, value):
+    for elt in self.finds(clue):
+      if elt.get_property('value') == value:
+        return elt
+    raise Exception('Never found {} with value {}'.format(clue, value))
+
+  def find_pk(self, elt):
+    return int(
+        elt.find_element_by_xpath('ancestor::tr').get_attribute('data-pk'))
+
+  def find_with_text(self, tag_name, text):
+    found = self.finds_with_text(tag_name, text)
+    if found:
+      return found[0]
+    raise Exception('I was unable to find a {} with {}'.format(tag_name, text))
+
+  def finds_with_text(self, tag_name, text):
+    found = []
+    for elt in self.driver.find_elements_by_tag_name(tag_name):
+      if elt.text.find(text) >= 0:
+        found.append(elt)
+    return found
+
+  def get_element(self, element_or_clue):
+    if isinstance(element_or_clue, str):
+      return self.find(element_or_clue)
+    return element_or_clue

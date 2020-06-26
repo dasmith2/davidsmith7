@@ -1,4 +1,7 @@
+from datetime import datetime
+
 from django.core.management.base import BaseCommand
+from djaveDT import get_readable_duration
 from djaveTest.web_test import all_web_tests
 
 
@@ -31,8 +34,10 @@ class Command(BaseCommand):
       else:
         print(test_name)
         web_test_instance.pre_run()
+        start = datetime.now()
         web_test_instance.run()
-        print('Success!')
+        duration_delta = datetime.now() - start
+        print('Success in {}'.format(get_readable_duration(duration_delta)))
         first_test = False
 
   def web_test_classes(self, single_web_test_class_path):

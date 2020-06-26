@@ -23,5 +23,6 @@ class ProjectInvoicesTable(InvoicesTable):
   def add_invoice_row(self, invoice, buttons, row_class):
     cells = [
         invoice.invoice_id, invoice.project.name, invoice.total,
-        invoice.status_with_date(), Cell(buttons)]
+        Cell(invoice.status_with_date(), classes=['status_cell']),
+        Cell(buttons)]
     self.create_row(cells, classes=[row_class], pk=invoice.pk)

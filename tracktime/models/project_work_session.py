@@ -9,6 +9,8 @@ from tracktime.models.project import Project
 @receiver(destroy_user, sender=Project)
 def destroy_user_project_work_sessions(sender, destroy_object=None, **kwargs):
   for project_work_session in destroy_object.projectworksession_set.all():
+    destroy_user.send(
+        sender=ProjectWorkSession, destroy_object=project_work_session)
     project_work_session.destroy()
 
 

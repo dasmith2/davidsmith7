@@ -31,8 +31,13 @@ class NewAPIKeyForm(Form):
         self.username_field, self.webhook_url_field, self.save_button])
 
   def is_valid(self):
-    return super().is_valid() and (
-        username_available(self.username_field.get_value()))
+    super_is_valid = super().is_valid()
+    if not super_is_valid:
+      return super_is_valid
+    can_username = username_available(self.username_field.get_value())
+    if not can_username:
+      self.username_field.set_invalid_reason('This username is in use already')
+    return can_username
 
 
 class APIKeysTable(EditListTable):
