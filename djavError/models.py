@@ -241,8 +241,7 @@ class ProblemRequest(models.Model):
 
 class LongRequest(ProblemRequest):
   """ Requests that took too long. """
-  total_duration = models.DecimalField(
-      decimal_places=3, max_digits=10, help_text=('In seconds.'))
+  total_duration = models.FloatField(help_text=('In seconds.'))
 
   objects = LongRequestManager()
 

@@ -1,5 +1,7 @@
 {% load static %}
 
+window.done_moving_fake_mouse = false;
+
 function int_to_px(i) {
   return i + 'px';
 }
@@ -9,7 +11,6 @@ function px_to_int(px) {
 }
 
 function move_mouse(x, y) {
-  window.done_moving_fake_mouse = false;
   var mouse = get_mouse();
   var frame = function() {
     var mtop = px_to_int(mouse.css('top'));

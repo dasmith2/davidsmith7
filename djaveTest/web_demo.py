@@ -52,9 +52,9 @@ class WebDemo(WebTest):
       location = element.location
       context = {'x': location['x'] + offset_x, 'y': location['y'] + offset_y}
       script = render_to_string('move_fake_mouse.js', context)
+      self.driver.execute_script(script)
       if wait:
         self.wait_mouse()
-      return self.driver.execute_script(script)
 
   def move_type(self, element_or_clue, keys, clear_first=False):
     from selenium.webdriver.common.keys import Keys
@@ -78,7 +78,7 @@ class WebDemo(WebTest):
   def move_enter_date(self, element_or_clue, date):
     element = self.get_element(element_or_clue)
     if self._go_slow:
-      self.move_mouse(element)
+      self.move_mouse(element, wait=True)
     self.enter_date(element, date)
 
   def say_move(self, element_or_clue, say):
@@ -160,9 +160,9 @@ class WebDemo(WebTest):
   def wait_mouse(self):
     if self._go_slow:
 
-      def closure():
+      def done():
         return self._js_variable_undefined_or_true('done_moving_fake_mouse')
-      self.wait_closure(closure, wait_seconds=20)
+      self.wait_closure(done, wait_seconds=20)
 
   def _js_variable_undefined_or_true(self, variable_name):
     script = 'return typeof(window.{}) == "undefined" || window.{};'.format(
@@ -172,10 +172,9 @@ class WebDemo(WebTest):
 
   def sign_up(self, email_address):
     self.say_move_type('email', email_address, """
-        This is the sign up page. No passwords necessary. I enter my email and
-        click the button.'""")
+        This is the sign up page. No passwords necessary. I enter my email""")
 
-    self.move_click('email_me', wait_talking=True)
+    self.say_move_click('email_me', 'and click the button.')
     self.say("""
         It emailed me a secure, single-use sign up link. Lets go take a
         look.""", wait=True)

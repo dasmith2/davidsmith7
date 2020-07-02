@@ -111,7 +111,9 @@ class WebTest(object):
     """ Seconds can be a float """
     time.sleep(seconds)
 
-  def wait_closure(self, closure, error_message=None, wait_seconds=10):
+  def wait_closure(
+      self, closure, error_message=None, wait_seconds=10,
+      fail_on_timeout=True):
     attempts = 0
     poll_interval = 0.1
     max_attempts = wait_seconds / poll_interval
@@ -120,7 +122,8 @@ class WebTest(object):
         return
       self.wait(poll_interval)
       attempts += 1
-    raise Exception(error_message or 'Closure was never True')
+    if fail_on_timeout:
+      raise Exception(error_message or 'Closure was never True')
 
   def wait_for_class(self, class_name):
     from selenium.webdriver.common.by import By

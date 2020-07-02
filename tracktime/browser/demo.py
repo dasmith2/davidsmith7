@@ -6,25 +6,23 @@ from tracktime.browser.web_helper import WebHelper
 
 class Demo(WebDemo):
   def run(self):
-    self.go_fast()
-
     self.warm_up()
     self.demo_sign_up()
-    self.create_projects()
-    self.punch_clock()
-    self.do_stuff()
-    self.manual_time_entry()
-    self.report()
-    self.invoice_rule()
-    self.edit_invoice()
-    self.send_invoice()
-    self.all_invoices()
-    self.all_tasks()
-    self.archive_project()
-    self.settings()
-    self.api()
+    if self.create_projects():
+      self.punch_clock()
+      self.do_stuff()
+      self.manual_time_entry()
+      self.report()
+      self.invoice_rule()
+      self.edit_invoice()
+      self.send_invoice()
+      self.all_invoices()
+      self.all_tasks()
+      self.archive_project()
+      self.settings()
+      self.api()
 
-    self.done()
+      self.done()
 
   def first_view(self):
     return 'tracktime_homepage'
@@ -37,9 +35,9 @@ class Demo(WebDemo):
 
     self.say_move_click('sign_up_button', """
         Welcome to track time dot tech. Let me show you how it works. First,
-        lets sign up.""")
+        I sign up.""")
 
-    email = 'dave@software.company'
+    email = 'dasmith2@gmail.com'
     self.sign_up(email)
 
   def create_projects(self):
@@ -47,13 +45,15 @@ class Demo(WebDemo):
       # Whoops, if there's an archive button, that means there's an existing
       # project, which means that the demo user wasn't destroyed after the last
       # demo.
-      return self.demo_user_wasnt_destroyed()
+      self.demo_user_wasnt_destroyed()
+      return False
     self.say("""
         First, I need to set up a project or two. If you were my client, I
         would put your company's name here.""")
 
     self.hotel_id = self.helper.create_project(self.hotel)
     self.lab_id = self.helper.create_project(self.bobs)
+    return True
 
   def punch_clock(self):
     self.say_move_click('entertime_nav', """
@@ -70,8 +70,8 @@ class Demo(WebDemo):
     self.helper.create_to_do(
         'The extranet should only show test results after the client pays')
     self.say("""
-        It's meant to help maintain momentum, track how much time you spend,
-        and paint a picture of what you do.""")
+        It's meant to help maintain momentum, track how much time you spent,
+        and paint a picture of what you did with your time.""")
     self.helper.create_to_do(
         'Create a report of how many samples were processed per day')
     self.helper.create_to_do('Streamline accessioning')
@@ -177,7 +177,7 @@ class Demo(WebDemo):
             will get pulled into the latest invoice. """)
 
     self.say_move_type('invoice_id_prefix', 'bsl_', """
-        Every invoice gets a unique ID that starts with the unique ID prefix.
+        Every invoice gets a unique ID that starts with the invoice ID prefix.
         This is important to accountants.""")
 
     sent_to = '{}\n1 2nd St., 3rd floor\nMadison, WI, 45678'.format(self.bobs)
@@ -289,9 +289,6 @@ class Demo(WebDemo):
         Green invoices linger on this page for two days, but I can find any
         invoice at any time here.""")
 
-    import pdb
-    pdb.set_trace()
-
     self.say_move('status', "For instance I can find all Created")
     self.find_with_text('option', 'Created').click()
     self.say('Due', wait=True)
@@ -370,9 +367,9 @@ class Demo(WebDemo):
         Now that I have an API key username and password, let me explain the
         significance.""")
     self.say("""
-        The API gives you total power over your own data. You can program your
-        own computers to read, write, or delete any important object according
-        to your own logic.""", wait=True)
+        The API gives you the option to hire your own software engineers to
+        write custom code that searches, reads, edits, or deletes your data
+        according to your own logic.""", wait=True)
     self.say_scroll(self.find_with_text('h1', 'ManualLineItem'), """
         For example you could dynamically add line items to your invoices.""")
     self.say_scroll(self.find_with_text('h1', 'ProjectInvoice'), """
@@ -398,13 +395,13 @@ class Demo(WebDemo):
         unit.""", wait=True)
     self.say("""
         I'm particularly interested to build automations and workflows for
-        laboratories and hotels. Thanks for checking out my demo!""")
+        laboratories and hotels. If you want an equally amazing website and
+        demo for your business, drop me a line.""")
     self.wait_talking()
     self.driver.close()
 
   def demo_user_wasnt_destroyed(self):
     self.go_to_view('demo_done')
-    self.go_slow()
     self.say("""
         It appears that the demo user wasn't successfully destroyed after the
         last demo, so I destroyed them now. I'm afraid you will have to
