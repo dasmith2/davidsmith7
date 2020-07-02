@@ -10,10 +10,14 @@ class WebDemo(WebTest):
     self.go_slow()
 
   def warm_up(self):
-    self.go_to_view(self.first_view())
+    self.go_to_first_view()
 
-    self.say('Warming up blah blah blah')
-    input('Hit enter and I will start')
+    if self._go_slow:
+      self.say('Warming up blah blah blah')
+      input('Hit enter and I will start')
+
+  def go_to_first_view(self):
+    self.go_to_view(self.first_view())
 
   def first_url(self):
     return 'djave_sign_up'

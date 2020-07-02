@@ -31,7 +31,7 @@ def all_models(subclass_of=None):
 def models_in_app(app_name, subclass_of=None):
   subclass_of = subclass_of or Model
   to_return = []
-  for possible_sub_module in ['models', 'web_test']:
+  for possible_sub_module in ['models', 'browser']:
     try:
       sub_module = import_module('{}.{}'.format(app_name, possible_sub_module))
       for model_name, cls in sub_module.__dict__.items():

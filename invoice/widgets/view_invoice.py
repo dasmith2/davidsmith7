@@ -1,7 +1,6 @@
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
-from djaveDT import d_to_str, now
-from djaveForm.button import Button
+from djaveDT import d_to_str
 
 from invoice.widgets.view_line_items import ViewLineItems
 from invoice.html_email_context import html_context
@@ -11,22 +10,12 @@ class ViewInvoice(object):
   def __init__(self, invoice, request):
     self.invoice = invoice
     self.request = request
-    self.mark_sent_button = Button(
-        'I will send this invoice today', button_type='submit',
-        additional_attrs={'style': ''})
-
-    if self.mark_sent_button.get_was_clicked(request.POST):
-      self.invoice.sent = now()
-      self.invoice.save()
-
     self.view_line_items = ViewLineItems(invoice)
 
   def as_html(self):
     invoice_date = None
-    mark_sent_button = self.mark_sent_button.as_html()
     if self.invoice.sent:
       invoice_date = d_to_str(self.invoice.sent)
-      mark_sent_button = None
 
     (service_dates_label, service_dates_str) = self._label_and_service_dates()
     due = None
@@ -38,7 +27,6 @@ class ViewInvoice(object):
         'invoice_id': self.invoice.invoice_id,
         'invoice_date': invoice_date,
         'due': due,
-        'mark_sent_button': mark_sent_button,
         'sent_to': self._sent_to(),
         'make_payable_to': self._make_payable_to(),
         'view_line_items': self.view_line_items}

@@ -16,11 +16,6 @@ hence all the inlined css {% endcomment %}
       {{ open_cell }}
         {% if invoice_date %}
           {{ invoice_date }}
-        {% elif mark_sent_button %}
-          <style>
-            {% include "css/button.css" %}
-          </style>
-          <form method="POST" style="margin: 0px;">{% csrf_token %}{{ mark_sent_button }}</form>
         {% endif %}
       </td>
     </tr>

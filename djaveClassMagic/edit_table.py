@@ -40,11 +40,22 @@ class EditTable(Table):
     confirm_delete_js = WIRE_UP_CONFIRM_DELETE.replace('Delete?', question)
     super().__init__(js=confirm_delete_js, classes=['margin-top'])
 
+    # You have to add_rows before you handle_clicks because handle_clicks has
+    # to check to see if the widgets are valid.
+    self._redo_rows()
+    self.handle_clicks()
+
+    if self.saved():
+      # But if there's a readonly field that changed based on what the user
+      # saved, then the old call to add_rows might have out of date data, so
+      # we'd better redo the rows.
+      self._redo_rows()
+      self.buttons_cell.cell_contents.append(DisappearingFeedback())
+
+  def _redo_rows(self):
+    self.rows = []
     self.buttons_cell = Cell([], additional_attrs={'colspan': 2})
     self.add_rows()
-    self.handle_clicks()
-    if self.saved():
-      self.buttons_cell.cell_contents.append(DisappearingFeedback())
 
   def add_rows(self):
     raise NotImplementedError('add_rows')
@@ -118,21 +129,32 @@ class EditTable(Table):
     for field_name in field_names:
       self.add_field_row(field_name)
 
-  def add_field_row(self, field_name, widget=None):
+  def add_field_row(self, field_name, widget=None, read_only=False):
     field = self._get_field(field_name)
-    if not widget:
-      widget = default_widget(field)
-    if self.instance:
-      default = getattr(self.instance, field_name)
-      if default is not None:
-        if isinstance(default, Money):
-          default = default.amount
-        widget.default = default
+    current_value = self.get_current_value(field_name)
+    second_cell = current_value
+
+    if not read_only:
+      if not widget:
+        widget = default_widget(field)
+      if current_value:
+        widget.default = current_value
+      self.form.new_form_element(widget)
+      second_cell = widget
+
     label = field.display_name
     if field.help_text:
       label = Tooltip(field.display_name, field.help_text)
-    self.create_row([label, widget])
-    self.form.new_form_element(widget)
+    self.create_row([label, second_cell])
+
+  def get_current_value(self, field_name):
+    value = None
+    if self.instance:
+      value = getattr(self.instance, field_name)
+      if value is not None:
+        if isinstance(value, Money):
+          value = value.amount
+    return value
 
   def _get_field(self, field_name):
     for field in self.model_fields:

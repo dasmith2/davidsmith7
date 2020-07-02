@@ -41,7 +41,7 @@ function get_button_cell(row) {
 function append_done_button(row) {
   var html = '<button type="button" class="done">Done</button>';
   var button = $(html).appendTo(get_button_cell(row));
-  wire_up_ajax_button(button, '{{ to_do_done_url }}', function() {
+  wire_up_ajax_button(button, '{{ task_done_url }}', function() {
     put_row_in_done_mode(row);
   });
 }
@@ -68,6 +68,7 @@ $(setup_done_delete_and_not_done);
 <style>
 table { margin-top: 20px; }
 .to_done, .to_done textarea.description { background-color: #dfd; }
+.to_done.editing, .to_done.editing textarea { background-color: #ffb; }
 </style>
 {% endblock tracktime_head %}
 
@@ -94,8 +95,8 @@ table { margin-top: 20px; }
 
 {% if project or punch_in_table.has_projects %}
   <div class="margin-top">
-    <a href="{{ to_do_for_another_project_url }}" class="all_tasks">
-      See all Tasks without punching in
+    <a href="{{ all_tasks_url }}" class="all_tasks">
+      See all tasks without punching in
     </a>
   </div>
 {% endif %}

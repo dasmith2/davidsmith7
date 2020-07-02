@@ -202,7 +202,7 @@ def obj_as_cell_content(obj, csv=False):
     if csv:
       return StringContent(str(obj).replace('\n', ' '))
     else:
-      return StringContent(str(obj))
+      return StringContent(str(obj).replace('\n', '<br>'))
   if obj is None:
     return StringContent('')
   if isinstance(obj, datetime):

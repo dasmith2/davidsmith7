@@ -10,16 +10,14 @@ from tracktime.views.projects import (
 from tracktime.views.report import (
     project_work_summary, project_work_report)
 from tracktime.views.settings import settings
-from tracktime.views.to_do import (
-    to_do, to_do_done, to_do_not_done, to_do_for_another_project)
+from tracktime.views.tasks import (
+    to_do, task_done, task_not_done, all_tasks)
 
 
 tracktime_urls = [
     path('', enter_time, name='enter_time'),
     path('to_do', to_do, name='to_do'),
-    path(
-        'to_do_for_another_project', to_do_for_another_project,
-        name='to_do_for_another_project'),
+    path('all_tasks', all_tasks, name='all_tasks'),
     path(
         'report', project_work_summary,
         name='project_work_summary'),
@@ -46,8 +44,8 @@ tracktime_urls = [
     path(
         'delete_work_session', delete_work_session,
         name='delete_work_session'),
-    path('to_do_done', to_do_done, name='to_do_done'),
-    path('to_do_not_done', to_do_not_done, name='to_do_not_done'),
+    path('task_done', task_done, name='task_done'),
+    path('task_not_done', task_not_done, name='task_not_done'),
 
     path('projects', projects, name='projects'),
     path(

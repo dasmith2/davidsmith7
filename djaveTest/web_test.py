@@ -186,11 +186,11 @@ class WebTest(object):
     return above and below
 
   def scroll_to_bottom(self):
-    self._scroll('document.body.scrollHeight');
+    self._scroll('document.body.scrollHeight')
 
   def scroll_to_element(self, element_or_clue):
     element = self.get_element(element_or_clue)
-    self._scroll(str(element.location['y']));
+    self._scroll(str(element.location['y']))
 
   def _scroll(self, scrollTop):
     script = (

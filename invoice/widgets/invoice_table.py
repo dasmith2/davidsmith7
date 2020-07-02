@@ -25,11 +25,10 @@ class InvoiceTable(EditTable):
         'sent_to',
         'make_payment_to',
         'service_from',
-        'service_to')
-    if self.invoice.due:
-      self.add_field_row('due')
-    else:
-      self.add_field_row('net_days')
+        'service_to',
+        'sent',
+        'net_days')
+    self.add_field_row('due', read_only=True)
     self.add_final_row()
 
   def handle_delete_click(self):

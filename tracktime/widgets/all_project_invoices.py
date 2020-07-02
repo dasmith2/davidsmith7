@@ -6,9 +6,9 @@ from djaveDT import now
 from djaveForm.field import SelectField, Option
 from djaveReport.date_range_report import DateRangeReport
 from djaveTable.cell_content import InHref
-from djaveTable.table import Table
+from djaveTable.table import Table, Cell
 
-from invoice.models.invoice import STATUSES
+from invoice.models.invoice import STATUSES, STATUS_TOOLTIP
 from tracktime.fields import project_field
 from tracktime.models.project_invoice import ProjectInvoice
 
@@ -18,18 +18,22 @@ class AllProjectInvoicesTable(Table):
     see_line_items_button = InHref(
         'See all line items', reverse('project_line_items'),
         classes=['all_line_items'])
+    status = Cell(STATUS_TOOLTIP, is_header=True)
     super().__init__([
-        'Invoice ID', 'Project', 'Status', 'Total', 'Created', 'Sent', 'Due',
+        'Invoice ID', 'Project', status, 'Total', 'Created', 'Sent', 'Due',
         'Paid'], post_table_buttons=[see_line_items_button])
     self.user = user
     self.css = render_to_string('invoice_row_color.css')
 
   def add_rows(self, invoices):
     for invoice in invoices:
+      paid = invoice.paid
+      if paid:
+        paid = paid.date()
       self.create_row([
           invoice.invoice_id, invoice.project.name, invoice.status(),
-          invoice.total, invoice.created, invoice.sent, invoice.due,
-          invoice.paid], classes=[invoice.status().lower()])
+          invoice.total, invoice.created.date(), invoice.sent, invoice.due,
+          paid], classes=[invoice.status().lower()])
 
 
 class AllProjectInvoices(DateRangeReport):
@@ -68,7 +72,7 @@ class AllProjectInvoices(DateRangeReport):
   def get_status_filter(self):
     return SelectField(
         key_prefix='status', options=self.status_options(), required=False,
-        label='Status')
+        label=STATUS_TOOLTIP)
 
   def status_options(self):
     return [Option(option, option) for option in STATUSES]

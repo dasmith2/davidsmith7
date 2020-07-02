@@ -1,12 +1,12 @@
 from datetime import date, timedelta
 from djaveTest.web_demo import WebDemo
 
-from tracktime.web_test.web_helper import WebHelper
+from tracktime.browser.web_helper import WebHelper
 
 
 class Demo(WebDemo):
   def run(self):
-    # self.go_fast()
+    self.go_fast()
 
     self.warm_up()
     self.demo_sign_up()
@@ -39,7 +39,7 @@ class Demo(WebDemo):
         Welcome to track time dot tech. Let me show you how it works. First,
         lets sign up.""")
 
-    email = 'dave@software.contractor'
+    email = 'dave@software.company'
     self.sign_up(email)
 
   def create_projects(self):
@@ -57,7 +57,8 @@ class Demo(WebDemo):
 
   def punch_clock(self):
     self.say_move_click('entertime_nav', """
-        Now that I'm done setting up a few projects, let's get to work.""")
+        Now that I'm done setting up a few projects, let's get to work. I
+        navigate to enter time.""")
     self.say_move_click('starttheclock_{}'.format(self.lab_id), """
         I'm going to do a few tasks for {}, so I start the
         clock.""".format(self.bobs))
@@ -69,13 +70,13 @@ class Demo(WebDemo):
     self.helper.create_to_do(
         'The extranet should only show test results after the client pays')
     self.say("""
-        This tool is meant to help maintain momentum, track how much time you
-        spent, and paint a picture of what you did.""")
+        It's meant to help maintain momentum, track how much time you spend,
+        and paint a picture of what you do.""")
     self.helper.create_to_do(
         'Create a report of how many samples were processed per day')
     self.helper.create_to_do('Streamline accessioning')
     self.say("""
-        That last task was a bit vague. It\'s best to pick tasks that you
+        That last task was a bit vague. It\'s best to pick tasks that I
         can reasonably accomplish in a single session, because that's going to
         create beautiful invoices. Notice that the row I\'m editing turned
         yellow, and the buttons changed.""")
@@ -109,16 +110,17 @@ class Demo(WebDemo):
 
   def manual_time_entry(self):
     yesterday_link = self.find('one_before').find_element_by_tag_name('a')
-    self.say_move_click(yesterday_link, """
-        Once I punch out, I land back on the Enter Time page, where I can punch
-        back in. But I just remembered I worked yesterday and forgot to punch
-        the clock. I navigate to yesterday.""")
     self.say("""
-        Now I can manually enter time for yesterday. The project select
-        remembers the last project I worked on. I enter my time and click save
-        new.""")
-    self.move_type('hours', '0.5')
-    self.move_click('savenew', wait_talking=True)
+        Once I punch out, I land back on the Enter Time page, where I can punch
+        back in.""", wait=True)
+    self.say_move_click(yesterday_link, """
+        But I just remembered I worked yesterday and forgot to punch
+        the clock. I navigate to yesterday.""")
+    self.say('Where I can manually enter time.', wait=True)
+    self.say_move('project', """
+        The project select remembers the last project I worked on.""")
+    self.say_move_type('hours', '0.5', 'I enter my time')
+    self.say_move_click('savenew', 'and click save new')
     self.say("I also worked on {} yesterday.".format(self.hotel))
     self.move_mouse('project')  # project select box
     self.wait_mouse()
@@ -137,10 +139,10 @@ class Demo(WebDemo):
     self.wait_mouse()
     self.wait_talking()
     self.say_move_click('details_{}'.format(self.lab_id), """
-        You can click on the hours to get a more detailed report.""")
+        I can click on the hours to get a more detailed report.""")
     self.say("""
-        As you can see, the report shows every work session and the tasks you
-        completed during those work sessions.""")
+        The report shows my work sessions and the tasks I completed during
+        those times.""", wait=True)
 
   def invoice_rule(self):
     self.say_move_click(
@@ -151,7 +153,7 @@ class Demo(WebDemo):
         rule.""".format(self.bobs))
 
     self.say(
-        'Whenever you see a dotted underline, you can hover and see an '
+        'Whenever I see a dotted underline, I can hover and see an '
         'explanation.')
     self.move_mouse('tooltip')
     self.wait_mouse()
@@ -166,9 +168,8 @@ class Demo(WebDemo):
     self.find_with_value('option', str(self.lab_id)).click()
 
     self.say_move_type('hourly_rate', '100', """
-        Work sessions get a line item in an invoice whose cost is equal to the
-        hourly rate times the duration of the
-        session.""")
+        Work sessions turn into a line item whose cost is equal to the hourly
+        rate times the duration of the session.""")
 
     self.say_move_enter_date(
         'first_billable_day', date.today() - timedelta(days=1), """
@@ -181,25 +182,22 @@ class Demo(WebDemo):
 
     sent_to = '{}\n1 2nd St., 3rd floor\nMadison, WI, 45678'.format(self.bobs)
     self.say_move_type('sent_to', sent_to, """
-        In the sent to field, say who you will send the invoices
-        to.""")
+        In the sent to field, I say who I will send these invoices to.""")
 
     make_payment_to = (
         'Dave\'s Software Company\n9 10th Ave., Unit 11\nNew York, NY, 12131')
     self.say_move_type('make_payment_to', make_payment_to, """
-        In the make payment to field, explain who you are and how your
-        customers should pay
-        you.""")
+        In the make payment to field, I explain who I am and how my customers
+        should pay me.""")
 
     self.say_move_type(
         'default_line_item_description', 'Software development', """
-            The default line item description only comes into play if you have
-            a work session where you didn't click done on any tasks.""")
+            The default line item description only comes into play if I have
+            a work session where I didn't click done on any tasks.""")
 
     self.say_move_type('net_days', '30', """
-        When you create an invoice, you will get a chance to review it.
-        Once its ready you will click a button, and the due date will be set
-        net days from now.""")
+        When I create an invoice, I will pick the day I intend to send out the
+        invoice. The due date will be set net days from then.""")
 
     self.move_click('save', wait_talking=True)
 
@@ -208,21 +206,28 @@ class Demo(WebDemo):
         'createnewinvoice',
         'Now I can create an invoice for {}'.format(self.bobs))
 
-    self.move_mouse(self.find_with_text('td', 'Created'), wait=True)
-    self.say_move_click(
-        'edit', 'If an invoice still has the created status, you can edit it.')
+    self.say_move(self.find_with_text('td', 'Created'), """
+        If an invoice still has the created status""")
+    self.say_move_click('edit', 'I can edit it.')
 
     self.say_move('h1', """
         The invoice ID reflects the invoice ID prefix and the date the invoice
         was created.""")
 
     self.say_move('service_from', """
-        Service from is automatically set to the date of the first un invoiced
-        work session, which in our case happens to be yesterday.""")
+        Service from is automatically set to the date of the first
+        work session in the invoice, which in our case happens to be
+        yesterday.""")
 
     self.say_move('service_to', """
-        Service to is automatically set to the date you created the
-        invoice.""")
+        Service to is automatically set to the date I created the invoice.""")
+
+    self.say_move(self.find_with_text('div', 'Due'), 'The due date')
+    self.say_move('sent', 'is calculated based on when I send the invoice')
+    self.say_move('net_days', 'and net days.')
+    self.say_move_enter_date(
+        'sent', date.today(), 'I will send my invoice today.')
+    self.move_click('save')
 
     self.say("Let's take a look at the line items")
     self.scroll_to_bottom()
@@ -258,14 +263,10 @@ class Demo(WebDemo):
   def send_invoice(self):
     self.say_move_click('saveandpreview', """
         I'm pretty happy with my invoice. Let me see the preview.""")
-    self.say_move_click('iwillsendthisinvoicetoday', """
-        Once I'm ready to send my invoice, I click this button to set the
-        invoice date.""")
     self.say("""
-        The due date is set according to the invoice date and net days. It's up
-        to you to actually send the invoice. You can copy this page and paste
-        it in an email, or print this page out and mail it, whatever works for
-        you.""", wait=True)
+        It's up to me to deliver the invoice. I can copy this page and paste it
+        in an email, or print this page out and mail it, whatever
+        works.""", wait=True)
     self.go_to_view('project_invoices')
     self.say_move(self.find_with_text('td', 'Due '), """
         My invoice now has the status due, and the invoice row is colored
@@ -275,17 +276,21 @@ class Demo(WebDemo):
     self.say_move_click('markpaid', """
         But hopefully everything goes well and I can click
         mark paid.""")
-    self.say_move_click('view', """
+    self.say_move(self.find_with_text('td', 'Paid'), """
         My invoice now has the status paid, the invoice row is colored green,
-        and I can no longer edit. If I view the invoice now, it will show
-        payment.""")
+        and I can no longer edit.""")
+    self.say_move_click('view', """
+        If I view the invoice now, it will show payment.""")
     self.wait(2)
     self.go_to_view('project_invoices')
 
   def all_invoices(self):
     self.say_move_click('all_invoices', """
-        Green invoices linger on this page for 2 days, but I can find any
-        invoice at any time.""")
+        Green invoices linger on this page for two days, but I can find any
+        invoice at any time here.""")
+
+    import pdb
+    pdb.set_trace()
 
     self.say_move('status', "For instance I can find all Created")
     self.find_with_text('option', 'Created').click()
@@ -314,12 +319,11 @@ class Demo(WebDemo):
     self.say_move_click('todo_nav', """
         Let me point out a few more features related to tasks.""")
     self.say_move('starttheclock', """
-        Ideally, you're on the clock any time you're thinking about a
-        project.""")
+        Ideally, I'm on the clock any time I'm thinking about a project.""")
     self.say_move_click('all_tasks', """
         But sometimes it makes sense to dig through all the tasks.""")
     self.say_move('to_do_status', """
-        For instance maybe you want to see all complete tasks""")
+        For instance maybe I want to see all complete tasks""")
     self.find_with_text('option', 'Done').click()
     self.say_move_click('report', 'created in the last month for any project.')
     self.say_move(self.finds('project')[1], """
@@ -329,13 +333,17 @@ class Demo(WebDemo):
     to_do = (
         'When a guest changes rooms, automatically schedule an immediate '
         'cleaning in the old unit')
-    self.say_move_type('new_description', to_do, 'I can do that here.')
+    self.say_move_type('new_description', to_do, """
+        I can do that here. It's best to plan your work and work your plan, but
+        sometimes I end up describing what I did after I did it.""")
     self.say_move_click('did', """
-        It's best to plan your work and work your plan, but sometimes you end
-        up describing what you did after you did it. That's what this shortcut
-        is for.""")
+        That's what this shortcut is for.""")
     self.say_move_click('not_done', """
         If I accidentally clicked done, I can undo""")
+    self.say_move_type(
+        'description', 'typos typos blah blah blah', """
+            If I don't like the edits I'm making""")
+    self.say_move_click('cancel-save-row', 'I can cancel them.')
 
   def archive_project(self):
     self.say_move_click('projects_nav', """
@@ -347,8 +355,7 @@ class Demo(WebDemo):
     self.say_move_click('unarchive', 'I can resurrect it.')
 
   def settings(self):
-    self.say_move_click('settings_url', """
-        Let's take a quick look at settings.""")
+    self.say_move_click('settings_url', "Let's take a look at settings.")
     self.say_move('logout', 'I can log out here.')
 
   def api(self):
@@ -364,10 +371,10 @@ class Demo(WebDemo):
         significance.""")
     self.say("""
         The API gives you total power over your own data. You can program your
-        own computers to read or write any important object according to your
-        own logic.""", wait=True)
+        own computers to read, write, or delete any important object according
+        to your own logic.""", wait=True)
     self.say_scroll(self.find_with_text('h1', 'ManualLineItem'), """
-        You could dynamically add line items to your invoices.""")
+        For example you could dynamically add line items to your invoices.""")
     self.say_scroll(self.find_with_text('h1', 'ProjectInvoice'), """
         You could write an automation that bugs your customers for overdue
         invoices.""")
@@ -385,8 +392,13 @@ class Demo(WebDemo):
     except WebDriverException:
       self.sleep(1)
       self.go_to_view('demo_done')
-    # self.go_fast()
-    self.say('Thanks for checking out my demo!')
+    self.say("""
+        I built track time dot tech so everyone would know I'm ready to take on
+        my own clients. I am open to charging per hour, or per
+        unit.""", wait=True)
+    self.say("""
+        I'm particularly interested to build automations and workflows for
+        laboratories and hotels. Thanks for checking out my demo!""")
     self.wait_talking()
     self.driver.close()
 

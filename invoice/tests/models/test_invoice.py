@@ -1,10 +1,10 @@
-from datetime import date
-from djaveDT import to_tz_dt
+from datetime import date, datetime
+from djaveDT import to_tz_dt, to_d
 from djaveTest.unit_test import random_string, get_test_user, TestCase
 from djmoney.money import Money
 
 from invoice.models.invoice import (
-    Invoice, get_an_invoice_id, CREATED, DUE, LATE, PAID)
+    Invoice, get_an_invoice_id, CREATED, SENDING, DUE, LATE, PAID)
 
 
 def get_test_invoice(**kwargs):
@@ -26,7 +26,9 @@ def set_invoice_stuff(invoice, **kwargs):
   invoice.sent_to = sent_to
   invoice.make_payment_to = make_payment_to
   invoice.creator = kwargs.get('creator', creator)
-  invoice.sent = to_tz_dt(kwargs.get('sent', None))
+  invoice.sent = to_d(kwargs.get('sent', None))
+  if isinstance(invoice.sent, datetime):
+    raise Exception('invoice.sent is a date now')
   invoice.net_days = kwargs.get('net_days', 30)
   invoice.paid = to_tz_dt(kwargs.get('paid', None))
   invoice.total = kwargs.get('total', Money(100, 'USD'))
@@ -53,15 +55,13 @@ class ImportantInvoicesTests(TestCase):
     user = get_test_user()
 
     get_test_invoice(  # Paid a while ago
-        creator=user, sent=to_tz_dt('2020-01-01 12:00'),
-        paid=to_tz_dt('2020-01-10'))
+        creator=user, sent=date(2020, 1, 1), paid=to_tz_dt('2020-01-10'))
     recently_paid = get_test_invoice(
-        creator=user, sent=to_tz_dt('2020-01-01 12:00'),
-        paid=to_tz_dt('2020-01-15 11:00'))
+        creator=user, sent=date(2020, 1, 1), paid=to_tz_dt('2020-01-15 11:00'))
     past_due = get_test_invoice(
-        creator=user, sent=to_tz_dt('2020-01-01 12:00'), net_days=10)
+        creator=user, sent=date(2020, 1, 1), net_days=10)
     sent = get_test_invoice(
-        creator=user, sent=to_tz_dt('2020-01-01 12:00'))
+        creator=user, sent=date(2020, 1, 1))
     new = get_test_invoice(creator=user)
     get_test_invoice()  # Wrong user
 
@@ -77,22 +77,28 @@ class GetInvoicesTests(TestCase):
 
     created = get_test_invoice(
         creator=user, created=to_tz_dt('2020-01-01 12:00'))
+    sending = get_test_invoice(
+        creator=user, created=to_tz_dt('2020-01-01 12:00'),
+        sent=date(2020, 5, 1), net_days=10)
     due = get_test_invoice(
         creator=user, created=to_tz_dt('2020-01-01 12:00'),
-        sent=to_tz_dt('2020-01-15 12:00'), net_days=10)
+        sent=date(2020, 1, 5), net_days=10)
     late = get_test_invoice(
         creator=user, created=to_tz_dt('2020-01-01 12:00'),
-        sent=to_tz_dt('2020-01-01 12:00'), net_days=10)
+        sent=date(2020, 1, 1), net_days=10)
     paid = get_test_invoice(
         creator=user, created=to_tz_dt('2020-01-01 12:00'),
-        sent=to_tz_dt('2020-01-01 12:00'), paid=to_tz_dt('2020-01-15 12:00'))
+        sent=date(2020, 1, 1), paid=to_tz_dt('2020-01-15 12:00'))
 
     self.assertFalse(
         Invoice.live.get_invoices(user, created_to=date(2019, 12, 25)))
     self.assertFalse(
         Invoice.live.get_invoices(user, created_from=date(2020, 1, 25)))
+    self.assertFalse(Invoice.live.get_invoices(
+        get_test_user(), created_from=date(2019, 12, 25),
+        created_to=date(2020, 1, 25)))
     self.assertEqual(
-        [created, due, late, paid],
+        [created, sending, due, late, paid],
         list(Invoice.live.get_invoices(
             user, created_from=date(2019, 12, 25),
             created_to=date(2020, 1, 25))))
@@ -100,6 +106,8 @@ class GetInvoicesTests(TestCase):
     nnow = to_tz_dt('2020-01-15 12:00')
     self.assertEqual([created], list(
         Invoice.live.get_invoices(user, status=CREATED)))
+    self.assertEqual([sending], list(
+        Invoice.live.get_invoices(user, status=SENDING, nnow=nnow)))
     self.assertEqual([due], list(
         Invoice.live.get_invoices(user, status=DUE, nnow=nnow)))
     self.assertEqual([late], list(

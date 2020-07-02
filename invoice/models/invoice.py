@@ -10,6 +10,7 @@ from djaveAPI.models.user_api_key import UserAPIKey
 from djaveClassMagic.models.base_knows_child import BaseKnowsChild
 from djaveClassMagic.signals import destroy_user
 from djaveDT import now, dt_to_d_str, d_to_str, midnight_from_date
+from djaveTable.cell_content import Tooltip
 from djmoney.models.fields import MoneyField
 from djmoney.money import Money
 
@@ -22,11 +23,20 @@ def destroy_user_invoices(sender, destroy_object=None, **kwargs):
 
 
 CREATED = 'Created'
+SENDING = 'Sending'
 DUE = 'Due'
 LATE = 'Late'
 PAID = 'Paid'
 
-STATUSES = [CREATED, DUE, LATE, PAID]
+STATUSES = [CREATED, SENDING, DUE, LATE, PAID]
+
+
+STATUS_HELP_TEXT = """
+    Created invoices don't have a sent date yet. Sending invoices have a sent
+    date in the future. Due invoices were sent already, but aren't due yet.
+    Late invoices have a due date in the past. Paid invoices have a paid
+    date."""
+STATUS_TOOLTIP = Tooltip('Status', STATUS_HELP_TEXT, width=400)
 
 
 def get_an_invoice_id(invoice_id_prefix, nnow=None):
@@ -61,10 +71,13 @@ class LiveInvoiceManager(LivePublishableManager):
       qs = qs.filter(created__lte=cutoff)
     if status == CREATED:
       qs = qs.filter(sent__isnull=True)
+    elif status == SENDING:
+      qs = qs.filter(sent__gt=nnow.date())
     elif status == DUE:
-      qs = qs.filter(paid__isnull=True, due__gte=nnow)
+      qs = qs.filter(
+          paid__isnull=True, sent__lte=nnow.date(), due__gte=nnow.date())
     elif status == LATE:
-      qs = qs.filter(paid__isnull=True, due__lte=nnow)
+      qs = qs.filter(paid__isnull=True, due__lt=nnow.date())
     elif status == PAID:
       qs = qs.filter(paid__isnull=False)
     return qs.order_by('pk')
@@ -89,13 +102,12 @@ class Invoice(Publishable, BaseKnowsChild):
 
   created = models.DateTimeField(auto_now_add=True, help_text=(
       'When was this Invoice created?'))
-  sent = models.DateTimeField(null=True, blank=True, help_text=(
-      'When was this Invoice sent out?'))
+  sent = models.DateField(null=True, blank=True, help_text=(
+      'When was this Invoice sent out, or when will it be sent out?'))
   net_days = models.PositiveIntegerField(help_text=(
       'How many days after the Invoice is sent is it due?'))
   due = models.DateField(null=True, blank=True, help_text=(
-      'When is this Invoice due? This field is set automatically on save '
-      'according to sent and net_days'))
+      'The due date is set automatically based on the Sent date and Net Days'))
   paid = models.DateTimeField(null=True, blank=True, help_text=(
       'When was this Invoice marked paid?'))
 
@@ -124,12 +136,15 @@ class Invoice(Publishable, BaseKnowsChild):
     return re.compile(r'^\w+').findall(self.status_with_date(nnow=nnow))[0]
 
   def status_with_date(self, nnow=None):
+    nnow = nnow or now()
     if self.paid:
       return 'Paid {}'.format(dt_to_d_str(self.paid))
     elif self.sent:
       if self.past_due(nnow=nnow):
         return 'Late. Due {}'.format(d_to_str(self.due))
-      return 'Due {}'.format(d_to_str(self.due))
+      if self.sent <= nnow.date():
+        return 'Due {}'.format(d_to_str(self.due))
+      return 'Sending {}'.format(d_to_str(self.sent))
     return 'Created {}'.format(dt_to_d_str(self.created))
 
   def add_to_json(self, existing_json):
@@ -141,8 +156,10 @@ class Invoice(Publishable, BaseKnowsChild):
     return self.due and self.due < nnow.date()
 
   def save(self, *args, **kwargs):
-    if self.sent and not self.due:
-      self.due = (self.sent + timedelta(days=self.net_days)).date()
+    if self.sent:
+      self.due = (self.sent + timedelta(days=self.net_days))
+    else:
+      self.due = None
     super().save(*args, **kwargs)
 
   @classmethod

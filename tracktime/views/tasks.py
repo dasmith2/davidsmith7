@@ -47,41 +47,41 @@ def to_do(request):
       punch_in_table=punch_in_table,
       punch_out_button=punch_out_button,
       stop_problem=stop_problem,
-      to_do_for_another_project_url=reverse('to_do_for_another_project'))
+      all_tasks_url=reverse('all_tasks'))
   return render(request, 'to_do.html', context)
 
 
 @ajax_endpoint_login_required
-def to_do_done(request):
-  to_do = _ajax_to_do(request)
-  to_do.done = now()
-  to_do.save()
+def task_done(request):
+  task = _ajax_task(request)
+  task.done = now()
+  task.save()
 
 
 @ajax_endpoint_login_required
-def to_do_not_done(request):
-  to_do = _ajax_to_do(request)
-  to_do.done = None
-  to_do.save()
+def task_not_done(request):
+  task = _ajax_task(request)
+  task.done = None
+  task.save()
 
 
-def _ajax_to_do(request):
+def _ajax_task(request):
   pk = get_request_variable(request, 'pk')
-  to_do = ToDo.live.filter(pk=pk).first()
-  if not to_do:
+  task = ToDo.live.filter(pk=pk).first()
+  if not task:
     raise AjaxProblem('There is no ToDo with pk {}'.format(pk))
-  return to_do
+  return task
 
 
 @login_required
-def to_do_for_another_project(request):
+def all_tasks(request):
   all_project_to_dos = AllProjectToDos(request)
   context = to_do_context(all_project_to_dos, request)
-  return render(request, 'to_do_for_another_project.html', context)
+  return render(request, 'all_tasks.html', context)
 
 
 def to_do_context(to_dos_table, request, **kwargs):
   return tracktime_context(
       TO_DO, request, to_dos_table=to_dos_table,
-      to_do_done_url=reverse(to_do_done),
-      not_done_url=reverse(to_do_not_done), **kwargs)
+      task_done_url=reverse(task_done),
+      not_done_url=reverse(task_not_done), **kwargs)
