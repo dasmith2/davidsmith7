@@ -81,7 +81,13 @@ function row_by_pk(pk) {
 }
 
 function remove_row(pk) {
-  row_by_pk(pk).remove();
+  var row = row_by_pk(pk);
+  var table = row.parents('table');
+  row.remove();
+  if (!table.find('tbody tr').length) {
+    $('<p class="margin-top">Nothing to report</p>').insertAfter(table);
+    table.hide();
+  }
 }
 
 function wire_up_ajax_button(

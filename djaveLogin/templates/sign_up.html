@@ -1,21 +1,19 @@
 {% extends "sign_up_or_log_in.html" %}
 
-{% block message %}
+{% block top_message %}
 <p class="margin-top">
-  I will <b>never sell or share your data</b> without your express consent.
-  The only people who can see your data are you, the employees of my business,
-  and whoever you give login information or API keys to.
+  I'll <b>never sell or share your data</b>. The only people who can see
+  your data are you, the employees of my business, and whoever you give login
+  information or API keys to.
 </p>
 <p>
-  Whenever possible, I will use the website itself to communicate.
-</p>
-<p>
-  I will only send you an email if
+  I'll <b>never spam you</b>. I'll only email you if
   <ul>
-    <li>You specifically request an email, such as a sign up or login link.</li>
+    <li>You request an email, such as a sign up or login link.</li>
     <li>You opt into notifications. All notifications will be default opt-out.</li>
     <li>I or an employee needs to personally communicate with you specifically,
-    such as to help debug a problem you're experiencing on the website.</li>
+    such as to help debug a problem you're experiencing on the website, or if
+    you contacted us first.</li>
   </ul>
 </p>
-{% endblock message %}
+{% endblock top_message %}

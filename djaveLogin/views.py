@@ -51,7 +51,7 @@ def sign_up(request, token=None):
 
 def login(request, token=None):
   return login_sign_up_helper(
-      request, 'sign_up_or_log_in.html', token=token, login_mode=True)
+      request, 'log_in.html', token=token, login_mode=True)
 
 
 def login_sign_up_helper(request, template, token=None, login_mode=True):
@@ -104,7 +104,8 @@ def login_sign_up_helper(request, template, token=None, login_mode=True):
       'email_sent_to': send_to_email,
       'possible_used_up_token': possible_used_up_token,
       'post_to': post_to,
-      'default_header': default_header})
+      'default_header': default_header,
+      'sign_up_url': reverse('djave_sign_up')})
 
 
 def logout(request):
