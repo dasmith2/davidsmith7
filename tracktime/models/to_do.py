@@ -1,3 +1,8 @@
+""" I realize now that these should be called Tasks and that "To Do" is a
+phrase that should refer to undone Tasks for a particular project. But
+ProjectToDo already inherits from ToDo, and the Django migration tools can't
+handle renaming base classes without quite a lot of effort, and renaming ToDo
+to Task won't actually accomplish much, so I will reluctantly let it stand. """
 from datetime import timedelta
 
 from django.contrib.auth.models import User
