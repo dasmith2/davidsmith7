@@ -24,14 +24,14 @@ class ProjectWorkSession(WorkSession):
   # the base class.
   project = models.ForeignKey(
       Project, on_delete=models.PROTECT, help_text=(
-          'What project did the user work on in this work session?'))
+          'What Project did the User work on?'))
 
   live = ProjectWorkSessionManager()
 
   @classmethod
   def model_description(cls):
     return (
-        'A ProjectWorkSession describes a single time span that a user worked '
+        'A ProjectWorkSession describes a single time span that a User worked '
         'on a Project.')
 
   def __repr__(self, nnow=None):

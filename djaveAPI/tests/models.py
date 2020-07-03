@@ -34,7 +34,6 @@ class MyFakeModel(Publishable):
   def allowed_api_keys(self, api_key_type):
     if api_key_type is UserAPIKey:
       return api_key_type.objects.filter(user=self.user)
-    raise Exception(api_key_type)
 
 
 def get_test_my_fake_model(**kwargs):

@@ -50,9 +50,6 @@ class User(PretendPublishable):
   def allowed_api_keys(self, api_key_type):
     if api_key_type is UserAPIKey:
       return UserAPIKey.objects.filter(user=self.instance)
-    else:
-      raise Exception('I dont know which {} are allowed'.format(
-          api_key_type.__class__))
 
 
 @receiver(pre_save, sender=DjangoUser)

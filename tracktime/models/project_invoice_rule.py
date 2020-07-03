@@ -4,7 +4,8 @@ import re
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
-from djaveAllowed.models import Allowed
+from djaveAPI.models.publishable import Publishable
+from djaveAPI.models.user_api_key import UserAPIKey
 from djaveDT import now
 from djmoney.models.fields import MoneyField
 
@@ -16,18 +17,19 @@ from tracktime.models.project_work_session_description import (
     ProjectWorkSessionDescriptions)
 
 
-class ProjectInvoiceRule(Allowed):
+class ProjectInvoiceRule(Publishable):
   project = models.ForeignKey(Project, on_delete=models.CASCADE, help_text=(
       'When you run this rule, it will create an Invoice for the work you '
-      'did on this project.'))
-  creator = models.ForeignKey(User, on_delete=models.CASCADE)
+      'did on this Project.'))
+  creator = models.ForeignKey(User, on_delete=models.CASCADE, help_text=(
+      'Who created this?'))
   hourly_rate = MoneyField(max_digits=10, decimal_places=2, help_text=(
-      'How much should I charge per hour you spent on this project?'))
+      'How much should I charge per hour for this Project?'))
   first_billable_day = models.DateField(
       default=date(2000, 1, 1), help_text=(
-          'Every work session that hasn\'t been billed for yet that occurs '
-          'on or after this date will go in an Invoice when you run this '
-          'rule.'))
+          'When you run this rule, every ProjectWorkSession that hasn\'t '
+          'been billed for yet that occurs on or after this date will go in a '
+          'new Invoice.'))
   # So, I could make this a SlugField. But I would need to update
   # djaveClassMagic.model_filed.ModelField to include a, like, is_slug
   # attribute, which feels like polluting an abstract idea with details about a
@@ -36,23 +38,29 @@ class ProjectInvoiceRule(Allowed):
   # stick with the rule that explain_why_invalid is for anything more
   # complicated than required fields, basic type checking, and permission.
   invoice_id_prefix = models.CharField(max_length=10, help_text=(
-      'Every Invoice you make with this rule will get a unique id. That '
-      'unique id will start with what you put here.'))
+      'Every Invoice created with this rule gets a unique id that starts with '
+      'the value of this field.'))
   sent_to = models.TextField(blank=False, null=False, help_text=(
-      'This is labeled "Sent to" in the upper left of the Invoice. Explain '
-      'who the customer is in this Invoice.'))
+      'This is labeled "Invoice sent to" in the upper left of the Invoice. '
+      'Explain who the client is.'))
   make_payment_to = models.TextField(help_text=(
-      'This is labeled "Make payable to" in the upper left of the Invoice. '
-      'Explain who the service provider is in this Invoice, and how to '
-      'pay them.'))
+      'This is labeled "Make payment to" in the upper left of the Invoice. '
+      'Explain who the service provider is and how to pay them.'))
   default_line_item_description = models.TextField(help_text=(
-      'When you "Enter time", you create a Work Session. That Work Session '
-      'gets turned into an Invoice Line Item whose description is everything '
-      'you marked "Done" during that Work Session. If, however, you didn\'t '
-      'mark anything done, then the description of that Invoice Line Item '
-      'defaults to this field.'))
+      'When you "Enter time", you create a ProjectWorkSession. That '
+      'gets turned into an InvoiceLineItem whose description '
+      'is the descriptions of every ProjectToDo you marked "Done" during that '
+      'session. If, however, you didn\'t mark anything done, then the '
+      'description of that InvoiceLineItem defaults to the value of this '
+      'field.'))
   net_days = models.PositiveIntegerField(help_text=(
       'How many days after the Invoice is sent is it due?'))
+
+  @classmethod
+  def model_description(cls):
+    return """
+        A ProjectInvoiceRule describes how to create a new Invoice for a
+        Project."""
 
   @classmethod
   def filter_live(cls, query_set):
@@ -62,6 +70,10 @@ class ProjectInvoiceRule(Allowed):
   @classmethod
   def filter_allowed_by_user(cls, user, query_set):
     return query_set.filter(creator=user).select_related('project')
+
+  def allowed_api_keys(self, api_key_type):
+    if api_key_type is UserAPIKey:
+      return UserAPIKey.objects.filter(user=self.creator)
 
   def explain_why_invalid(self):
     super_why = super().explain_why_invalid()

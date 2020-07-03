@@ -28,9 +28,7 @@ class ProjectLineItem(LineItem):
   project_work_session = OneToOneOrNoneField(
       ProjectWorkSession, on_delete=models.PROTECT, help_text=(
           'Which ProjectWorkSession does this ProjectLineItem represent? '
-          'There may be only 1 ProjectLineItem per ProjectWorkSession, '
-          'meaning that a single ProjectWorkSession may appear in 1 Invoice '
-          'at most.'))
+          'There can be only one ProjectLineItem per ProjectWorkSession.'))
 
   @classmethod
   def model_description(cls):

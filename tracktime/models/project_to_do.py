@@ -23,12 +23,12 @@ class ProjectToDoManager(ToDoManager):
 class ProjectToDo(ToDo):
   project = models.ForeignKey(
       Project, on_delete=models.PROTECT, help_text=(
-          'What Project does this ProjectToDo apply to?'))
+          'What Project does this this apply to?'))
 
   @classmethod
   def model_description(cls):
     return """
-        A ProjectToDo is a single task that a user intends to complete.
+        A ProjectToDo is a single task that a User intends to complete.
         Picking these is a bit of an art form. Ideally, you click "Done" on a
         few ProjectToDos every ProjectWorkSession. Then when you Report, you
         can see a steady rhythm. """

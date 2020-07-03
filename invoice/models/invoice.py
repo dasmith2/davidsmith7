@@ -90,15 +90,15 @@ class Invoice(Publishable, BaseKnowsChild):
       'and accountants seem to like that.'))
 
   sent_to = models.TextField(blank=False, null=False, help_text=(
-      'This is labeled "Sent to" in the upper left of the Invoice. Explain '
-      'who the client is.'))
+      'This is labeled "Invoice sent to" in the upper left of the Invoice. '
+      'Explain who the client is.'))
   make_payment_to = models.TextField(help_text=(
       'This is labeled "Make payment to" in the upper left of the Invoice. '
-      'Explain who the service provider is, and how to pay them.'))
+      'Explain who the service provider is and how to pay them.'))
 
   creator = models.ForeignKey(
       User, related_name='createdinvoice_set', on_delete=models.PROTECT,
-      help_text='Who sent this Invoice?')
+      help_text='Who created this Invoice?')
 
   created = models.DateTimeField(auto_now_add=True, help_text=(
       'When was this Invoice created?'))
@@ -112,13 +112,15 @@ class Invoice(Publishable, BaseKnowsChild):
       'When was this Invoice marked paid?'))
 
   total = MoneyField(max_digits=10, decimal_places=2, help_text=(
-      'What is the total amount due for this Invoice?'))
+      'What is the total amount due for this Invoice? This field gets set '
+      'automatically any time you save a Line Item, so it\'s best not to edit '
+      'the total directly.'))
   service_from = models.DateField(help_text=(
-      'An Invoice is for service that happened between a from date and a to '
-      'date'))
+      'An Invoice is for service that happened between a "from date" and a '
+      '"to date."'))
   service_to = models.DateField(help_text=(
-      'An Invoice is for service that happened between a from date and a to '
-      'date'))
+      'An Invoice is for service that happened between a "from date" and a '
+      '"to date."'))
 
   def mark_deleted(self, nnow=None):
     for line_item in self.lineitem_set.all():
@@ -169,6 +171,5 @@ class Invoice(Publishable, BaseKnowsChild):
   def allowed_api_keys(self, api_key_type):
     if api_key_type is UserAPIKey:
       return UserAPIKey.objects.filter(user=self.creator)
-    raise Exception('I dont know how to check which {} can see this Invoice')
 
   live = LiveInvoiceManager()

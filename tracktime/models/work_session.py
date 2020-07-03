@@ -85,20 +85,20 @@ class WorkSessionManager(LivePublishableManager):
 
 class WorkSession(Publishable):
   user = models.ForeignKey(User, on_delete=models.PROTECT, help_text=(
-      'Which user actually did the work?'))
+      'Which User actually did the work?'))
   date = models.DateField(db_index=True, help_text=(
-      'What date did this work session occur on? If a '
-      'user in New York punches out at 11pm on Friday, the '
+      'What date did this happen on? If a '
+      'User in New York punches out at 11pm on Friday, the '
       'stopped field is technically stored as 3 or 4am Greenwich '
       'Mean Time, but the date field here will say Friday.'))
   hours = models.FloatField(blank=True, null=True, help_text=(
-      'How long was the work session in hours? If this is null, then '
-      'the work session is ongoing.'))
+      'How long was this session in hours? If hours is null, then '
+      'the session is ongoing or abandoned.'))
   started = models.DateTimeField(blank=True, null=True, help_text=(
-      'If the user used the clock to time this work session, when did they '
+      'If the User used the clock to time this session, when did they '
       'start the clock?'))
   stopped = models.DateTimeField(blank=True, null=True, help_text=(
-      'If the user used the clock to time this work session, when did they '
+      'If the User used the clock to time this work session, when did they '
       'stop the clock?'))
 
   def explain_why_invalid(self):
@@ -127,9 +127,6 @@ class WorkSession(Publishable):
   def allowed_api_keys(self, api_key_type):
     if api_key_type is UserAPIKey:
       return UserAPIKey.objects.filter(user=self.user)
-    else:
-      raise Exception('I dont know which {} are allowed'.format(
-          api_key_type.__class__))
 
   def describe_time_span(self, tz_str=None):
     if self.started and self.stopped:

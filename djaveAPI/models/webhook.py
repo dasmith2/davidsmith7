@@ -45,7 +45,12 @@ class WebhookManager(RmOldManager):
     payload = json.dumps(to_json_dict(publishable))
 
     for api_key_type in api_key_types():
-      for api_key in publishable.allowed_api_keys(api_key_type):
+      allowed_keys = publishable.allowed_api_keys(api_key_type)
+      if allowed_keys is None:
+        raise Exception((
+            'Apparently I dont know how to check which {} have access to '
+            'this {}').format(api_key_type, publishable.__class__))
+      for api_key in allowed_keys:
         webhook_url = api_key.webhook_url
         if not webhook_url:
           continue

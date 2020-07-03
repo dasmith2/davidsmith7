@@ -29,11 +29,12 @@ class LiveLineItemManager(LivePublishableManager):
 
 
 class LineItem(Publishable, BaseKnowsChild):
-  invoice = models.ForeignKey(Invoice, on_delete=models.PROTECT)
+  invoice = models.ForeignKey(Invoice, on_delete=models.PROTECT, help_text=(
+      'What Invoice is this in?'))
   describe_service = models.TextField(help_text=(
       'What did somebody do that was worth charging money for?'))
   amount = MoneyField(max_digits=10, decimal_places=2, help_text=(
-      'How much should be charged for this Line Item?'))
+      'How much should be charged for this?'))
   amount_calculation = models.TextField(
       null=False, blank=True, default='', help_text=(
           'Describe the exact forumula used to arrive at the amount'))
@@ -45,6 +46,5 @@ class LineItem(Publishable, BaseKnowsChild):
   def allowed_api_keys(self, api_key_type):
     if api_key_type is UserAPIKey:
       return UserAPIKey.objects.filter(user=self.invoice.creator)
-    raise Exception('I dont know how to check which {} can see this Invoice')
 
   live = LiveLineItemManager()

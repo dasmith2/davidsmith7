@@ -65,13 +65,14 @@ class ToDoManager(LivePublishableManager):
 
 
 class ToDo(Publishable):
-  description = models.TextField()
+  description = models.TextField(help_text=(
+      'Describe what you intend to do, or what you did.'))
   created = models.DateTimeField(auto_now_add=True)
   done = models.DateTimeField(null=True, blank=True, db_index=True, help_text=(
-      'When, if ever, was this ToDo marked done?'))
+      'When, if ever, was this marked done?'))
   creator = models.ForeignKey(
       User, on_delete=models.PROTECT, related_name='creator', help_text=(
-          'Who created this ToDo?'))
+          'Who created this?'))
 
   live = ToDoManager()
 
@@ -82,9 +83,6 @@ class ToDo(Publishable):
   def allowed_api_keys(self, api_key_type):
     if api_key_type is UserAPIKey:
       return UserAPIKey.objects.filter(user=self.creator)
-    else:
-      raise Exception('I dont know which {} are allowed'.format(
-          api_key_type.__class__))
 
   @classmethod
   def model_description(cls):

@@ -28,7 +28,8 @@ class LiveProjectInvoiceManager(LiveInvoiceManager):
 
 
 class ProjectInvoice(Invoice):
-  project = models.ForeignKey(Project, on_delete=models.PROTECT)
+  project = models.ForeignKey(Project, on_delete=models.PROTECT, help_text=(
+      'What Project is this Invoice collecting payment for?'))
 
   @classmethod
   def filter_allowed_by_user(cls, user, query_set):
@@ -39,6 +40,6 @@ class ProjectInvoice(Invoice):
   def model_description(cls):
     return (
         'A ProjectInvoice is an Invoice for time tracked against a Project. '
-        'A ProjectInvoice is made up of ProjectLineItems.')
+        'A ProjectInvoice is made up of ProjectLineItems and ManualLineItems.')
 
   live = LiveProjectInvoiceManager()
