@@ -1,12 +1,8 @@
 from django.urls import path
 
-from djavError.views.see_error import see_error
-from djavError.views.js_error import js_error
-
-from djavError.views.errors import errors
-from djavError.views.notifications import notifications
-from djavError.views.long_requests import long_requests
-from djavError.views.too_many_queries import too_many_queries
+from djavError.views import (
+    see_error, js_error, errors, notifications, long_requests,
+    too_many_queries)
 
 
 djaverror_urls = [

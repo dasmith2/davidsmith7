@@ -10,7 +10,7 @@ TOO_MANY_QUERIES = NavItem('too_many_queries', 'Too many queries')
 NAV_LIST = [ERRORS, NOTIFICATIONS, LONG_REQUESTS, TOO_MANY_QUERIES]
 
 
-def error_context(current_view, **kwargs):
+def nav_context(current_view, **kwargs):
   use_nav_list = []
   for nav in NAV_LIST:
     how_many = get_how_many(nav.view_name)

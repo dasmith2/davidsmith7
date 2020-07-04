@@ -51,28 +51,6 @@ def to_do(request):
   return render(request, 'to_do.html', context)
 
 
-@ajax_endpoint_login_required
-def task_done(request):
-  task = _ajax_task(request)
-  task.done = now()
-  task.save()
-
-
-@ajax_endpoint_login_required
-def task_not_done(request):
-  task = _ajax_task(request)
-  task.done = None
-  task.save()
-
-
-def _ajax_task(request):
-  pk = get_request_variable(request, 'pk')
-  task = ToDo.live.filter(pk=pk).first()
-  if not task:
-    raise AjaxProblem('There is no ToDo with pk {}'.format(pk))
-  return task
-
-
 @login_required
 def all_tasks(request):
   all_project_to_dos = AllProjectToDos(request)
@@ -81,7 +59,4 @@ def all_tasks(request):
 
 
 def to_do_context(to_dos_table, request, **kwargs):
-  return tracktime_context(
-      TO_DO, to_dos_table=to_dos_table,
-      task_done_url=reverse(task_done),
-      not_done_url=reverse(task_not_done), **kwargs)
+  return tracktime_context(TO_DO, to_dos_table=to_dos_table, **kwargs)
