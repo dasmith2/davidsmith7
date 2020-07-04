@@ -39,6 +39,7 @@ form { margin: 0px; padding: 0px; }
 .feedback { color: #f00; }
 .start-hidden { display: none; }
 .editing, .editing textarea, .editing input { background-color: #ffb; }
+.green, .green textarea { background-color: #dfd; }
 
 .margin-top { margin: 60px 0px 0px 0px; }
 .margin-top-half { margin: 20px 0px 0px 0px; }

@@ -19,7 +19,7 @@ def settings(request):
   djave_login_settings_widget = DjaveLoginSettingsWidget(request)
 
   context = tracktime_context(
-      'settings_tracktime', request,
+      'settings_tracktime',
       user_api_key_widget=user_api_key_widget,
       djave_login_settings_widget=djave_login_settings_widget,
       api_docs_url=reverse('tracktime_api_docs'))

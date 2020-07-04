@@ -33,6 +33,8 @@ function problem_in_response(response) {
   if (response.responseJSON) {
     // You need this for .fail(function(response) { ...
     response = response.responseJSON;
+  } else if (response.status && response.status != 200) {
+    return response.status;
   }
   return response['problem'];
 }
@@ -137,7 +139,11 @@ var other_buttons = function(row) {
 };
 
 var buttons_cell = function(row) {
-  return other_buttons(row).parents('td');
+  var by_other_buttons = other_buttons(row).parents('td');
+  if (by_other_buttons.length) {
+    return by_other_buttons;
+  }
+  return row.find('.buttons');
 };
 
 var turn_on_edit_mode = function(row) {
@@ -273,4 +279,93 @@ function wire_up_ajax_save_field(selector_or_elt, field_name) {
 
   $(selector_or_elt).keyup(handle_row_maybe_changed);
   $(selector_or_elt).click(handle_row_maybe_changed);
+}
+
+function setup_set_clear_dt_green_mode(
+    table_finder, field_name, set_button_text, unset_button_text,
+    set_mode_callback, unset_mode_callback) {
+  /* You have a model where, when a field is set, the row should be colored
+   * green, but when the field is not set, the row is uncolored. You need
+   * buttons that switch between the modes and set the field to either now or
+   * null. For instance, ToDos have a done field and invoices have a paid
+   * field. */
+
+  var set_mode = function(row) {
+    row.addClass('green');
+    var buttons = buttons_cell(row);
+    buttons.find('.set').remove();
+    var unset = $('<button type="button" class="unset"></button>').text(
+        unset_button_text);
+
+    unset.click(function() {
+      update_field(row, null, unset_mode);
+    });
+
+    buttons.append(unset);
+
+    if (set_mode_callback) {
+      set_mode_callback(row);
+    }
+  };
+
+  var unset_mode = function(row) {
+    row.removeClass('green');
+    var buttons = buttons_cell(row);
+    buttons.find('.unset').remove();
+    var set = $('<button type="button" class="set"></button>').text(
+        set_button_text);
+
+    set.click(function() {
+      update_field(row, 'now', set_mode);
+    });
+
+    buttons.append(set);
+
+    if (unset_mode_callback) {
+      unset_mode_callback(row);
+    }
+  };
+
+  var update_field = function(row, new_value, success) {
+    var data = {pk: find_pk(row), type: find_model(row)};
+    data[field_name] = new_value;
+    var handle_problem = function(response) {
+      var cells = row.find('td');
+      var last_cell = $(cells[cells.length - 1]);
+      return show_problem(response, get_feedback_elt_append(last_cell));
+    };
+    post('{{ ajax_update_url }}', data, function(response) {
+      if (!handle_problem(response)) {
+        success(row);
+      }
+    }).fail(handle_problem);
+  };
+
+  var rows = $(table_finder).find('tr[data-pk]');
+  for (var i = 0; i < rows.length; i++) {
+    // I used a for loop so if I throw an exception the loop stops.
+    var row = $(rows[i]);
+    if (buttons_cell(row).length == 0) {
+      window.log_error(
+          'Unable to find the buttons cell for a row in ' + table_finder);
+      return;
+    }
+    var field_data_attr = 'data-' + field_name;
+    var field_data_val = row.attr(field_data_attr);
+    if (field_data_val != 'True' && field_data_val != 'False') {
+      var message = (
+          table_finder + ' rows should have a True or False '
+          + field_data_attr);
+      // Don't throw message because then Firefox just hands blank information
+      // to onerror.
+      window.log_error(message);
+      return;
+    }
+    var is_set = field_data_val == 'True';
+    if (is_set) {
+      set_mode(row);
+    } else {
+      unset_mode(row);
+    }
+  }
 }

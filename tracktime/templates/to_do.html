@@ -5,71 +5,30 @@
 function focus_on_new_to_do() {
   $('.new_description').focus();
 }
-
-function setup_done_delete_and_not_done() {
-  $('tr[data-pk]').each(function() {
-    // to_done so as not to conflict with the done button
-    if ($(this).hasClass('to_done')) {
-      put_row_in_done_mode($(this));
-    } else {
-      put_row_in_not_done_mode($(this));
-    }
-  });
-}
-
-function put_row_in_done_mode(row) {
-  row.addClass('to_done');
-  clear_buttons(row);
-  append_not_done_button(row);
-}
-
-function put_row_in_not_done_mode(row) {
-  row.removeClass('to_done');
-  clear_buttons(row);
-  append_done_button(row);
-  append_delete_button(row);
-}
-
-function clear_buttons(row) {
-  get_button_cell(row).empty();
-}
-
-function get_button_cell(row) {
-  return row.find('.buttons');
-}
-
-function append_done_button(row) {
-  var html = '<button type="button" class="done">Done</button>';
-  var button = $(html).appendTo(get_button_cell(row));
-  wire_up_ajax_button(button, '{{ task_done_url }}', function() {
-    put_row_in_done_mode(row);
-  });
-}
+$(focus_on_new_to_do);
 
 function append_delete_button(row) {
   var html = '<button type="button" class="delete">Delete</button>';
-  var button = $(html).appendTo(get_button_cell(row));
+  var button = $(html).appendTo(buttons_cell(row));
   wire_up_ajax_delete_button(button, 'Delete To Do?')
 }
 
-function append_not_done_button(row) {
-  var html =
-      '<button type="button" class="not_done">Not done actually</button>';
-  var button = $(html).appendTo(get_button_cell(row));
-  wire_up_ajax_button(button, '{{ not_done_url }}', function() {
-    put_row_in_not_done_mode(row);
-  });
+function remove_delete_button(row) {
+  row.find('.delete').remove();
 }
 
-$(focus_on_new_to_do);
-$(setup_done_delete_and_not_done);
+function init_done_mode() {
+  var table_finder = 'table[data-model="ToDo"]';
+  var field_name = 'done';
+  var set_mode_callback = remove_delete_button;
+  var unset_mode_callback = append_delete_button;
+  setup_set_clear_dt_green_mode(
+      table_finder, field_name, 'Done', 'Not done',
+      set_mode_callback, unset_mode_callback);
+}
+$(init_done_mode);
 </script>
 
-<style>
-table { margin-top: 20px; }
-.to_done, .to_done textarea.description { background-color: #dfd; }
-.to_done.editing, .to_done.editing textarea { background-color: #ffb; }
-</style>
 {% endblock tracktime_head %}
 
 {% block tracktime_body %}

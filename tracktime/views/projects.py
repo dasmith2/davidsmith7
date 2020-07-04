@@ -25,7 +25,7 @@ def archived_projects(request):
 
 def projects_context(table, request, **kwargs):
   context = tracktime_context(
-      PROJECTS, request, table=table,
+      PROJECTS, table=table,
       archive_project_url=reverse('archive_project'),
       unarchive_project_url=reverse('unarchive_project'))
   context.update(kwargs)

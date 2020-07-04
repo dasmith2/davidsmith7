@@ -5,8 +5,7 @@ from djaveNav.nav import Nav, NavItem
 
 
 class NavWithAccount(Nav):
-  def __init__(self, nav_list, settings_view_name, current_view_name, request):
-    self.request = request
+  def __init__(self, nav_list, settings_view_name, current_view_name):
     settings_nav_item = NavItem(settings_view_name, 'Settings')
     super().__init__(nav_list + [settings_nav_item], current_view_name)
 

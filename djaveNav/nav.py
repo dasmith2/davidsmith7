@@ -11,7 +11,10 @@ NavItemCurrentOrNot = namedtuple(
 
 
 class Nav(object):
-  def __init__(self, nav_list, current_view_name):
+  def __init__(self, nav_list, current_view_name_or_nav_item):
+    current_view_name = current_view_name_or_nav_item
+    if isinstance(current_view_name_or_nav_item, NavItem):
+      current_view_name = current_view_name_or_nav_item.view_name
     found_current = False
     self.nav_items_current_or_not = []
     for nav_item in nav_list:

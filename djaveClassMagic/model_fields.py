@@ -23,6 +23,13 @@ def _get_django_model_fields(cls):
   return cls._meta.get_fields()
 
 
+def model_fields_lookup(model):
+  lookup = {}
+  for field in model_fields(model):
+    lookup[field.name] = field
+  return lookup
+
+
 def model_fields(model, specific_field=None):
   fields = []
   for field in _get_django_model_fields(model):

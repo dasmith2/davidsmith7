@@ -1,7 +1,7 @@
 import sys
 
 from django.conf import settings
-from djavError.models import log_error
+from djavError.log_error import log_error
 from redis.connection import ResponseError
 from rq import Queue
 

@@ -1,0 +1,17 @@
+{% extends "this_site.html" %}
+
+{% block this_section_head %}
+{% block error_head %}
+{% endblock error_head %}
+{% endblock this_section_head %}
+
+{% block this_site_body %}
+
+{{ nav.as_html }}
+
+{% block error_body %}
+  {% csrf_token %}
+  {{ the_one_thing_on_the_page.as_html }}
+{% endblock error_body %}
+
+{% endblock this_site_body %}

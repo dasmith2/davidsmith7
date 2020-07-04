@@ -82,6 +82,6 @@ def all_tasks(request):
 
 def to_do_context(to_dos_table, request, **kwargs):
   return tracktime_context(
-      TO_DO, request, to_dos_table=to_dos_table,
+      TO_DO, to_dos_table=to_dos_table,
       task_done_url=reverse(task_done),
       not_done_url=reverse(task_not_done), **kwargs)

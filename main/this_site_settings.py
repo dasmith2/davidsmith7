@@ -3,6 +3,9 @@
 
 GO_TO_VIEW_AFTER_SIGN_UP = 'projects'
 
+# Mailgun
+MAILGUN_API_KEY = '913a5827-38186220'
+
 
 # Amazon S3 test buckets. Replace these!
 from djaveS3.bucket_config import BucketConfig

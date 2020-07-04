@@ -3,7 +3,7 @@ import os
 import re
 
 from django.conf import settings
-from djavError.models import log_error
+from djavError.log_error import log_error
 from djaveS3.boto_client import get_boto_client
 from djaveS3.get_bucket_config import get_bucket_config
 

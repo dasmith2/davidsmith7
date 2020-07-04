@@ -32,7 +32,7 @@ def enter_time(request):
   totals = ProjectWorkSession.live.total_hours_per_date(
       day - timedelta(days=2), day + timedelta(days=2), request.user)
   context = tracktime_context(
-      ENTER_TIME, request,
+      ENTER_TIME,
       delete_work_session_url=reverse('delete_work_session'),
       date_roller=date_roller,
       punch_the_clock_table=punch_the_clock_table,

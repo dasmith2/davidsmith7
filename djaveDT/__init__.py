@@ -166,6 +166,10 @@ def beginning_of_day(d, tz_str=None):
   return naive_dt_to_tz_dt(d_to_naive_dt(d), tz_str=tz_str)
 
 
+def end_of_day(d, tz_str=None):
+  return beginning_of_day(d, tz_str=tz_str) + timedelta(days=1)
+
+
 def tz_dt_to_tz_dt(tz_dt, tz_str=None):
   """ Take a timezone aware datetime that's localized to UTC (or whatever,
   but Django stores and loads datetimes in the database in UTC so that's

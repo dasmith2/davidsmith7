@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import redirect, reverse, render
 from djaveAPI.ajax_endpoint import ajax_endpoint
 from djaveAPI.problem import Problem
-from djavError.models import log_error
+from djavError.log_error import log_error
 from djaveLogin.forms import LoginForm
 from djaveLogin.calc_urls import NEXT_URL, append_next_url
 from djaveLogin.models import (

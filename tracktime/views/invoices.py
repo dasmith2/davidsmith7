@@ -41,7 +41,7 @@ def project_invoices(request):
   invoices_exist = ProjectInvoice.live.allowed_by_user(request.user).exists()
 
   context = tracktime_context(
-      INVOICES, request,
+      INVOICES,
       project_invoice_rules_table=project_invoice_rules_table,
       project_invoices_table=project_invoices_table,
       invoice_rules_header=invoice_rules_header,

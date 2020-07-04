@@ -24,7 +24,7 @@ class ToDoForm(Form):
 
 class ToDosTable(EditListTable):
   def __init__(self, user, form_data, nnow=None):
-    super().__init__(ToDo)
+    super().__init__(ToDo, classes=['margin-top-half'])
 
     self.created_from_date = None
     self.created_to_date = None
@@ -90,7 +90,8 @@ class ToDosTable(EditListTable):
       if to_do.done:
         classes = ['to_done']  # So as not to conflict with the done button
       self.create_row(
-          self.cells_for_existing(to_do), pk=to_do.pk, classes=classes)
+          self.cells_for_existing(to_do), pk=to_do.pk, classes=classes,
+          additional_attrs={'data-done': bool(to_do.done)})
 
   # From here on out it's stuff you probably want to override in your
   # FooToDosTable. See ProjectToDosTable for an example.

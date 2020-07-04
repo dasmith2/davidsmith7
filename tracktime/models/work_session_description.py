@@ -1,6 +1,6 @@
 from collections import namedtuple
 
-from djavError.models import log_error
+from djavError.log_error import log_error
 
 from tracktime.models.to_do import ToDo
 from tracktime.models.work_session import WorkSession

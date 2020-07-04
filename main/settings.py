@@ -16,7 +16,10 @@ LOCAL = DEBUG
 STAGE = os.environ.get('STAGE', default='False') == 'True'
 PROD = os.environ.get('PROD', default='False') == 'True'
 TEST = 'test' in sys.argv
-WEB_TEST = 'main.web_test_settings' in sys.argv
+# In order to remove the Django Debug Toolbar from the web test, you have to
+# ./manage.py runserver --settings main.web_test_settings
+WEB_TEST = bool(filter(None, [  # In case --settings=main.web_test_settings
+    arg for arg in sys.argv if arg.find('main.web_test_settings') >= 0]))
 USE_DEBUG_TOOLBAR = DEBUG and not WEB_TEST
 RUNSERVER = 'runserver' in sys.argv
 GUNICORN = 'gunicorn' in sys.argv

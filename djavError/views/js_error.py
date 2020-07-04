@@ -1,7 +1,6 @@
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-
-from djavError.models import log_error, Error
+from djavError.log_error import log_error
 
 
 @csrf_exempt
@@ -17,14 +16,3 @@ def js_error(request):
   subject = post.get('msg', 'Javascript error received')
   log_error(subject, message, supress_stack_trace=True)
   return HttpResponse('ok')
-
-
-def see_error(request, pk):
-  error = Error.objects.get(pk=pk)
-  parts = [
-      error.title,
-      error.message,
-      error.error_message,
-      error.stack_trace]
-  return HttpResponse(
-      '\n'.join(['<pre>{}</pre>'.format(part) for part in parts]))
