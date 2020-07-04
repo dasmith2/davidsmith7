@@ -8,6 +8,7 @@ from djavError.models.error import Error
 from djavError.nav_context import (
     nav_context, ERRORS, NOTIFICATIONS, LONG_REQUESTS, TOO_MANY_QUERIES)
 from djavError.widgets.errors_report import ErrorsReport
+from djavError.widgets.notifications_report import NotificationsReport
 
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -41,11 +42,13 @@ def js_error(request):
 
 
 def long_requests(request):
-  pass
+  context = nav_context(LONG_REQUESTS)
+  return render(request, 'error_base.html', context)
 
 
 def too_many_queries(request):
-  pass
+  context = nav_context(TOO_MANY_QUERIES)
+  return render(request, 'error_base.html', context)
 
 
 def see_error(request, pk):

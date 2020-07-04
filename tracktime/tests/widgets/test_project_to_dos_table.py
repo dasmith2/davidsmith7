@@ -44,7 +44,7 @@ class ProjectToDosTableTests(TestCase):
         self._to_do_did_buttons()]))
     table.rows[1].assertEqual(Row(
         ['My rad project', description, Cell(None, classes=['buttons'])],
-        pk=to_do.pk))
+        pk=to_do.pk, additional_attrs={'data-done': False}))
 
   def _to_do_did_buttons(self):
     return [

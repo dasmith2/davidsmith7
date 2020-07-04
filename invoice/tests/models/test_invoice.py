@@ -71,6 +71,19 @@ class ImportantInvoicesTests(TestCase):
             user, nnow=to_tz_dt('2020-01-15 12:00'))))
 
 
+class StatusIfNotPaidTests(TestCase):
+  def test_status_if_not_paid(self):
+    invoice = get_test_invoice(
+        created=to_tz_dt('2020-01-01 12:00'), sent=date(2020, 1, 1),
+        paid=to_tz_dt('2020-01-01 12:00'), net_days=10)
+    self.assertEqual(
+        PAID, invoice.status(nnow=to_tz_dt('2020-01-15 12:00')))
+    self.assertEqual(
+        LATE, invoice.status_if_not_paid(nnow=to_tz_dt('2020-01-15 12:00')))
+    self.assertEqual(
+        DUE, invoice.status_if_not_paid(nnow=to_tz_dt('2020-01-05 12:00')))
+
+
 class GetInvoicesTests(TestCase):
   def test_get_invoices(self):
     user = get_test_user()

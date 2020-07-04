@@ -1,3 +1,7 @@
+/* Buttons are typically, like, css inline formatted, and apparently browsers
+ * will render whitespace. So if you see some buttons with larger gaps between
+ * them, it's because you've got whitespace between the buttons. The answer is
+ * the spaceless django template tag. */
 button, .button, input[type="submit"], input[type="button"], a.button {
   background: #79aec8;
   padding: 10px 15px;
@@ -6,7 +10,7 @@ button, .button, input[type="submit"], input[type="button"], a.button {
   color: #fff;
   cursor: pointer;
   box-shadow: 4px 4px 2px grey;
-  margin: 3px 3px 3px 0px;
+  margin: 3px 6px 3px 0px;
   font-size: 15px;
   font-weight: 401; }
 button:active, .button:active, input[type=submit]:active, input[type=button]:active,

@@ -135,27 +135,35 @@ class Invoice(Publishable, BaseKnowsChild):
     self.save()
 
   def status(self, nnow=None):
-    return re.compile(r'^\w+').findall(self.status_with_date(nnow=nnow))[0]
+    return self._just_status(self.status_with_date(nnow=nnow))
+
+  def _just_status(self, status_with_date):
+    return re.compile(r'^\w+').findall(status_with_date)[0]
 
   def status_with_date(self, nnow=None):
+    return self._calc_status_with_date(
+        self.sent, self.due, self.paid, nnow=nnow)
+
+  def status_if_not_paid(self, nnow=None):
+    return self._just_status(
+        self._calc_status_with_date(self.sent, self.due, None, nnow=nnow))
+
+  def _calc_status_with_date(self, sent, due, paid, nnow=None):
     nnow = nnow or now()
-    if self.paid:
-      return 'Paid {}'.format(dt_to_d_str(self.paid))
-    elif self.sent:
-      if self.past_due(nnow=nnow):
-        return 'Late. Due {}'.format(d_to_str(self.due))
-      if self.sent <= nnow.date():
-        return 'Due {}'.format(d_to_str(self.due))
-      return 'Sending {}'.format(d_to_str(self.sent))
+    if paid:
+      return 'Paid {}'.format(dt_to_d_str(paid))
+    elif sent:
+      past_due = due and due < nnow.date()
+      if past_due:
+        return 'Late. Due {}'.format(d_to_str(due))
+      if sent <= nnow.date():
+        return 'Due {}'.format(d_to_str(due))
+      return 'Sending {}'.format(d_to_str(sent))
     return 'Created {}'.format(dt_to_d_str(self.created))
 
   def add_to_json(self, existing_json):
     existing_json['status'] = self.status()
     existing_json['status_with_date'] = self.status_with_date()
-
-  def past_due(self, nnow=None):
-    nnow = nnow or now()
-    return self.due and self.due < nnow.date()
 
   def save(self, *args, **kwargs):
     if self.sent:

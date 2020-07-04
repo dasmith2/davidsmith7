@@ -1,15 +1,10 @@
 from datetime import date
 
 from django.shortcuts import render, reverse, redirect
-from djaveDT import now
 from djaveForm.button import Button
-from djaveAPI.ajax_endpoint import ajax_endpoint_login_required
-from djaveAPI.problem import Problem as AjaxProblem
-from djaveAPI.get_request_variable import get_request_variable
 from djaveLogin.login_required import login_required
 from djaveTable.problem import Problem as HtmlProblem
 
-from tracktime.models.to_do import ToDo
 from tracktime.models.project_work_session import ProjectWorkSession
 from tracktime.widgets.punch_the_clock import PunchTheClockTable
 from tracktime.widgets.project_to_dos_table import ProjectToDosTable

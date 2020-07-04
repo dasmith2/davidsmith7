@@ -172,7 +172,9 @@ def cell_contents_as_html(cell_contents):
   to_return = []
   for cell_content in _cell_contents_as_list(cell_contents):
     to_return.append(cell_content.as_html())
-  return '\n'.join(to_return)
+  # Don't '\n'.join(to_return) because that will insert whitespace nodes
+  # between buttons, causing the buttons to spread out more.
+  return ''.join(to_return)
 
 
 def cell_contents_as_csv(cell_contents):

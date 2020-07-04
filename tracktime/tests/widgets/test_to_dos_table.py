@@ -46,7 +46,8 @@ class ToDosTableTests(TestCase):
     description = TextAreaField(
         'description', default='Hello world!', required=False)
     table.rows[1].assertEqual(Row([
-        description, Cell(None, classes=['buttons'])], pk=to_do.pk))
+        description, Cell(None, classes=['buttons'])], pk=to_do.pk,
+        additional_attrs={'data-done': False}))
 
   def test_did(self):
     table = ToDosTable(self.user, {
