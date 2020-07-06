@@ -63,6 +63,13 @@ class WebTest(object):
   def go_to_url(self, url):
     self.driver.get(url)
     self.close_django_toolbar()
+    if self.on_django_server_error_screen():
+      raise Exception(
+          'It appears I am on an error screen and the test has failed.')
+
+  def on_django_server_error_screen(self):
+    return bool(
+        self.finds('exception_value', raise_exception_if_not_found=False))
 
   def go_to_view(self, view_name, query_string='', **kwargs):
     url = self.server_plus_reverse(view_name, **kwargs)

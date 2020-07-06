@@ -1,4 +1,4 @@
-This will create your {{ email }} user on TrackTime.TECH,
-and it SHOULD log you in for, like, 10 years (or until you log out).
+This will create your {{ email }} user on {{ site_name }}.
+It SHOULD log you in for, like, 10 years (or until you log out).
 
 {{ url }}

@@ -1,5 +1,5 @@
 from djavError.models.notification import Notification
-from djaveStaffEmail import StaffEmailSender
+from djavEmail.staff_email_sender import StaffEmailSender
 
 
 class Notifier(object):

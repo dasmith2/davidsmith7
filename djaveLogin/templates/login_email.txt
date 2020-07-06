@@ -1,3 +1,4 @@
-This link SHOULD log {{ email }} in to TimeTrack.TECH for, like, 10 years.
+This link SHOULD log {{ email }} in to {{ site_name }}
+for, like, 10 years (or until you log out).
 
 {{ url }}

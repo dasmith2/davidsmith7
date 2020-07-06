@@ -6,23 +6,29 @@ ERRORS = NavItem('errors', 'Errors')
 NOTIFICATIONS = NavItem('notifications', 'Notifications')
 LONG_REQUESTS = NavItem('long_requests', 'Long requests')
 TOO_MANY_QUERIES = NavItem('too_many_queries', 'Too many queries')
+TRIGGER_ERRORS = NavItem('trigger_errors', 'Trigger')
 
-NAV_LIST = [ERRORS, NOTIFICATIONS, LONG_REQUESTS, TOO_MANY_QUERIES]
+NAV_LIST = [
+    ERRORS, NOTIFICATIONS, LONG_REQUESTS, TOO_MANY_QUERIES, TRIGGER_ERRORS]
 
 
 def nav_context(current_view, **kwargs):
   use_nav_list = []
   for nav in NAV_LIST:
     how_many = get_how_many(nav.view_name)
-    use_nav_list.append(NavItem(
-        nav.view_name, '{} ({})'.format(nav.display, how_many)))
+    display = '{} ({})'.format(nav.display, how_many)
+    if how_many is None:
+      display = nav.display
+    use_nav_list.append(NavItem(nav.view_name, display))
   context = {'nav': Nav(use_nav_list, current_view)}
   context.update(kwargs)
   return context
 
 
 def get_how_many(view_name):
-  if view_name == 'errors':
+  if view_name == 'trigger_errors':
+    return None
+  elif view_name == 'errors':
     return get_errors().count()
   elif view_name == 'notifications':
     return get_notifications().count()

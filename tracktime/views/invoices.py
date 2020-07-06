@@ -55,8 +55,7 @@ def project_invoices(request):
 @CanCSV
 def all_project_invoices(request):
   report = AllProjectInvoices(request.user, request.GET)
-  context = tracktime_context(
-      INVOICES, request, the_one_thing_on_the_page=report)
+  context = tracktime_context(INVOICES, the_one_thing_on_the_page=report)
   return CanCSVResponse(
       'tracktime_base.html', context, report.table, 'invoices.csv')
 
@@ -66,7 +65,7 @@ def all_project_invoices(request):
 def project_line_items(request):
   report = AllProjectLineItems(request.user, request.GET)
   context = tracktime_context(
-      INVOICES, request, the_one_thing_on_the_page=report, title='Line items')
+      INVOICES, the_one_thing_on_the_page=report, title='Line items')
   return CanCSVResponse(
       'tracktime_base.html', context, report.table, 'line_items.csv')
 
@@ -85,7 +84,7 @@ def edit_project_invoice(request, pk=None):
     return redirect(the_one_thing_on_the_page.redirect_to())
 
   context = tracktime_context(
-      INVOICES, request, the_one_thing_on_the_page=the_one_thing_on_the_page)
+      INVOICES, the_one_thing_on_the_page=the_one_thing_on_the_page)
   return render(request, 'tracktime_base.html', context)
 
 
@@ -95,8 +94,7 @@ def view_project_invoice(request, pk=None):
 
   view_invoice = ViewInvoice(invoice, request)
 
-  context = tracktime_context(
-      INVOICES, request, the_one_thing_on_the_page=view_invoice)
+  context = tracktime_context(INVOICES, the_one_thing_on_the_page=view_invoice)
 
   return render(request, 'blank.html', context)
 
@@ -116,5 +114,5 @@ def project_invoice_rule(request, pk=None):
   if table.saved() or table.deleted():
     return redirect('project_invoices')
 
-  context = tracktime_context(INVOICES, request, table=table)
+  context = tracktime_context(INVOICES, table=table)
   return render(request, 'project_invoice_rule.html', context)

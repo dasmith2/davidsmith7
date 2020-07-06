@@ -294,8 +294,10 @@ function setup_set_clear_dt_green_mode(
     row.addClass('green');
     var buttons = buttons_cell(row);
     buttons.find('.set').remove();
+    // This code uses the .unset class, but the web tests probably find it
+    // makes more sense to search for the, like, .not_done button or whatever.
     var unset = $('<button type="button" class="unset"></button>').text(
-        unset_button_text);
+        unset_button_text).addClass('unset').addClass('not_' + field_name);
 
     unset.click(function() {
       update_field(row, null, unset_mode);
@@ -312,8 +314,10 @@ function setup_set_clear_dt_green_mode(
     row.removeClass('green');
     var buttons = buttons_cell(row);
     buttons.find('.unset').remove();
-    var set = $('<button type="button" class="set"></button>').text(
-        set_button_text);
+    // This code uses the .set class, but the web tests probably find it makes
+    // more sense to search for the, like, .done button or whatever.
+    var set = $('<button type="button"></button>').text(
+        set_button_text).addClass('set').addClass(field_name);
 
     set.click(function() {
       update_field(row, 'now', set_mode);

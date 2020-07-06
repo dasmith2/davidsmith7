@@ -4,7 +4,7 @@ import traceback
 from django.conf import settings
 from djaveDT import now
 from djavError.log_error import log_error
-from djaveStaffEmail import StaffEmailSender
+from djavEmail.staff_email_sender import StaffEmailSender
 from djaveThread.models import LoggedCommand
 from rq import Queue
 

@@ -25,10 +25,14 @@ def protocol_and_host(request):
   request does appear to have a _current_scheme_host property that's exactly
   what I want, but as it's a "private" property I'm reluctant to rely on it.
   """
+  return '{}://{}'.format(protocol(request), request.get_host())
+
+
+def protocol(request):
   protocol = 'http'
   if request.is_secure():
     protocol = 'https'
-  return '{}://{}'.format(protocol, request.get_host())
+  return protocol
 
 
 def admin_edit_url(my_object):

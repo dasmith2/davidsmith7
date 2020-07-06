@@ -5,7 +5,6 @@ from django.shortcuts import reverse
 from djaveClassMagic.models.rm_old import RmOldManager, RmOld
 from djaveDT import now
 from djaveLogin.calc_urls import append_next_url
-from djaveURL import protocol_and_host
 from django.db import models
 
 
@@ -25,8 +24,8 @@ def new_login_token(user):
   return LoginToken.objects.create(user=user, token=new_token_str())
 
 
-def new_login_url(user, request, next_url=None):
-  return _new_url_helper(request, new_login_token(user), next_url)
+def new_login_url(user, protocol, host, next_url=None):
+  return _new_url_helper(protocol, host, new_login_token(user), next_url)
 
 
 # Sign up URLs
@@ -36,14 +35,13 @@ def new_sign_up_token(email):
   return token
 
 
-def new_sign_up_url(email, request):
-  return _new_url_helper(request, new_sign_up_token(email), None)
+def new_sign_up_url(email, protocol, host):
+  return _new_url_helper(protocol, host, new_sign_up_token(email), None)
 
 
-def _new_url_helper(request, token, next_url):
-  return '{}{}'.format(
-      protocol_and_host(request),
-      append_next_url(token.next_action_url(), next_url))
+def _new_url_helper(protocol, host, token, next_url):
+  return '{}://{}{}'.format(
+      protocol, host, append_next_url(token.next_action_url(), next_url))
 
 
 def use_token_and_return_user(token_str, nnow=None):

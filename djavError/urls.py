@@ -2,7 +2,7 @@ from django.urls import path
 
 from djavError.views import (
     see_error, js_error, errors, notifications, long_requests,
-    too_many_queries)
+    too_many_queries, trigger_errors)
 
 
 djaverror_urls = [
@@ -12,4 +12,5 @@ djaverror_urls = [
     path('errors', errors, name='errors'),
     path('notifications', notifications, name='notifications'),
     path('long_requests', long_requests, name='long_requests'),
-    path('too_many_queries', too_many_queries, name='too_many_queries')]
+    path('too_many_queries', too_many_queries, name='too_many_queries'),
+    path('trigger', trigger_errors, name='trigger_errors')]

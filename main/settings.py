@@ -60,11 +60,6 @@ if EMAIL_ERRORS_TO:
   ADMINS.append(
       ('Heroku errors', EMAIL_ERRORS_TO))
 
-# Otherwise, when Django sends emails to the admins due to 500 errors, they're
-# from root@localhost and no self respecting smtp provider lets that through.
-# You'll probably need to override this in this_site_settings
-SERVER_EMAIL = 'server@davespace.tech'
-
 # You'll probably want to override this in this_site_settings.py
 GO_TO_VIEW_AFTER_SIGN_UP = '/'
 

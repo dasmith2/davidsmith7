@@ -6,7 +6,7 @@ from django.db import models
 from djaveClassMagic import RmOldManager
 from djaveDT import now
 from djavError.models.staff_email_log import StaffEmailLog
-from djaveStaffEmail import StaffEmailSender
+from djavEmail.staff_email_sender import StaffEmailSender
 
 
 class ErrorManager(RmOldManager):
@@ -80,15 +80,11 @@ class ErrorManager(RmOldManager):
     if error.stack_trace:
       email_message += '\n\n{}'.format(error.stack_trace)
     subject = '{} on {}'.format(error.title, settings.THIS_SERVERS_BASE_URL)
-    if not settings.SERVER_EMAIL or not error.to:
-      message = 'settings.SERVER_EMAIL: {}. error.to: {}'.format(
-          settings.SERVER_EMAIL, error.to)
-      Error.objects.create(title=message)
-      Error.objects.create(title=subject[:250], message=email_message)
+    if error.to:
+      email_sender.send_mail(subject, email_message, error.to.split(','))
     else:
-      email_sender.send_mail(
-          subject, email_message, settings.SERVER_EMAIL,
-          error.to.split(','))
+      message = 'This error didnt specify to:\n\n{}'.format(email_message)
+      Error.objects.create(title=subject[:250], message=message)
 
 
 class Error(StaffEmailLog):

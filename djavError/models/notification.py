@@ -4,7 +4,7 @@ from django.conf import settings
 from djaveClassMagic import RmOldManager
 from djaveDT import now
 from djavError.models.staff_email_log import StaffEmailLog
-from djaveStaffEmail import StaffEmailSender
+from djavEmail.staff_email_sender import StaffEmailSender
 
 
 class NotificationManager(RmOldManager):

@@ -273,7 +273,7 @@ class Demo(WebDemo):
         yellow.""")
     self.say_move(
         'edit', 'I can still edit the invoice in case Bob is unhappy.')
-    self.say_move_click('markpaid', """
+    self.say_move_click('paid', """
         But hopefully everything goes well and I can click
         mark paid.""")
     self.say_move(self.find_with_text('td', 'Paid'), """

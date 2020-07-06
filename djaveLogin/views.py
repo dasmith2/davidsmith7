@@ -10,8 +10,9 @@ from djavError.log_error import log_error
 from djaveLogin.forms import LoginForm
 from djaveLogin.calc_urls import NEXT_URL, append_next_url
 from djaveLogin.models import (
-    new_login_url, new_sign_up_url, LoginToken, new_token_str)
+    new_login_url, new_sign_up_url, LoginToken)
 from djaveLogin.widgets.sign_up_email import SignUpEmail
+from djaveLogin.widgets.login_email import LoginEmail
 from djaveURL import is_valid_url
 
 
@@ -79,15 +80,19 @@ def login_sign_up_helper(request, template, token=None, login_mode=True):
   if send_to_email:
     user = User.objects.filter(email=send_to_email).first()
     next_url = _next_url(request)
-    send_url = None
-    if user:
-      send_url = new_login_url(user, request, next_url=next_url)
-    else:
-      send_url = new_sign_up_url(send_to_email, request)
     if settings.LOCAL:
-      print('\n{}\n'.format(send_url))
+      if user:
+        print('\n{}\n'.format(new_login_url(
+            user, 'http', 'localhost', next_url=next_url)))
+      else:
+        print('\n{}\n'.format(new_sign_up_url(
+            send_to_email, 'http', 'localhost')))
     else:
-      raise Exception('I dont know how to send an email to users yet!!')
+      if user:
+        LoginEmail(
+            'https', request.get_host(), user, next_url=next_url).send()
+      else:
+        SignUpEmail('https', request.get_host(), send_to_email).send()
     form = LoginForm(None, login_mode=login_mode)
 
   # If the user tried to log in but used an expired token, they'll stay stuck
@@ -133,11 +138,8 @@ def _post_login_url(request):
 
 
 def sign_up_email_preview(request):
-  token = new_token_str()
-  fake_relative = reverse('djave_sign_up', kwargs={'token': token})
-  fake_url = 'https://TrackTime.TECH{}'.format(fake_relative)
   to = request.GET.get('to', 'example@gmail.com')
-  email = SignUpEmail(fake_url, to)
+  email = SignUpEmail('https', 'tracktime.tech', to)
   context = {
       'to': to,
       'subject': email.subject(),

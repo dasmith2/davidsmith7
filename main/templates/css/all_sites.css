@@ -20,7 +20,7 @@ td { font-weight: 300; }
 th { font-weight: 500; color: #555; }
 td, th { border-right: 1px solid #999;
   border-bottom: 1px solid #999; padding: 10px; }
-th, .row2 { background-color: #eee; }
+th, .row2, .row2 textarea { background-color: #eee; }
 
 table textarea { overflow: auto; width: 240px; height: 57px; }
 table textarea, table input {
