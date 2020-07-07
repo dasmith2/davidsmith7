@@ -18,7 +18,7 @@ PROD = os.environ.get('PROD', default='False') == 'True'
 TEST = 'test' in sys.argv
 # In order to remove the Django Debug Toolbar from the web test, you have to
 # ./manage.py runserver --settings main.web_test_settings
-WEB_TEST = bool(filter(None, [  # In case --settings=main.web_test_settings
+WEB_TEST = bool(len([  # In case --settings=main.web_test_settings
     arg for arg in sys.argv if arg.find('main.web_test_settings') >= 0]))
 USE_DEBUG_TOOLBAR = DEBUG and not WEB_TEST
 RUNSERVER = 'runserver' in sys.argv
@@ -179,7 +179,8 @@ INSTALLED_APPS = [
     'djaveReport',
     'djaveS3',
     'djaveTest',
-    'djaveThread'] + THIS_SITE_INSTALLED_APPS
+    'djaveThread',
+    'main'] + THIS_SITE_INSTALLED_APPS
 
 # Whichever of these test classes reference django.contrib.auth.User need
 # explicit migrations to work. I did that by uncommenting "if TEST:" here,

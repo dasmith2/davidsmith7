@@ -1,13 +1,3 @@
-<style>
-.when {
-    margin-top: 60px; background-color: #eee; border: 1px solid #aaa;
-    padding: 10px; box-shadow: 4px 4px 2px grey; }
-.when div.two_before { margin-top: 0px; }
-.when div { margin-top: 12px; }
-.when .current { font-size: 37px; }
-.when .one_before a, .when .one_after a { font-size: 20px; }
-.when .two_before a, .when .two_after a { font-size: 15px; }
-</style>
 <script>
 function append_day_info_to_date_roller(date_info_lookup) {
   /* date_info_lookup should be like {'2020-05-20': 'Stuff about may 20th'} */
@@ -17,6 +7,7 @@ function append_day_info_to_date_roller(date_info_lookup) {
     $('span[data-date-str=' + key + ']').text(date_info_lookup[key]);
   }
 }
+css('date_roller', 'date_roller.css');
 </script>
 
 <div class="when">

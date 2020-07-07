@@ -12,9 +12,6 @@ def this_site_js(request):
   return render(request, 'js/this_site.js', content_type='text/javascript')
 
 
-def all_sites_css(request):
-  return render(request, 'css/all_sites.css', content_type='text/css')
-
-
-def this_site_css(request):
-  return render(request, 'css/this_site.css', content_type='text/css')
+def css(request, template_file_name):
+  return render(
+      request, 'css/{}'.format(template_file_name), content_type='text/css')

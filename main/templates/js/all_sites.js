@@ -2,3 +2,4 @@
 {% include "js/feedback.js" %}
 {{ ajax_js }}
 {% include "js/query_string.js" %}
+{% include "js/style.js" %}

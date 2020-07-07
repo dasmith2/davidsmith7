@@ -1,8 +1,3 @@
-<style>
-  .nav { display: flex; align-items: baseline; }
-  .nav .current { font-size: 30px; margin-top: 10px; font-weight: 500; }
-  .primary_nav div { margin: 0px 20px 0px 0px; }
-</style>
 <div class="nav primary_nav">
   {% for item in primary_nav_items %}
     <div{% if item.is_current %} class="current"{% endif %}>

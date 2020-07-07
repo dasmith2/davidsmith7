@@ -1,37 +1,41 @@
+{% load zoom %}
 /* This is for styles that apply to all sites. Modify this file only in
  * davebase. Individual sites should not modify this file but they can totally
  * modify this_site.css */
-body {
-  font-family: 'Roboto', sans-serif; font-weight: 300; margin: 0px;
-  padding: 0px; margin: 0px 10px 10px 10px; }
+html body {
+  font-family: 'Roboto', sans-serif; font-weight: 300; font-size: {% zoom 16 %}px;
+  padding: 0px; margin: 0px {% zoom 10 %}px {% zoom 10 %}px {% zoom 10 %}px; display: block; }
 
 h1 {
-  font-weight: 300; margin: 60px 0px 0px 0px; font-size: 37px;
-  border-top: 15px solid #558; }
+  font-weight: 300; margin: {% zoom 60 %}px 0px 0px 0px; font-size: {% zoom 37 %}px;
+  border-top: {% zoom 15 %}px solid #558; }
 h2 {
-  font-weight: 500; margin: 60px 0px 0px 0px; color: #555; }
-h3 { color: #999; margin: 60px 0px 0px 0px; }
+  font-weight: 500; margin: {% zoom 60 %}px 0px 0px 0px; color: #555; }
+h3 { color: #999; margin: {% zoom 60 %}px 0px 0px 0px; }
 
 table {
-  border-collapse: collapse; border-left: 1px solid #999;
-  border-top: 1px solid #999;
-  box-shadow: 4px 4px 2px grey; }
-td { font-weight: 300; }
+  border-collapse: collapse; border-left: {% zoom 1 %}px solid #999;
+  border-top: {% zoom 1 %}px solid #999;
+  box-shadow: {% zoom 4 %}px {% zoom 4 %}px {% zoom 2 %}px grey;
+  font-size: inherit; }
+td { font-weight: 300;  }
 th { font-weight: 500; color: #555; }
-td, th { border-right: 1px solid #999;
-  border-bottom: 1px solid #999; padding: 10px; }
+td, th { border-right: {% zoom 1 %}px solid #999;
+  border-bottom: {% zoom 1 %}px solid #999; padding: {% zoom 10 %}px; }
 th, .row2, .row2 textarea { background-color: #eee; }
 
-table textarea { overflow: auto; width: 240px; height: 57px; }
+table textarea { overflow: auto; width: {% zoom 240 %}px; height: {% zoom 57 %}px; }
 table textarea, table input {
-  border: 1px solid #999; border-radius: 3px; padding: 5px;
-  box-shadow: 2px 2px 1px grey; }
+  border: {% zoom 1 %}px solid #999; border-radius: {% zoom 3 %}px; padding: {% zoom 5 %}px;
+  box-shadow: {% zoom 2 %}px {% zoom 2 %}px {% zoom 1 %}px grey; }
+
+select, input, textarea { font-size: inherit; }
 
 pre {
-  margin: 10px 0px 0px 0px; background-color: #eee; border: 1px solid #999;
-  padding: 10px; font-size: 14px; box-shadow: 4px 4px 2px grey; }
+  margin: {% zoom 10 %}px 0px 0px 0px; background-color: #eee; border: {% zoom 1 %}px solid #999;
+  padding: {% zoom 10 %}px; font-size: {% zoom 14 %}px; box-shadow: {% zoom 4 %}px {% zoom 4 %}px {% zoom 2 %}px grey; }
 
-input[type="number"] { width: 100px; }
+input[type="number"] { width: {% zoom 100 %}px; }
 
 form { margin: 0px; padding: 0px; }
 
@@ -41,31 +45,31 @@ form { margin: 0px; padding: 0px; }
 .editing, .editing textarea, .editing input { background-color: #ffb; }
 .green, .green textarea { background-color: #dfd; }
 
-.margin-top { margin: 60px 0px 0px 0px; }
-.margin-top-half { margin: 20px 0px 0px 0px; }
-.pad-half { padding: 20px; }
+.margin-top { margin: {% zoom 60 %}px 0px 0px 0px; }
+.margin-top-half { margin: {% zoom 20 %}px 0px 0px 0px; }
+.pad-half { padding: {% zoom 20 %}px; }
 
-.max-width, p, ul { max-width: 480px; }
+.max-width, p, ul { max-width: {% zoom 480 %}px; }
 
 /* Buttons */
 {% include "css/button.css" %}
 
 /* Tooltips */
 .tooltip {
-  position: relative; display: inline-block; border-bottom: 1px dotted black;
+  position: relative; display: inline-block; border-bottom: {% zoom 1 %}px dotted black;
 }
 
 .tooltip .tooltiptext {
   visibility: hidden; background-color: #555; color: #fff;
-  text-align: center; border-radius: 6px; padding: 10px;
+  text-align: center; border-radius: {% zoom 6 %}px; padding: {% zoom 10 %}px;
   position: absolute; z-index: 1; bottom: 125%;
-  left: 10%; opacity: 0; transition: opacity 0.3s; width: 200px;
-  font-size: 16px; font-weight: 300;
+  left: 10%; opacity: 0; transition: opacity 0.3s; width: {% zoom 200 %}px;
+  font-size: {% zoom 16 %}px; font-weight: 300;
 }
 
 .tooltip .tooltiptext::after {
   content: ""; position: absolute; top: 100%; left: 10%;
-  margin-left: -5px; border-width: 5px; border-style: solid;
+  margin-left: -{% zoom 5 %}px; border-width: {% zoom 5 %}px; border-style: solid;
   border-color: #555 transparent transparent transparent;
 }
 
@@ -73,3 +77,8 @@ form { margin: 0px; padding: 0px; }
   visibility: visible;
   opacity: 1;
 }
+
+.nav { display: flex; align-items: baseline; }
+.nav .current {
+    font-size: {% zoom 30 %}px; margin-top: {% zoom 10 %}px; font-weight: {% zoom 500 %}; }
+.primary_nav div { margin: 0px {% zoom 20 %}px 0px 0px; }
