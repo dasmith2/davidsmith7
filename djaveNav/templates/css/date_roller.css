@@ -4,6 +4,6 @@
     padding: {% zoom 10 %}px; box-shadow: {% zoom 4 %}px {% zoom 4 %}px {% zoom 2 %}px grey; }
 .when div.two_before { margin-top: 0px; }
 .when div { margin-top: {% zoom 12 %}px; }
-.when .current { font-size: {% zoom 37 %}px; }
+.when .current { font-size: {% zoom 35 %}px; }
 .when .one_before a, .when .one_after a { font-size: {% zoom 20 %}px; }
 .when .two_before a, .when .two_after a { font-size: {% zoom 15 %}px; }

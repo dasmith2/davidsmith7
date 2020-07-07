@@ -1,8 +1,10 @@
 {% load zoom %}
 /* This is for styles that apply to all sites. Modify this file only in
  * davebase. Individual sites should not modify this file but they can totally
- * modify this_site.css */
-html body {
+ * modify this_site.css Chrome on my phone vs Chrome on my desktop seem to use
+ * different style inheritance rules or something. html body p adds enough
+ * specificity that Chrome on my phone finally sizes correctly. */
+html body, html body p {
   font-family: 'Roboto', sans-serif; font-weight: 300; font-size: {% zoom 16 %}px;
   padding: 0px; margin: 0px {% zoom 10 %}px {% zoom 10 %}px {% zoom 10 %}px; display: block; }
 
@@ -51,7 +53,7 @@ form { margin: 0px; padding: 0px; }
 .margin-top-half { margin: {% zoom 20 %}px 0px 0px 0px; }
 .pad-half { padding: {% zoom 20 %}px; }
 
-.max-width, p, ul { max-width: {% zoom 480 %}px; }
+.max-width, p, ul { max-width: {% zoom 540 %}px; }
 
 /* Buttons */
 {% include "css/button.css" %}

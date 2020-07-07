@@ -5,12 +5,14 @@ function css(finder, file_name) {
       if (old_min_dim != new_min_dim) {
         return;
       }
-      if ($('.' + finder + '[data-min-dim=' + new_min_dim + ']').length) {
-        return;
-      }
       var href = '/css/' + file_name + '?min_dimension=' + new_min_dim;
-      $('<link rel="stylesheet">').addClass(finder).attr(
-          'href', href).attr('data-min-dim', new_min_dim).appendTo($('head'));
+      var tag = $('.' + finder);
+      if (tag.length) {
+        tag.attr('href', href);
+      } else {
+        tag = $('<link rel="stylesheet">').addClass(finder).attr(
+          'href', href).appendTo($('head'));
+      }
     };
 
     var old_min_dim = Math.min(window.innerWidth, window.innerHeight);
