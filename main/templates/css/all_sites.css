@@ -5,7 +5,7 @@
  * different style inheritance rules or something. html body p adds enough
  * specificity that Chrome on my phone finally sizes correctly. */
 html body, html body p {
-  font-family: 'Roboto', sans-serif; font-weight: 300; font-size: {% zoom 16 %}px;
+  font-family: 'Roboto', sans-serif; font-weight: 300; font-size: {{ font_size }}px;
   padding: 0px; margin: 0px {% zoom 10 %}px {% zoom 20 %}px {% zoom 10 %}px;
   display: block; }
 
@@ -29,7 +29,7 @@ th, .row2, .row2 textarea { background-color: #eee; }
 
 table textarea {
     overflow: auto; width: {% zoom 280 %}px; height: {% zoom 65 %}px;
-    font-size: {% zoom 14%}px; }
+    font-size: {% zoom 18%}px; }
 table textarea, table input {
   border: {% zoom 1 %}px solid #999; border-radius: {% zoom 3 %}px; padding: {% zoom 5 %}px;
   box-shadow: {% zoom 2 %}px {% zoom 2 %}px {% zoom 1 %}px grey; }
@@ -38,9 +38,10 @@ select, input { font-size: inherit; }
 
 pre {
   margin: {% zoom 10 %}px 0px 0px 0px; background-color: #eee; border: {% zoom 1 %}px solid #999;
-  padding: {% zoom 10 %}px; font-size: {% zoom 14 %}px; box-shadow: {% zoom 4 %}px {% zoom 4 %}px {% zoom 2 %}px grey; }
+  padding: {% zoom 10 %}px; font-size: {{ font_size }}px; box-shadow: {% zoom 4 %}px {% zoom 4 %}px {% zoom 2 %}px grey; }
 
 input[type="number"] { width: {% zoom 100 %}px; }
+input[type="text"] { width: {% zoom 270 %}px; }
 
 form { margin: 0px; padding: 0px; }
 
@@ -50,8 +51,8 @@ form { margin: 0px; padding: 0px; }
 .editing, .editing textarea, .editing input { background-color: #ffb; }
 .green, .green textarea { background-color: #dfd; }
 
-.margin-top { margin: {% zoom 60 %}px 0px 0px 0px; }
-.margin-top-half { margin: {% zoom 20 %}px 0px 0px 0px; }
+.margin-top, p.margin-top { margin: {% zoom 60 %}px 0px 0px 0px; }
+.margin-top-half, p { margin: {% zoom 20 %}px 0px 0px 0px; }
 .pad-half { padding: {% zoom 20 %}px; }
 
 .max-width, p, ul { max-width: {% zoom 540 %}px; }
@@ -69,7 +70,7 @@ form { margin: 0px; padding: 0px; }
   text-align: center; border-radius: {% zoom 6 %}px; padding: {% zoom 10 %}px;
   position: absolute; z-index: 1; bottom: 125%;
   left: 10%; opacity: 0; transition: opacity 0.3s; width: {% zoom 200 %}px;
-  font-size: {% zoom 16 %}px; font-weight: 300;
+  font-size: {{ font_size }}px; font-weight: 300;
 }
 
 .tooltip .tooltiptext::after {
