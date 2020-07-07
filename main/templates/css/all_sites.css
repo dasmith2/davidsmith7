@@ -6,7 +6,8 @@
  * specificity that Chrome on my phone finally sizes correctly. */
 html body, html body p {
   font-family: 'Roboto', sans-serif; font-weight: 300; font-size: {% zoom 16 %}px;
-  padding: 0px; margin: 0px {% zoom 10 %}px {% zoom 10 %}px {% zoom 10 %}px; display: block; }
+  padding: 0px; margin: 0px {% zoom 10 %}px {% zoom 20 %}px {% zoom 10 %}px;
+  display: block; text-size-adjust: none; }
 
 h1 {
   font-weight: 300; margin: {% zoom 60 %}px 0px 0px 0px; font-size: {% zoom 37 %}px;
