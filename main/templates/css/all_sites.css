@@ -24,12 +24,14 @@ td, th { border-right: {% zoom 1 %}px solid #999;
   border-bottom: {% zoom 1 %}px solid #999; padding: {% zoom 10 %}px; }
 th, .row2, .row2 textarea { background-color: #eee; }
 
-table textarea { overflow: auto; width: {% zoom 240 %}px; height: {% zoom 57 %}px; }
+table textarea {
+    overflow: auto; width: {% zoom 280 %}px; height: {% zoom 65 %}px;
+    font-size: {% zoom 14%}px; }
 table textarea, table input {
   border: {% zoom 1 %}px solid #999; border-radius: {% zoom 3 %}px; padding: {% zoom 5 %}px;
   box-shadow: {% zoom 2 %}px {% zoom 2 %}px {% zoom 1 %}px grey; }
 
-select, input, textarea { font-size: inherit; }
+select, input { font-size: inherit; }
 
 pre {
   margin: {% zoom 10 %}px 0px 0px 0px; background-color: #eee; border: {% zoom 1 %}px solid #999;
