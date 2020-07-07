@@ -1,6 +1,5 @@
 function css(finder, file_name) {
   var this_load_css = function() {
-
     var actually_load_css = function(old_min_dim) {
       var new_min_dim = Math.min(window.innerWidth, window.innerHeight);
       if (old_min_dim != new_min_dim) {
@@ -9,9 +8,7 @@ function css(finder, file_name) {
       if ($('.' + finder + '[data-min-dim=' + new_min_dim + ']').length) {
         return;
       }
-      // $('.' + id).remove();
       var href = '/css/' + file_name + '?min_dimension=' + new_min_dim;
-      console.log(href); // DO NOT SUBMIT
       $('<link rel="stylesheet">').addClass(finder).attr(
           'href', href).attr('data-min-dim', new_min_dim).appendTo($('head'));
     };
