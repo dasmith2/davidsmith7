@@ -5,8 +5,8 @@ from djaveLogin.models import new_sign_up_url
 
 
 class SignUpEmail(EmailBase):
-  def __init__(self, protocol, host, email):
-    super().__init__(protocol, host)
+  def __init__(self, protocol, host, email, user_email_sender=None):
+    super().__init__(protocol, host, user_email_sender=user_email_sender)
     self.email = email
 
   def to(self):
