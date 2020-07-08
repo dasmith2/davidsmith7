@@ -178,6 +178,7 @@ INSTALLED_APPS = [
     'djaveLogin',
     'djaveReport',
     'djaveS3',
+    'djaveStyle',
     'djaveTest',
     'djaveThread',
     'main'] + THIS_SITE_INSTALLED_APPS

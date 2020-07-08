@@ -42,12 +42,12 @@ class NewAPIKeyForm(Form):
 
 class APIKeysTable(EditListTable):
   def __init__(self, model, request_POST):
-    super().__init__(model, [
-        'API Key username', 'API Key password', 'Webhook URL', ''])
+    headers = ['API Key username', 'API Key password', 'Webhook URL', '']
+    super().__init__(model, headers, classes=['margin-top-half'])
     self.form = NewAPIKeyForm()
     keys = list(self.existing_keys())
 
-    if request_POST:
+    if request_POST and self.form.a_button_was_clicked(request_POST):
       self.form.set_form_data(request_POST)
       if self.form.is_valid():
         new_api_key = self.create_key(self.form.username_field.get_value())

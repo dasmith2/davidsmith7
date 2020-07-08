@@ -142,7 +142,7 @@ class Table(object):
 class Cell(object):
   def __init__(
       self, cell_contents, classes=[], is_header=False,
-      additional_attrs=None, color=None):
+      additional_attrs=None, color=None, none_is_nbsp=True):
     """ cell_contents can be a datetime, date, string, float, int, any object
     that inherits from CellContent, or a list of any of those things. """
     self.cell_contents = cell_contents
@@ -156,12 +156,16 @@ class Cell(object):
     self.is_header = is_header
     self.additional_attrs = additional_attrs
     self.color = color
+    self.none_is_nbsp = none_is_nbsp
 
   def as_html(self):
     t_what = 'td'
     if self.is_header:
       t_what = 'th'
-    content_str = cell_contents_as_html(self.cell_contents)
+
+    content_str = ''
+    if self.none_is_nbsp or self.cell_contents is not None:
+      content_str = cell_contents_as_html(self.cell_contents)
 
     open_tag_parts = [t_what]
     if self.classes:
@@ -191,6 +195,11 @@ class Cell(object):
   def __eq__(self, other):
     return self.__class__ == other.__class__ and (
         self.as_html() == other.as_html())
+
+
+class ButtonsCell(Cell):
+  def __init__(self):
+    super().__init__(None, classes=['buttons'], none_is_nbsp=False)
 
 
 class Row(object):

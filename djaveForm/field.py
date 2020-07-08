@@ -195,6 +195,11 @@ class TextField(HtmlInputField):
     return 'text'
 
 
+class HiddenField(HtmlInputField):
+  def input_type(self):
+    return 'hidden'
+
+
 class SlugField(TextField):
   def explain_why_not_valid(self):
     super_invalid = super().explain_why_not_valid()

@@ -1,20 +1,18 @@
 {% load zoom %}
-/* This is for styles that apply to all sites. Modify this file only in
- * davebase. Individual sites should not modify this file but they can totally
- * modify this_site.css Chrome on my phone vs Chrome on my desktop seem to use
- * different style inheritance rules or something. html body p adds enough
- * specificity that Chrome on my phone finally sizes correctly. */
-html body, html body p {
-  font-family: 'Roboto', sans-serif; font-weight: 300; font-size: {{ font_size }}px;
+/* This is for styles that apply to all sites. */
+html body {
+  font-family: 'Roboto', sans-serif; font-weight: 300; font-size: {% font_size %};
   padding: 0px; margin: 0px {% zoom 10 %}px {% zoom 20 %}px {% zoom 10 %}px;
   display: block; }
 
 h1 {
-  font-weight: 300; margin: {% zoom 60 %}px 0px 0px 0px; font-size: {% zoom 37 %}px;
-  border-top: {% zoom 15 %}px solid #558; }
+  font-weight: 300; margin: {% zoom 60 %}px 0px 0px 0px;
+  font-size: {% font_size 3 %}; border-top: {% zoom 15 %}px solid #558; }
 h2 {
-  font-weight: 500; margin: {% zoom 60 %}px 0px 0px 0px; color: #555; }
-h3 { color: #999; margin: {% zoom 60 %}px 0px 0px 0px; }
+  font-weight: 500; margin: {% zoom 60 %}px 0px 0px 0px; color: #555;
+  {% font_size 2 %}; }
+h3 {
+  color: #999; margin: {% zoom 60 %}px 0px 0px 0px; {% font_size 1.5 %}; }
 
 table {
   border-collapse: collapse; border-left: {% zoom 1 %}px solid #999;
@@ -28,17 +26,17 @@ td, th { border-right: {% zoom 1 %}px solid #999;
 th, .row2, .row2 textarea { background-color: #eee; }
 
 table textarea {
-    overflow: auto; width: {% zoom 280 %}px; height: {% zoom 65 %}px;
-    font-size: {% zoom 18%}px; }
+    overflow: auto; width: {% zoom 300 %}px; height: {% zoom 70 %}px;
+    font-size: {% font_size .80 %}; }
 table textarea, table input {
   border: {% zoom 1 %}px solid #999; border-radius: {% zoom 3 %}px; padding: {% zoom 5 %}px;
   box-shadow: {% zoom 2 %}px {% zoom 2 %}px {% zoom 1 %}px grey; }
 
-select, input { font-size: inherit; }
+select, input { font-size: {% font_size .90 %}; }
 
 pre {
   margin: {% zoom 10 %}px 0px 0px 0px; background-color: #eee; border: {% zoom 1 %}px solid #999;
-  padding: {% zoom 10 %}px; font-size: {{ font_size }}px; box-shadow: {% zoom 4 %}px {% zoom 4 %}px {% zoom 2 %}px grey; }
+  padding: {% zoom 10 %}px; font-size: {% font_size %}; box-shadow: {% zoom 4 %}px {% zoom 4 %}px {% zoom 2 %}px grey; }
 
 input[type="number"] { width: {% zoom 100 %}px; }
 input[type="text"] { width: {% zoom 270 %}px; }
@@ -52,10 +50,11 @@ form { margin: 0px; padding: 0px; }
 .green, .green textarea { background-color: #dfd; }
 
 .margin-top, p.margin-top { margin: {% zoom 60 %}px 0px 0px 0px; }
-.margin-top-half, p { margin: {% zoom 20 %}px 0px 0px 0px; }
+.margin-top-half, p { margin: {% zoom 25 %}px 0px 0px 0px; }
 .pad-half { padding: {% zoom 20 %}px; }
+.margin-left { margin: 0px 0px 0px {% zoom 25 %}; }
 
-.max-width, p, ul { max-width: {% zoom 540 %}px; }
+.max-width, p, ul { max-width: {% fit_to_screen 540 %}px; }
 
 /* Buttons */
 {% include "css/button.css" %}
@@ -70,7 +69,7 @@ form { margin: 0px; padding: 0px; }
   text-align: center; border-radius: {% zoom 6 %}px; padding: {% zoom 10 %}px;
   position: absolute; z-index: 1; bottom: 125%;
   left: 10%; opacity: 0; transition: opacity 0.3s; width: {% zoom 200 %}px;
-  font-size: {{ font_size }}px; font-weight: 300;
+  font-size: {% font_size %}; font-weight: 300;
 }
 
 .tooltip .tooltiptext::after {
@@ -86,5 +85,5 @@ form { margin: 0px; padding: 0px; }
 
 .nav { display: flex; align-items: baseline; }
 .nav .current {
-    font-size: {% zoom 30 %}px; margin-top: {% zoom 10 %}px; font-weight: {% zoom 500 %}; }
+    font-size: {% font_size 2 %}; margin-top: {% zoom 10 %}px; font-weight: {% zoom 500 %}; }
 .primary_nav div { margin: 0px {% zoom 20 %}px 0px 0px; }

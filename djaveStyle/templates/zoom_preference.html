@@ -1,0 +1,20 @@
+<h2>
+  {% if zoom_override %}
+    Manual Zoom: {{ zoom_override }}
+  {% else %}
+    Automatic Zoom: <span id="automatic_zoom"></span>
+  {% endif %}
+</h2>
+<form method="POST" class="margin-top-half">
+  {% csrf_token %}
+  {{ form.hidden_automatic_zoom }}
+  {{ form.zoom_in_button }}
+  {{ form.zoom_out_button }}
+  {% if zoom_override %}
+    {{ form.automatic_button }}
+  {% endif %}
+</form>
+<script>
+  $('.hiddenautomaticzoom').val(automatic_zoom_factor());
+  $('#automatic_zoom').text(automatic_zoom_factor());
+</script>

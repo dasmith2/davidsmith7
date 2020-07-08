@@ -3,7 +3,7 @@ from djaveDT import now
 from djaveForm.button import Button
 from djaveForm.form import Form
 from djaveForm.field import TextAreaField
-from djaveTable.table import Cell
+from djaveTable.table import ButtonsCell
 
 from tracktime.models.to_do import ToDo
 
@@ -134,5 +134,5 @@ class ToDosTable(EditListTable):
     cells = [description]
     if self.should_filter_created():
       cells.append(to_do.created.date())
-    cells.append(Cell(None, ['buttons']))
+    cells.append(ButtonsCell())
     return cells

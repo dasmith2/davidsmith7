@@ -36,7 +36,10 @@ $(init_done_mode);
 <form method="POST">
   {% csrf_token %}
   {% if project %}
-    <h1>Project: {{ project.name }} {{ punch_out_button.as_html }}</h1>
+    <h1 style="display: flex; align-items: center;">
+      {{ project.name }}
+      <div class="margin-left">{{ punch_out_button.as_html }}</div>
+    </h1>
   {% elif punch_in_table.has_projects %}
     <h2>You SHOULD be on the clock first</h2>
   {% else %}

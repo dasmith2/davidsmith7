@@ -123,16 +123,6 @@ is a nice font from Google, and last but not least, all_sites.js which includes
 global utility kinds of things such as helper functions for ajax that go well
 with tables.
 
-### Specific site
-
-Now, davebase does provide this_site.css, but it's empty. This file is
-meant to be overwritten by the specific sites. The reason davebase provides
-this_site.css is so that this_site.html can come pre-loaded with the
-correct css link. Obviously you can modify this_site.html to your heart's
-content as well.
-
-this_site.html inherits from all_sites.html
-
 ### Specific section on a site
 
 You'll create my_specific_section.html which inherits from this_site.html

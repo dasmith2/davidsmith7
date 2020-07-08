@@ -8,18 +8,18 @@ from djaveAPI.urls import djave_api_urls
 from djavError.urls import djaverror_urls
 from djaveLogin.urls import djave_login_urls
 from djaveS3.urls import djave_s3_urls
+from djaveStyle.urls import djave_style_urls
 
-from main.views import all_sites_js, this_site_js, css
 from main.this_site_urls import this_site_urls
+from main.views import all_sites_js
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include(auth_urls)),
     path('js/all_sites.js', all_sites_js, name='all_sites_js'),
-    path('js/this_site.js', this_site_js, name='this_site_js'),
     path('api/', include(djave_api_urls)),
-    path('css/<template_file_name>', css, name='css'),
+    path('', include(djave_style_urls)),
     path('', include(djave_login_urls)),
     path('', include(djaverror_urls)),
     path('', include(djave_s3_urls)),
