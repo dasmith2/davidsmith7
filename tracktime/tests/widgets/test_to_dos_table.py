@@ -45,8 +45,8 @@ class ToDosTableTests(TestCase):
     to_do = ToDo.live.filter(creator=self.user).first()
     description = TextAreaField(
         'description', default='Hello world!', required=False)
-    table.rows[1].assertEqual(
-        Row([description, ButtonsCell()], pk=to_do.pk,
+    table.rows[1].assertEqual(Row(
+        [description, ButtonsCell()], pk=to_do.pk,
         additional_attrs={'data-done': False}))
 
   def test_did(self):
