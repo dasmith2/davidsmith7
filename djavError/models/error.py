@@ -19,7 +19,7 @@ class ErrorManager(RmOldManager):
       if existing:
         return existing
     new_error = self.create_error(
-        title, message, exc_info, extra_to, always_new_error,
+        title, message, exc_info=exc_info, extra_to=extra_to,
         supress_stack_trace=supress_stack_trace)
     self._email_error_obj(new_error, email_sender=email_sender)
     return new_error
@@ -37,7 +37,7 @@ class ErrorManager(RmOldManager):
       return existing
 
   def create_error(
-      self, title, message, exc_info, extra_to, always_new_error,
+      self, title, message, exc_info=None, extra_to=None,
       supress_stack_trace=False):
     # Just in case somebody passes a tuple in or whatever as the message.
     message = str(message)
