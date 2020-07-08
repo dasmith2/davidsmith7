@@ -3,6 +3,7 @@
     Manual Zoom: {{ zoom_override }}
   {% else %}
     Automatic Zoom: <span id="automatic_zoom"></span>
+    based on screen size <span id="screen_size"></span>px
   {% endif %}
 </h2>
 <form method="POST" class="margin-top-half">
@@ -17,4 +18,5 @@
 <script>
   $('.hiddenautomaticzoom').val(automatic_zoom_factor());
   $('#automatic_zoom').text(automatic_zoom_factor());
+  $('#screen_size').text(min_screen_dimension());
 </script>

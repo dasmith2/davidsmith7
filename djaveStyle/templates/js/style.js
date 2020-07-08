@@ -7,7 +7,10 @@ function css(finder, file_name) {
 }
 
 function automatic_zoom_factor() {
-  var min_dim = Math.min(window.innerWidth, window.innerHeight);
-  var full_value = min_dim / 600.0;
-  return Math.round(full_value * 100) / 100;
+  var full_value = min_screen_dimension() / 600.0;
+  return Math.round(100 * full_value) / 100;
+}
+
+function min_screen_dimension() {
+  return Math.min(window.innerWidth, window.innerHeight);
 }
