@@ -7,7 +7,9 @@ function css(finder, file_name) {
 }
 
 function automatic_zoom_factor() {
-  var full_value = min_screen_dimension() / 600.0;
+  /* My desktop has screen size 860 and looks best with zoom factor 1.0 My
+   * phone has screen size 360 and looks best with zoom factor 0.6 */
+  var full_value = (min_screen_dimension()  + 577) / 1562;
   return Math.round(100 * full_value) / 100;
 }
 
