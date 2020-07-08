@@ -1,3 +1,9 @@
+"""
+In order to play with this in the local shell:
+
+from django.conf import settings
+settings.ALWAYS_ALLOW_SEND_MAIL = True
+"""
 from djavEmail.email_sender import EmailSender
 from djavEmail.users_email_config_by_host import users_email_config_by_host
 

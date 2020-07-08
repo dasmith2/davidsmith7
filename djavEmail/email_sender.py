@@ -1,3 +1,6 @@
+""" This is a base class which won't work on its own. If you intend to play in
+the shell, you probably want user_email_sender or staff_email_sender. """
+
 from django.conf import settings
 from djavEmail.mailgun.api import send as mailgun_send, MailgunException
 
@@ -23,11 +26,11 @@ class EmailSender(object):
         settings.ALWAYS_ALLOW_SEND_MAIL):
       # I do it in stage too so I can get error emails.
       try:
-          self.send_function(
-              self.from_display(),
-              self.from_username(),
-              self.from_domain(),
-              to_emails, subject, email_message)
+        self.send_function(
+            self.from_display(),
+            self.from_username(),
+            self.from_domain(),
+            to_emails, subject, email_message)
       except MailgunException as ex:
         # If there's a bug in the actual error email code, this hack will
         # simply save an error without attempting to email and therefore

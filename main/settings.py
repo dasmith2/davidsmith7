@@ -154,7 +154,8 @@ DEFAULT_SECRET_KEY = 'DEFAULT_SECRET_KEY'
 SECRET_KEY = os.environ.get('SECRET_KEY', DEFAULT_SECRET_KEY)
 if (PROD or STAGE) and SECRET_KEY == DEFAULT_SECRET_KEY:
   raise Exception(
-      'Set the SECRET_KEY environment variable to a long random string')
+      'Set the SECRET_KEY environment variable to a long random string such '
+      'as from secrets import token_urlsafe; token_urlsafe()')
 
 
 """ API stuff """
