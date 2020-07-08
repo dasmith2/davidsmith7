@@ -9,6 +9,8 @@ class EmailSender(object):
   def send_mail(
       self, subject, email_message, to_emails,
       ok_to_do_it_in_dev=False):
+    if settings.TEST:
+      raise Exception('You should Mock(spec=EmailSender)')
     if isinstance(to_emails, str):
       to_emails = [to_emails]
     if (settings.DEBUG or settings.SHELL) and (
@@ -36,8 +38,6 @@ class EmailSender(object):
             ex.status_code, ex.response_content)
         if not Error.objects.logged_existing_error(title):
           Error.objects.create_error(title, message)
-    elif settings.TEST:
-      pass
     else:
       raise Exception('Some unexpected pathway is trying to email!')
 

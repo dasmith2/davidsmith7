@@ -3,7 +3,7 @@ from datetime import date
 from djaveDT import to_tz_dt
 from djaveForm.button import Button
 from djaveForm.field import TextAreaField
-from djaveTable.table import Row, Cell
+from djaveTable.table import Row, ButtonsCell
 from djaveTest.unit_test import TestCase, get_test_user
 
 from tracktime.models.to_do import ToDo
@@ -45,8 +45,8 @@ class ToDosTableTests(TestCase):
     to_do = ToDo.live.filter(creator=self.user).first()
     description = TextAreaField(
         'description', default='Hello world!', required=False)
-    table.rows[1].assertEqual(Row([
-        description, Cell(None, classes=['buttons'])], pk=to_do.pk,
+    table.rows[1].assertEqual(
+        Row([description, ButtonsCell()], pk=to_do.pk,
         additional_attrs={'data-done': False}))
 
   def test_did(self):

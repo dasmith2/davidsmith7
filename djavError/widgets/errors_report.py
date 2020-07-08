@@ -60,7 +60,7 @@ class ErrorsTable(StaffEmailLogTable):
     super().__init__(Error)
     self.js = render_to_string('errors.js', context={
         'ajax_update_url': reverse('ajax_update')})
-    self.css = '.fixed { background-color: #dfd; }'
+    self.css = 'tr.fixed { background-color: #dfd; }'
 
   def headers(self):
     return super().headers() + ['Fixed', '']

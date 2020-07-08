@@ -29,7 +29,7 @@ class TestUserAPIKeysTable(TestCase):
   def save_new(self):
     request_POST = {
         'username': 'asdf', 'new_webhook_url': 'https://whatever',
-        'save': 'yep'}
+        'create': 'yep'}
     return UserAPIKeysTable(self.user, request_POST)
 
   def test_save_new(self):
