@@ -1,4 +1,5 @@
 This will create your {{ email }} user on {{ site_name }}.
+
 It SHOULD log you in for, like, 10 years (or until you log out).
 
 {{ url }}

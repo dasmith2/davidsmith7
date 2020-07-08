@@ -14,7 +14,7 @@ class LoginEmail(EmailBase):
     return self.user.email
 
   def subject(self):
-    return 'A log in link for {}'.format(self.get_site_name())
+    return 'A login link for {}'.format(self.get_site_name())
 
   def as_str(self):
     url = new_login_url(

@@ -10,6 +10,10 @@ class MailgunException(Exception):
 
 
 def send(from_display, from_username, from_domain, to, subject, text):
+  if not settings.MAILGUN_API_KEY:
+    raise MailgunException(401, (
+        'You need to put MAILGUN_API_KEY in Heroku\'s config vars for this '
+        'site'))
   if not from_display or not from_username or not from_domain:
     raise Exception((
         'from_display {}, from_username {}, and from_domain {} are all '

@@ -76,17 +76,6 @@ GO_TO_VIEW_AFTER_SIGN_UP = '/'
 # there's a hard error. The free tier of Mailgun is good enough for this
 # purpose.
 MAILGUN_API_KEY = os.environ.get('MAILGUN_API_KEY', default='')
-MAILGUN_DOMAIN = os.environ.get('MAILGUN_DOMAIN', default='')
-MAILGUN_PUBLIC_KEY = os.environ.get('MAILGUN_PUBLIC_KEY', default='')
-MAILGUN_SMTP_LOGIN = os.environ.get('MAILGUN_SMTP_LOGIN', default='')
-MAILGUN_SMTP_PASSWORD = os.environ.get('MAILGUN_SMTP_PASSWORD', default='')
-MAILGUN_SMTP_PORT = os.environ.get('MAILGUN_SMTP_PORT', default='')
-MAILGUN_SMTP_SERVER = os.environ.get('MAILGUN_SMTP_SERVER', default='')
-
-EMAIL_HOST = MAILGUN_SMTP_SERVER
-EMAIL_PORT = MAILGUN_SMTP_PORT
-EMAIL_HOST_USER = MAILGUN_SMTP_LOGIN
-EMAIL_HOST_PASSWORD = MAILGUN_SMTP_PASSWORD
 
 
 """ Money stuff """

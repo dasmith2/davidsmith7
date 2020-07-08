@@ -26,7 +26,7 @@ td, th { border-right: {% zoom 1 %}px solid #999;
 th, .row2, .row2 textarea { background-color: #eee; }
 
 table textarea {
-    overflow: auto; width: {% zoom 300 %}px; height: {% zoom 70 %}px;
+    overflow: auto; width: {% zoom 300 %}px; height: {% zoom 71 %}px;
     font-size: {% font_size .80 %}; }
 table textarea, table input {
   border: {% zoom 1 %}px solid #999; border-radius: {% zoom 3 %}px; padding: {% zoom 5 %}px;
@@ -85,5 +85,5 @@ form { margin: 0px; padding: 0px; }
 
 .nav { display: flex; align-items: baseline; }
 .nav .current {
-    font-size: {% font_size 2 %}; margin-top: {% zoom 10 %}px; font-weight: {% zoom 500 %}; }
+    font-size: {% font_size 1.5 %}; margin-top: {% zoom 10 %}px; font-weight: 500; }
 .primary_nav div { margin: 0px {% zoom 20 %}px 0px 0px; }

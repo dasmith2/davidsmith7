@@ -1,4 +1,3 @@
-This link SHOULD log {{ email }} in to {{ site_name }}
-for, like, 10 years (or until you log out).
+This link SHOULD log {{ email }} in to {{ site_name }} for, like, 10 years (or until you log out).
 
 {{ url }}

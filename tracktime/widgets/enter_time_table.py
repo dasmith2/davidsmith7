@@ -48,8 +48,9 @@ class EnterTimeTable(Table):
       if self.is_valid():
         self.save()
         self.form = EnterTimeForm(self.user)
-    row = [
-        self.form.project_field, self.form.hours_field, self.form.save_button]
+    hours_cell = Cell(
+        self.form.hours_field, additional_attrs={'style': 'text-align: right'})
+    row = [self.form.project_field, hours_cell, self.form.save_button]
     self.create_row(row, classes=['new'])
 
   def total_hours(self, got_work_session):
