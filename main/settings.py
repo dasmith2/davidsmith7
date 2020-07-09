@@ -55,7 +55,7 @@ ALWAYS_ALLOW_SEND_MAIL = False
 # listed in the ADMINS
 ADMINS = []
 EMAIL_ERRORS_TO = os.environ.get(
-    'EMAIL_STACK_TRACES_TO', default='dave@davespace.tech')
+    'EMAIL_STACK_TRACES_TO', default='dasmith2@gmail.com')
 if EMAIL_ERRORS_TO:
   ADMINS.append(
       ('Heroku errors', EMAIL_ERRORS_TO))
