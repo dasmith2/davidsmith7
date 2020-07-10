@@ -38,7 +38,15 @@ class LongRequest(ProblemRequest):
     super().increment()
 
   def average_duration(self):  # In seconds.
+    if self.count == 0:
+      return 'DIVIDE BY ZERO'
     return self.total_duration / self.count
+
+  @classmethod
+  def filter_allowed_by_user(cls, user, query_set):
+    if user.is_superuser:
+      return query_set
+    return query_set.none()
 
   class Meta:
     ordering = ('-created',)

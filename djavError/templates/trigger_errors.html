@@ -1,4 +1,18 @@
+{% if form.feedback %}
+  <h2>{{ form.feedback }}</h2>
+{% endif %}
 <form class="margin-top" method="POST">
   {% csrf_token %}
-  {{ form.trigger_server_error_button }}
+  <div>
+    {{ form.trigger_server_error_button }}
+  </div>
+  <div class="margin-top-half">
+    {{ form.trigger_too_many_queries_button }}
+  </div>
+  <div class="margin-top-half">
+    {{ form.trigger_long_request_button }}
+  </div>
+  <div class="margin-top-half">
+    {{ form.send_notification_to }}{{ form.send_notification }}
+  </div>
 </form>

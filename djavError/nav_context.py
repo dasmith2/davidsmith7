@@ -1,6 +1,10 @@
 from djaveNav.nav import NavItem, Nav
-from djavError.widgets.errors_report import get_errors
-from djavError.widgets.notifications_report import get_notifications
+from djavError.models.error import Error
+from djavError.models.notification import Notification
+from djavError.models.long_request import LongRequest
+from djavError.models.too_many_queries_request import TooManyQueriesRequest
+from djavError.widgets.fixable_report import get_fixables
+
 
 ERRORS = NavItem('errors', 'Errors')
 NOTIFICATIONS = NavItem('notifications', 'Notifications')
@@ -29,7 +33,11 @@ def get_how_many(view_name):
   if view_name == 'trigger_errors':
     return None
   elif view_name == 'errors':
-    return get_errors().count()
+    return get_fixables(Error).count()
   elif view_name == 'notifications':
-    return get_notifications().count()
+    return get_fixables(Notification).count()
+  elif view_name == 'long_requests':
+    return get_fixables(LongRequest).count()
+  elif view_name == 'too_many_queries':
+    return get_fixables(TooManyQueriesRequest).count()
   return 0

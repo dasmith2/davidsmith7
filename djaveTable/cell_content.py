@@ -85,6 +85,12 @@ class InHref(CellContent):
     return cell_contents_as_csv(self.cell_contents)
 
 
+class ButtonInHref(InHref):
+  def __init__(self, cell_contents, url, classes=[]):
+    classes.append('button')
+    super().__init__(cell_contents, url, classes=classes)
+
+
 class StringContent(CellContent):
   def __init__(self, the_string):
     self.the_string = the_string

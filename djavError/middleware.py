@@ -23,29 +23,43 @@ def TrackRequestTimeAndQueriesMiddleware(get_response):
       variables = request.GET
     elif method == 'POST':
       variables = request.POST
+    variables = _variables_to_string(variables)
 
     if duration_seconds > settings.MAX_ALLOWED_REQUEST_TIME:
       existing = LongRequest.objects.filter(
-          path=request.path, method=method, variables=variables).first()
+          path=request.path, method=method, fixed__isnull=True).first()
       if existing:
         existing.increment(duration_seconds)
       else:
         LongRequest.objects.create(
             path=request.path, total_duration=duration_seconds, method=method,
-            variables=variables)
+            variables=variables, count=1)
 
     if query_count > settings.MAX_ALLOWED_DB_QUERIES:
       existing = TooManyQueriesRequest.objects.filter(
-          path=request.path, method=method, variables=variables).first()
+          path=request.path, method=method, fixed__isnull=True).first()
       if existing:
         existing.increment(query_count)
       else:
         TooManyQueriesRequest.objects.create(
             path=request.path, total_query_count=query_count, method=method,
-            variables=variables)
+            variables=variables, count=1)
 
     return response
   return middleware
+
+
+def _variables_to_string(variables):
+  if variables is None:
+    return variables
+  if hasattr(variables, 'dict'):
+    variables = variables.dict()
+  if 'csrfmiddlewaretoken' in variables:
+    del variables['csrfmiddlewaretoken']
+  del_keys = [key for key in variables.keys() if variables[key] in [None, '']]
+  for key in del_keys:
+    del variables[key]
+  return str(variables)
 
 
 class LogExceptionsMiddleware:

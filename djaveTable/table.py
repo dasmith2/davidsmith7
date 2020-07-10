@@ -66,10 +66,10 @@ class Table(object):
           '  <thead>',
           '    <tr>'])
       for header in self.headers:
-        if isinstance(header, (Cell, CellContent)):
+        if isinstance(header, Cell):
           to_return.append(header.as_html())
         else:
-          to_return.append('<th>{}</th>'.format(header))
+          to_return.append('<th>{}</th>'.format(obj_as_cell_content(header)))
       to_return.extend([
           '    </tr>',
           '  </thead>'])
@@ -198,8 +198,8 @@ class Cell(object):
 
 
 class ButtonsCell(Cell):
-  def __init__(self):
-    super().__init__(None, classes=['buttons'], none_is_nbsp=False)
+  def __init__(self, cell_contents=None):
+    super().__init__(cell_contents, classes=['buttons'], none_is_nbsp=False)
 
 
 class Row(object):

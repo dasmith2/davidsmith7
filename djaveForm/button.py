@@ -31,8 +31,9 @@ class Button(FormElement):
       raise Exception(
           'I can not tell you if this button was clicked because '
           'set_was_clicked was never called and you didnt pass in post_data. '
-          'You probably need to call set_form_data on the form containing '
-          'this button.')
+          'You may need to call set_form_data on the form containing '
+          'this button, or you may need to check that this button is actually '
+          'added to the form controls.')
     return self._was_clicked
 
   def as_csv(self):

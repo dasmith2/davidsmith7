@@ -9,7 +9,10 @@ from djavError.nav_context import (
     nav_context, ERRORS, NOTIFICATIONS, LONG_REQUESTS, TOO_MANY_QUERIES,
     TRIGGER_ERRORS)
 from djavError.widgets.errors_report import ErrorsReport
+from djavError.widgets.long_requests import LongRequestsReport
 from djavError.widgets.notifications_report import NotificationsReport
+from djavError.widgets.too_many_queries_requests import (
+    TooManyQueriesRequestsReport)
 from djavError.widgets.trigger_errors import TriggerErrors
 
 
@@ -53,13 +56,16 @@ def js_error(request):
 
 @user_passes_test(lambda u: u.is_superuser)
 def long_requests(request):
-  context = nav_context(LONG_REQUESTS)
+  context = nav_context(
+      LONG_REQUESTS, the_one_thing_on_the_page=LongRequestsReport(request.GET))
   return render(request, 'error_base.html', context)
 
 
 @user_passes_test(lambda u: u.is_superuser)
 def too_many_queries(request):
-  context = nav_context(TOO_MANY_QUERIES)
+  context = nav_context(
+      TOO_MANY_QUERIES,
+      the_one_thing_on_the_page=TooManyQueriesRequestsReport(request.GET))
   return render(request, 'error_base.html', context)
 
 

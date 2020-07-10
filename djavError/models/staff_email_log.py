@@ -1,12 +1,9 @@
 from django.db import models
-from djaveAllowed.models import Allowed
+from djavError.models.fixable import Fixable
 
 
-class StaffEmailLog(Allowed):
+class StaffEmailLog(Fixable):
   title = models.CharField(max_length=250)
-  created = models.DateTimeField(auto_now_add=True)
-  latest = models.DateTimeField()
-  count = models.PositiveIntegerField(default=0)
   message = models.TextField(blank=True, default='')
   to = models.TextField(blank=True, default='')
 

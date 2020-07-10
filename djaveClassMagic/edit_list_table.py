@@ -1,6 +1,6 @@
 """ This table is for editing a list of objects. It does one row per object.
 """
-
+from django.template.loader import render_to_string
 from djaveTable.table import Table
 
 
@@ -37,6 +37,15 @@ class EditListTable(Table):
           "'", r"\'").replace('\n', r'\n')
     new_js = "wire_up_ajax_delete_button('{}', '{}');".format(
         selector, confirm_question)
+    self._append_js(new_js)
+
+  def wire_up_set_dt_green(
+      self, field_name, set_button_text, unset_button_text):
+    new_js = render_to_string('js/init_dt_green_mode.js', {
+        'data_model_name': self.model.__name__,
+        'field_name': field_name,
+        'set_button_text': set_button_text,
+        'unset_button_text': unset_button_text})
     self._append_js(new_js)
 
   def _append_js(self, new_js):

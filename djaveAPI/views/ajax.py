@@ -17,9 +17,8 @@ def ajax_get(request):
 @ajax_endpoint_login_required
 def ajax_update(request):
   instance = get_request_ajax_obj(request)
-  update(
-      instance, _js_variables_to_py(instance.__class__, request.POST),
-      UserCredentials(request.user))
+  data = _js_variables_to_py(instance.__class__, request.POST)
+  update(instance, data, UserCredentials(request.user))
 
 
 def _js_variables_to_py(model, request_post):

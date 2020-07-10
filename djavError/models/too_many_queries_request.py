@@ -12,3 +12,9 @@ class TooManyQueriesRequest(ProblemRequest):
 
   def average_query_count(self):
     return self.total_query_count / self.count
+
+  @classmethod
+  def filter_allowed_by_user(cls, user, query_set):
+    if user.is_superuser:
+      return query_set
+    return query_set.none()

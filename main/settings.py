@@ -204,10 +204,12 @@ if USE_DEBUG_TOOLBAR:
 
 
 """ Template stuff. """
+ONE_OFF_TEMPLATE_DIRS = [
+    'main/templates', 'djaveNav/templates', 'djaveClassMagic/templates']
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['main/templates', 'djaveNav/templates'],
+        'DIRS': ONE_OFF_TEMPLATE_DIRS,
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
