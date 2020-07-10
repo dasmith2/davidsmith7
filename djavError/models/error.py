@@ -90,9 +90,5 @@ class ErrorManager(RmOldManager):
 class Error(StaffEmailLog):
   error_message = models.TextField(blank=True, default='')
   stack_trace = models.TextField(blank=True, default='')
-  fixed = models.DateTimeField(null=True, blank=True, help_text=(
-      'If you set fixed and the error happens again, a new error '
-      'will be opened. So you should set this once you THINK you\'ve '
-      'fixed it so you\'ll find out if you haven\'t.'))
 
   objects = ErrorManager()
