@@ -19,7 +19,7 @@ class TriggerErrorsForm(Form):
         'Trigger long request', button_type='submit')
     self.send_notification_button = Button(
         'Send notification', button_type='submit')
-    self.send_notification_to = TextField('sendnotificationto')
+    self.send_notification_to = TextField('sendnotificationto', required=False)
     super().__init__([
         self.trigger_server_error_button,
         self.trigger_too_many_queries_button,
