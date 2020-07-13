@@ -17,11 +17,14 @@ class Nav(object):
       current_view_name = current_view_name_or_nav_item.view_name
     found_current = False
     self.nav_items_current_or_not = []
+    self._title = None
     for nav_item in nav_list:
       if not isinstance(nav_item, NavItem):
         raise Exception('nav_list should be a list of NavItem objects')
       is_current = nav_item.view_name == current_view_name or (
           nav_item.display == current_view_name)
+      if is_current:
+        self._title = nav_item.display
       found_current = found_current or is_current
       css_class = '{}_nav'.format(
           re.compile(r'[^\w]').sub('', nav_item.display.lower()))
@@ -32,6 +35,9 @@ class Nav(object):
     if not found_current:
       raise Exception(
           'I was unable to find {} in the nav_list'.format(current_view_name))
+
+  def title(self):
+    return self._title
 
   def template(self):
     return 'nav.html'

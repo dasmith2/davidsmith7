@@ -10,6 +10,7 @@
     <script> css('all_sites_css', 'all_sites.css'); </script>
     {% block this_site_head %}
     {% endblock this_site_head %}
+    <title>{% if title %}{{ title }}{% elif nav and nav.title %}{{ nav.title }}{% else %}TrackTime.TECH{% endif %}</title>
   </head>
   <body>
     {% block this_site_body %}

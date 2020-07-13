@@ -17,7 +17,8 @@ STAFF_EMAIL_FROM_DOMAIN = 'tracktimestaff.tech'
 # But users should get emails from domains that reflect the domains they
 # requested emails from.
 TRACK_TIME_USERS = UsersEmailConfig(
-    'Users', 'users', 'tracktimeusers.tech', 'TrackTime.TECH')
+    'TrackTime.TECH', 'TrackTime.TECH', 'tracktimeusers.tech',
+    'TrackTime.TECH')
 USERS_EMAIL_LOOKUP = {
     'http://127.0.0.1:8000': TRACK_TIME_USERS,
     'https://tracktime.tech': TRACK_TIME_USERS}

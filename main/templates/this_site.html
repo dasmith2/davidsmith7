@@ -1,10 +1,12 @@
 {% extends "all_sites.html" %}
+{% load static %}
 
 {% comment %}
 Feel free to modify this file on specific sites. The templates for the various sections of your website should inherit from this template.
 {% endcomment %}
 
 {% block this_site_head %}
+  <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>
   {% block this_section_head %}
   {% endblock this_section_head %}
 {% endblock this_site_head %}
