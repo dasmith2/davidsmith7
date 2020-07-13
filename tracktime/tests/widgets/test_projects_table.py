@@ -37,8 +37,8 @@ class ProjectsTableTests(TestCase):
         ArchivedProjectsTable(self.user).rows[0], 'Un-archive')
 
   def assert_project_row(self, got_row, archive_action):
-    name_field = TextField('edit_name', default='Time Tracker!')
+    name_field = TextField('name', default='Time Tracker!')
     archive_button = Button(archive_action)
     expected_row = Row(
         [name_field, archive_button], pk=self.project.pk)
-    expected_row.assertEqual(got_row)
+    got_row.assertEqual(expected_row)
