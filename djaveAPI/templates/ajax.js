@@ -33,7 +33,11 @@ function problem_in_response(response) {
   if (response.responseJSON) {
     // You need this for .fail(function(response) { ...
     response = response.responseJSON;
-  } else if (response.status && response.status != 200) {
+  } else if (
+      response.status && typeof response.status == 'number'
+      && response.status != 200) {
+    // When objects have a status, it's a word. When responses have a failed
+    // status, it's a number.
     return response.status;
   }
   return response['problem'];
@@ -44,7 +48,6 @@ function post(url, data, success, always, feedback) {
   always = always || function() {};
   feedback = feedback || get_feedback_elt_append('body');
 
-  var use_feedback = feedback && feedback.length;
   return $.post(url, add_csrf_token(data), function(response) {
     if (!show_problem(response, feedback)) {
       success(response);
@@ -83,5 +86,5 @@ function update_field(
   var use_success = function(response) {
     return success(pk);
   };
-  post('{{ ajax_update_url }}', data, use_success, always, feedback);
+  return post('{{ ajax_update_url }}', data, use_success, always, feedback);
 }

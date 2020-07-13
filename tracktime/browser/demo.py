@@ -1,3 +1,5 @@
+""" Don't put any asserts in here really. Put them in tracktime.browser.test
+which inherits from thisdemo. """
 from datetime import date, timedelta
 from djaveTest.web_demo import WebDemo
 
@@ -11,6 +13,7 @@ class Demo(WebDemo):
     if self.create_projects():
       self.punch_clock()
       self.do_stuff()
+      self.what_a_productive_day()
       self.manual_time_entry()
       self.report()
       self.invoice_rule()
@@ -20,8 +23,8 @@ class Demo(WebDemo):
       self.all_tasks()
       self.archive_project()
       self.settings()
+      self.zoom()
       self.api()
-
       self.done()
 
   def first_view(self):
@@ -47,13 +50,20 @@ class Demo(WebDemo):
       # demo.
       self.demo_user_wasnt_destroyed()
       return False
-    self.say("""
-        First, I need to set up a project or two. If you were my client, I
-        would put your company's name here.""")
 
-    self.hotel_id = self.helper.create_project(self.hotel)
-    self.lab_id = self.helper.create_project(self.bobs)
+    self.hotel_id = self.create_project(
+        self.hotel, 'First, I need to set up a project or two.')
+    self.lab_id = self.create_project(self.bobs, (
+        "If you were my client, I would put your company's name here."))
     return True
+
+  def create_project(self, name, say):
+    self.say(say)
+    self.move_type(self.find('new_name'), name)
+    self.move_click('savenew', wait_talking=True)
+
+    name = self.find_with_value('name', name)
+    return self.find_pk(name)
 
   def punch_clock(self):
     self.say_move_click('entertime_nav', """
@@ -94,6 +104,8 @@ class Demo(WebDemo):
     self.wait(2)
     self.move_click('done')
     self.wait(2)
+
+  def what_a_productive_day(self):
     self.say_move_click('punch_out_on_to_do', """
         What a productive day. It's time to punch out.""")
     self.at_least_some_time()
@@ -355,10 +367,28 @@ class Demo(WebDemo):
     self.say_move_click('settings_url', "Let's take a look at settings.")
     self.say_move('logout', 'I can log out here.')
 
+  def zoom(self):
+    self.say('Now, in order to look good', wait=True)
+    self.show_photo_say('phone.jpg', 'on a phone')
+    self.wait(1)
+    self.show_photo_say('tablet.jpg', 'Tablet')
+    self.wait(1)
+    self.show_photo_say('desktop.png', 'and desktop')
+    self.wait(1)
+    self.go_to_view('settings_tracktime')
+    self.say_move('automatic_zoom', """
+        Track time dot tech automatically zooms the content to fit your
+        screen.""")
+    self.say_move_click('zoomin', """
+        But you can adjust the zoom to your liking.""")
+    self.move_click('zoomin', quick=True)
+    self.move_click('zoomin', quick=True)
+    self.say_move_click(
+        'automatic', "I'll go back to automatic zoom for the rest of the demo")
+
   def api(self):
     self.say_move_type('username', 'daves_data', """
-        But much more interesting is the API. Here you can create an API
-        key.""")
+        Here you can create an API key.""")
     self.say_move_type('new_webhook_url', 'https://your.website', """
         If you specify a webhook url, Track Time dot tech will send data to
         your computers whenever your data changes.""")

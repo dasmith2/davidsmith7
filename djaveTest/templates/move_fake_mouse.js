@@ -21,14 +21,14 @@ function move_mouse(x, y) {
     } else {
       window.done_moving_fake_mouse = false;
       if (mtop > y) {
-        mtop--;
+        mtop -= Math.min({{ step }}, mtop - y);
       } else if (mtop < y) {
-        mtop++;
+        mtop += Math.min({{ step }}, y - mtop);
       }
       if (mleft > x) {
-        mleft--;
+        mleft -= Math.min({{ step }}, mleft - x);
       } else if (mleft < x) {
-        mleft++;
+        mleft += Math.min({{ step }}, x - mleft);
       }
       mouse.css('top', int_to_px(mtop));
       mouse.css('left', int_to_px(mleft));

@@ -11,3 +11,7 @@ def demo_done(request):
   if request.user.is_authenticated:
     do_destroy_user(request.user)
   return render(request, 'demo_done.html')
+
+
+def demo_photo(request, file_name):
+  return render(request, 'demo_photo.html', context={'file_name': file_name})

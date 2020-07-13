@@ -39,7 +39,8 @@ class WebDemo(WebTest):
       if wait:
         self.wait_talking()
 
-  def move_mouse(self, element_or_clue, offset_x=6, offset_y=19, wait=False):
+  def move_mouse(
+      self, element_or_clue, offset_x=5, offset_y=20, wait=False, quick=False):
     """ 7 and 18 are chosen fairly specifically. If you have a small "Did"
     button, say, and you use 10 and 10, say, then when you try to click,
     Selenium outsmarts itself.
@@ -50,11 +51,17 @@ class WebDemo(WebTest):
     element = self.get_element(element_or_clue)
     if self._go_slow:
       location = element.location
-      context = {'x': location['x'] + offset_x, 'y': location['y'] + offset_y}
+      context = {
+          'x': location['x'] + offset_x, 'y': location['y'] + offset_y,
+          'step': 3 if quick else 1}
       script = render_to_string('move_fake_mouse.js', context)
       self.driver.execute_script(script)
       if wait:
         self.wait_mouse()
+
+  def show_photo_say(self, file_name, say):
+    self.go_to_view('demo_photo', file_name=file_name)
+    self.say(say, wait=True)
 
   def move_type(self, element_or_clue, keys, clear_first=False):
     from selenium.webdriver.common.keys import Keys
@@ -101,10 +108,10 @@ class WebDemo(WebTest):
     self.scroll_to_element(element_or_clue)
     self.wait_talking()
 
-  def move_click(self, element_or_clue, wait_talking=False):
+  def move_click(self, element_or_clue, wait_talking=False, quick=False):
     element = self.get_element(element_or_clue)
     if self._go_slow:
-      self.move_mouse(element)
+      self.move_mouse(element, quick=quick)
       self.wait_mouse()
       self.hover(element)
       if wait_talking:

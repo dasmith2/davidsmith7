@@ -214,8 +214,8 @@ function setup_set_clear_dt_green_mode(
    * null. For instance, ToDos have a `done` field and invoices have a `paid`
    * field. */
 
-  var set_mode = function(row) {
-    row.addClass('green');
+  var set_mode = function(pk) {
+    var row = row_by_pk(pk).addClass('green');
     var buttons = buttons_cell(row);
     buttons.find('.set').remove();
     // This code uses the .unset class, but the web tests probably find it
@@ -234,8 +234,8 @@ function setup_set_clear_dt_green_mode(
     }
   };
 
-  var unset_mode = function(row) {
-    row.removeClass('green');
+  var unset_mode = function(pk) {
+    var row = row_by_pk(pk).removeClass('green');
     var buttons = buttons_cell(row);
     buttons.find('.unset').remove();
     // This code uses the .set class, but the web tests probably find it makes
@@ -256,9 +256,9 @@ function setup_set_clear_dt_green_mode(
 
   var _update_field = function(row, new_value, success) {
     var feedback = get_feedback_elt_append(buttons_cell(row));
-    update_field(
+    return update_field(
         find_model(row), find_pk(row), field_name, new_value, success,
-        feedback);
+        null, feedback);
   };
 
   var rows = $(table_finder).find('tr[data-pk]');
@@ -283,9 +283,9 @@ function setup_set_clear_dt_green_mode(
     }
     var is_set = field_data_val == 'True';
     if (is_set) {
-      set_mode(row);
+      set_mode(find_pk(row));
     } else {
-      unset_mode(row);
+      unset_mode(find_pk(row));
     }
   }
 }
