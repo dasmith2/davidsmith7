@@ -30,11 +30,6 @@
   </form>
 
   <script>
-  function wire_up_delete() {
-    wire_up_ajax_button('button.delete', '{{ delete_work_session_url }}', remove_row);
-  }
-  $(wire_up_delete);
-
   $(function() {
     var total_hours_per_date = {{ total_hours_per_date|safe }};
     append_day_info_to_date_roller(total_hours_per_date);

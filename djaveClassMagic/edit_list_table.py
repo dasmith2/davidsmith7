@@ -1,7 +1,14 @@
 """ This table is for editing a list of objects. It does one row per object.
 """
+from django.shortcuts import reverse
 from django.template.loader import render_to_string
+from django.utils.safestring import mark_safe
 from djaveTable.table import Table
+
+
+def edit_list_table_js():
+  context = {'ajax_update_url': reverse('ajax_update')}
+  return render_to_string('js/edit_list_table.js', context)
 
 
 class EditListTable(Table):
@@ -15,6 +22,8 @@ class EditListTable(Table):
     super().__init__(*args, **kwargs)
 
   def wire_up_edit_ajax(self, column_or_columns, selector_or_selectors=None):
+    """ Make it so when you change a text box the row turns yellow and the
+    buttons change to Save and Cancel. """
     if isinstance(column_or_columns, str):
       column_or_columns = [column_or_columns]
     if isinstance(selector_or_selectors, str):
@@ -47,6 +56,12 @@ class EditListTable(Table):
         'set_button_text': set_button_text,
         'unset_button_text': unset_button_text})
     self._append_js(new_js)
+
+  def wire_up_click_updates_field(
+      self, selector, field_name, new_value, success):
+    self._append_js(render_to_string('js/wire_up_click_updates_field.js', {
+        'selector': selector, 'field_name': field_name,
+        'new_value': mark_safe(new_value), 'success': mark_safe(success)}))
 
   def _append_js(self, new_js):
     if not self.js:

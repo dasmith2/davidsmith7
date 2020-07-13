@@ -83,10 +83,10 @@ def login_sign_up_helper(request, template, token=None, login_mode=True):
     if settings.LOCAL:
       if user:
         print('\n{}\n'.format(new_login_url(
-            user, 'http', 'localhost', next_url=next_url)))
+            user, 'http', '127.0.0.1:8000', next_url=next_url)))
       else:
         print('\n{}\n'.format(new_sign_up_url(
-            send_to_email, 'http', 'localhost')))
+            send_to_email, 'http', '127.0.0.1:8000')))
     else:
       if user:
         LoginEmail(

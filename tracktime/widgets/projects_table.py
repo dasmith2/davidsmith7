@@ -8,10 +8,11 @@ from tracktime.models.project import Project
 
 class BaseProjectsTable(EditListTable):
   def __init__(self):
-    super().__init__(Project, ['Name', ''])
+    super().__init__(Project, ['Name', ''], classes=['margin-top'])
+    self.wire_up_edit_ajax('name')
 
   def create_row_for_existing(self, project, archive_action):
-    name_field = TextField('edit_name', default=project.name)
+    name_field = TextField('name', default=project.name)
     archive_button = Button(archive_action)
     self.create_row([name_field, archive_button], pk=project.pk)
 
@@ -30,6 +31,8 @@ class ProjectsTable(BaseProjectsTable):
 
     self.setup_create_new()
     self.setup_existing()
+    self.wire_up_click_updates_field(
+        '.archive', 'deleted', "'now'", 'remove_row')
 
   def setup_create_new(self):
     self.create_row([
@@ -46,6 +49,9 @@ class ArchivedProjectsTable(BaseProjectsTable):
     self.user = user
     super().__init__()
     self.setup_deleted()
+
+    self.wire_up_click_updates_field(
+        '.unarchive', 'deleted', 'null', 'remove_row')
 
   def setup_deleted(self):
     for project in Project.allowed_by_user(self.user).filter(

@@ -1,5 +1,6 @@
+from djaveClassMagic.edit_list_table import EditListTable
 from djaveDT import dt_to_time_str
-from djaveTable.table import Table, Cell
+from djaveTable.table import Cell
 from djaveForm.form import Form
 from djaveForm.button import Button
 
@@ -19,7 +20,7 @@ class EnterTimeForm(Form):
         self.save_button])
 
 
-class EnterTimeTable(Table):
+class EnterTimeTable(EditListTable):
   """ Saving a new one is done by posting a form. Deleting an existing one is
   done by AJAX. In general, I think that when a page is talking about a single
   instance of something it should be manipulated through posting the page,
@@ -28,7 +29,7 @@ class EnterTimeTable(Table):
     self.day = day
     self.user = user
     self.form_data = form_data
-    super().__init__(classes=['margin-top-half'])
+    super().__init__(ProjectWorkSession, classes=['margin-top-half'])
 
     # This might save a new one if the form is valid so it has to go before we
     # load this user's WorkSessions.
@@ -40,6 +41,8 @@ class EnterTimeTable(Table):
 
     hours = self.total_hours(work_session)
     self.headers = ['Project', 'Hours: {}'.format(hours), '']
+    self.wire_up_delete_ajax(
+        '.delete', confirm_question='Delete work session?')
 
   def setup_enter_new(self):
     self.form = EnterTimeForm(self.user)
