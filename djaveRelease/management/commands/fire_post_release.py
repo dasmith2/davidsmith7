@@ -8,4 +8,4 @@ class Command(BaseCommand):
       'database stuff')
 
   def handle(self, *args, **options):
-    post_release.send(sender=self.__class__)
+    post_release.send(sender=None)

@@ -101,7 +101,8 @@ class PunchTheClockTableTests(TestCase):
         'Start the clock', pk=self.project_1.pk, button_type='submit')]))
     table.rows[1].assertEqual(Row(['Project 2', '', Button(
         'Start the clock', pk=self.project_2.pk, button_type='submit')]))
-    delete_button = Button('Abandoned session. Delete.', key_prefix='delete')
+    delete_button = Button(
+        'Abandoned session. Delete.', key_prefix='abandoned')
     table.rows[2].assertEqual(Row(
         ['Project 1', self.clicked_start_at, delete_button],
         pk=self.work_session.pk))
