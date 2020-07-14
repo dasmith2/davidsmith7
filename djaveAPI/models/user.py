@@ -12,6 +12,7 @@ from django.dispatch import receiver
 from djaveAPI.models.pretend_publishable import PretendPublishable
 from djaveAPI.models.user_api_key import UserAPIKey
 from djaveAPI.signals import publishable_post_save
+from djaveRelease.signals import post_release
 
 
 class User(PretendPublishable):
@@ -54,7 +55,6 @@ class User(PretendPublishable):
 
 @receiver(pre_save, sender=DjangoUser)
 def pre_save_user(sender, instance, **kwargs):
-  ensure_unique_email_index()
   if instance.username != instance.email:
     instance.username = instance.email
 
@@ -62,6 +62,11 @@ def pre_save_user(sender, instance, **kwargs):
 @receiver(post_save, sender=DjangoUser)
 def post_save_user(sender, instance, **kwargs):
   publishable_post_save.send(sender=User, instance=User(instance))
+
+
+@receiver(post_release)
+def post_release_user(*args, **kwargs):
+  ensure_unique_email_index()
 
 
 CREATE_UNIQUE_EMAIL_INDEX_SQL = (

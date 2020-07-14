@@ -55,6 +55,7 @@ form { margin: 0px; padding: 0px; }
 .margin-left { margin: 0px 0px 0px {% zoom 25 %}; }
 
 .max-width, p, ul { max-width: {% fit_to_screen 540 %}px; }
+.width-135 { width: {% zoom 135 %}px; }
 
 /* Buttons */
 {% include "css/button.css" %}

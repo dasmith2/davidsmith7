@@ -62,7 +62,7 @@ class APIKeysTable(EditListTable):
     self.setup_keys_rows(keys)
 
     self.wire_up_edit_ajax(['webhook_url'])
-    self.wire_up_delete_ajax('.delete')
+    self.wire_up_delete_ajax('.delete', 'Delete API Key?')
 
   def setup_top_row(self):
     self.create_row([

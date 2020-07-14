@@ -1,10 +1,10 @@
 from collections import namedtuple
 
+from djaveClassMagic.edit_list_table import EditListTable
+from djaveDT import now, tz_dt_to_tz_dt
 from djaveForm.button import Button
 from djaveForm.form import Form
-from djaveDT import now, tz_dt_to_tz_dt
 from djaveTable.problem import Problem
-from djaveTable.table import Table
 
 from tracktime.models.project_work_session import ProjectWorkSession
 from tracktime.models.project import Project
@@ -78,7 +78,7 @@ class StopTheClockForm(Form):
     return not self.explain_why_not_valid(nnow=nnow)
 
 
-class PunchTheClockTable(Table):
+class PunchTheClockTable(EditListTable):
   def __init__(
       self, user, day, show_abandoned=True, form_data=None, nnow=None):
     self.user = user
@@ -126,7 +126,8 @@ class PunchTheClockTable(Table):
     columns = ['Project', '']
     if display_started_column:
       columns = ['Project', 'Started', '']
-    super().__init__(columns, classes=['margin-top-half'])
+    super().__init__(ProjectWorkSession, columns, classes=['margin-top-half'])
+    self.wire_up_delete_ajax('.abandoned')
 
     if a_clock_can_be_stopped:
       stop_form.display(self)
@@ -138,7 +139,7 @@ class PunchTheClockTable(Table):
 
   def display_abandoned(self, abandoned):
     for work_session in abandoned:
-      delete = Button('Abandoned session. Delete.', key_prefix='delete')
+      delete = Button('Abandoned session. Delete.', key_prefix='abandoned')
       self.create_row([
           work_session.project.name, work_session.started, delete],
           pk=work_session.pk)

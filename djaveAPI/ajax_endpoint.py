@@ -34,4 +34,4 @@ class ajax_endpoint_login_required(ajax_endpoint):
   def __call__(self, request, *args, **kwargs):
     if request.user.is_authenticated:
       return super().__call__(request, *args, **kwargs)
-    return problem_response('You are not logged in')
+    return problem_response('You are not logged in', 403)

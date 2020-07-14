@@ -77,7 +77,8 @@ def login_sign_up_helper(request, template, token=None, login_mode=True):
   # The user may want to send themselves a login or sign up link
   form = LoginForm(request.POST, login_mode=login_mode)
   send_to_email = form.get_email()
-  if send_to_email:
+  sent = bool(send_to_email)
+  if sent:
     user = User.objects.filter(email=send_to_email).first()
     next_url = _next_url(request)
     if settings.LOCAL:
@@ -110,7 +111,9 @@ def login_sign_up_helper(request, template, token=None, login_mode=True):
       'possible_used_up_token': possible_used_up_token,
       'post_to': post_to,
       'default_header': default_header,
-      'sign_up_url': reverse('djave_sign_up')})
+      'sent': sent,
+      'sign_up_url': reverse('djave_sign_up'),
+      'login_url': reverse('djave_login')})
 
 
 def logout(request):

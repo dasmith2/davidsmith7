@@ -71,7 +71,7 @@ class EnterTimeTable(EditListTable):
         hours = '{} starting at {}'.format(
             hours, dt_to_time_str(work_session.started))
       self.create_row([
-          work_session.project.name, Cell(hours, classes=['hours']), delete],
+          work_session.project.name, Cell(hours, classes=['hours', 'width-135']), delete],
           pk=work_session.pk)
 
   def is_valid(self):

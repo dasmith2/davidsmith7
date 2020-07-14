@@ -38,6 +38,9 @@ function problem_in_response(response) {
       && response.status != 200) {
     // When objects have a status, it's a word. When responses have a failed
     // status, it's a number.
+    if (response.status == 403) {
+      return 'Hm, it looks like your login changed. Try refreshing the page.';
+    }
     return response.status;
   }
   return response['problem'];
