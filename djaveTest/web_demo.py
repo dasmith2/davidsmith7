@@ -1,4 +1,5 @@
 from random import choice
+import time
 
 from djaveTest.web_test import WebTest
 from django.template.loader import render_to_string
@@ -14,7 +15,14 @@ class WebDemo(WebTest):
 
     if self._go_slow:
       self.say('Warming up blah blah blah')
-      input('Hit enter and I will start')
+      seconds = input(
+          'Start after seconds delay, or leave blank to start immediately: ')
+      try:
+        for i in reversed(range(int(seconds))):
+          time.sleep(1)
+          print(i)
+      except ValueError:
+        pass
 
   def go_to_first_view(self):
     self.go_to_view(self.first_view())

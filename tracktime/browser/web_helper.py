@@ -5,13 +5,6 @@ class WebHelper(object):
     self.web_test = web_test
     self.driver = self.web_test.driver
 
-  def create_to_do(self, text, button_clue='todo'):
-    self.web_test.type('new_description', text)
-    self.web_test.move_click(button_clue, wait_talking=True)
-
-    edit_description = self.web_test.find_with_value('description', text)
-    return self.web_test.find_pk(edit_description)
-
   def set_to_do_hours(self, project_work_session_pk, hours):
     script = "update_field('ProjectWorkSession', {}, 'hours', {});".format(
         project_work_session_pk, hours)

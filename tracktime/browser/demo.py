@@ -40,7 +40,7 @@ class Demo(WebDemo):
         Welcome to track time dot tech. Let me show you how it works. First,
         I sign up.""")
 
-    email = 'dasmith2@gmail.com'
+    email = 'dave@davebase.tech'
     self.sign_up(email)
 
   def create_projects(self):
@@ -77,16 +77,16 @@ class Demo(WebDemo):
     self.say("""
         Now that I'm on the clock, it's time to decide what to do. This is not
         a tool for creating elaborate dependency graphs.""")
-    self.helper.create_to_do(
+    self.create_to_do(
         'The extranet should only show test results after the client pays')
     self.say("""
         It's meant to help maintain momentum, track how much time you spent,
         and paint a picture of what you did with your time.""")
-    self.helper.create_to_do(
+    self.create_to_do(
         'Create a report of how many samples were processed per day')
-    self.helper.create_to_do('Streamline accessioning')
+    self.create_to_do('Streamline accessioning')
     self.say("""
-        That last task was a bit vague. It\'s best to pick tasks that I
+        That last task was a bit vague. It\'s best to pick tasks you
         can reasonably accomplish in a single session, because that's going to
         create beautiful invoices. Notice that the row I\'m editing turned
         yellow, and the buttons changed.""")
@@ -104,6 +104,10 @@ class Demo(WebDemo):
     self.wait(2)
     self.move_click('done')
     self.wait(2)
+
+  def create_to_do(self, text):
+    self.move_type('new_description', text)
+    self.move_click('todo', wait_talking=True)
 
   def what_a_productive_day(self):
     self.say_move_click('punch_out_on_to_do', """
@@ -197,7 +201,7 @@ class Demo(WebDemo):
         In the sent to field, I say who I will send these invoices to.""")
 
     make_payment_to = (
-        'Dave\'s Software Company\n9 10th Ave., Unit 11\nNew York, NY, 12131')
+        'DaveBase.TECH\n1 2nd Ave., Unit 3\nNew York, NY, 12345')
     self.say_move_type('make_payment_to', make_payment_to, """
         In the make payment to field, I explain who I am and how my customers
         should pay me.""")
@@ -208,8 +212,7 @@ class Demo(WebDemo):
             a work session where I didn't click done on any tasks.""")
 
     self.say_move_type('net_days', '30', """
-        When I create an invoice, I will pick the day I intend to send out the
-        invoice. The due date will be set net days from then.""")
+        The invoice will be due net days after I send it.""")
 
     self.move_click('save', wait_talking=True)
 
@@ -287,7 +290,7 @@ class Demo(WebDemo):
         'edit', 'I can still edit the invoice in case Bob is unhappy.')
     self.say_move_click('paid', """
         But hopefully everything goes well and I can click
-        mark paid.""")
+        paid.""")
     self.say_move(self.find_with_text('td', 'Paid'), """
         My invoice now has the status paid, the invoice row is colored green,
         and I can no longer edit.""")
@@ -341,10 +344,10 @@ class Demo(WebDemo):
     self.finds_with_text('option', self.hotel)[1].click()
     to_do = (
         'When a guest changes rooms, automatically schedule an immediate '
-        'cleaning in the old unit')
+        'cleaning in the old room')
     self.say_move_type('new_description', to_do, """
         I can do that here. It's best to plan your work and work your plan, but
-        sometimes I end up describing what I did after I did it.""")
+        sometimes you end up describing what you did after you did it.""")
     self.say_move_click('did', """
         That's what this shortcut is for.""")
     self.say_move_click('not_done', """
@@ -368,7 +371,7 @@ class Demo(WebDemo):
     self.say_move('logout', 'I can log out here.')
 
   def zoom(self):
-    self.say('Now, in order to look good', wait=True)
+    self.say('In order to look good', wait=True)
     self.show_photo_say('phone.jpg', 'on a phone')
     self.wait(1)
     self.show_photo_say('tablet.jpg', 'Tablet')

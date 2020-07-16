@@ -23,8 +23,7 @@ class AllProjectToDos(DateRangeReport):
 
     super().__init__(
         default_from_date, default_to_date, request_get=request.GET,
-        filters=[project_filter, status_filter], contents=to_dos_table,
-        from_filter_label='Created from')
+        filters=[project_filter, status_filter], contents=to_dos_table)
 
     project_id = request.GET.get(project_filter.key(), None)
     if project_id:
