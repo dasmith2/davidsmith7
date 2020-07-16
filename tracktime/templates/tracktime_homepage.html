@@ -31,7 +31,14 @@
   </div>
 
   <h2>The demo is the best part</h2>
-  <iframe class="margin-top-half" style="border: 5px solid #000;" width="759" height="706" src="https://www.youtube.com/embed/AlDX3jLQ6OA" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+  <div id="video_container"></div>
+  <script>
+    $(function() {
+      var width = Math.min(759, window.innerWidth);
+      var height = width * (706 / 759);
+      $('<iframe class="margin-top-half border-5" src="https://www.youtube.com/embed/AlDX3jLQ6OA" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>').attr('width', width).attr('height', height).appendTo($('#video_container'));
+    });
+  </script>
 </div>
 
 {% endblock this_section_body %}
