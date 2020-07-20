@@ -11,20 +11,29 @@ from tracktime.models.latest_project import get_latest_project
 PROJECT = 'project'
 
 
-def project_field(user, label=None, required=True):
+def project_field(
+    user, label=None, required=True, use_clock=None, has_to_do_list=None):
+  """ use_clock can be True, False, or None, meaning you only want projects
+  that use the clock, or don't, or it doesn't matter, respectively. """
   default = None
   if user and required:
     latest_project = get_latest_project(user)
     if latest_project:
       default = latest_project.pk
+  options = project_options(
+      user, use_clock=use_clock, has_to_do_list=has_to_do_list)
   field = SelectField(
-      key_prefix=PROJECT, options=project_options(user), required=required,
-      default=default, label=label)
+      key_prefix=PROJECT, options=options,
+      required=required, default=default, label=label)
   return field
 
 
-def project_options(user):
+def project_options(user, use_clock=None, has_to_do_list=None):
   projects = Project.live.allowed_by_user(user).order_by('name')
+  if use_clock in (True, False):
+    projects = projects.filter(use_clock=use_clock)
+  if has_to_do_list in (True, False):
+    projects = projects.filter(has_to_do_list=has_to_do_list)
   return [Option(project.pk, project.name) for project in projects]
 
 

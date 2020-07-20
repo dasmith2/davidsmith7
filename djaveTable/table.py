@@ -45,12 +45,15 @@ class Table(object):
           csv_row.append(cell_contents_as_csv(cell))
       writer.writerow(csv_row)
 
+  def css_classes_str(self):
+    return 'class="{}"'.format(' '.join(self.classes))
+
   def as_html(self):
     table_start = []
     for key, value in self.additional_attrs.items():
       table_start.append('{}="{}"'.format(key, value))
     if self.classes:
-      table_start.append('class="{}"'.format(' '.join(self.classes)))
+      table_start.append(self.css_classes_str())
     table_start_str = '<table>'
     if table_start:
       table_start_str = '<table {}>'.format(' '.join(table_start))

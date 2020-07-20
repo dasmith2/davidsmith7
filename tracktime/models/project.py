@@ -23,6 +23,13 @@ class Project(Publishable):
   creator = models.ForeignKey(User, on_delete=models.PROTECT, help_text=(
       'Who created this Project?'))
 
+  use_clock = models.BooleanField(default=True, help_text=(
+      'Do you want TrackTime.TECH to ask you to punch in on this project, and '
+      'then provide reports on the time you spent?'))
+  has_to_do_list = models.BooleanField(default=True, help_text=(
+      'Do you want TrackTime.TECH to show you screens where you can create '
+      'and complete tasks for this project?'))
+
   @classmethod
   def model_description(cls):
     return 'Users track time against Projects.'

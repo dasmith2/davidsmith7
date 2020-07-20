@@ -1,5 +1,6 @@
 
 from django.shortcuts import render, redirect, get_object_or_404, reverse
+from djaveForm.form_wrapper import FormWrapper
 from djaveLogin.login_required import login_required
 from djaveTable.cell_content import Tooltip
 from djaveCSV import CanCSVResponse, CanCSV
@@ -114,5 +115,7 @@ def project_invoice_rule(request, pk=None):
   if table.saved() or table.deleted():
     return redirect('project_invoices')
 
-  context = tracktime_context(INVOICES, table=table)
-  return render(request, 'project_invoice_rule.html', context)
+  form_wrapper = FormWrapper(table, request)
+  context = tracktime_context(
+      INVOICES, the_one_thing_on_the_page=form_wrapper, title='Invoice Rule')
+  return render(request, 'tracktime_base.html', context)

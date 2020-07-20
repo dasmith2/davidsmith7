@@ -45,7 +45,7 @@ class CanCSV(object):
 
 def download_csv_button():
   button = InHref(
-      'Download CSV', '', classes=['button', 'download_csv_button'])
+      'Download CSV', '', classes=['download_csv_button'], button=True)
   return StringContent(
       render_to_string('download_csv_button.html', {'button': button}))
 

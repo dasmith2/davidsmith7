@@ -7,8 +7,6 @@ from tracktime.models.project_invoice_rule import ProjectInvoiceRule
 class ProjectInvoiceRuleTable(EditTable):
   def __init__(self, user, request_POST, invoice_rule):
     self.user = user
-    self.request_POST = request_POST
-    self.invoice_rule = invoice_rule
     super().__init__(ProjectInvoiceRule, request_POST, invoice_rule)
 
   def add_rows(self):

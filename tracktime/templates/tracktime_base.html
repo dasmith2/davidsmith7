@@ -13,7 +13,9 @@
   {% if title %}
     <h1>{{ title }}</h1>
   {% endif %}
-  {{ the_one_thing_on_the_page.as_html }}
+  {% if the_one_thing_on_the_page %}
+    {{ the_one_thing_on_the_page.as_html }}
+  {% endif %}
 {% endblock tracktime_body %}
 
 {% endblock this_site_body %}

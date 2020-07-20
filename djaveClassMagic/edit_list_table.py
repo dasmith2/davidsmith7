@@ -3,7 +3,8 @@
 from django.shortcuts import reverse
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
-from djaveTable.table import Table
+from djaveTable.table import Table, Cell
+from djaveTable.cell_content import InHref
 
 
 def edit_list_table_js():
@@ -14,12 +15,27 @@ def edit_list_table_js():
 class EditListTable(Table):
   def __init__(self, model, *args, **kwargs):
     self.model = model
+    # I mean, probably it will, until I find out otherwise.
+    self._has_objects = True
+    self._create_new_button = None
 
     if 'additional_attrs' not in kwargs or kwargs['additional_attrs'] is None:
       kwargs['additional_attrs'] = {}
     kwargs['additional_attrs']['data-model'] = model.__name__
 
     super().__init__(*args, **kwargs)
+
+  def as_html(self):
+    only_show_create_new_button = (
+        self._create_new_button and not self._has_objects)
+    only_show_nothing = not len(self.rows)
+    if only_show_create_new_button or only_show_nothing:
+      content = 'Nothing to report'
+      if only_show_create_new_button:
+        content = self._create_new_button.as_html()
+      return mark_safe('<div {}>{}</div>'.format(
+          self.css_classes_str(), content))
+    return super().as_html()
 
   def wire_up_edit_ajax(self, column_or_columns, selector_or_selectors=None):
     """ Make it so when you change a text box the row turns yellow and the
@@ -66,3 +82,16 @@ class EditListTable(Table):
     if not self.js:
       self.js = ''
     self.js = '{}\n{}'.format(self.js, new_js)
+
+  def append_create_new_row(self, button_text, href):
+    # This is a bit hacky, but the create new row goes last, so if there aren't
+    # any other rows yet, that means there must not be any objects in this
+    # table. I keep track of that so when I render the table I can not bother
+    # to show the headers if there aren't any rows.
+    self._has_objects = bool(len(self.rows))
+    self._create_new_button = InHref(button_text, href, button=True)
+    create_new_cell = Cell(
+        self._create_new_button,
+        additional_attrs={'colspan': len(self.headers)})
+    self.create_row([create_new_cell])
+    return self._create_new_button

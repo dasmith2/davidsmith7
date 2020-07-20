@@ -1,36 +1,51 @@
 from collections import namedtuple
 
+from django.shortcuts import reverse
 from djaveClassMagic.edit_list_table import EditListTable
 from djaveDT import now, tz_dt_to_tz_dt
 from djaveForm.button import Button
 from djaveForm.form import Form
 from djaveTable.problem import Problem
+from djaveTable.cell_content import InHref
 
 from tracktime.models.project_work_session import ProjectWorkSession
 from tracktime.models.project import Project
 from tracktime.models.latest_project import set_latest_project
 
 
-class StartTheClockForm(Form):
-  StartTheClockButton = namedtuple('StartTheClockButton', 'button project')
+class StartProjectForm(Form):
+  StartProjectInfo = namedtuple(
+      'StartProjectInfo', 'project button can_click_start')
 
-  def __init__(self, user):
-    self.start_the_clock_buttons = []
+  def __init__(
+      self, user, see_all_tasks_button=False, only_show_has_to_do_list=False):
+    self.start_project_infos = []
     form_buttons = []
     self.has_projects = False
     for project in Project.live.allowed_by_user(user).order_by('name'):
-      self.has_projects = True
-      form_button = Button(
-          'Start the clock', pk=project.pk, button_type='submit')
-      form_buttons.append(form_button)
-      start_the_clock_button = self.StartTheClockButton(form_button, project)
-      self.start_the_clock_buttons.append(start_the_clock_button)
+      if project.has_to_do_list or not only_show_has_to_do_list:
+        self.has_projects = True
+        button = None
+        if project.use_clock:
+          button = Button(
+              'Start the clock', pk=project.pk, button_type='submit')
+          form_buttons.append(button)
+        else:
+          url = reverse('to_do', kwargs={'project_pk': project.pk})
+          button = InHref(project.name, url, button=True)
+        self.start_project_infos.append(
+            self.StartProjectInfo(project, button, bool(button)))
+    if see_all_tasks_button:
+      button = InHref('See ALL tasks', reverse('all_tasks'), button=True)
+      self.start_project_infos.append(
+          self.StartProjectInfo(None, button, False))
     super().__init__(form_buttons)
 
   def started_clock_on_project(self, user, nnow=None):
-    for start_the_clock_button in self.start_the_clock_buttons:
-      if start_the_clock_button.button.get_was_clicked():
-        started_project = start_the_clock_button.project
+    for start_project_info in self.start_project_infos:
+      if start_project_info.can_click_start and (
+          start_project_info.button.get_was_clicked()):
+        started_project = start_project_info.project
         self.start(user, started_project, nnow=nnow)
         set_latest_project(user, started_project)
         return started_project
@@ -41,12 +56,16 @@ class StartTheClockForm(Form):
         user=user, project=project, date=nnow.date(), started=nnow)
 
   def display(self, punch_the_clock_table, display_started_column):
-    for start_the_clock_button in self.start_the_clock_buttons:
-      row = [start_the_clock_button.project.name]
+    for start_project_info in self.start_project_infos:
+      cells = []
+      if start_project_info.project and start_project_info.project.use_clock:
+        cells.append(start_project_info.project.name)
+      else:
+        cells.append('')
       if display_started_column:
-        row.append('')
-      row.append(start_the_clock_button.button)
-      punch_the_clock_table.create_row(row)
+        cells.append('')
+      cells.append(start_project_info.button)
+      punch_the_clock_table.create_row(cells)
 
 
 class StopTheClockForm(Form):
@@ -80,7 +99,8 @@ class StopTheClockForm(Form):
 
 class PunchTheClockTable(EditListTable):
   def __init__(
-      self, user, day, show_abandoned=True, form_data=None, nnow=None):
+      self, user, day, show_abandoned=True, form_data=None, nnow=None,
+      see_all_tasks_button=False, only_show_has_to_do_list=False):
     self.user = user
     self.day = day
     self.show_abandoned = show_abandoned
@@ -90,7 +110,9 @@ class PunchTheClockTable(EditListTable):
 
     stop_form = None
 
-    start_form = StartTheClockForm(user)
+    start_form = StartProjectForm(
+        user, see_all_tasks_button=see_all_tasks_button,
+        only_show_has_to_do_list=only_show_has_to_do_list)
     self.has_projects = start_form.has_projects
     self.started_clock_on_project = None
     if start_form.a_button_was_clicked(form_data):
@@ -123,10 +145,10 @@ class PunchTheClockTable(EditListTable):
 
     display_started_column = a_clock_can_be_stopped or (
         abandoned and self.show_abandoned)
-    columns = ['Project', '']
+    columns = []
     if display_started_column:
       columns = ['Project', 'Started', '']
-    super().__init__(ProjectWorkSession, columns, classes=['margin-top-half'])
+    super().__init__(ProjectWorkSession, columns, classes=['margin-top'])
     self.wire_up_delete_ajax('.abandoned')
 
     if a_clock_can_be_stopped:

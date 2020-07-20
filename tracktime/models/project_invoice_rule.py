@@ -63,11 +63,6 @@ class ProjectInvoiceRule(Publishable):
         Project."""
 
   @classmethod
-  def filter_live(cls, query_set):
-    # When you delete a ProjectInvoiceRule, you actually do delete it.
-    return query_set
-
-  @classmethod
   def filter_allowed_by_user(cls, user, query_set):
     return query_set.filter(creator=user).select_related('project')
 

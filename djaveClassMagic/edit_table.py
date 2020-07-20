@@ -22,12 +22,15 @@ $(function() {
 
 
 class EditTable(Table):
-  def __init__(self, model, request_data, instance=None, extra_buttons=None):
+  def __init__(
+      self, model, request_data, instance=None, extra_buttons=None,
+      show_delete=True):
     self.model = model
     self.model_fields = model_fields(model)
     self.request_data = request_data
     self.instance = instance
     self.extra_buttons = extra_buttons
+    self.show_delete = show_delete
 
     self.save_button = Button('Save', button_type='submit')
     self.delete_button = Button('Delete', button_type='delete')
@@ -70,11 +73,12 @@ class EditTable(Table):
     return self.model()
 
   def handle_clicks(self):
-    self.form.set_form_data(self.request_data)
-    if self.save_button.get_was_clicked():
-      self.handle_save_click()
-    if self.delete_button.get_was_clicked():
-      self.handle_delete_click()
+    if self.form.a_button_was_clicked(self.request_data):
+      self.form.set_form_data(self.request_data)
+      if self.save_button.get_was_clicked():
+        self.handle_save_click()
+      if self.delete_button.get_was_clicked():
+        self.handle_delete_click()
 
   def handle_save_click(self):
     if self.is_valid():
@@ -118,7 +122,7 @@ class EditTable(Table):
 
   def add_final_row(self):
     buttons = [self.save_button]
-    if self.instance:
+    if self.instance and self.show_delete:
       buttons.append(self.delete_button)
     if self.extra_buttons:
       buttons.extend(self.extra_buttons)

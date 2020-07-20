@@ -8,9 +8,5 @@ $(setup_name_change);
 {% block tracktime_body %}
   <h1>Archived</h1>
   {% csrf_token %}
-  {% if table.rows %}
-    {{ table.as_html }}
-  {% else %}
-    <p class="margin-top">Nothing to report</p>
-  {% endif %}
+  {{ table.as_html }}
 {% endblock tracktime_body %}

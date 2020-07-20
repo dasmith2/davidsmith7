@@ -1,7 +1,8 @@
 from djaveClassMagic.model_fields import (
-    ModelField, DATE, FLOAT, INTEGER, TEXT, CHAR)
+    ModelField, DATE, FLOAT, INTEGER, TEXT, CHAR, BOOLEAN)
 from djaveForm.field import (
-    DateField, PositiveFloatField, PositiveIntField, TextAreaField, TextField)
+    DateField, PositiveFloatField, PositiveIntField, TextAreaField, TextField,
+    TrueFalseField)
 
 
 def default_widget(model_field):
@@ -22,6 +23,8 @@ def default_widget(model_field):
     return TextAreaField(model_field.name, required=required)
   elif model_field.type == CHAR:
     return TextField(model_field.name, required=required)
+  elif model_field.type == BOOLEAN:
+    return TrueFalseField(model_field.name)
   else:
     raise Exception('I dont know what widget to use for a {} field'.format(
         model_field.type))

@@ -22,8 +22,11 @@ def enter_time(request):
   punch_the_clock_table = PunchTheClockTable(
       user=request.user, day=day, form_data=request.POST)
   projects_exist = punch_the_clock_table.has_projects
-  if punch_the_clock_table.started_clock_on_project:
+  started_project = punch_the_clock_table.started_clock_on_project
+  if started_project and started_project.has_to_do_list:
     return redirect('to_do')
+  else:
+    punch_the_clock_table = PunchTheClockTable(user=request.user, day=day)
   if day != date.today():
     punch_the_clock_table = None
   enter_time_table = EnterTimeTable(

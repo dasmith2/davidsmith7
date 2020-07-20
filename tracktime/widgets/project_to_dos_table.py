@@ -14,7 +14,7 @@ class ProjectToDoForm(ToDoForm):
   def create_fields(self):
     fields = super().create_fields()
     if self.do_all_projects:
-      self.project_field = project_field(self.user)
+      self.project_field = project_field(self.user, has_to_do_list=True)
       fields.append(self.project_field)
     return fields
 

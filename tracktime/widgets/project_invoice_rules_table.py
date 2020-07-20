@@ -1,42 +1,37 @@
 from django.shortcuts import reverse
 
+from djaveClassMagic.edit_list_table import EditListTable
 from djaveForm.button import Button
 from djaveTable.cell_content import InHref
-from djaveTable.table import Table, Cell
 
 from tracktime.models.project_invoice_rule import ProjectInvoiceRule
 
 
-class ProjectInvoiceRulesTable(Table):
+class ProjectInvoiceRulesTable(EditListTable):
   def __init__(self, user, request_POST):
     self.user = user
     self.request_POST = request_POST
-    super().__init__(['Project', 'Rate', ''], classes=['margin-top-half'])
+    super().__init__(
+        ProjectInvoiceRule, ['Project', 'Rate', ''],
+        classes=['margin-top-half'])
     self._has_rules = False
     self.add_rule_rows()
-    self.add_final_row()
+    self.create_new_button = self.append_create_new_row(
+        'Create new rule', reverse('project_invoice_rule'))
 
   def has_rules(self):
     return self._has_rules
 
   def add_rule_rows(self):
-    for rule in ProjectInvoiceRule.allowed_by_user(self.user):
+    for rule in ProjectInvoiceRule.filter_live(
+        ProjectInvoiceRule.allowed_by_user(self.user)):
       self._has_rules = True
       href = reverse('project_invoice_rule', kwargs={'pk': rule.pk})
       create_new_invoice_button = Button(
           'Create new invoice', button_type='submit', pk=rule.pk)
       if create_new_invoice_button.get_was_clicked(self.request_POST):
         rule.create_invoice()
-      buttons = [
-          InHref('Edit', href, classes=['button']), create_new_invoice_button]
+      buttons = [InHref('Edit', href, button=True), create_new_invoice_button]
       self.create_row([
           rule.project.name, '{} / hr'.format(rule.hourly_rate),
-          buttons])
-
-  def add_final_row(self):
-    self.create_new_button = InHref(
-        'Create new rule', reverse('project_invoice_rule'), classes=['button'])
-    create_new_cell = Cell(
-        self.create_new_button,
-        additional_attrs={'colspan': len(self.headers)})
-    self.create_row([create_new_cell])
+          buttons], pk=rule.pk)

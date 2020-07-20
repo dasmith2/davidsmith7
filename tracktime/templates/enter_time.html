@@ -12,8 +12,6 @@
 
 {% if projects_exist %}
   {% if punch_the_clock_table %}
-    <h2>Punch the clock</h2>
-
     <form method="POST" class="punch_the_clock">
       {% csrf_token %}
       {{ punch_the_clock_table.as_html|safe }}

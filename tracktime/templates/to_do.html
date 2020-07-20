@@ -30,32 +30,31 @@ $(init_done_mode);
 
 <form method="POST">
   {% csrf_token %}
+
   {% if project %}
-    <h1 style="display: flex; align-items: center;">
-      {{ project.name }}
-      <div class="margin-left" style="display: flex;">{{ punch_out_button.as_html }}</div>
-    </h1>
+    {% if project.has_to_do_list %}
+      <h1 style="display: flex; align-items: center;">
+        {{ project.name }}
+        {% if use_clock %}
+          <div class="margin-left" style="display: flex;">{{ punch_out_button.as_html }}</div>
+        {% endif %}
+      </h1>
+      {% if stop_problem %}
+        <div>{{ stop_problem.as_html }}</div>
+      {% endif %}
+      {{ to_dos_table.as_html }}
+      <div class="margin-top">
+        {{ see_all_tasks }}
+      </div>
+    {% else %}
+      <h2>{{ project.name }}</h2>
+      <p>doesn't have a to do list. But you could {{ see_all_tasks }}</p>
+    {% endif %}
   {% elif punch_in_table.has_projects %}
-    <h2>You SHOULD be on the clock first</h2>
+    {{ punch_in_table.as_html }}
   {% else %}
     <h2>You need a Project first</h2>
   {% endif %}
-  {% if project %}
-    {% if stop_problem %}
-      <div>{{ stop_problem.as_html }}</div>
-    {% endif %}
-    {{ to_dos_table.as_html }}
-  {% elif punch_in_table.has_projects %}
-    {{ punch_in_table.as_html }}
-  {% endif %}
 </form>
-
-{% if project or punch_in_table.has_projects %}
-  <div class="margin-top">
-    <a href="{{ all_tasks_url }}" class="all_tasks">
-      See all tasks without punching in
-    </a>
-  </div>
-{% endif %}
 
 {% endblock tracktime_body %}

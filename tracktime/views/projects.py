@@ -1,26 +1,47 @@
-from django.shortcuts import reverse, render
+from django.shortcuts import reverse, render, get_object_or_404, redirect
+from djaveForm.form_wrapper import FormWrapper
 from djaveLogin.login_required import login_required
 
+from tracktime.models.project import Project
+from tracktime.views.util import tracktime_context, PROJECTS
+from tracktime.widgets.project_table import ProjectTable
 from tracktime.widgets.projects_table import (
     ProjectsTable, ArchivedProjectsTable)
-from tracktime.views.util import tracktime_context, PROJECTS
 
 
 @login_required
 def projects(request):
   context = projects_context(
-      ProjectsTable(request.user, request.POST),
+      table=ProjectsTable(request.user, request.POST),
       archived_projects_url=reverse('archived_projects'))
   return render(request, 'projects.html', context)
 
 
 @login_required
 def archived_projects(request):
-  context = projects_context(ArchivedProjectsTable(request.user))
+  context = projects_context(table=ArchivedProjectsTable(request.user))
   return render(request, 'archived_projects.html', context)
 
 
-def projects_context(table, **kwargs):
-  context = tracktime_context(PROJECTS, table=table)
+@login_required
+def edit_project(request, pk=None):
+  project = None
+  title = 'New Project'
+  if pk:
+    project = get_object_or_404(Project.allowed_by_user(request.user), pk=pk)
+    title = project.name
+
+  table = ProjectTable(request.user, request.POST, project)
+  if table.saved() or table.deleted():
+    return redirect('projects')
+
+  form_wrapper = FormWrapper(table, request)
+  context = projects_context(
+      the_one_thing_on_the_page=form_wrapper, title=title)
+  return render(request, 'tracktime_base.html', context)
+
+
+def projects_context(**kwargs):
+  context = tracktime_context(PROJECTS)
   context.update(kwargs)
   return context

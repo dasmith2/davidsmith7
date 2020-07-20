@@ -12,7 +12,7 @@ from tracktime.models.latest_project import set_latest_project
 
 class EnterTimeForm(Form):
   def __init__(self, user):
-    self.project_field = project_field(user)
+    self.project_field = project_field(user, use_clock=True)
     self.hours_field = hours_field()
     self.save_button = Button('Save new', button_type='submit')
     super().__init__([

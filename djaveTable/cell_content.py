@@ -69,10 +69,12 @@ class DisappearingFeedback(Feedback):
 
 
 class InHref(CellContent):
-  def __init__(self, cell_contents, url, classes=[]):
+  def __init__(self, cell_contents, url, classes=None, button=False):
     self.cell_contents = cell_contents
     self.url = url
-    self.classes = classes
+    self.classes = classes or []
+    if button:
+      self.classes.append('button')
 
   def as_html(self):
     classes_str = ''

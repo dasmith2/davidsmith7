@@ -166,15 +166,48 @@ class TextAreaField(Field):
 class HtmlInputField(Field):
   """ This is for fields that start with <input type="... """
   def widget_html(self):
-    return '<input type="{}"{} name="{}" class="{}" value="{}"{}>'.format(
+    return '<input type="{}"{} name="{}" class="{}"{}{}>'.format(
         self.input_type(), self.additional_attrs_str(), self.key(),
-        self.key_prefix, self.get_value_string(), self.autofocus_str())
+        self.key_prefix, self.get_value_html_str(), self.autofocus_str())
+
+  def get_value_html_str(self):
+    return ' value="{}"'.format(self.get_value_string())
 
   def input_type(self):
     raise NotImplementedError('input_type')
 
   def additional_attrs_str(self):
     return ''
+
+
+class TrueFalseField(HtmlInputField):
+  """ As opposed to a True/False/Unspecified field. """
+  def __init__(self, *args, **kwargs):
+    if 'required' not in kwargs:
+      kwargs['required'] = False
+    if 'default' in kwargs:
+      raise Exception(
+          'TrueFalseFields cant have a default because, in form post data, '
+          'theres no way to distinguish between unset and False')
+    kwargs['default'] = False
+    super().__init__(*args, **kwargs)
+
+  def is_valid(self):
+    """  This field is a little wacky in that, when the form returns nothing
+    whatsoever, that's assumed to be false. So within this field I can't tell
+    if you never passed in the form or it's just false. """
+    return True
+
+  def get_value_html_str(self):
+    if self.get_value_or_default():
+      return ' checked'
+    return ''
+
+  def set_value(self, value):
+    super().set_value(bool(value))
+
+  def input_type(self):
+    return 'checkbox'
 
 
 class DateField(HtmlInputField):

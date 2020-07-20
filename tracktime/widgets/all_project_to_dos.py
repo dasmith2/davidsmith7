@@ -18,7 +18,7 @@ class AllProjectToDos(DateRangeReport):
     to_dos_table = ProjectToDosTable(user=request.user, form_data=request.POST)
 
     project_filter = project_field(
-        request.user, label='Project', required=False)
+        request.user, label='Project', required=False, has_to_do_list=True)
     status_filter = get_status_filter()
 
     super().__init__(

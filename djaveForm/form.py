@@ -1,5 +1,5 @@
 from djaveForm.button import Button
-from djaveForm.field import Field
+from djaveForm.field import Field, TrueFalseField
 from djaveURL import dict_as_query
 
 
@@ -51,6 +51,8 @@ class Form(object):
       key_present = form_element.key() in values
       if isinstance(form_element, Button):
         form_element.set_was_clicked(key_present)
+      elif isinstance(form_element, TrueFalseField):
+        form_element.set_value(key_present)
       elif key_present:
         if isinstance(form_element, Field):
           form_element.set_value(values[form_element.key()])

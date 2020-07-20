@@ -19,4 +19,4 @@ class ErrorsTable(StaffEmailLogTable):
   def get_buttons(self, staff_email_log):
     return InHref(
         'View', reverse('see_error', kwargs={'pk': staff_email_log.pk}),
-        classes=['button'])
+        button=True)
