@@ -13,7 +13,8 @@ class ToDoForm(Form):
     super().__init__(self.create_fields())
 
   def create_fields(self):
-    self.description_field = TextAreaField('new_description', required=True)
+    self.description_field = TextAreaField(
+        'new_description', required=True, autofocus=True)
     self.to_do_button = Button('To do', button_type='submit')
     self.did_button = Button('Did', button_type='submit')
     return [self.description_field, self.to_do_button, self.did_button]

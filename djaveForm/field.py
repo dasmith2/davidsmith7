@@ -13,7 +13,7 @@ class Field(FormElement):
   # You can put djaveForm fields in djaveTables.
   def __init__(
       self, key_prefix, required=True, default=None, pk=None, value=None,
-      label=None):
+      label=None, autofocus=False):
     super().__init__(key_prefix, pk)
     self.required = required
     self.default = default
@@ -24,6 +24,7 @@ class Field(FormElement):
       self.set_value(value)
 
     self.label = label
+    self.autofocus = autofocus
 
     self._custom_invalid_reason = None
 
@@ -93,6 +94,11 @@ class Field(FormElement):
   def widget_html(self):
     raise NotImplementedError('widget_html')
 
+  def autofocus_str(self):
+    if self.autofocus:
+      return ' autofocus'
+    return ''
+
 
 Option = namedtuple('Option', 'id display')
 
@@ -128,7 +134,7 @@ class SelectField(Field):
     return option.id == self.default
 
   def widget_html(self):
-    render = ['<select name="{}">'.format(self.key())]
+    render = ['<select name="{}"{}>'.format(self.key(), self.autofocus_str())]
     if not self.required:
       render.append('<option></option>')
     for option in self.options:
@@ -152,16 +158,17 @@ def datefield_string_to_date(day_string):
 
 class TextAreaField(Field):
   def widget_html(self):
-    return '<textarea name="{}" class="{}">{}</textarea>'.format(
-        self.key(), self.key_prefix, self.get_value_string())
+    return '<textarea name="{}" class="{}"{}>{}</textarea>'.format(
+        self.key(), self.key_prefix, self.autofocus_str(),
+        self.get_value_string())
 
 
 class HtmlInputField(Field):
   """ This is for fields that start with <input type="... """
   def widget_html(self):
-    return '<input type="{}"{} name="{}" class="{}" value="{}">'.format(
+    return '<input type="{}"{} name="{}" class="{}" value="{}"{}>'.format(
         self.input_type(), self.additional_attrs_str(), self.key(),
-        self.key_prefix, self.get_value_string())
+        self.key_prefix, self.get_value_string(), self.autofocus_str())
 
   def input_type(self):
     raise NotImplementedError('input_type')

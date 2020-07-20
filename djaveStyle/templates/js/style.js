@@ -2,8 +2,20 @@ function css(finder, file_name) {
   /* I used to $(window).resize(...). But that turned out to be outsmarting
    * myself. When you click into a text box on mobile, the keyboard pops up,
    * and changes the size of the screen. */
+
+  var on_load = function() {};
+  if (file_name == 'all_sites.css') {
+    // The page starts hidden and all_sites.css shows the page. But that breaks
+    // autofocus because an element can only focus once it's shown.
+    on_load = function() {
+      $('[autofocus]').focus();
+    };
+  }
   var href = '/css/' + file_name + '?zoom=' + automatic_zoom_factor();
-  $('<link rel="stylesheet">').attr('href', href).appendTo($('head'));
+  var link = $('<link rel="stylesheet" type="text/css"/>').attr(
+      'href', href).appendTo($('head'));
+  // jQuery raises an obfuscated error if I link.load(on_load)
+  link[0].onload = on_load;
 }
 
 function automatic_zoom_factor() {

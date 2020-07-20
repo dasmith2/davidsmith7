@@ -2,11 +2,6 @@
 
 {% block tracktime_head %}
 <script>
-function focus_on_new_to_do() {
-  $('.new_description').focus();
-}
-$(focus_on_new_to_do);
-
 function append_delete_button(row) {
   var html = '<button type="button" class="delete">Delete</button>';
   var button = $(html).appendTo(buttons_cell(row));
@@ -38,7 +33,7 @@ $(init_done_mode);
   {% if project %}
     <h1 style="display: flex; align-items: center;">
       {{ project.name }}
-      <div class="margin-left">{{ punch_out_button.as_html }}</div>
+      <div class="margin-left" style="display: flex;">{{ punch_out_button.as_html }}</div>
     </h1>
   {% elif punch_in_table.has_projects %}
     <h2>You SHOULD be on the clock first</h2>

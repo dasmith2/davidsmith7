@@ -1,5 +1,6 @@
 {% load zoom %}
-/* This is for styles that apply to all sites. */
+/* This is for styles that apply to all sites. The body starts hidden and then
+ * this style shows it. */
 html body {
   font-family: 'Roboto', sans-serif; font-weight: 300; font-size: {% font_size %};
   padding: 0px; margin: 0px {% zoom 10 %}px {% zoom 20 %}px {% zoom 10 %}px;
@@ -52,7 +53,7 @@ form { margin: 0px; padding: 0px; }
 .margin-top, p.margin-top { margin: {% zoom 60 %}px 0px 0px 0px; }
 .margin-top-half, p { margin: {% zoom 25 %}px 0px 0px 0px; }
 .pad-half { padding: {% zoom 20 %}px; }
-.margin-left { margin: 0px 0px 0px {% zoom 25 %}; }
+.margin-left { margin: 0px 0px 0px {% zoom 25 %}px; }
 
 .max-width, p, ul { max-width: {% fit_to_screen 540 %}px; }
 .width-135 { width: {% zoom 135 %}px; }
