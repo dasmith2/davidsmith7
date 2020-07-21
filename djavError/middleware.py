@@ -71,7 +71,7 @@ class LogExceptionsMiddleware:
     return self.get_response(request)
 
   def process_exception(self, request, exception):
-    view_name = resolve(request.path).func.__name__
+    view_name = resolve(request.path).url_name
     title = '{} at {}'.format(type(exception).__name__, view_name)
     message = 'url: {}'.format(request.path)
     # Just a quick and dirty reverse engineering of sys.exc_info() I do it this
