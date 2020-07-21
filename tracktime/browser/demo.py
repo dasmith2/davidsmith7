@@ -3,8 +3,6 @@ which inherits from thisdemo. """
 from datetime import date, timedelta
 from djaveTest.web_demo import WebDemo
 
-from tracktime.browser.web_helper import WebHelper
-
 
 class Demo(WebDemo):
   def run(self):
@@ -31,8 +29,6 @@ class Demo(WebDemo):
     return 'tracktime_homepage'
 
   def demo_sign_up(self):
-    self.helper = WebHelper(self)
-
     self.bobs = 'Bob’s Science Laboratory'
     self.hotel = 'The Business Woman Hotel'
 
@@ -122,7 +118,8 @@ class Demo(WebDemo):
     for elt in self.finds('hours'):
       if elt.text.find('0.0 ') == 0:
         pk = self.find_pk(elt)
-        self.helper.set_to_do_hours(pk, 0.01)
+        script = "update_field('ProjectWorkSession', {}, 'hours', 0.01);"
+        self.driver.execute_script(script.format(pk))
 
   def manual_time_entry(self):
     yesterday_link = self.find('one_before').find_element_by_tag_name('a')

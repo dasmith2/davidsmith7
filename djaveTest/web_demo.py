@@ -126,17 +126,31 @@ class WebDemo(WebTest):
     self.wait_talking()
 
   def move_click(self, element_or_clue, wait_talking=False, quick=False):
-    element = self.get_element(element_or_clue)
-    if self._go_slow:
-      self.move_mouse(element, quick=quick)
-      self.wait_mouse()
-      self.hover(element)
-      if wait_talking:
-        self.wait_talking()
-    element.click()
-    # Often when you click something you navigate to a new page, and the demo
-    # and test should always halt in its tracks if it sees the error screen.
-    self.raise_if_on_error_screen()
+    # I only seem to have these problems in Chrome.
+    from selenium.common.exceptions import (
+        StaleElementReferenceException, ElementNotInteractableException)
+    attempts = 0
+    while attempts < 3:
+      attempts += 1
+      element = self.get_element(element_or_clue)
+      if self._go_slow:
+        self.move_mouse(element, quick=quick)
+        self.wait_mouse()
+        self.hover(element)
+        if wait_talking:
+          self.wait_talking()
+      try:
+        element.click()
+        # Often when you click something you navigate to a new page, and the
+        # demo and test should always halt in its tracks if it sees the error
+        # screen.
+        self.raise_if_on_error_screen()
+        return
+      except StaleElementReferenceException:
+        pass
+      except ElementNotInteractableException:
+        time.sleep(.1)
+    raise Exception('I got selenium exceptions 3 times in a row.')
 
   def hover(self, element_or_clue):
     self._hover_helper(element_or_clue, 'addClass')

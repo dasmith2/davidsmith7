@@ -12,7 +12,7 @@ from tracktime.widgets.projects_table import (
 @login_required
 def projects(request):
   context = projects_context(
-      table=ProjectsTable(request.user, request.POST),
+      table=ProjectsTable(request.user),
       archived_projects_url=reverse('archived_projects'))
   return render(request, 'projects.html', context)
 

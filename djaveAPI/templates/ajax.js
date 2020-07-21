@@ -58,8 +58,15 @@ function post(url, data, success, always, feedback) {
     always();
   }).fail(function(response) {
     if (!show_problem(response, feedback)) {
+      if (response.status == 0 && response.statusText == 'error') {
+        // Firefox is complaining because somebody closed the window before the
+        // response could come back and be handled.
+        return
+      }
       feedback.show().text('Server error :(');
       console.log('Server error :(');
+      window.onerror(
+          'function post fail server error: ' + JSON.stringify(response));
     }
     always();
   });

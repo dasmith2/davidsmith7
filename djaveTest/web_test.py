@@ -41,13 +41,15 @@ class WebTest(object):
 
   def pre_run(self):
     from selenium import webdriver
-    # I WISH I could use just regular old Chrome purely because it has a
-    # beautiful speaking voice for the demo. Buuuut you aren't allowed to use
-    # Chrome exactly, you have to use Chromium or something, which ships with
-    # no voices. The sparse help I could find online about this was about
-    # hooking Chromium up to espeak, but espeak sounds just as bad as Firefox.
-    # So as far as I can tell, there's no way to use Chrome's beautiful
-    # speaking voice in my demos :( self.driver =
+    # Chrome seems to raise a bunch more selenium exceptions, like element not
+    # interactable or stale element reference. I WISH I could use just regular
+    # old Chrome purely because it has a beautiful speaking voice for the demo.
+    # Buuuut you aren't allowed to use Chrome exactly, you have to use Chromium
+    # or something, which ships with no voices. The sparse help I could find
+    # online about this was about hooking Chromium up to espeak, but espeak
+    # sounds just as bad as Firefox.  So as far as I can tell, there's no way
+    # to use Chrome's beautiful speaking voice in my demos :( That's not all
+    # though. self.driver =
     # webdriver.Chrome(service_args=['--enable-speech-dispatcher'])
     self.driver = webdriver.Firefox()
 
