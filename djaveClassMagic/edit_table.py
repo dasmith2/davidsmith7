@@ -29,13 +29,14 @@ class EditTable(Table):
     self.model_fields = model_fields(model)
     self.request_data = request_data
     self.instance = instance
-    self.extra_buttons = extra_buttons
+    self.extra_buttons = extra_buttons or []
     self.show_delete = show_delete
 
     self.save_button = Button('Save', button_type='submit')
     self.delete_button = Button('Delete', button_type='delete')
 
-    self.form = Form([self.save_button, self.delete_button])
+    self.form = Form(
+        [self.save_button, self.delete_button] + self.extra_buttons)
     self._saved = False
     self._deleted = False
 
@@ -135,7 +136,7 @@ class EditTable(Table):
 
   def add_field_row(self, field_name, widget=None, read_only=False):
     field = self._get_field(field_name)
-    current_value = self.get_current_value(field_name)
+    current_value = self.get_current_value(field)
     second_cell = current_value
 
     if not read_only:
@@ -151,13 +152,15 @@ class EditTable(Table):
       label = Tooltip(field.display_name, field.help_text)
     self.create_row([label, second_cell])
 
-  def get_current_value(self, field_name):
+  def get_current_value(self, field):
     value = None
     if self.instance:
-      value = getattr(self.instance, field_name)
+      value = getattr(self.instance, field.name)
       if value is not None:
         if isinstance(value, Money):
           value = value.amount
+    else:
+      return field.default
     return value
 
   def _get_field(self, field_name):

@@ -40,7 +40,7 @@ class ProjectToDosTableTests(TestCase):
         'description', default='Hello world!', required=False)
     table.rows[0].assertEqual(Row([
         project_field(self.user),
-        TextAreaField('new_description', required=True),
+        TextAreaField('new_description', required=True, autofocus=True),
         self._to_do_did_buttons()]))
     table.rows[1].assertEqual(Row(
         ['My rad project', description, ButtonsCell()],

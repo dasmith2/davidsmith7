@@ -11,7 +11,10 @@ def get_test_project(**kwargs):
   if not creator:
     creator = get_test_user()
   project = Project.live.create(
-      name=kwargs.get('name', 'Time Tracker'), creator=creator)
+      name=kwargs.get('name', 'Time Tracker'),
+      creator=creator,
+      use_clock=kwargs.get('use_clock', True),
+      has_to_do_list=kwargs.get('has_to_do_list', True))
   if 'created' in kwargs:
     created = str_to_tz_dt(kwargs['created'])
     Project.live.filter(pk=project.pk).update(created=created)

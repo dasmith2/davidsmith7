@@ -24,7 +24,7 @@ class PunchTheClockTableTests(TestCase):
     self._not_started_table_assertions(table)
 
   def _not_started_table_assertions(self, table):
-    self.assertEqual(['Project', ''], table.headers)
+    self.assertEqual([], table.headers)
     self.assertEqual(2, len(table.rows))
     table.rows[0].assertEqual(Row(['Project 1', Button(
         'Start the clock', pk=self.project_1.pk, button_type='submit')]))

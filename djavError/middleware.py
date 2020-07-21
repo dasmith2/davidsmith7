@@ -1,6 +1,7 @@
 from datetime import datetime
 from django.conf import settings
 from django.db import connection
+from django.urls import resolve
 
 from djavError.models import Error, LongRequest, TooManyQueriesRequest
 
@@ -70,8 +71,9 @@ class LogExceptionsMiddleware:
     return self.get_response(request)
 
   def process_exception(self, request, exception):
-    title = '{} at {}'.format(type(exception).__name__, request.path)
-    message = ''
+    view_name = resolve(request.path).func.__name__
+    title = '{} at {}'.format(type(exception).__name__, view_name)
+    message = 'url: {}'.format(request.path)
     # Just a quick and dirty reverse engineering of sys.exc_info() I do it this
     # way so the tests are valid.
     exc_info = (exception.__class__, exception, exception.__traceback__)

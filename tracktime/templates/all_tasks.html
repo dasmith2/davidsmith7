@@ -2,9 +2,6 @@
 
 {% block tracktime_body %}
 
-<form method="POST">
-  {% csrf_token %}
-  {{ to_dos_table.as_html }}
-</form>
+{{ form_wrapper.as_html }}
 
 {% endblock tracktime_body %}

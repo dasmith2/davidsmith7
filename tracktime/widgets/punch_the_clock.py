@@ -36,7 +36,9 @@ class StartProjectForm(Form):
         self.start_project_infos.append(
             self.StartProjectInfo(project, button, bool(button)))
     if see_all_tasks_button:
-      button = InHref('See ALL tasks', reverse('all_tasks'), button=True)
+      button = InHref(
+          'See ALL tasks', reverse('all_tasks'), classes=['all_tasks'],
+          button=True)
       self.start_project_infos.append(
           self.StartProjectInfo(None, button, False))
     super().__init__(form_buttons)

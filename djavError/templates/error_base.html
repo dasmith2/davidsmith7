@@ -10,7 +10,6 @@
 {{ nav.as_html }}
 
 {% block error_body %}
-  {% csrf_token %}
   {{ the_one_thing_on_the_page.as_html }}
 {% endblock error_body %}
 

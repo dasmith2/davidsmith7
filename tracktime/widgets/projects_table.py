@@ -22,7 +22,7 @@ class BaseProjectsTable(EditListTable):
 
 
 class ProjectsTable(BaseProjectsTable):
-  def __init__(self, user, request_post):
+  def __init__(self, user):
     self.user = user
 
     super().__init__()

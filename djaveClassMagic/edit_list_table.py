@@ -52,7 +52,7 @@ class EditListTable(Table):
         selector = selector_or_selectors[i]
       entries.append(
           "wire_up_ajax_save_field('{}', '{}');".format(selector, column))
-    self._append_js('\n'.join(entries))
+    self.append_js('\n'.join(entries))
 
   def wire_up_delete_ajax(self, selector, confirm_question=None):
     confirm_question_arg = ''
@@ -61,7 +61,7 @@ class EditListTable(Table):
           "'", r"\'").replace('\n', r'\n'))
     new_js = "wire_up_ajax_delete_button('{}'{});".format(
         selector, confirm_question_arg)
-    self._append_js(new_js)
+    self.append_js(new_js)
 
   def wire_up_set_dt_green(
       self, field_name, set_button_text, unset_button_text):
@@ -70,18 +70,13 @@ class EditListTable(Table):
         'field_name': field_name,
         'set_button_text': set_button_text,
         'unset_button_text': unset_button_text})
-    self._append_js(new_js)
+    self.append_js(new_js)
 
   def wire_up_click_updates_field(
       self, selector, field_name, new_value, success):
-    self._append_js(render_to_string('js/wire_up_click_updates_field.js', {
+    self.append_js(render_to_string('js/wire_up_click_updates_field.js', {
         'selector': selector, 'field_name': field_name,
         'new_value': mark_safe(new_value), 'success': mark_safe(success)}))
-
-  def _append_js(self, new_js):
-    if not self.js:
-      self.js = ''
-    self.js = '{}\n{}'.format(self.js, new_js)
 
   def append_create_new_row(self, button_text, href):
     # This is a bit hacky, but the create new row goes last, so if there aren't
@@ -89,7 +84,8 @@ class EditListTable(Table):
     # table. I keep track of that so when I render the table I can not bother
     # to show the headers if there aren't any rows.
     self._has_objects = bool(len(self.rows))
-    self._create_new_button = InHref(button_text, href, button=True)
+    self._create_new_button = InHref(
+        button_text, href, classes=['create_new'], button=True)
     create_new_cell = Cell(
         self._create_new_button,
         additional_attrs={'colspan': len(self.headers)})

@@ -94,6 +94,11 @@ class Table(object):
 
     return mark_safe('\n'.join(to_return))
 
+  def append_js(self, new_js):
+    if not self.js:
+      self.js = ''
+    self.js = '{}\n{}'.format(self.js, new_js)
+
   def _js_or_css_helper(self, tag_name, this_content, content_list):
     if this_content:
       open_tag = '<{}>'.format(tag_name)

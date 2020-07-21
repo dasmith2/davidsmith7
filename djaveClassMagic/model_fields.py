@@ -1,11 +1,12 @@
 from collections import namedtuple
 import re
 
+from django.db.models.fields import NOT_PROVIDED
 from django.db.models.fields.reverse_related import ManyToOneRel
 
 ModelField = namedtuple('ModelField', [
     'name', 'display_name', 'help_text', 'can_filter', 'type',
-    'foreign_key_to', 'max_length', 'required', 'editable'])
+    'foreign_key_to', 'max_length', 'required', 'editable', 'default'])
 
 DATE_TIME = 'DateTime'
 DATE = 'Date'
@@ -47,6 +48,9 @@ def model_fields(model, specific_field=None):
     field_type = field.get_internal_type()
     required = not field.null
     editable = field.editable
+    default = field.default
+    if default is NOT_PROVIDED:
+      default = None
     foreign_key_to = None
     max_length = None
 
@@ -87,7 +91,7 @@ def model_fields(model, specific_field=None):
 
     field = ModelField(
         name, _display_name(name), help_text, can_filter, field_type,
-        foreign_key_to, max_length, required, editable)
+        foreign_key_to, max_length, required, editable, default)
     if name == specific_field:
       return field
     else:

@@ -29,7 +29,7 @@ class ToDosTableTests(TestCase):
     self.assertIsNone(table.headers)
     self.assertEqual(1, len(table.rows))
     table.rows[0].assertEqual(Row([
-        TextAreaField('new_description', required=True),
+        TextAreaField('new_description', required=True, autofocus=True),
         self._to_do_did_buttons()]))
 
   def test_new_to_do(self):
@@ -66,7 +66,8 @@ class ToDosTableTests(TestCase):
     table.populate_rows()
 
     self.assertEqual(1, len(table.rows))
-    expected_description = TextAreaField('new_description', required=True)
+    expected_description = TextAreaField(
+        'new_description', required=True, autofocus=True)
     expected_description.set_value('')  # This causes "Required" to show
     table.rows[0].assertEqual(Row([
         expected_description, self._to_do_did_buttons()]))

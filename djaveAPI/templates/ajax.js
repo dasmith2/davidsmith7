@@ -87,7 +87,9 @@ function update_field(
   var data = {'type': model_name, 'pk': pk};
   data[field_name] = new_value;
   var use_success = function(response) {
-    return success(pk);
+    if (success) {
+      return success(pk);
+    }
   };
   return post('{{ ajax_update_url }}', data, use_success, always, feedback);
 }

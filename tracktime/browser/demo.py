@@ -58,12 +58,12 @@ class Demo(WebDemo):
     return True
 
   def create_project(self, name, say):
+    self.move_click('create_new')
     self.say(say)
-    self.move_type(self.find('new_name'), name)
-    self.move_click('savenew', wait_talking=True)
+    self.move_type('name', name)
+    self.move_click('save', wait_talking=True)
 
-    name = self.find_with_value('name', name)
-    return self.find_pk(name)
+    return self.find_pk(self.find_with_text('td', name))
 
   def punch_clock(self):
     self.say_move_click('entertime_nav', """

@@ -160,7 +160,7 @@ class WebTest(object):
     return self.driver.find_element_by_xpath(xpath)
 
   def raise_if_on_error_screen(self):
-    if 1 == len(self.driver.find_elements_by_id('traceback')):
+    if self.on_error_screen():
       message = 'There\'s an on-screen Django error. '
       if settings.LOCAL:
         message += 'Check your ./manage.py runserver. '
@@ -170,6 +170,9 @@ class WebTest(object):
       message += 'The error message is: {}'.format(
           self.driver.find_element_by_xpath('//div[@id="summary"]/pre').text)
       raise Exception(message)
+
+  def on_error_screen(self):
+    return 1 == len(self.driver.find_elements_by_id('traceback'))
 
   def click_button(self, container_or_button_id):
     from selenium.common.exceptions import NoSuchElementException

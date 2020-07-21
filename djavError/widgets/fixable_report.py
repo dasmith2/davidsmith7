@@ -1,7 +1,10 @@
 from datetime import timedelta
 
+from django.shortcuts import reverse
+from django.template.loader import render_to_string
 from djaveClassMagic.edit_list_table import EditListTable
 from djaveDT import now, end_of_day, beginning_of_day
+from djaveForm.button import Button
 from djaveForm.field import SelectField, Option
 from djaveReport.date_range_report import DateRangeReport
 from djaveTable.table import ButtonsCell
@@ -58,15 +61,27 @@ def do_fixed_filter(query_set, status):
 
 class FixableTable(EditListTable):
   def __init__(self, from_date, to_date, status, nnow=None):
-    super().__init__(self.get_model(), self.headers() + [''])
+    super().__init__(self.get_model(), self.headers())
+    pks = []
     for fixable in get_fixables(
         self.get_model(), from_date=from_date, to_date=to_date,
         status=status, nnow=nnow):
+      pks.append(str(fixable.pk))
       cells = self.get_cells(fixable) + [
           ButtonsCell(self.get_buttons(fixable))]
       self.create_row(
           cells, pk=fixable.pk,
           additional_attrs={'data-fixed': bool(fixable.fixed)})
+
+    last_header = ''
+    if pks:
+      last_header = Button('All fixed')
+      all_fixed_url = reverse('all_fixed', kwargs={
+          'model_name': self.get_model().__name__,
+          'pks': ','.join(pks)})
+      self.append_js(render_to_string(
+          'all_fixed.js', context={'all_fixed_url': all_fixed_url}))
+    self.headers.append(last_header)
     self.wire_up_set_dt_green('fixed', 'Fixed', 'Not fixed')
 
   def get_model(self):

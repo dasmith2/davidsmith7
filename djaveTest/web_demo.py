@@ -36,6 +36,15 @@ class WebDemo(WebTest):
   def go_slow(self):
     self._go_slow = True
 
+  def execute_script(self, script, *args):
+    from selenium.common.exceptions import JavascriptException
+    try:
+      return self.driver.execute_script(script, *args)
+    except JavascriptException as ex:
+      if self.on_error_screen():
+        raise Exception('Server error.')
+      raise ex
+
   def say(self, message, wait=False):
     if self._go_slow:
       # Literally cause the browser to say the message out loud in a Stephen
@@ -43,7 +52,7 @@ class WebDemo(WebTest):
       # literally spells out the unicode.
       message_safe = message.replace("'", "’").replace('\n', ' ')
       script = render_to_string('say.js', {'say_this': message_safe})
-      self.driver.execute_script(script)
+      self.execute_script(script)
       if wait:
         self.wait_talking()
 
@@ -63,7 +72,7 @@ class WebDemo(WebTest):
           'x': location['x'] + offset_x, 'y': location['y'] + offset_y,
           'step': 3 if quick else 1}
       script = render_to_string('move_fake_mouse.js', context)
-      self.driver.execute_script(script)
+      self.execute_script(script)
       if wait:
         self.wait_mouse()
 
@@ -125,6 +134,9 @@ class WebDemo(WebTest):
       if wait_talking:
         self.wait_talking()
     element.click()
+    # Often when you click something you navigate to a new page, and the demo
+    # and test should always halt in its tracks if it sees the error screen.
+    self.raise_if_on_error_screen()
 
   def hover(self, element_or_clue):
     self._hover_helper(element_or_clue, 'addClass')
@@ -134,7 +146,7 @@ class WebDemo(WebTest):
 
   def _hover_helper(self, element_or_clue, js_function):
     element = self.get_element(element_or_clue)
-    self.driver.execute_script(
+    self.execute_script(
         "$(arguments[0]).{}('hover');".format(js_function), element)
 
   def type(self, element_or_clue, keys):
@@ -163,7 +175,7 @@ class WebDemo(WebTest):
         arguments[0].focus();
         var pos = $(arguments[0]).val().length;
         arguments[0].setSelectionRange(pos, pos);"""
-    self.driver.execute_script(script, element)
+    self.execute_script(script, element)
 
   def wait_talking(self):
     if self._go_slow:
@@ -182,7 +194,7 @@ class WebDemo(WebTest):
   def _js_variable_undefined_or_true(self, variable_name):
     script = 'return typeof(window.{}) == "undefined" || window.{};'.format(
         variable_name, variable_name)
-    return_value = self.driver.execute_script(script)
+    return_value = self.execute_script(script)
     return return_value is True
 
   def sign_up(self, email_address):

@@ -2,6 +2,7 @@ from datetime import date
 
 from django.shortcuts import render, reverse, redirect, get_object_or_404
 from djaveForm.button import Button
+from djaveForm.form_wrapper import FormWrapper
 from djaveLogin.login_required import login_required
 from djaveTable.cell_content import InHref
 from djaveTable.problem import Problem as HtmlProblem
@@ -59,8 +60,8 @@ def to_do(request, project_pk=None):
 
 @login_required
 def all_tasks(request):
-  all_project_to_dos = AllProjectToDos(request)
-  context = to_do_context(all_project_to_dos, request)
+  form_wrapper = FormWrapper(AllProjectToDos(request), request)
+  context = tracktime_context(TO_DO, form_wrapper=form_wrapper)
   return render(request, 'all_tasks.html', context)
 
 
