@@ -16,8 +16,11 @@ class ToDoProjectPicker(SimpleList):
       self.has_projects = True
       button = None
       if project.use_clock:
+        # Project names are unique, but the sluggified version of their names
+        # isn't necessarily, and that's what form fields are keyed off of.
         button = Button(
-            'Punch in: {}'.format(project.name), button_type='submit')
+            'Punch in: {}'.format(project.name),
+            key_prefix='punchin', pk=project.pk, button_type='submit')
         if button.get_was_clicked(request_POST):
           start_clock_on_project(user, project)
       else:

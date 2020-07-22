@@ -54,7 +54,8 @@ def to_do(request, project_pk=None):
 
 @login_required
 def all_tasks(request):
-  form_wrapper = FormWrapper(AllProjectToDos(request), request)
+  all_to_dos = AllProjectToDos(request.user, request.GET, request.POST)
+  form_wrapper = FormWrapper(all_to_dos, request)
   context = tracktime_context(request.user, TO_DO, form_wrapper=form_wrapper)
   return render(request, 'all_tasks.html', context)
 
