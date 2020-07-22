@@ -47,7 +47,7 @@ class ProjectInvoiceRule(Publishable):
       'This is labeled "Make payment to" in the upper left of the Invoice. '
       'Explain who the service provider is and how to pay them.'))
   default_line_item_description = models.TextField(help_text=(
-      'When you "Enter time", you create a ProjectWorkSession. That '
+      'When you enter time, you create a ProjectWorkSession. That '
       'gets turned into an InvoiceLineItem whose description '
       'is the descriptions of every ProjectToDo you marked "Done" during that '
       'session. If, however, you didn\'t mark anything done, then the '

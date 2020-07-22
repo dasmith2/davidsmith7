@@ -11,24 +11,23 @@ from djaveURL import date_from_url
 
 from tracktime.models.project_work_session import ProjectWorkSession
 from tracktime.widgets.enter_time_table import EnterTimeTable
-from tracktime.widgets.punch_the_clock import PunchTheClockTable
+from tracktime.widgets.punch_the_clock import PunchTheClock
 from tracktime.views.util import tracktime_context, ENTER_TIME
 
 
 @login_required
 def enter_time(request):
   day = date_from_url(request)
-  punch_the_clock_table = None
-  punch_the_clock_table = PunchTheClockTable(
+  punch_the_clock = PunchTheClock(
       user=request.user, day=day, form_data=request.POST)
-  projects_exist = punch_the_clock_table.has_projects
-  started_project = punch_the_clock_table.started_clock_on_project
-  if started_project and started_project.has_to_do_list:
+  if punch_the_clock.started_project and (
+      punch_the_clock.started_project.has_to_do_list):
     return redirect('to_do')
-  else:
-    punch_the_clock_table = PunchTheClockTable(user=request.user, day=day)
+
+  projects_exist = punch_the_clock.has_projects
   if day != date.today():
-    punch_the_clock_table = None
+    punch_the_clock = None
+
   enter_time_table = EnterTimeTable(
       user=request.user, day=day, form_data=request.POST)
   date_roller = DateRoller(ENTER_TIME, day, max_day=date.today())
@@ -38,7 +37,7 @@ def enter_time(request):
       ENTER_TIME,
       delete_work_session_url=reverse('delete_work_session'),
       date_roller=date_roller,
-      punch_the_clock_table=punch_the_clock_table,
+      punch_the_clock=punch_the_clock,
       enter_time_table=enter_time_table,
       total_hours_per_date=json.dumps(totals),
       projects_exist=projects_exist)

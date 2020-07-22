@@ -1,5 +1,3 @@
-from datetime import date
-
 from django.shortcuts import render, reverse, redirect, get_object_or_404
 from djaveForm.button import Button
 from djaveForm.form_wrapper import FormWrapper
@@ -9,23 +7,18 @@ from djaveTable.problem import Problem as HtmlProblem
 
 from tracktime.models.project import Project
 from tracktime.models.project_work_session import ProjectWorkSession
-from tracktime.widgets.punch_the_clock import PunchTheClockTable
 from tracktime.widgets.project_to_dos_table import ProjectToDosTable
 from tracktime.widgets.all_project_to_dos import AllProjectToDos
+from tracktime.widgets.to_do_project_picker import ToDoProjectPicker
 from tracktime.views.util import tracktime_context, TO_DO
 
 
 @login_required
 def to_do(request, project_pk=None):
-  # These have to go first because they might process a POST and change the
-  # current project.
-  punch_in_table = PunchTheClockTable(
-      user=request.user, day=date.today(), show_abandoned=False,
-      form_data=request.POST, see_all_tasks_button=True,
-      only_show_has_to_do_list=True)
-  # key_prefix otherwise the punch out button in the punch_in_table takes over
-  punch_out_button = Button(
-      'Punch out', key_prefix='punch_out_on_to_do', button_type='submit')
+  # This goes first because it might process a POST and change the current
+  # project.
+  to_do_project_picker = ToDoProjectPicker(request.user, request.POST)
+  punch_out_button = Button('Punch out', button_type='submit')
 
   project = None
   to_dos_table = None
@@ -42,7 +35,8 @@ def to_do(request, project_pk=None):
         return redirect('enter_time')
       stop_problem = HtmlProblem(clock_running.explain_why_can_not_stop())
   use_clock = False
-  see_all_tasks = InHref('See ALL tasks', reverse('all_tasks'))
+  see_all_tasks = InHref(
+      'See ALL tasks', reverse('all_tasks'), classes=['all_tasks'])
   if project and project.has_to_do_list:
     to_dos_table = ProjectToDosTable(
         user=request.user, form_data=request.POST, project=project)
@@ -50,7 +44,7 @@ def to_do(request, project_pk=None):
     use_clock = project.use_clock
   context = to_do_context(
       to_dos_table, request, project=project,
-      punch_in_table=punch_in_table,
+      to_do_project_picker=to_do_project_picker,
       punch_out_button=punch_out_button,
       use_clock=use_clock,
       stop_problem=stop_problem,

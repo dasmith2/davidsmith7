@@ -11,10 +11,11 @@
 {{ date_roller.as_html|safe }}
 
 {% if projects_exist %}
-  {% if punch_the_clock_table %}
+  {% if punch_the_clock %}
+    <h2>Punch the clock</h2>
     <form method="POST" class="punch_the_clock">
       {% csrf_token %}
-      {{ punch_the_clock_table.as_html|safe }}
+      {{ punch_the_clock.as_html }}
     </form>
 
     <h2>Or enter time manually</h2>

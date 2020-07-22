@@ -1,137 +1,51 @@
 from collections import namedtuple
 
-from django.shortcuts import reverse
 from djaveClassMagic.edit_list_table import EditListTable
-from djaveDT import now, tz_dt_to_tz_dt
+from djaveDT import tz_dt_to_tz_dt, now
 from djaveForm.button import Button
 from djaveForm.form import Form
+from djaveForm.simple_form_as_html import simple_form_as_html
 from djaveTable.problem import Problem
-from djaveTable.cell_content import InHref
 
-from tracktime.models.project_work_session import ProjectWorkSession
+from tracktime.models.project_work_session import (
+    ProjectWorkSession, start_clock_on_project)
 from tracktime.models.project import Project
-from tracktime.models.latest_project import set_latest_project
 
 
-class StartProjectForm(Form):
-  StartProjectInfo = namedtuple(
-      'StartProjectInfo', 'project button can_click_start')
+class PunchTheClock(object):
+  def __init__(self, user, day, form_data, nnow=None):
+    self.has_projects = True
+    self.started_project = None
 
-  def __init__(
-      self, user, see_all_tasks_button=False, only_show_has_to_do_list=False):
-    self.start_project_infos = []
-    form_buttons = []
-    self.has_projects = False
-    for project in Project.live.allowed_by_user(user).order_by('name'):
-      if project.has_to_do_list or not only_show_has_to_do_list:
-        self.has_projects = True
-        button = None
-        if project.use_clock:
-          button = Button(
-              'Start the clock', pk=project.pk, button_type='submit')
-          form_buttons.append(button)
-        else:
-          url = reverse('to_do', kwargs={'project_pk': project.pk})
-          button = InHref(project.name, url, button=True)
-        self.start_project_infos.append(
-            self.StartProjectInfo(project, button, bool(button)))
-    if see_all_tasks_button:
-      button = InHref(
-          'See ALL tasks', reverse('all_tasks'), classes=['all_tasks'],
-          button=True)
-      self.start_project_infos.append(
-          self.StartProjectInfo(None, button, False))
-    super().__init__(form_buttons)
-
-  def started_clock_on_project(self, user, nnow=None):
-    for start_project_info in self.start_project_infos:
-      if start_project_info.can_click_start and (
-          start_project_info.button.get_was_clicked()):
-        started_project = start_project_info.project
-        self.start(user, started_project, nnow=nnow)
-        set_latest_project(user, started_project)
-        return started_project
-
-  def start(self, user, project, nnow=None):
-    nnow = nnow or now()
-    ProjectWorkSession.live.create(
-        user=user, project=project, date=nnow.date(), started=nnow)
-
-  def display(self, punch_the_clock_table, display_started_column):
-    for start_project_info in self.start_project_infos:
-      cells = []
-      if start_project_info.project and start_project_info.project.use_clock:
-        cells.append(start_project_info.project.name)
-      else:
-        cells.append('')
-      if display_started_column:
-        cells.append('')
-      cells.append(start_project_info.button)
-      punch_the_clock_table.create_row(cells)
-
-
-class StopTheClockForm(Form):
-  def __init__(self, stoppable: ProjectWorkSession):
-    self.stoppable = stoppable
-    self.stop_button = Button('Punch out', button_type='submit')
-    self.cancel_button = Button('Cancel', button_type='submit')
-    super().__init__([self.stop_button, self.cancel_button])
-
-  def stop(self, nnow=None):
-    self.stoppable.stop(nnow=nnow)
-
-  def cancel(self, nnow=None):
-    self.stoppable.mark_deleted(nnow=nnow)
-
-  def display(self, punch_the_clock_table, nnow=None):
-    start_time = tz_dt_to_tz_dt(self.stoppable.started).time()
-    problem = ''
-    if self.form_data_was_set() and not self.is_valid(nnow=nnow):
-      problem = Problem(self.explain_why_not_valid(nnow=nnow))
-    punch_the_clock_table.create_row([
-        self.stoppable.project.name, start_time,
-        [self.stop_button, self.cancel_button, problem]])
-
-  def explain_why_not_valid(self, nnow=None):
-    return self.stoppable.explain_why_can_not_stop(nnow=nnow)
-
-  def is_valid(self, nnow=None):
-    return not self.explain_why_not_valid(nnow=nnow)
-
-
-class PunchTheClockTable(EditListTable):
-  def __init__(
-      self, user, day, show_abandoned=True, form_data=None, nnow=None,
-      see_all_tasks_button=False, only_show_has_to_do_list=False):
     self.user = user
     self.day = day
-    self.show_abandoned = show_abandoned
     self.form_data = form_data
-    nnow = nnow or now()
-    self.today = nnow.date()
 
-    stop_form = None
+    self.content = None
 
-    start_form = StartProjectForm(
-        user, see_all_tasks_button=see_all_tasks_button,
-        only_show_has_to_do_list=only_show_has_to_do_list)
-    self.has_projects = start_form.has_projects
-    self.started_clock_on_project = None
-    if start_form.a_button_was_clicked(form_data):
-      start_form.set_form_data(form_data)
-      self.started_clock_on_project = start_form.started_clock_on_project(
-          user, nnow=nnow)
+    if not self.use_stop_the_clock_form(nnow=nnow):
+      projects = Project.live.allowed_by_user(self.user).filter(
+          use_clock=True).order_by('name')
+      self.has_projects = bool(projects)
+      if self.has_projects:
+        start_the_clock_form = StartTheClockForm(projects)
+        self.content = start_the_clock_form
+        self.started_project = start_the_clock_form.started_clock_on_project(
+            form_data, self.user, nnow=nnow)
+        if self.started_project:
+          self.use_stop_the_clock_form(nnow=nnow)
 
-    a_clock_can_be_stopped = False
-    abandoned = []
+  def use_stop_the_clock_form(self, nnow=None):
     for work_session in ProjectWorkSession.live.get_clock_never_stopped(
-        user, nnow=nnow):
-      if work_session.clock_running(nnow=nnow):
-        stop_form = StopTheClockForm(work_session)
+        self.user, nnow=nnow):
+      if work_session.abandoned(nnow=nnow):
+        work_session.mark_deleted()
+      else:
+        stop_form = StopTheClockForm(work_session, nnow=nnow)
         stop_clicked = False
         cancel_clicked = False
-        if stop_form.a_button_was_clicked(form_data):
-          stop_form.set_form_data(form_data)
+        if stop_form.a_button_was_clicked(self.form_data):
+          stop_form.set_form_data(self.form_data)
           stop_clicked = stop_form.stop_button.get_was_clicked()
           cancel_clicked = stop_form.cancel_button.get_was_clicked()
         a_clock_can_be_stopped = True
@@ -142,31 +56,74 @@ class PunchTheClockTable(EditListTable):
               stop_form.stop(nnow=nnow)
             if cancel_clicked:
               stop_form.cancel(nnow=nnow)
-      else:
-        abandoned.append(work_session)
+        if a_clock_can_be_stopped:
+          self.content = stop_form
+          return self.content
 
-    display_started_column = a_clock_can_be_stopped or (
-        abandoned and self.show_abandoned)
-    columns = []
-    if display_started_column:
-      columns = ['Project', 'Started', '']
-    super().__init__(ProjectWorkSession, columns, classes=['margin-top'])
-    self.wire_up_delete_ajax('.abandoned')
+  def as_html(self):
+    return self.content.as_html()
 
-    if a_clock_can_be_stopped:
-      stop_form.display(self)
-    elif self.day == self.today:
-      start_form.display(self, display_started_column=display_started_column)
 
-    if abandoned and self.show_abandoned:
-      self.display_abandoned(abandoned)
+class StartTheClockForm(Form):
+  StartProjectInfo = namedtuple('StartProjectInfo', 'project button')
 
-  def display_abandoned(self, abandoned):
-    for work_session in abandoned:
-      delete = Button('Abandoned session. Delete.', key_prefix='abandoned')
-      self.create_row([
-          work_session.project.name, work_session.started, delete],
-          pk=work_session.pk)
+  def __init__(self, projects):
+    self.start_project_infos = []
+    form_buttons = []
+    for project in projects:
+      button = Button(
+          project.name, key_prefix='startclock', pk=project.pk,
+          button_type='submit')
+      form_buttons.append(button)
+      self.start_project_infos.append(self.StartProjectInfo(project, button))
+    super().__init__(form_buttons)
 
-  def is_visible(self):
-    return bool(self.rows)
+  def started_clock_on_project(self, form_data, user, nnow=None):
+    if not form_data:
+      return
+    for start_project_info in self.start_project_infos:
+      if start_project_info.button.get_was_clicked(form_data):
+        started_project = start_project_info.project
+        start_clock_on_project(user, started_project, nnow=nnow)
+        return started_project
+
+  def as_html(self):
+    return simple_form_as_html(self)
+
+
+class StopTheClockForm(Form):
+  def __init__(self, stoppable: ProjectWorkSession, nnow=None):
+    self.stoppable = stoppable
+    self.nnow = nnow or now()
+    self.stop_button = Button('Punch out', button_type='submit')
+    self.cancel_button = Button('Cancel', button_type='submit')
+    super().__init__([self.stop_button, self.cancel_button])
+
+  def stop(self, nnow=None):
+    self.stoppable.stop(nnow=nnow)
+
+  def cancel(self, nnow=None):
+    self.stoppable.mark_deleted(nnow=nnow)
+
+  def get_table(self):
+    table = EditListTable(
+        ProjectWorkSession, ['Project', 'Started', ''],
+        classes=['margin-top-half'])
+
+    start_time = tz_dt_to_tz_dt(self.stoppable.started).time()
+    problem = ''
+    if self.form_data_was_set() and not self.is_valid(nnow=self.nnow):
+      problem = Problem(self.explain_why_not_valid(nnow=self.nnow))
+    table.create_row([
+        self.stoppable.project.name, start_time,
+        [self.stop_button, self.cancel_button, problem]])
+    return table
+
+  def as_html(self, nnow=None):
+    return self.get_table(nnow=nnow).as_html()
+
+  def explain_why_not_valid(self, nnow=None):
+    return self.stoppable.explain_why_can_not_stop(nnow=nnow)
+
+  def is_valid(self, nnow=None):
+    return not self.explain_why_not_valid(nnow=nnow)

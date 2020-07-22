@@ -1,7 +1,9 @@
 from django.db import models
 from django.dispatch import receiver
 from djaveClassMagic.signals import destroy_user
+from djaveDT import now
 
+from tracktime.models.latest_project import set_latest_project
 from tracktime.models.work_session import WorkSessionManager, WorkSession
 from tracktime.models.project import Project
 
@@ -12,6 +14,13 @@ def destroy_user_project_work_sessions(sender, destroy_object=None, **kwargs):
     destroy_user.send(
         sender=ProjectWorkSession, destroy_object=project_work_session)
     project_work_session.destroy()
+
+
+def start_clock_on_project(user, project, nnow=None):
+  nnow = nnow or now()
+  set_latest_project(user, project)
+  ProjectWorkSession.live.create(
+      user=user, project=project, date=nnow.date(), started=nnow)
 
 
 class ProjectWorkSessionManager(WorkSessionManager):

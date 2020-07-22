@@ -4,6 +4,11 @@ from djaveURL import dict_as_query
 
 
 class Form(object):
+  """ Forms don't know about display. You don't call my_form.as_html. Where
+  Django forms get it wrong is their assumption that there's a simple rendering
+  function or two that are good enough for all forms. In my experience, your
+  website will be much better if you put thought into how each form will be
+  uniquely laid out. """
   def __init__(self, form_elements=None):
     form_elements = form_elements or []
     self.form_elements = form_elements

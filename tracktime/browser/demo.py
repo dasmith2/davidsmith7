@@ -65,7 +65,7 @@ class Demo(WebDemo):
     self.say_move_click('entertime_nav', """
         Now that I'm done setting up a few projects, let's get to work. I
         navigate to enter time.""")
-    self.say_move_click('starttheclock_{}'.format(self.lab_id), """
+    self.say_move_click('startclock_{}'.format(self.lab_id), """
         I'm going to do a few tasks for {}, so I start the
         clock.""".format(self.bobs))
 
@@ -106,12 +106,12 @@ class Demo(WebDemo):
     self.move_click('todo', wait_talking=True)
 
   def what_a_productive_day(self):
-    self.say_move_click('punch_out_on_to_do', """
+    self.say_move_click('punchout', """
         What a productive day. It's time to punch out.""")
     self.at_least_some_time()
 
   def at_least_some_time(self):
-    """ Make sure all the Project Work Sessions on the "Enter time" page have
+    """ Make sure all the Project Work Sessions on the "Time" page have
     at least 0.01 hours, which is important because when you go fast through
     do_stuff the work session has duration 0 which means nothing appears in the
     report. """
@@ -327,7 +327,7 @@ class Demo(WebDemo):
   def all_tasks(self):
     self.say_move_click('todo_nav', """
         Let me point out a few more features related to tasks.""")
-    self.say_move('starttheclock', """
+    self.say_move('button', """
         Ideally, I'm on the clock any time I'm thinking about a project.""")
     self.say_move_click('all_tasks', """
         But sometimes it makes sense to dig through all the tasks.""")
