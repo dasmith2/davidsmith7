@@ -10,7 +10,7 @@ from tracktime.models.project_work_session import ProjectWorkSession
 from tracktime.widgets.project_to_dos_table import ProjectToDosTable
 from tracktime.widgets.all_project_to_dos import AllProjectToDos
 from tracktime.widgets.to_do_project_picker import ToDoProjectPicker
-from tracktime.views.util import tracktime_context, TO_DO
+from tracktime.views.nav_context import tracktime_context, TO_DO
 
 
 @login_required
@@ -55,9 +55,10 @@ def to_do(request, project_pk=None):
 @login_required
 def all_tasks(request):
   form_wrapper = FormWrapper(AllProjectToDos(request), request)
-  context = tracktime_context(TO_DO, form_wrapper=form_wrapper)
+  context = tracktime_context(request.user, TO_DO, form_wrapper=form_wrapper)
   return render(request, 'all_tasks.html', context)
 
 
 def to_do_context(to_dos_table, request, **kwargs):
-  return tracktime_context(TO_DO, to_dos_table=to_dos_table, **kwargs)
+  return tracktime_context(
+      request.user, TO_DO, to_dos_table=to_dos_table, **kwargs)

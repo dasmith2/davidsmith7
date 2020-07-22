@@ -14,7 +14,8 @@ def get_test_project(**kwargs):
       name=kwargs.get('name', 'Time Tracker'),
       creator=creator,
       use_clock=kwargs.get('use_clock', True),
-      has_to_do_list=kwargs.get('has_to_do_list', True))
+      has_to_do_list=kwargs.get('has_to_do_list', True),
+      has_invoices=kwargs.get('has_invoices', True))
   if 'created' in kwargs:
     created = str_to_tz_dt(kwargs['created'])
     Project.live.filter(pk=project.pk).update(created=created)

@@ -3,7 +3,7 @@ from djaveForm.form_wrapper import FormWrapper
 from djaveLogin.login_required import login_required
 
 from tracktime.models.project import Project
-from tracktime.views.util import tracktime_context, PROJECTS
+from tracktime.views.nav_context import tracktime_context, PROJECTS
 from tracktime.widgets.project_table import ProjectTable
 from tracktime.widgets.projects_table import (
     ProjectsTable, ArchivedProjectsTable)
@@ -12,14 +12,15 @@ from tracktime.widgets.projects_table import (
 @login_required
 def projects(request):
   context = projects_context(
-      table=ProjectsTable(request.user),
+      request.user, table=ProjectsTable(request.user),
       archived_projects_url=reverse('archived_projects'))
   return render(request, 'projects.html', context)
 
 
 @login_required
 def archived_projects(request):
-  context = projects_context(table=ArchivedProjectsTable(request.user))
+  context = projects_context(
+      request.user, table=ArchivedProjectsTable(request.user))
   return render(request, 'archived_projects.html', context)
 
 
@@ -37,11 +38,9 @@ def edit_project(request, pk=None):
 
   form_wrapper = FormWrapper(table, request)
   context = projects_context(
-      the_one_thing_on_the_page=form_wrapper, title=title)
+      request.user, the_one_thing_on_the_page=form_wrapper, title=title)
   return render(request, 'tracktime_base.html', context)
 
 
-def projects_context(**kwargs):
-  context = tracktime_context(PROJECTS)
-  context.update(kwargs)
-  return context
+def projects_context(user, **kwargs):
+  return tracktime_context(user, PROJECTS, **kwargs)

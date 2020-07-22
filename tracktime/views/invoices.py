@@ -10,7 +10,7 @@ from invoice.widgets.edit_invoice import EditInvoice
 from invoice.widgets.view_invoice import ViewInvoice
 from tracktime.models.project_invoice import ProjectInvoice
 from tracktime.models.project_invoice_rule import ProjectInvoiceRule
-from tracktime.views.util import tracktime_context, INVOICES
+from tracktime.views.nav_context import tracktime_context, INVOICES
 from tracktime.widgets.all_project_invoices import AllProjectInvoices
 from tracktime.widgets.all_project_line_items import AllProjectLineItems
 from tracktime.widgets.project_invoice_rule_table import (
@@ -42,7 +42,7 @@ def project_invoices(request):
   invoices_exist = ProjectInvoice.live.allowed_by_user(request.user).exists()
 
   context = tracktime_context(
-      INVOICES,
+      request.user, INVOICES,
       project_invoice_rules_table=project_invoice_rules_table,
       project_invoices_table=project_invoices_table,
       invoice_rules_header=invoice_rules_header,
@@ -56,7 +56,8 @@ def project_invoices(request):
 @CanCSV
 def all_project_invoices(request):
   report = AllProjectInvoices(request.user, request.GET)
-  context = tracktime_context(INVOICES, the_one_thing_on_the_page=report)
+  context = tracktime_context(
+      request.user, INVOICES, the_one_thing_on_the_page=report)
   return CanCSVResponse(
       'tracktime_base.html', context, report.table, 'invoices.csv')
 
@@ -66,7 +67,8 @@ def all_project_invoices(request):
 def project_line_items(request):
   report = AllProjectLineItems(request.user, request.GET)
   context = tracktime_context(
-      INVOICES, the_one_thing_on_the_page=report, title='Line items')
+      request.user, INVOICES, the_one_thing_on_the_page=report,
+      title='Line items')
   return CanCSVResponse(
       'tracktime_base.html', context, report.table, 'line_items.csv')
 
@@ -85,7 +87,8 @@ def edit_project_invoice(request, pk=None):
     return redirect(the_one_thing_on_the_page.redirect_to())
 
   context = tracktime_context(
-      INVOICES, the_one_thing_on_the_page=the_one_thing_on_the_page)
+      request.user, INVOICES,
+      the_one_thing_on_the_page=the_one_thing_on_the_page)
   return render(request, 'tracktime_base.html', context)
 
 
@@ -95,7 +98,8 @@ def view_project_invoice(request, pk=None):
 
   view_invoice = ViewInvoice(invoice, request)
 
-  context = tracktime_context(INVOICES, the_one_thing_on_the_page=view_invoice)
+  context = tracktime_context(
+      request.user, INVOICES, the_one_thing_on_the_page=view_invoice)
 
   return render(request, 'blank.html', context)
 
@@ -117,5 +121,6 @@ def project_invoice_rule(request, pk=None):
 
   form_wrapper = FormWrapper(table, request)
   context = tracktime_context(
-      INVOICES, the_one_thing_on_the_page=form_wrapper, title='Invoice Rule')
+      request.user, INVOICES, the_one_thing_on_the_page=form_wrapper,
+      title='Invoice Rule')
   return render(request, 'tracktime_base.html', context)

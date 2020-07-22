@@ -12,7 +12,7 @@ class ProjectTable(EditTable):
 
   def add_rows(self):
     self.add_field_row('name', NewProjectNameField(self.instance))
-    self.add_field_rows('use_clock', 'has_to_do_list')
+    self.add_field_rows('use_clock', 'has_to_do_list', 'has_invoices')
     self.add_final_row()
 
   def init_new(self):

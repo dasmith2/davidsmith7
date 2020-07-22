@@ -12,7 +12,7 @@ from djaveURL import date_from_url
 from tracktime.models.project_work_session import ProjectWorkSession
 from tracktime.widgets.enter_time_table import EnterTimeTable
 from tracktime.widgets.punch_the_clock import PunchTheClock
-from tracktime.views.util import tracktime_context, ENTER_TIME
+from tracktime.views.nav_context import tracktime_context, ENTER_TIME
 
 
 @login_required
@@ -34,7 +34,7 @@ def enter_time(request):
   totals = ProjectWorkSession.live.total_hours_per_date(
       day - timedelta(days=2), day + timedelta(days=2), request.user)
   context = tracktime_context(
-      ENTER_TIME,
+      request.user, ENTER_TIME,
       delete_work_session_url=reverse('delete_work_session'),
       date_roller=date_roller,
       punch_the_clock=punch_the_clock,

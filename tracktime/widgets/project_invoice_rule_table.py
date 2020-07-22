@@ -10,7 +10,8 @@ class ProjectInvoiceRuleTable(EditTable):
     super().__init__(ProjectInvoiceRule, request_POST, invoice_rule)
 
   def add_rows(self):
-    self.add_field_row('project', project_field(user=self.user))
+    self.add_field_row(
+        'project', project_field(user=self.user, has_invoices=True))
     self.add_field_rows(
         'hourly_rate',
         'first_billable_day',

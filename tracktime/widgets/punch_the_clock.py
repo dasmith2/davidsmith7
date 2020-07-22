@@ -120,7 +120,7 @@ class StopTheClockForm(Form):
     return table
 
   def as_html(self, nnow=None):
-    return self.get_table(nnow=nnow).as_html()
+    return self.get_table().as_html()
 
   def explain_why_not_valid(self, nnow=None):
     return self.stoppable.explain_why_can_not_stop(nnow=nnow)

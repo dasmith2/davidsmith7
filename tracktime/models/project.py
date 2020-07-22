@@ -29,6 +29,8 @@ class Project(Publishable):
   has_to_do_list = models.BooleanField(default=True, help_text=(
       'Do you want TrackTime.TECH to show you screens where you can create '
       'and complete tasks for this project?'))
+  has_invoices = models.BooleanField(default=True, help_text=(
+      'Will you create invoices for this project?'))
 
   @classmethod
   def model_description(cls):

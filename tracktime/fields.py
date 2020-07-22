@@ -12,7 +12,8 @@ PROJECT = 'project'
 
 
 def project_field(
-    user, label=None, required=True, use_clock=None, has_to_do_list=None):
+    user, label=None, required=True, use_clock=None, has_to_do_list=None,
+    has_invoices=None):
   """ use_clock can be True, False, or None, meaning you only want projects
   that use the clock, or don't, or it doesn't matter, respectively. """
   default = None
@@ -21,19 +22,23 @@ def project_field(
     if latest_project:
       default = latest_project.pk
   options = project_options(
-      user, use_clock=use_clock, has_to_do_list=has_to_do_list)
+      user, use_clock=use_clock, has_to_do_list=has_to_do_list,
+      has_invoices=has_invoices)
   field = SelectField(
       key_prefix=PROJECT, options=options,
       required=required, default=default, label=label)
   return field
 
 
-def project_options(user, use_clock=None, has_to_do_list=None):
+def project_options(
+    user, use_clock=None, has_to_do_list=None, has_invoices=None):
   projects = Project.live.allowed_by_user(user).order_by('name')
   if use_clock in (True, False):
     projects = projects.filter(use_clock=use_clock)
   if has_to_do_list in (True, False):
     projects = projects.filter(has_to_do_list=has_to_do_list)
+  if has_invoices in (True, False):
+    projects = projects.filter(has_invoices=has_invoices)
   return [Option(project.pk, project.name) for project in projects]
 
 
