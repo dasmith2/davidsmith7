@@ -91,6 +91,11 @@ class RunningClockTests(TestCase):
     self.assertEqual(self.six_pm, self.recent.stopped)
     self.assertEqual(6.0, self.recent.hours)
 
+  def test_min_duration(self):
+    self.recent.stop(nnow=self.recent.started)
+    self.recent.refresh_from_db()
+    self.assertEqual(0.01, self.recent.hours)
+
   def test_abandoned(self):
     self.assertTrue(self.old.abandoned(nnow=self.six_pm))
     self.assertFalse(self.recent.abandoned(nnow=self.six_pm))

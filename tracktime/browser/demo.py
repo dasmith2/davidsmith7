@@ -108,18 +108,6 @@ class Demo(WebDemo):
   def what_a_productive_day(self):
     self.say_move_click('punchout', """
         What a productive day. It's time to punch out.""")
-    self.at_least_some_time()
-
-  def at_least_some_time(self):
-    """ Make sure all the Project Work Sessions on the "Time" page have
-    at least 0.01 hours, which is important because when you go fast through
-    do_stuff the work session has duration 0 which means nothing appears in the
-    report. """
-    for elt in self.finds('hours'):
-      if elt.text.find('0.0 ') == 0:
-        pk = self.find_pk(elt)
-        script = "update_field('ProjectWorkSession', {}, 'hours', 0.01);"
-        self.driver.execute_script(script.format(pk))
 
   def manual_time_entry(self):
     yesterday_link = self.find('one_before').find_element_by_tag_name('a')

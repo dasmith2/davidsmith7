@@ -192,7 +192,7 @@ class WorkSession(Publishable):
     if self.deleted:
       raise Exception('I can not calculate hours for a deleted work session')
     delta = stopped - self.started
-    return round(delta.total_seconds() / 3600, 2)
+    return max([round(delta.total_seconds() / 3600, 2), 0.01])
 
   def __repr__(self, nnow=None):
     return '<WorkSession {}: {} {} {} for {} hrs>'.format(
