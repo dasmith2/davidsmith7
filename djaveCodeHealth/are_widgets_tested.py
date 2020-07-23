@@ -15,45 +15,69 @@ class {widget_name}Tests(TestCase):
     self.assertTrue(html.find('???') > 0)"""
 
 
-def widget_test_path(widget_path):
+def test_path_from_widget(widget_path):
   got = re.compile(r'(.*)widgets\/(.*)').search(widget_path)
   if got:
     got = got.groups()
     return '{}tests/widgets/test_{}'.format(got[0], got[1])
 
 
-def widgets():
+def widget_path_from_test(widget_test_path):
+  return widget_test_path.replace('tests/', '').replace('test_', '')
+
+
+def find_widgets():
+  return find_widgets_helper(yes_tests=False)
+
+
+def find_widget_tests():
+  return find_widgets_helper(yes_tests=True)
+
+
+def find_widgets_helper(yes_tests):
   to_return = []
   for (dir_name, d, files) in os.walk('.'):
-    if is_widgets_dir(dir_name):
+    if is_widgets_dir(dir_name, yes_tests):
       for file_name in files:
         if file_name not in ['__init__.py']:
           to_return.append(os.path.join(dir_name, file_name))
   return to_return
 
 
-def is_widgets_dir(dir_name):
-  return not ignore(dir_name) and (
-      re.compile(r'\/widgets$').findall(dir_name) and (
-          dir_name.find('tests') == -1))
+def is_widgets_dir(dir_name, yes_tests):
+  if ignore(dir_name):
+    return False
+  if re.compile(r'\/widgets$').findall(dir_name):
+    is_tests = dir_name.find('tests') >= 0
+    return yes_tests == is_tests
+  return False
 
 
 def missing_test_paths():
   to_return = []
-  for widget in widgets():
-    test_path = widget_test_path(widget)
+  for widget in find_widgets():
+    test_path = test_path_from_widget(widget)
     if not os.path.exists(test_path):
       to_return.append(test_path)
   return to_return
 
 
-def test_dir(test_path):
+def too_many_test_paths():
+  to_return = []
+  for widget_test in find_widget_tests():
+    widget_path = widget_path_from_test(widget_test)
+    if not os.path.exists(widget_path):
+      to_return.append(widget_test)
+  return to_return
+
+
+def test_path_dir(test_path):
   return re.compile(r'.*widgets').findall(test_path)[0]
 
 
 def makedirs(test_path):
   try:
-    os.makedirs(test_dir(test_path))
+    os.makedirs(test_path_dir(test_path))
   except FileExistsError:
     pass
 
@@ -78,4 +102,7 @@ def make_test(test_path):
 
 if __name__ == '__main__':
   for test_path in missing_test_paths():
+    print(test_path)
     make_test(test_path)
+  for test_path in too_many_test_paths():
+    print('There\'s no widget for {}'.format(test_path))

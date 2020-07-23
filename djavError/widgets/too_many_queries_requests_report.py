@@ -1,6 +1,6 @@
 from djavError.models.too_many_queries_request import TooManyQueriesRequest
 from djavError.widgets.fixable_report import FixableReport
-from djavError.widgets.problem_requests import ProblemRequestsTable
+from djavError.widgets.problem_requests_table import ProblemRequestsTable
 
 
 class TooManyQueriesRequestsReport(FixableReport):

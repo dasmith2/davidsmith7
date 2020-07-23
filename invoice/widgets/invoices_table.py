@@ -21,6 +21,9 @@ class InvoicesTable(EditListTable):
     self.js = render_to_string('invoices_table.js', context=context)
     self.css = render_to_string('invoice_row_color.css')
 
+  def headers(self):
+    raise NotImplementedError('headers')
+
   def get_invoices(self, nnow=None):
     return self.invoice_class().live.get_important_invoices(
         self.user, nnow=nnow)

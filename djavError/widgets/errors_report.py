@@ -1,7 +1,7 @@
 from django.shortcuts import reverse
 from djavError.models.error import Error
 from djavError.widgets.fixable_report import FixableReport
-from djavError.widgets.staff_email_log_report import StaffEmailLogTable
+from djavError.widgets.staff_email_log_table import StaffEmailLogTable
 from djaveTable.cell_content import InHref
 
 

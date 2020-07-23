@@ -80,7 +80,7 @@ def edit_project_invoice(request, pk=None):
     return redirect(reverse('view_project_invoice', kwargs={'pk': invoice.pk}))
 
   the_one_thing_on_the_page = None
-  the_one_thing_on_the_page = EditInvoice(request, invoice)
+  the_one_thing_on_the_page = EditInvoice(request, request.POST, invoice)
   if the_one_thing_on_the_page.deleted():
     return redirect('project_invoices')
   elif the_one_thing_on_the_page.redirect_to():

@@ -2,14 +2,9 @@ from django.urls import path
 
 from djaveAPI.views.ajax import ajax_get, ajax_update, ajax_delete
 from djaveAPI.views.api import list_or_save_new, get_or_save_existing
-from djaveAPI.views.keys import delete_key, user_api_keys
 
 
 djave_api_urls = [
-    path('delete_key', delete_key, name='delete_key'),
-
-    path('user_api_keys', user_api_keys, name='user_api_keys'),
-
     path('ajax_get', ajax_get, name='ajax_get'),
     path('ajax_update', ajax_update, name='ajax_update'),
     path('ajax_delete', ajax_delete, name='ajax_delete'),

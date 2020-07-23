@@ -13,7 +13,7 @@ class APIKeysWidget(object):
     self.title = title
     self.description = description
 
-  def __str__(self):
+  def as_html(self):
     template = loader.get_template('api_keys_widget.html')
     context = {
         'new_api_key_table': self.new_api_key_table,

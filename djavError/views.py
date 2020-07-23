@@ -13,9 +13,9 @@ from djavError.nav_context import (
     nav_context, ERRORS, NOTIFICATIONS, LONG_REQUESTS, TOO_MANY_QUERIES,
     TRIGGER_ERRORS)
 from djavError.widgets.errors_report import ErrorsReport
-from djavError.widgets.long_requests import LongRequestsReport
+from djavError.widgets.long_requests_report import LongRequestsReport
 from djavError.widgets.notifications_report import NotificationsReport
-from djavError.widgets.too_many_queries_requests import (
+from djavError.widgets.too_many_queries_requests_report import (
     TooManyQueriesRequestsReport)
 from djavError.widgets.trigger_errors import TriggerErrors
 

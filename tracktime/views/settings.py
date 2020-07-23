@@ -17,7 +17,8 @@ def settings(request):
       'see on the website.')
   user_api_key_widget = APIKeysWidget(
       request, table, 'User API Keys', description)
-  djave_login_settings_widget = DjaveLoginSettingsWidget(request)
+  djave_login_settings_widget = DjaveLoginSettingsWidget(
+      request.get_full_path(), request.user)
   zoom_preference = ZoomPreference(request, request.POST, request.user)
 
   context = tracktime_context(

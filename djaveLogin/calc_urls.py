@@ -5,9 +5,8 @@ from djaveURL import is_valid_url
 NEXT_URL = 'next_url'
 
 
-def get_logout_url(request):
-  return append_next_url(
-      reverse('djave_logout'), request.get_full_path())
+def get_logout_url(request_get_full_path):
+  return append_next_url(reverse('djave_logout'), request_get_full_path)
 
 
 def append_next_url(url, next_url):

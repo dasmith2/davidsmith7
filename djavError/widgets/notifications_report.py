@@ -1,6 +1,6 @@
 from djavError.models.notification import Notification
 from djavError.widgets.fixable_report import FixableReport
-from djavError.widgets.staff_email_log_report import (
+from djavError.widgets.staff_email_log_table import (
     StaffEmailLogTable)
 
 
