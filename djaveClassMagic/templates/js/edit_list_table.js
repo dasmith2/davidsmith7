@@ -30,7 +30,7 @@ function remove_row(pk) {
   }
 }
 
-function wire_up_click_updates_field(
+function setup_click_updates_field(
     selector, field_name, new_value, success, confirm_question) {
   $(selector).click(function() {
     var button = $(this).prop('disabled', true);
@@ -49,8 +49,8 @@ function wire_up_click_updates_field(
   });
 }
 
-function wire_up_ajax_delete_button(selector_or_elt, confirm_question) {
-  wire_up_click_updates_field(
+function setup_ajax_delete_button(selector_or_elt, confirm_question) {
+  setup_click_updates_field(
       selector_or_elt, 'deleted', 'now', remove_row, confirm_question);
 }
 
@@ -113,7 +113,7 @@ var is_editing = function(elt) {
   return elt.attr('data-saved-value') != elt.val()
 };
 
-function wire_up_ajax_save_field(selector_or_elt, field_name) {
+function setup_ajax_save_field(selector_or_elt, field_name) {
   /* This is for text boxes or whatever in tables so you can edit inline with
    * AJAX. Once you start editing, this hides all the other buttons and gives
    * the user "Save" and "Cancel" buttons. selector_or_elt can be a string or a

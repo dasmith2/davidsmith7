@@ -37,7 +37,7 @@ class EditListTable(Table):
           self.css_classes_str(), content))
     return super().as_html()
 
-  def wire_up_edit_ajax(self, column_or_columns, selector_or_selectors=None):
+  def setup_edit_ajax(self, column_or_columns, selector_or_selectors=None):
     """ Make it so when you change a text box the row turns yellow and the
     buttons change to Save and Cancel. """
     if isinstance(column_or_columns, str):
@@ -51,19 +51,19 @@ class EditListTable(Table):
       if selector_or_selectors and len(selector_or_selectors) >= i:
         selector = selector_or_selectors[i]
       entries.append(
-          "wire_up_ajax_save_field('{}', '{}');".format(selector, column))
+          "setup_ajax_save_field('{}', '{}');".format(selector, column))
     self.append_js('\n'.join(entries))
 
-  def wire_up_delete_ajax(self, selector, confirm_question=None):
+  def setup_delete_ajax(self, selector, confirm_question=None):
     confirm_question_arg = ''
     if confirm_question:
       confirm_question_arg = ", '{}'".format(confirm_question.replace(
           "'", r"\'").replace('\n', r'\n'))
-    new_js = "wire_up_ajax_delete_button('{}'{});".format(
+    new_js = "setup_ajax_delete_button('{}'{});".format(
         selector, confirm_question_arg)
     self.append_js(new_js)
 
-  def wire_up_set_dt_green(
+  def setup_set_dt_green(
       self, field_name, set_button_text, unset_button_text):
     new_js = render_to_string('js/init_dt_green_mode.js', {
         'data_model_name': self.model.__name__,
@@ -72,9 +72,9 @@ class EditListTable(Table):
         'unset_button_text': unset_button_text})
     self.append_js(new_js)
 
-  def wire_up_click_updates_field(
+  def setup_click_updates_field(
       self, selector, field_name, new_value, success):
-    self.append_js(render_to_string('js/wire_up_click_updates_field.js', {
+    self.append_js(render_to_string('js/setup_click_updates_field.js', {
         'selector': selector, 'field_name': field_name,
         'new_value': mark_safe(new_value), 'success': mark_safe(success)}))
 

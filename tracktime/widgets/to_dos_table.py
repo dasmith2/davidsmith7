@@ -37,7 +37,7 @@ class ToDosTable(EditListTable):
 
     self._rows_populated = False
 
-    self.wire_up_edit_ajax('description')
+    self.setup_edit_ajax('description')
 
   def should_filter_created(self):
     how_many_specified = int(bool(self.created_from_date)) + int(

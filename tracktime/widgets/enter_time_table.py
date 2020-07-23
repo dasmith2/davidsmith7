@@ -41,7 +41,7 @@ class EnterTimeTable(EditListTable):
 
     hours = self.total_hours(work_session)
     self.headers = ['Project', 'Hours: {}'.format(hours), '']
-    self.wire_up_delete_ajax(
+    self.setup_delete_ajax(
         '.delete', confirm_question='Delete work session?')
 
   def setup_enter_new(self):

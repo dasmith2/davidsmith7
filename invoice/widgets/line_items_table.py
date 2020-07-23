@@ -44,10 +44,10 @@ class LineItemsTable(EditListTable):
 
     self.create_top_row()
     self.create_line_item_rows()
-    self.wire_up_edit_ajax([DESCRIBE_SERVICE, AMOUNT_CALCULATION, AMOUNT])
-    self.wire_up_delete_ajax(
+    self.setup_edit_ajax([DESCRIBE_SERVICE, AMOUNT_CALCULATION, AMOUNT])
+    self.setup_delete_ajax(
         '.remove', 'Remove?\n\n(This will show up\nin the next invoice)')
-    self.wire_up_delete_ajax(
+    self.setup_delete_ajax(
         '.delete_line_item', 'Delete?\n\n(This will go away forever)')
 
   def create_top_row(self):

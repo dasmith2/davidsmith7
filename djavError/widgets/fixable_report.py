@@ -82,7 +82,7 @@ class FixableTable(EditListTable):
       self.append_js(render_to_string(
           'all_fixed.js', context={'all_fixed_url': all_fixed_url}))
     self.headers.append(last_header)
-    self.wire_up_set_dt_green('fixed', 'Fixed', 'Not fixed')
+    self.setup_set_dt_green('fixed', 'Fixed', 'Not fixed')
 
   def get_model(self):
     raise NotImplementedError('get_model')
