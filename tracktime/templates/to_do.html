@@ -5,7 +5,7 @@
 function append_delete_button(row) {
   var html = '<button type="button" class="delete">Delete</button>';
   var button = $(html).appendTo(buttons_cell(row));
-  setup_ajax_delete_button(button, 'Delete To Do?')
+  setup_click_deletes(button, 'Delete To Do?');
 }
 
 function remove_delete_button(row) {
