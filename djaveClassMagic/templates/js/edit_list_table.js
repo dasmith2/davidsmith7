@@ -30,8 +30,27 @@ function remove_row(pk) {
   }
 }
 
+function setup_click_deletes(selector, confirm_question) {
+  var do_something = function(model, pk, feedback, always) {
+    var data = {'type': model, 'pk': pk};
+    var success = function() {
+      remove_row(pk);
+    };
+    post('{{ ajax_delete_url }}', data, success, always, feedback)
+  };
+  setup_click_does_something(selector, confirm_question, do_something);
+}
+
 function setup_click_updates_field(
     selector, field_name, new_value, success, confirm_question) {
+  var do_something = function(model, pk, feedback, always) {
+    update_field(
+        model, pk, field_name, new_value, success, always, feedback);
+  };
+  setup_click_does_something(selector, confirm_question, do_something);
+}
+
+function setup_click_does_something(selector, confirm_question, do_something) {
   $(selector).click(function() {
     var button = $(this).prop('disabled', true);
     var always = function() {
@@ -41,17 +60,11 @@ function setup_click_updates_field(
       var model = find_model(button);
       var pk = find_pk(button);
       var feedback = get_feedback_elt_after(button);
-      update_field(
-          model, pk, field_name, new_value, success, always, feedback);
+      do_something(model, pk, feedback, always);
     } else {
       always();
     }
   });
-}
-
-function setup_ajax_delete_button(selector_or_elt, confirm_question) {
-  setup_click_updates_field(
-      selector_or_elt, 'deleted', 'now', remove_row, confirm_question);
 }
 
 var all_elts = function(row) {

@@ -8,7 +8,9 @@ from djaveTable.cell_content import InHref
 
 
 def edit_list_table_js():
-  context = {'ajax_update_url': reverse('ajax_update')}
+  context = {
+      'ajax_update_url': reverse('ajax_update'),
+      'ajax_delete_url': reverse('ajax_delete')}
   return render_to_string('js/edit_list_table.js', context)
 
 
@@ -59,7 +61,7 @@ class EditListTable(Table):
     if confirm_question:
       confirm_question_arg = ", '{}'".format(confirm_question.replace(
           "'", r"\'").replace('\n', r'\n'))
-    new_js = "setup_ajax_delete_button('{}'{});".format(
+    new_js = "setup_click_deletes('{}'{});".format(
         selector, confirm_question_arg)
     self.append_js(new_js)
 
