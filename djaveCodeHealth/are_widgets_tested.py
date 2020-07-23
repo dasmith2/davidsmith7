@@ -102,7 +102,7 @@ def make_test(test_path):
 
 if __name__ == '__main__':
   for test_path in missing_test_paths():
-    print(test_path)
+    print('Creating {}'.format(test_path))
     make_test(test_path)
   for test_path in too_many_test_paths():
     print('There\'s no widget for {}'.format(test_path))
