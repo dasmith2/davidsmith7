@@ -6,7 +6,23 @@
   {{ table.as_html }}
 </form>
 
-<div class="margin-top">
+<div class="margin-top" id="archived_projects_link">
   <a href="{{ archived_projects_url }}" class="archived_projects">See archived projects</a>
 </div>
+<script>
+function hide_archived_projects_link() {
+  $('#archived_projects_link').hide();
+}
+
+function show_archived_projects_link() {
+  $('#archived_projects_link').show();
+}
+
+$(function() {
+  $('.archive').click(show_archived_projects_link);
+});
+{% if not archived_projects_exist %}
+hide_archived_projects_link();
+{% endif %}
+</script>
 {% endblock tracktime_body %}

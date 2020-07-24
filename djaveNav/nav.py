@@ -11,9 +11,10 @@ NavItemCurrentOrNot = namedtuple(
 
 
 class Nav(object):
-  def __init__(self, nav_list, current_view_name_or_nav_item):
+  def __init__(self, nav_list, current_view_name_or_nav_item=None):
     current_view_name = current_view_name_or_nav_item
-    if isinstance(current_view_name_or_nav_item, NavItem):
+    if current_view_name and isinstance(
+        current_view_name_or_nav_item, NavItem):
       current_view_name = current_view_name_or_nav_item.view_name
     found_current = False
     self.nav_items_current_or_not = []
@@ -32,9 +33,12 @@ class Nav(object):
           NavItemCurrentOrNot(
               reverse(nav_item.view_name), nav_item.display, is_current,
               css_class))
-    if not found_current:
-      raise Exception(
-          'I was unable to find {} in the nav_list'.format(current_view_name))
+    # Don't raise an exception here if current_view_name and not found_current.
+    # Nav entries disappear now depending on what features you have enabled. So
+    # if, for instance, you have one project with a clock so "Enter time" is
+    # visible, but you're on the projects page and you archive your only
+    # project, and THEN click on "Enter time", you land on a page without a nav
+    # that's smart enough to tell you to go make a project. So that works fine.
 
   def title(self):
     return self._title

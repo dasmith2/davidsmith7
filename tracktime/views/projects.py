@@ -11,9 +11,12 @@ from tracktime.widgets.projects_table import (
 
 @login_required
 def projects(request):
+  archived_projects_exist = Project.allowed_by_user(request.user).filter(
+      deleted__isnull=False).exists()
   context = projects_context(
       request.user, table=ProjectsTable(request.user),
-      archived_projects_url=reverse('archived_projects'))
+      archived_projects_url=reverse('archived_projects'),
+      archived_projects_exist=archived_projects_exist)
   return render(request, 'projects.html', context)
 
 

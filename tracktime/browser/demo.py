@@ -57,6 +57,9 @@ class Demo(WebDemo):
     self.move_click('create_new')
     self.say(say)
     self.move_type('name', name)
+    self.move_click('use_clock')
+    self.move_click('has_to_do_list')
+    self.move_click('has_invoices')
     self.move_click('save', wait_talking=True)
 
     return self.find_pk(self.find_with_text('td', name))

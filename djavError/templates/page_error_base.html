@@ -1,0 +1,13 @@
+{% extends "this_site.html" %}
+{% comment %}This is for server errors and 404s and such.{% endcomment %}
+
+{% block this_section_head %}
+<style>
+  html body { background-color: #558; color: #fff; }
+</style>
+{% endblock this_section_head %}
+
+{% block this_site_body %}
+{% block page_error_body %}
+{% endblock page_error_body %}
+{% endblock this_site_body %}

@@ -11,8 +11,8 @@ import django_heroku
 
 
 """ What environment are you in? Just check your settings! """
-DEBUG = os.path.exists('main/local_settings.py')
-LOCAL = DEBUG
+LOCAL = os.path.exists('main/local_settings.py')
+DEBUG = LOCAL
 STAGE = os.environ.get('STAGE', default='False') == 'True'
 PROD = os.environ.get('PROD', default='False') == 'True'
 TEST = 'test' in sys.argv
@@ -100,7 +100,7 @@ MAX_ALLOWED_DB_QUERIES = 10
 
 
 """ URL stuff. """
-SECURE_SSL_REDIRECT = not IN_HEROKU_CI and not DEBUG
+SECURE_SSL_REDIRECT = not IN_HEROKU_CI and not LOCAL
 
 APPEND_SLASH = False
 

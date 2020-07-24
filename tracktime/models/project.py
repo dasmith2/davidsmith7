@@ -23,13 +23,13 @@ class Project(Publishable):
   creator = models.ForeignKey(User, on_delete=models.PROTECT, help_text=(
       'Who created this Project?'))
 
-  use_clock = models.BooleanField(default=True, help_text=(
+  use_clock = models.BooleanField(default=False, help_text=(
       'Do you want TrackTime.TECH to ask you to punch in on this project, and '
       'then provide reports on the time you spent?'))
-  has_to_do_list = models.BooleanField(default=True, help_text=(
+  has_to_do_list = models.BooleanField(default=False, help_text=(
       'Do you want TrackTime.TECH to show you screens where you can create '
       'and complete tasks for this project?'))
-  has_invoices = models.BooleanField(default=True, help_text=(
+  has_invoices = models.BooleanField(default=False, help_text=(
       'Will you create invoices for this project?'))
 
   @classmethod
@@ -48,10 +48,11 @@ class Project(Publishable):
     if Project.objects.filter(
         ~Q(pk=self.pk), creator=self.creator, name=self.name).exists():
       return 'You already have a Project with this name'
-    if not self.use_clock and not self.has_to_do_list:
+    if not self.use_clock and not self.has_to_do_list and (
+        not self.has_invoices):
       return (
-          'If you don\'t use the clock or the to do list, this entire thing '
-          'is pointless.')
+          'If you don\'t use the clock, the to do list, or invoices, this '
+          'entire thing is pointless.')
 
   def __repr__(self):
     return '<Project {}: {}>'.format(self.pk, self.name)

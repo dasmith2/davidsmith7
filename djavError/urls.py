@@ -5,6 +5,10 @@ from djavError.views import (
     too_many_queries, trigger_errors, all_fixed)
 
 
+handler404 = 'djavError.views.handler404'
+handler500 = 'djavError.views.handler500'
+
+
 djaverror_urls = [
     path('js_error', js_error, name='js_error'),
     path('see_error/<pk>', see_error, name='see_error'),

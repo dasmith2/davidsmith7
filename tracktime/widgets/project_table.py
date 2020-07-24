@@ -22,7 +22,7 @@ class ProjectTable(EditTable):
 class NewProjectNameField(TextField):
   def __init__(self, instance):
     self.instance = instance
-    super().__init__('name', required=True)
+    super().__init__('name', required=True, autofocus=True)
 
   def explain_why_not_valid(self):
     reason = super().explain_why_not_valid()
