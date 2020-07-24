@@ -43,7 +43,7 @@ class EditTable(Table):
     confirm_delete_js = WIRE_UP_CONFIRM_DELETE.replace('Delete?', question)
     super().__init__(
         js=confirm_delete_js, classes=['margin-top', 'edit-table'])
-    self.append_js("setup_edit_field_turns_yellow('.edit-table');");
+    self.append_js("setup_edit_field_turns_yellow('.edit-table');")
 
     # You have to add_rows before you handle_clicks because handle_clicks has
     # to check to see if the widgets are valid.
