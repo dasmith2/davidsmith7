@@ -3,6 +3,7 @@ classes in the `models` and `web_test` modules of INSTALLED_APPS. By default
 these functions pull back django.db.models.Model subclasses but you can specify
 a different base class. """
 from importlib import import_module
+import re
 
 from django.conf import settings
 from django.db.models import Model
@@ -29,6 +30,9 @@ def all_models(subclass_of=None):
 
 
 def models_in_app(app_name, subclass_of=None):
+  # This turns 'djaveAPI.tests.apps.DjaveAPITestsConfig' into 'djaveAPI.tests'
+  app_name = re.compile(r'\.apps\..+Config').sub('', app_name)
+
   subclass_of = subclass_of or Model
   to_return = []
   for possible_sub_module in ['models', 'browser']:

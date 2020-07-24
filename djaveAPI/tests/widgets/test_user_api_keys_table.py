@@ -5,7 +5,7 @@ from djaveAPI.tests.test_user_api_key import get_test_user_api_key
 from djaveAPI.widgets.user_api_keys_table import UserAPIKeysTable
 from djaveForm.button import Button
 from djaveForm.field import SlugField, URLField
-from djaveTable.table import Row
+from djaveTable.table import Row, Cell
 from djaveTest.unit_test import TestCase, get_test_user
 
 
@@ -40,10 +40,10 @@ class TestUserAPIKeysTable(TestCase):
     api_key = user_keys.first()
 
     row = table.rows[1]
-    self.assertEqual('asdf', row.cells[0])
+    self.assertEqual(Cell('asdf', classes=['username_cell']), row.cells[0])
     description_tester = re.compile(
         r"Write this down because you'll never see it "
-        r"again:<br><br><b>[\w-]{10}")
+        r"again:<br><br><b class=\"plain_password\">[\w-]{10}")
     self.assertTrue(description_tester.findall(row.cells[1]))
     webhook_field = URLField(
         'webhook_url', required=False, default='https://whatever')

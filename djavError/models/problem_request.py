@@ -7,6 +7,7 @@ class ProblemRequest(Fixable):
   path = models.CharField(max_length=300)
   method = models.CharField(max_length=10)
   variables = models.TextField(
+      null=True, blank=True,
       help_text='request.POST or request.GET, depending on the method')
 
   def increment(self):

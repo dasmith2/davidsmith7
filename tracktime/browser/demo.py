@@ -22,6 +22,7 @@ class Demo(WebDemo):
       self.archive_project()
       self.settings()
       self.zoom()
+      self.api_key()
       self.api()
       self.done()
 
@@ -377,13 +378,15 @@ class Demo(WebDemo):
     self.say_move_click(
         'automatic', "I'll go back to automatic zoom for the rest of the demo")
 
-  def api(self):
+  def api_key(self):
     self.say_move_type('username', 'daves_data', """
         Here you can create an API key.""")
     self.say_move_type('new_webhook_url', 'https://your.website', """
         If you specify a webhook url, Track Time dot tech will send data to
         your computers whenever your data changes.""")
     self.move_click('create')
+
+  def api(self):
     self.say_move_click('api_docs', """
         Now that I have an API key username and password, let me explain the
         significance.""")

@@ -4,6 +4,7 @@ from djaveClassMagic.edit_list_table import EditListTable
 from djaveForm.button import Button
 from djaveForm.field import SlugField, URLField
 from djaveForm.form import Form
+from djaveTable.table import Cell
 
 
 class APIKeysWidget(object):
@@ -75,11 +76,13 @@ class APIKeysTable(EditListTable):
       if key.has_plain_password():
         password = (
             'Write this down because you\'ll never see it again:<br><br>'
-            '<b>{}</b>').format(key.get_plain_password())
+            '<b class="plain_password">{}</b>').format(
+                key.get_plain_password())
       webhook_url_field = URLField(
           'webhook_url', required=False, default=key.webhook_url)
+      username_cell = Cell(key.username, classes=['username_cell'])
       self.create_row([
-          key.username, password, webhook_url_field, Button('Delete')],
+          username_cell, password, webhook_url_field, Button('Delete')],
           pk=key.pk)
 
   def existing_keys(self):

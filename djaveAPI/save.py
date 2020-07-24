@@ -2,6 +2,7 @@ from datetime import date
 
 from django.utils.dateparse import parse_datetime, parse_date
 from djaveAPI.currency_field import corresponding_currency_value
+from djaveAPI.get_publishable_model import get_publishable_model
 from djaveAPI.problem import Problem
 from djaveClassMagic.model_fields import (
     model_fields, DATE_TIME, DATE, FLOAT, INTEGER, TEXT, CHAR, BOOLEAN)
@@ -31,7 +32,13 @@ def _set_fields(instance, request_data, credentials):
       raw_value = request_data[field.name]
       if field.foreign_key_to:
         if raw_value:
-          value = credentials.allowed_list(field.foreign_key_to).filter(
+          # This line exists entirely because I need to use
+          # djaveAPI.models.user.User when it's a foreign key to
+          # django.contrib.auth.models.User
+          check_credentials_against = get_publishable_model(
+              field.foreign_key_to.__name__)
+
+          value = credentials.allowed_list(check_credentials_against).filter(
               pk=raw_value).first()
           if value is None:
             raise Problem((
