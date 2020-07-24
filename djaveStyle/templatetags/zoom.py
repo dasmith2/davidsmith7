@@ -25,7 +25,7 @@ def fit_to_screen(context, value):
 
 @register.simple_tag(takes_context=True)
 def font_size(context, delta_factor=None):
-  target = 20
+  target = 21
   if delta_factor:
     target *= delta_factor
   px = calc_zoom(

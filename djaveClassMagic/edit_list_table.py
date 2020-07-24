@@ -52,12 +52,12 @@ class EditListTable(Table):
           "setup_ajax_save_field('{}', '{}');".format(selector, column))
     self.append_js('\n'.join(entries))
 
-  def setup_shrink_textareas(
+  def setup_resize_textareas(
       self, column_or_columns, selector_or_selectors=None):
     columns, selectors = self._columns_selectors(
         column_or_columns, selector_or_selectors)
     for selector in selectors:
-      self.append_js("shrink_textareas('{}');".format(selector))
+      self.append_js("resize_textareas('{}');".format(selector))
 
   def _columns_selectors(self, column_or_columns, selector_or_selectors):
     columns = column_or_columns

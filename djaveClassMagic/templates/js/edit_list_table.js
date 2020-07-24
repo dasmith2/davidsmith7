@@ -343,27 +343,51 @@ function setup_set_clear_dt_green_mode(
   }
 }
 
-function shrink_textareas(selector_or_elt) {
+function resize_textareas(selector_or_elt) {
   on_display(function() {
-    $(selector_or_elt).each(function() {
-      shrink_textarea($(this));
+    var on_change = function() {
+      resize_textarea($(this));
+    };
+    $(selector_or_elt).on('input', on_change).each(function() {
+      resize_textarea($(this));
     });
   });
 }
 
-function shrink_textarea(textarea) {
+function px_to_int(px) {
+  return parseInt(px.replace('px', ''));
+}
+
+function resize_textarea(textarea) {
   var row = textarea.parents('tr');
-  var min_height = row.find('button,.button').outerHeight();
-  var keep_going_while = function() {
+  // min-height and max-height are set in all_sites.css min-height is the
+  // height of a button.
+  var computed_style = getComputedStyle(textarea[0]);
+  var min_height = px_to_int(computed_style.minHeight);
+  var max_height = px_to_int(computed_style.maxHeight);
+
+  var keep_shrinking = function() {
     if (textarea[0].clientHeight == textarea[0].scrollHeight) {
-      if (!min_height || textarea.outerHeight() > min_height) {
+      if (textarea.height() > min_height) {
         return true;
       }
     }
     return false;
   };
-  while (keep_going_while()) {
+  while (keep_shrinking()) {
     textarea.height(textarea.height() - 1);
   }
-  textarea.height(textarea.height() + 1);
+
+  var keep_growing = function() {
+    if (textarea.height() >= max_height) {
+      return false;
+    }
+    if (textarea[0].clientHeight >= textarea[0].scrollHeight) {
+      return false;
+    }
+    return true;
+  }
+  while (keep_growing()) {
+    textarea.height(textarea.height() + 1);
+  }
 }
