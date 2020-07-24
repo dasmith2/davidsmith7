@@ -33,7 +33,7 @@ class InvoiceTable(EditTable):
     self.invoice = invoice
     save_and_preview_button = Button('Save and preview', button_type='submit')
     super().__init__(
-        Invoice, request_data, instance=invoice,
+        Invoice, request_data, reverse('project_invoices'), instance=invoice,
         extra_buttons=[save_and_preview_button])
 
     self.redirect_to = None

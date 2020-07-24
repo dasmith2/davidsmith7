@@ -42,19 +42,35 @@ class EditListTable(Table):
   def setup_edit_ajax(self, column_or_columns, selector_or_selectors=None):
     """ Make it so when you change a text box the row turns yellow and the
     buttons change to Save and Cancel. """
-    if isinstance(column_or_columns, str):
-      column_or_columns = [column_or_columns]
-    if isinstance(selector_or_selectors, str):
-      selector_or_selectors = [selector_or_selectors]
+    columns, selectors = self._columns_selectors(
+        column_or_columns, selector_or_selectors)
 
     entries = []
-    for i, column in enumerate(column_or_columns):
-      selector = '.{}'.format(column)
-      if selector_or_selectors and len(selector_or_selectors) >= i:
-        selector = selector_or_selectors[i]
+    for i, column in enumerate(columns):
+      selector = selectors[i]
       entries.append(
           "setup_ajax_save_field('{}', '{}');".format(selector, column))
     self.append_js('\n'.join(entries))
+
+  def setup_shrink_textareas(
+      self, column_or_columns, selector_or_selectors=None):
+    columns, selectors = self._columns_selectors(
+        column_or_columns, selector_or_selectors)
+    for selector in selectors:
+      self.append_js("shrink_textareas('{}');".format(selector))
+
+  def _columns_selectors(self, column_or_columns, selector_or_selectors):
+    columns = column_or_columns
+    if isinstance(column_or_columns, str):
+      columns = [column_or_columns]
+
+    if isinstance(selector_or_selectors, list):
+      selectors = selector_or_selectors
+    elif isinstance(selector_or_selectors, str):
+      selectors = [selector_or_selectors]
+    else:
+      selectors = ['.{}'.format(column) for column in columns]
+    return (columns, selectors)
 
   def setup_delete_ajax(self, selector, confirm_question=None):
     confirm_question_arg = ''

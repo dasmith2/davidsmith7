@@ -35,7 +35,7 @@ class ProjectToDosTable(ToDosTable):
     if self.should_filter_created():
       if not self.project:
         headers.append('Project')
-      headers.extend(['Description', 'Created', ''])
+      headers.extend(['Description', '', 'Created'])
     return headers
 
   def create_to_do(self):

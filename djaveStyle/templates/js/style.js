@@ -1,3 +1,16 @@
+var on_displayed_callbacks = [];
+var displayed_already = false;
+
+function on_display(callback) {
+  /* Like $(...) except it runs once all_sites.css loads which causes
+   * everything on the page to become visible. */
+  if (displayed_already) {
+    callback();
+  } else {
+    on_displayed_callbacks.push(callback);
+  }
+}
+
 function css(finder, file_name) {
   /* I used to $(window).resize(...). But that turned out to be outsmarting
    * myself. When you click into a text box on mobile, the keyboard pops up,
@@ -8,7 +21,11 @@ function css(finder, file_name) {
     // The page starts hidden and all_sites.css shows the page. But that breaks
     // autofocus because an element can only focus once it's shown.
     on_load = function() {
+      displayed_already = true;
       $('[autofocus]').focus();
+      for (var i = 0; i < on_displayed_callbacks.length; i++) {
+        on_displayed_callbacks[i]();
+      }
     };
   }
   var href = '/css/' + file_name + '?zoom=' + automatic_zoom_factor();

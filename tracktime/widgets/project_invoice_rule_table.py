@@ -1,3 +1,4 @@
+from django.shortcuts import reverse
 from djaveClassMagic.edit_table import EditTable
 
 from tracktime.fields import project_field
@@ -7,7 +8,9 @@ from tracktime.models.project_invoice_rule import ProjectInvoiceRule
 class ProjectInvoiceRuleTable(EditTable):
   def __init__(self, user, request_POST, invoice_rule):
     self.user = user
-    super().__init__(ProjectInvoiceRule, request_POST, invoice_rule)
+    super().__init__(
+        ProjectInvoiceRule, request_POST, reverse('project_invoices'),
+        invoice_rule)
 
   def add_rows(self):
     self.add_field_row(

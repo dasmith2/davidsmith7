@@ -38,6 +38,7 @@ class ToDosTable(EditListTable):
     self._rows_populated = False
 
     self.setup_edit_ajax('description')
+    self.setup_shrink_textareas('description')
 
   def should_filter_created(self):
     how_many_specified = int(bool(self.created_from_date)) + int(
@@ -105,9 +106,9 @@ class ToDosTable(EditListTable):
 
   def cells_for_enter_new(self):
     cells = [self.form.description_field]
+    cells.append([self.form.to_do_button, self.form.did_button])
     if self.should_filter_created():
       cells.append('')
-    cells.append([self.form.to_do_button, self.form.did_button])
     return cells
 
   def get_to_dos(self):
@@ -133,7 +134,7 @@ class ToDosTable(EditListTable):
     description = TextAreaField(
         'description', default=to_do.description, required=False)
     cells = [description]
+    cells.append(ButtonsCell())
     if self.should_filter_created():
       cells.append(to_do.created.date())
-    cells.append(ButtonsCell())
     return cells

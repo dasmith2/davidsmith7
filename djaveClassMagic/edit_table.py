@@ -6,24 +6,22 @@ from djaveForm.button import Button
 from djaveForm.default_widget import default_widget
 from djaveForm.form import Form
 from djaveTable.table import Table, Cell
-from djaveTable.cell_content import Tooltip, DisappearingFeedback, Feedback
+from djaveTable.cell_content import (
+    Tooltip, DisappearingFeedback, Feedback, InHref)
 from djmoney.money import Money
 
 
 WIRE_UP_CONFIRM_DELETE = """
-<script>
 $(function() {
   $('.delete').click(function() {
     return confirm('Delete?');
   });
-});
-</script>
-"""
+});"""
 
 
 class EditTable(Table):
   def __init__(
-      self, model, request_data, instance=None, extra_buttons=None,
+      self, model, request_data, cancel_url, instance=None, extra_buttons=None,
       show_delete=True):
     self.model = model
     self.model_fields = model_fields(model)
@@ -34,6 +32,7 @@ class EditTable(Table):
 
     self.save_button = Button('Save', button_type='submit')
     self.delete_button = Button('Delete', button_type='delete')
+    self.cancel_button = InHref('Cancel', cancel_url, button=True)
 
     self.form = Form(
         [self.save_button, self.delete_button] + self.extra_buttons)
@@ -42,7 +41,9 @@ class EditTable(Table):
 
     question = 'Delete this {}?'.format(model.__name__)
     confirm_delete_js = WIRE_UP_CONFIRM_DELETE.replace('Delete?', question)
-    super().__init__(js=confirm_delete_js, classes=['margin-top'])
+    super().__init__(
+        js=confirm_delete_js, classes=['margin-top', 'edit-table'])
+    self.append_js("setup_edit_field_turns_yellow('.edit-table');");
 
     # You have to add_rows before you handle_clicks because handle_clicks has
     # to check to see if the widgets are valid.
@@ -122,7 +123,7 @@ class EditTable(Table):
     return self._deleted
 
   def add_final_row(self):
-    buttons = [self.save_button]
+    buttons = [self.save_button, self.cancel_button]
     if self.instance and self.show_delete:
       buttons.append(self.delete_button)
     if self.extra_buttons:

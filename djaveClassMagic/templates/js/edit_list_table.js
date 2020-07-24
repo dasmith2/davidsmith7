@@ -1,4 +1,5 @@
-/* Stuff that comes up when I'm enabling tables for AJAX */
+/* Stuff that comes up when I'm enabling tables for AJAX. Well, now I'm putting
+ * edit table stuff in here too. */
 
 function find_pk($element) {
   // Search up the dom for a data-pk attribute. So you might do something like
@@ -123,8 +124,48 @@ var calc_edit_mode = function(row) {
 };
 
 var is_editing = function(elt) {
-  return elt.attr('data-saved-value') != elt.val()
+  // Sometimes val(elt) is a boolean but I'm comparing it to a string version
+  // of an earlier value.
+  return elt.attr('data-saved-value') != (val(elt) + '');
 };
+
+function setup_edit_field_turns_yellow(table_selector_or_elt) {
+  var table = $(table_selector_or_elt);
+  // In case there's more than one edit table on the page and this function
+  // gets called once for each.
+  if (table.attr('data-setup-edit-field-turns-yellow')) {
+    return;
+  }
+  table.attr('data-setup-edit-field-turns-yellow', 'yep');
+
+  var elts = table.find('input,select,textarea');
+  setup_saved_value(elts);
+
+  var handle_row_maybe_changed = function(event) {
+    var row = $(this).parents('tr');
+    calc_edit_mode(row);
+  };
+
+  anything_happened(elts, handle_row_maybe_changed);
+}
+
+function setup_saved_value(selector_or_elt) {
+  $(selector_or_elt).each(function() {
+    var elt = $(this);
+    elt.attr('data-saved-value', val(elt));
+  });
+}
+
+function val(elt) {
+  if (elt.attr('type') == 'checkbox') {
+    return elt.is(':checked');
+  }
+  return elt.val();
+}
+
+function anything_happened(selector_or_elt, callback) {
+  $(selector_or_elt).on('input', callback);
+}
 
 function setup_ajax_save_field(selector_or_elt, field_name) {
   /* This is for text boxes or whatever in tables so you can edit inline with
@@ -132,9 +173,9 @@ function setup_ajax_save_field(selector_or_elt, field_name) {
    * the user "Save" and "Cancel" buttons. selector_or_elt can be a string or a
    * jQuery object. Closures are a little tricky here because I want the same
    * save button to save all editing fields. */
+  setup_saved_value(selector_or_elt);
   $(selector_or_elt).each(function() {
     var elt = $(this);
-    elt.attr('data-saved-value', elt.val());
     elt.attr('data-field-name', field_name);
   });
 
@@ -214,8 +255,7 @@ function setup_ajax_save_field(selector_or_elt, field_name) {
     calc_edit_mode(row);
   };
 
-  $(selector_or_elt).keyup(handle_row_maybe_changed);
-  $(selector_or_elt).click(handle_row_maybe_changed);
+  anything_happened(selector_or_elt, handle_row_maybe_changed);
 }
 
 function setup_set_clear_dt_green_mode(
@@ -301,4 +341,29 @@ function setup_set_clear_dt_green_mode(
       unset_mode(find_pk(row));
     }
   }
+}
+
+function shrink_textareas(selector_or_elt) {
+  on_display(function() {
+    $(selector_or_elt).each(function() {
+      shrink_textarea($(this));
+    });
+  });
+}
+
+function shrink_textarea(textarea) {
+  var row = textarea.parents('tr');
+  var min_height = row.find('button,.button').outerHeight();
+  var keep_going_while = function() {
+    if (textarea[0].clientHeight == textarea[0].scrollHeight) {
+      if (!min_height || textarea.outerHeight() > min_height) {
+        return true;
+      }
+    }
+    return false;
+  };
+  while (keep_going_while()) {
+    textarea.height(textarea.height() - 1);
+  }
+  textarea.height(textarea.height() + 1);
 }

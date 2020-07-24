@@ -1,4 +1,5 @@
 from django.db.models import Q
+from django.shortcuts import reverse
 from djaveClassMagic.edit_table import EditTable
 from djaveForm.field import TextField
 
@@ -8,7 +9,8 @@ from tracktime.models.project import Project
 class ProjectTable(EditTable):
   def __init__(self, user, request_POST, project):
     self.user = user
-    super().__init__(Project, request_POST, project, show_delete=False)
+    super().__init__(
+        Project, request_POST, reverse('projects'), project, show_delete=False)
 
   def add_rows(self):
     self.add_field_row('name', NewProjectNameField(self.instance))
