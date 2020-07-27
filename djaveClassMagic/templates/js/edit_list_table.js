@@ -68,105 +68,6 @@ function setup_click_does_something(selector, confirm_question, do_something) {
   });
 }
 
-var all_elts = function(row) {
-  // Wait to calculate this so all columns that want to edit get a chance
-  // to wire up.
-  return row.find('[data-saved-value]');
-};
-
-var other_buttons = function(row) {
-  return row.find('button,.button');
-};
-
-var buttons_cell = function(row) {
-  var by_other_buttons = other_buttons(row).parents('td');
-  if (by_other_buttons.length) {
-    return by_other_buttons;
-  }
-  return row.find('.buttons');
-};
-
-var turn_on_edit_mode = function(row) {
-  other_buttons(row).hide();
-  buttons_cell(row).find('.save-row,.cancel-save-row').show().prop(
-      'disabled', false);
-  row.addClass('editing');
-};
-
-var SAVED = 'Saved!';
-
-var turn_off_edit_mode = function(row) {
-  other_buttons(row).show();
-  buttons_cell(row).find('.save-row,.cancel-save-row').hide();
-  row.removeClass('editing');
-  // Maybe you tried to blank out a field, hit save, got a required error,
-  // typed your original back in, that turns off edit mode, but we should now
-  // hide the required message. On the other hand, if you just successfully
-  // clicked save, we don't want to instantly remove the "Saved!" message.
-  row.find('.feedback').each(function() {
-    if ($(this).text() != SAVED) {
-      $(this).hide();
-    }
-  });
-};
-
-var calc_edit_mode = function(row) {
-  var got_all_elts = all_elts(row);
-  var any_editing = false;
-  for (var i = 0; i < got_all_elts.length; i++) {
-    any_editing = any_editing || is_editing($(got_all_elts[i]));
-  }
-  if (any_editing) {
-    turn_on_edit_mode(row);
-  } else {
-    turn_off_edit_mode(row);
-  }
-};
-
-var is_editing = function(elt) {
-  // Sometimes val(elt) is a boolean but I'm comparing it to a string version
-  // of an earlier value.
-  return elt.attr('data-saved-value') != (val(elt) + '');
-};
-
-function setup_edit_field_turns_yellow(table_selector_or_elt) {
-  var table = $(table_selector_or_elt);
-  // In case there's more than one edit table on the page and this function
-  // gets called once for each.
-  if (table.attr('data-setup-edit-field-turns-yellow')) {
-    return;
-  }
-  table.attr('data-setup-edit-field-turns-yellow', 'yep');
-
-  var elts = table.find('input,select,textarea');
-  setup_saved_value(elts);
-
-  var handle_row_maybe_changed = function(event) {
-    var row = $(this).parents('tr');
-    calc_edit_mode(row);
-  };
-
-  anything_happened(elts, handle_row_maybe_changed);
-}
-
-function setup_saved_value(selector_or_elt) {
-  $(selector_or_elt).each(function() {
-    var elt = $(this);
-    elt.attr('data-saved-value', val(elt));
-  });
-}
-
-function val(elt) {
-  if (elt.attr('type') == 'checkbox') {
-    return elt.is(':checked');
-  }
-  return elt.val();
-}
-
-function anything_happened(selector_or_elt, callback) {
-  $(selector_or_elt).on('input', callback);
-}
-
 function setup_ajax_save_field(selector_or_elt, field_name) {
   /* This is for text boxes or whatever in tables so you can edit inline with
    * AJAX. Once you start editing, this hides all the other buttons and gives
@@ -234,7 +135,7 @@ function setup_ajax_save_field(selector_or_elt, field_name) {
             // otherwise.
             last_edited_elt.focus();
           }
-          calc_edit_mode(row);
+          calc_edit_mode_4_edit_list_table(row);
         };
         // DON'T use update_field here because data may have multiple fields.
         post('{{ ajax_update_url }}', data, success, null, first_feedback);
@@ -247,15 +148,43 @@ function setup_ajax_save_field(selector_or_elt, field_name) {
           var elt = $(got_all_elts[i]);
           elt.val(elt.attr('data-saved-value'));
         }
-        calc_edit_mode(row);
+        calc_edit_mode_4_edit_list_table(row);
       });
     }
 
     /* Actually respond to the event. */
-    calc_edit_mode(row);
+    calc_edit_mode_4_edit_list_table(row);
   };
 
   anything_happened(selector_or_elt, handle_row_maybe_changed);
+}
+
+function calc_edit_mode_4_edit_list_table(row) {
+    calc_edit_mode(
+        row, turn_on_edit_mode_table_row, turn_off_edit_mode_table_row);
+}
+
+function turn_on_edit_mode_table_row(row) {
+  var save_cancel_buttons = buttons_cell(row).find(
+      '.save-row,.cancel-save-row');
+  other_buttons(row).hide();
+  save_cancel_buttons.show().prop('disabled', false);
+}
+
+var SAVED = 'Saved!';
+
+function turn_off_edit_mode_table_row(row) {
+  other_buttons(row).show();
+  buttons_cell(row).find('.save-row,.cancel-save-row').hide();
+  // Maybe you tried to blank out a field, hit save, got a required error,
+  // typed your original back in, that turns off edit mode, but we should now
+  // hide the required message. On the other hand, if you just successfully
+  // clicked save, we don't want to instantly remove the "Saved!" message.
+  row.find('.feedback').each(function() {
+    if ($(this).text() != SAVED) {
+      $(this).hide();
+    }
+  });
 }
 
 function setup_set_clear_dt_green_mode(
@@ -355,40 +284,42 @@ function resize_textareas(selector_or_elt) {
     var max_height = px_to_int(computed_style.maxHeight);
     var width = px_to_int(computed_style.width);
 
-    var height_finder_wrapper = $('<div/>').width(width).appendTo('body');
-    height_finder_wrapper.css({
+    var height_finder = $('<div/>').width(width).appendTo('body');
+    height_finder.css({
         'font-size': computed_style.fontSize,
         'font-family': computed_style.fontFamily});
-    var height_finder = $('<span/>').appendTo(height_finder_wrapper);
+    var height_finder_content = $('<span/>').appendTo(height_finder);
+
+    var resize_textarea = function(textarea) {
+      var row = textarea.parents('tr');
+      height_finder_content.text(textarea.val());
+      // If you try to get the height of the height_finder_content span, you'll
+      // only get the height up to the first line break.
+      var wants_to_be_height = height_finder.height();
+      var use_height = wants_to_be_height;
+      if (wants_to_be_height < min_height) {
+        use_height = min_height;
+      } else if (wants_to_be_height > max_height) {
+        use_height = max_height;
+      }
+      textarea.height(use_height);
+    };
 
     var resize_on_change = function() {
       var textarea = $(this);
-      height_finder_wrapper.show();
-      resize_textarea(textarea, height_finder, min_height, max_height);
-      height_finder_wrapper.hide();  // To debug this stuff, comment out.
+      height_finder.show();
+      resize_textarea(textarea);
+      height_finder.hide();  // To debug this stuff, comment out.
     };
     textareas.on('input', resize_on_change);
 
     for (var i = 0; i < textareas.length; i++) {
-      resize_textarea($(textareas[i]), height_finder, min_height, max_height);
+      resize_textarea($(textareas[i]));
     }
-    height_finder_wrapper.hide();  // To debug this stuff, comment out.
+    height_finder.hide();  // To debug this stuff, comment out.
   });
 }
 
 function px_to_int(px) {
   return parseInt(px.replace('px', ''));
-}
-
-function resize_textarea(textarea, height_finder, min_height, max_height) {
-  var row = textarea.parents('tr');
-  height_finder.text(textarea.val());
-  var wants_to_be_height = height_finder.height();
-  var use_height = wants_to_be_height;
-  if (wants_to_be_height < min_height) {
-    use_height = min_height;
-  } else if (wants_to_be_height > max_height) {
-    use_height = max_height;
-  }
-  textarea.height(use_height);
 }

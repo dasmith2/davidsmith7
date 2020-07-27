@@ -55,7 +55,10 @@ form { margin: 0px; padding: 0px; }
 .problem { color: #f00; }
 .feedback { color: #f00; }
 .start-hidden { display: none; }
-.editing, .editing textarea, .editing input { background-color: #ffb; }
+/* If you change the background color of a <input type="date"> Firefox
+ * re-renders the control with a different font size and rectangular corners.
+ * */
+.editing, .editing textarea, .editing input[type="text"] { background-color: #ffb; }
 .green, .green textarea { background-color: #dfd; }
 
 .margin-top, p.margin-top { margin: {% zoom 60 %}px 0px 0px 0px; }

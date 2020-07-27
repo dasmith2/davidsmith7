@@ -171,6 +171,7 @@ INSTALLED_APPS = [
     'djaveRelease',
     'djaveS3',
     'djaveStyle',
+    'djaveTable',
     'djaveTest',
     'djaveThread',
     'main'] + THIS_SITE_INSTALLED_APPS
