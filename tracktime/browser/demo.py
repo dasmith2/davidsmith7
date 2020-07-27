@@ -66,7 +66,7 @@ class Demo(WebDemo):
     return self.find_pk(self.find_with_text('td', name))
 
   def punch_clock(self):
-    self.say_move_click('entertime_nav', """
+    self.say_move_click('clock_nav', """
         Now that I'm done setting up a few projects, let's get to work. I
         navigate to enter time.""")
     self.say_move_click('startclock_{}'.format(self.lab_id), """

@@ -31,7 +31,7 @@ def tracktime_nav(user, current_view):
       has_invoices = has_invoices or project.has_invoices
     nav_list = []
     if use_clock:
-      nav_list.append(NavItem(ENTER_TIME, 'Enter time'))
+      nav_list.append(NavItem(ENTER_TIME, 'Clock'))
     if has_to_do_list:
       nav_list.append(NavItem(TO_DO, 'To do'))
     if use_clock:
