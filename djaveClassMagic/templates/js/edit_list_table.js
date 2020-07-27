@@ -344,13 +344,35 @@ function setup_set_clear_dt_green_mode(
 }
 
 function resize_textareas(selector_or_elt) {
+  // You have to wait until the page is visible in order to ask questions about
+  // what dimensions things are.
   on_display(function() {
-    var on_change = function() {
-      resize_textarea($(this));
+    var textareas = $(selector_or_elt);
+    var computed_style = getComputedStyle(textareas[0]);
+    // min-height and max-height are set in all_sites.css min-height is the
+    // height of a button.
+    var min_height = px_to_int(computed_style.minHeight);
+    var max_height = px_to_int(computed_style.maxHeight);
+    var width = px_to_int(computed_style.width);
+
+    var height_finder_wrapper = $('<div/>').width(width).appendTo('body');
+    height_finder_wrapper.css({
+        'font-size': computed_style.fontSize,
+        'font-family': computed_style.fontFamily});
+    var height_finder = $('<span/>').appendTo(height_finder_wrapper);
+
+    var resize_on_change = function() {
+      var textarea = $(this);
+      height_finder_wrapper.show();
+      resize_textarea(textarea, height_finder, min_height, max_height);
+      height_finder_wrapper.hide();  // To debug this stuff, comment out.
     };
-    $(selector_or_elt).on('input', on_change).each(function() {
-      resize_textarea($(this));
-    });
+    textareas.on('input', resize_on_change);
+
+    for (var i = 0; i < textareas.length; i++) {
+      resize_textarea($(textareas[i]), height_finder, min_height, max_height);
+    }
+    height_finder_wrapper.hide();  // To debug this stuff, comment out.
   });
 }
 
@@ -358,36 +380,15 @@ function px_to_int(px) {
   return parseInt(px.replace('px', ''));
 }
 
-function resize_textarea(textarea) {
+function resize_textarea(textarea, height_finder, min_height, max_height) {
   var row = textarea.parents('tr');
-  // min-height and max-height are set in all_sites.css min-height is the
-  // height of a button.
-  var computed_style = getComputedStyle(textarea[0]);
-  var min_height = px_to_int(computed_style.minHeight);
-  var max_height = px_to_int(computed_style.maxHeight);
-
-  var keep_shrinking = function() {
-    if (textarea[0].clientHeight == textarea[0].scrollHeight) {
-      if (textarea.height() > min_height) {
-        return true;
-      }
-    }
-    return false;
-  };
-  while (keep_shrinking()) {
-    textarea.height(textarea.height() - 1);
+  height_finder.text(textarea.val());
+  var wants_to_be_height = height_finder.height();
+  var use_height = wants_to_be_height;
+  if (wants_to_be_height < min_height) {
+    use_height = min_height;
+  } else if (wants_to_be_height > max_height) {
+    use_height = max_height;
   }
-
-  var keep_growing = function() {
-    if (textarea.height() >= max_height) {
-      return false;
-    }
-    if (textarea[0].clientHeight >= textarea[0].scrollHeight) {
-      return false;
-    }
-    return true;
-  }
-  while (keep_growing()) {
-    textarea.height(textarea.height() + 1);
-  }
+  textarea.height(use_height);
 }

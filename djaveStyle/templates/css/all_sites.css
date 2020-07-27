@@ -28,8 +28,9 @@ th, .row2, .row2 textarea { background-color: #eee; }
 
 table textarea {
     overflow: auto; width: {% zoom 290 %}px; height: {% zoom 71 %}px;
-    max-height: {% zoom 71 %}px; min-height: {% zoom 31 %}px;
-    font-size: {% font_size .90 %}; }
+    max-height: {% zoom 77 %}px; min-height: {% zoom 31 %}px;
+    font-size: {% font_size %}; font-family: 'Roboto', sans-serif;
+    font-weight: 400; }
 table textarea, table input {
   border: {% zoom 1 %}px solid #999; border-radius: {% zoom 3 %}px; padding: {% zoom 5 %}px;
   box-shadow: {% zoom 2 %}px {% zoom 2 %}px {% zoom 1 %}px grey; }
