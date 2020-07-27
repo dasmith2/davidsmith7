@@ -10,7 +10,7 @@ function append_day_info_to_date_roller(date_info_lookup) {
 css('date_roller', 'date_roller.css');
 </script>
 
-<div class="when">
+<div class="when raised-rectangle">
   {% for day in days %}
     {% if day.is_current %}
       <div class="current">

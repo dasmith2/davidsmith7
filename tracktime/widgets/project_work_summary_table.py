@@ -7,6 +7,8 @@ from djaveTable.table import Table
 from djaveReport.date_range_report import DateRangeReport
 from djaveURL import dict_as_query
 
+from tracktime.models.project import Project
+from tracktime.models.project_to_do import ProjectToDo
 from tracktime.models.project_work_session import ProjectWorkSession
 
 
@@ -25,16 +27,43 @@ class ProjectWorkSessionSummaryReport(DateRangeReport):
 
 class ProjectWorkSessionSummaryTable(Table):
   def __init__(self, user, from_date, to_date, current_query_dict):
-    super().__init__(['Project', 'Hours'])
-
     what_i_did_per_projects = self.get_what_i_did_per_projects(
         user, from_date, to_date, current_query_dict)
+
+    do_hours = False
+    do_done = False
+    for project in Project.live.allowed_by_user(user):
+      do_hours = do_hours or project.use_clock
+      do_done = do_done or project.has_to_do_list
+
+    headers = ['Project']
+    if do_hours:
+      headers.append('Hours')
+    if do_done:
+      headers.append('Done')
+    super().__init__(headers)
+
     for what_i_did_per_project in what_i_did_per_projects:
       css_class = 'details_{}'.format(what_i_did_per_project.project.pk)
-      href = InHref(
-          what_i_did_per_project.hours,
-          what_i_did_per_project.hours_breakdown_url, classes=[css_class])
-      self.create_row([what_i_did_per_project.name, href])
+      cells = [what_i_did_per_project.name]
+      if do_hours:
+        hours_href = None
+        if what_i_did_per_project.project.use_clock:
+          hours_href = InHref(
+              what_i_did_per_project.hours,
+              what_i_did_per_project.breakdown_url, classes=[css_class])
+        cells.append(hours_href)
+      if do_done:
+        done_href = None
+        if what_i_did_per_project.project.has_to_do_list:
+          if what_i_did_per_project.project.use_clock:
+            done_href = InHref(
+                what_i_did_per_project.done,
+                what_i_did_per_project.breakdown_url, classes=[css_class])
+          else:
+            done_href = what_i_did_per_project.done
+        cells.append(done_href)
+      self.create_row(cells)
 
   def get_what_i_did_per_projects(
       self, user, from_date, to_date, current_query_dict):
@@ -48,6 +77,15 @@ class ProjectWorkSessionSummaryTable(Table):
               work_session.project, current_query_dict)
         projects[work_session.project].hours = round(
             projects[work_session.project].hours + work_session.hours, 2)
+    all_user_to_dos = ProjectToDo.live.allowed_by_user(user).select_related(
+        'project')
+    to_dos = ProjectToDo.live.filter_done(
+        all_user_to_dos, from_date, to_date)
+    for to_do in to_dos:
+      if to_do.project not in projects:
+        projects[to_do.project] = WhatIDidPerProject(
+            to_do.project, current_query_dict)
+      projects[to_do.project].done += 1
     return sorted(list(projects.values()), key=lambda x: x.name)
 
 
@@ -56,9 +94,10 @@ class WhatIDidPerProject(object):
     self.project = project
     self.name = project.name
     self.hours = 0.0
+    self.done = 0
     # This is why the WhatIDidPerProject filters should be exactly the same as
     # the WorkReport filters, except time breakdown is also by project.
     use_query_dict = {'project': project.pk}
     use_query_dict.update(current_query_dict)
-    self.hours_breakdown_url = reverse(
+    self.breakdown_url = reverse(
         'project_work_report') + dict_as_query(use_query_dict)

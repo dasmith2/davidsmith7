@@ -33,6 +33,9 @@ $(setup_report_button);
 </script>
 
 <div class="filtered_report">
+  {% comment %}I tried putting filters and buttons in a <div
+  class="raised-rectangle"/> but it just cluttered up the page.
+  {% endcomment %}
   <div class="filters">
     {% for filter in filters %}
       <div class="filter">{{ filter.as_html }}</div>

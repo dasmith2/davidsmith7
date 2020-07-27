@@ -26,6 +26,12 @@ td, th { border-right: {% zoom 1 %}px solid #999;
   border-bottom: {% zoom 1 %}px solid #999; padding: {% zoom 10 %}px; }
 th, .row2, .row2 textarea { background-color: #eee; }
 
+.raised-rectangle {
+  border: {% zoom 1 %}px solid #999; padding: {% zoom 10 %}px;
+  box-shadow: {% zoom 4 %}px {% zoom 4 %}px {% zoom 2 %}px grey;
+  display: inline-block; background-color: #eee;
+}
+
 table textarea {
     overflow: auto; width: {% zoom 290 %}px; height: {% zoom 71 %}px;
     max-height: {% zoom 77 %}px; min-height: {% zoom 31 %}px;

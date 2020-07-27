@@ -1,7 +1,5 @@
 {% load zoom %}
-.when {
-    margin-top: {% zoom 60 %}px; background-color: #eee; border: {% zoom 1 %}px solid #aaa;
-    padding: {% zoom 10 %}px; box-shadow: {% zoom 4 %}px {% zoom 4 %}px {% zoom 2 %}px grey; }
+.when { margin-top: {% zoom 60 %}px; }
 .when div.two_before { margin-top: 0px; }
 .when div { margin-top: {% zoom 12 %}px; }
 .when .current { font-size: {% font_size 1.7 %}; }
