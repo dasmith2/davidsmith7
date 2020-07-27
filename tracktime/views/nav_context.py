@@ -15,10 +15,15 @@ SETTINGS = 'settings_tracktime'
 
 
 def tracktime_context(user, current_view, **kwargs):
+  context = {'nav': tracktime_nav(user, current_view)}
+  context.update(kwargs)
+  return context
+
+
+def tracktime_nav(user, current_view):
   use_clock = False
   has_to_do_list = False
   has_invoices = False
-  use_nav = None
   if user.is_authenticated:
     for project in Project.allowed_by_user_live(user):
       use_clock = use_clock or project.use_clock
@@ -34,11 +39,8 @@ def tracktime_context(user, current_view, **kwargs):
     if has_invoices:
       nav_list.append(NavItem(INVOICES, 'Invoices'))
     nav_list.append(NavItem(PROJECTS, 'Projects'))
-    use_nav = NavWithAccount(nav_list, SETTINGS, current_view)
+    return NavWithAccount(nav_list, SETTINGS, current_view)
   else:
-    use_nav = Nav(
+    return Nav(
         [NavItem('tracktime_homepage', mark_safe('&laquo; Home'))],
         'tracktime_homepage')
-  context = {'nav': use_nav}
-  context.update(kwargs)
-  return context

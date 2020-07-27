@@ -12,6 +12,7 @@ NavItemCurrentOrNot = namedtuple(
 
 class Nav(object):
   def __init__(self, nav_list, current_view_name_or_nav_item=None):
+    self.nav_list = nav_list
     current_view_name = current_view_name_or_nav_item
     if current_view_name and isinstance(
         current_view_name_or_nav_item, NavItem):
@@ -51,3 +52,7 @@ class Nav(object):
 
   def as_html(self):
     return render_to_string(self.template(), self.context())
+
+  def first_nav_item_current_or_not(self):
+    if self.nav_items_current_or_not:
+      return self.nav_items_current_or_not[0]
