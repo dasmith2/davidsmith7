@@ -38,7 +38,6 @@ class ToDosTable(EditListTable):
     self._rows_populated = False
 
     self.setup_edit_ajax('description')
-    self.setup_resize_textareas('description')
 
   def should_filter_created(self):
     how_many_specified = int(bool(self.created_from_date)) + int(
@@ -84,7 +83,7 @@ class ToDosTable(EditListTable):
           to_do.save()
         self.form = self.get_form()
 
-    self.create_row(self.cells_for_enter_new())
+    self.create_row(self.cells_for_enter_new(), classes=['create-new-row'])
 
   def setup_existing(self):
     for to_do in self.get_to_dos():

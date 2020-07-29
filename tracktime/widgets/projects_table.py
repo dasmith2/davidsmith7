@@ -9,14 +9,14 @@ from tracktime.models.project import Project
 
 class BaseProjectsTable(EditListTable):
   def __init__(self):
-    super().__init__(Project, ['Name', ''], classes=['margin-top'])
+    super().__init__(Project, ['Name', ''])
     self.setup_edit_ajax('name')
 
   def create_row_for_existing(self, project, archive_action):
     archive_button = Button(archive_action)
     edit_button = InHref(
         'Edit', reverse('edit_project', kwargs={'pk': project.pk}),
-        button=True)
+        classes=['edit'], button=True)
     buttons_cell = ButtonsCell([edit_button, archive_button])
     self.create_row([project.name, buttons_cell], pk=project.pk)
 

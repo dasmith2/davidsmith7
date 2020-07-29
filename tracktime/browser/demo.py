@@ -8,11 +8,13 @@ class Demo(WebDemo):
   def run(self):
     self.warm_up()
     self.demo_sign_up()
-    if self.create_projects():
+    if self.create_first_project():
       self.punch_clock()
-      self.do_stuff()
       self.what_a_productive_day()
       self.manual_time_entry()
+      self.add_to_do_list()
+      self.do_stuff()
+      self.what_a_productive_day()
       self.report()
       self.invoice_rule()
       self.edit_invoice()
@@ -40,7 +42,7 @@ class Demo(WebDemo):
     email = 'dave@davebase.tech'
     self.sign_up(email)
 
-  def create_projects(self):
+  def create_first_project(self):
     if self.finds('archive', raise_exception_if_not_found=False):
       # Whoops, if there's an archive button, that means there's an existing
       # project, which means that the demo user wasn't destroyed after the last
@@ -48,34 +50,61 @@ class Demo(WebDemo):
       self.demo_user_wasnt_destroyed()
       return False
 
-    self.hotel_id = self.create_project(
-        self.hotel, 'First, I need to set up a project or two.')
-    self.lab_id = self.create_project(self.bobs, (
-        "If you were my client, I would put your company's name here."))
+    self.say_move_click('create_new', """
+        First, I need to set up a project. In fact, that's the only thing I can
+        do at this point.""")
+
+    say = """
+        If you were my client, I would put your name here. Let's start simple.
+        I want to keep track of how much time I spend on this project."""
+    self.lab_id = self.create_a_project(self.bobs, say, 'use_clock')
     return True
 
-  def create_project(self, name, say):
-    self.move_click('create_new')
+  def create_a_project(self, name, say, *checkboxes):
+    """ checkboxes can be use_clock, has_to_do_list, and has_invoices. """
     self.say(say)
     self.move_type('name', name)
-    self.move_click('use_clock')
-    self.move_click('has_to_do_list')
-    self.move_click('has_invoices')
+    for checkbox in checkboxes:
+      self.move_click(checkbox)
     self.move_click('save', wait_talking=True)
 
     return self.find_pk(self.find_with_text('td', name))
 
   def punch_clock(self):
-    self.say_move_click('clock_nav', """
-        Now that I'm done setting up a few projects, let's get to work. I
-        navigate to enter time.""")
-    self.say_move_click('startclock_{}'.format(self.lab_id), """
-        I'm going to do a few tasks for {}, so I start the
-        clock.""".format(self.bobs))
+    self.say_move_click('clock_nav', (
+        "Now that I have a project with a clock, the navigation "
+        "shows new things I can do."))
+    self.say_move_click('startclock_{}'.format(self.lab_id), (
+        'I punch the clock on {}'.format(self.bobs)))
+
+  def what_a_productive_day(self):
+    self.say_move_click('punchout', """
+        What a productive session. It's time to punch out.""")
+
+  def manual_time_entry(self):
+    yesterday_link = self.find('one_before').find_element_by_tag_name('a')
+    self.say_move_click(yesterday_link, """
+        But I just remembered I worked yesterday and forgot to punch
+        the clock. I navigate to yesterday.""")
+    self.say('Where I can manually enter time.', wait=True)
+    self.say_move('project', """
+        The project select remembers the last project I worked on.""")
+    self.say_move_type('hours', '1', 'I enter my time')
+    self.say_move_click('savenew', 'and click save new')
+
+  def add_to_do_list(self):
+    self.say_move_click('projects_nav', """
+        This project is getting complicated. I'm going to need a to do
+        list.""")
+    self.say_move_click('edit', 'I edit the project')
+    self.say_move_click('has_to_do_list', 'And turn on the to do list.')
+    self.say_move_click('save', 'Notice that unsaved info is colored yellow.')
+    self.say_move_click('clock_nav', 'Now when I punch the clock')
+    self.move_click('startclock')
 
   def do_stuff(self):
     self.say("""
-        Now that I'm on the clock, it's time to decide what to do. This is not
+        I end up on the To Do list for this project. This is not
         a tool for creating elaborate dependency graphs.""")
     self.create_to_do(
         'The extranet should only show test results after the client pays')
@@ -109,30 +138,6 @@ class Demo(WebDemo):
     self.move_type('new_description', text)
     self.move_click('todo', wait_talking=True)
 
-  def what_a_productive_day(self):
-    self.say_move_click('punchout', """
-        What a productive day. It's time to punch out.""")
-
-  def manual_time_entry(self):
-    yesterday_link = self.find('one_before').find_element_by_tag_name('a')
-    self.say("""
-        Once I punch out, I land back on the Enter Time page, where I can punch
-        back in.""", wait=True)
-    self.say_move_click(yesterday_link, """
-        But I just remembered I worked yesterday and forgot to punch
-        the clock. I navigate to yesterday.""")
-    self.say('Where I can manually enter time.', wait=True)
-    self.say_move('project', """
-        The project select remembers the last project I worked on.""")
-    self.say_move_type('hours', '0.5', 'I enter my time')
-    self.say_move_click('savenew', 'and click save new')
-    self.say("I also worked on {} yesterday.".format(self.hotel))
-    self.move_mouse('project')  # project select box
-    self.wait_mouse()
-    self.find_with_value('option', str(self.hotel_id)).click()
-    self.move_type('hours', '2')
-    self.move_click('savenew', wait_talking=True)
-
   def report(self):
     self.say_move_click('report_nav', "Let's go take a look at the report.")
     self.say("""
@@ -150,8 +155,14 @@ class Demo(WebDemo):
         those times.""", wait=True)
 
   def invoice_rule(self):
-    self.say_move_click(
-        'invoices_nav', "Now let's go take a look at invoices.")
+    say = (
+        'Now that I\'m doing such great work for {}, it\'s time to create an '
+        'invoice.').format(self.bobs)
+    self.say_move_click('projects_nav', say)
+    self.say_move_click('edit', 'I edit the project')
+    self.say_move_click('has_invoices', 'And turn on invoices')
+    self.say_move_click('save', 'This time when I click save')
+    self.say_move_click('invoices_nav', 'An invoices tab appears.')
 
     self.say_move_click('button', """
         In order to create an invoice for {} I first create an invoice
@@ -328,12 +339,9 @@ class Demo(WebDemo):
     self.find_with_text('option', 'Done').click()
     self.say_move_click('report', 'created in the last month for any project.')
     self.say_move(self.finds('project')[1], """
-        If I'm punched in on {}, but I remember something I need to do for
-        {}""".format(self.bobs, self.hotel))
-    self.finds_with_text('option', self.hotel)[1].click()
-    to_do = (
-        'When a guest changes rooms, automatically schedule an immediate '
-        'cleaning in the old room')
+        If I'm punched in on a different project, but I remember something I
+        need to do for {}""".format(self.bobs))
+    to_do = 'When a customer calls, Front should display their name'
     self.say_move_type('new_description', to_do, """
         I can do that here. It's best to plan your work and work your plan, but
         sometimes you end up describing what you did after you did it.""")
@@ -414,13 +422,8 @@ class Demo(WebDemo):
       self.sleep(1)
       self.go_to_view('demo_done')
     self.say("""
-        I built track time dot tech so everyone would know I'm ready to take on
-        my own clients. I am open to charging per hour, or per
-        unit.""", wait=True)
-    self.say("""
-        I'm particularly interested to build automations and workflows for
-        laboratories and hotels. If you want an equally amazing website and
-        demo for your business, drop me a line.""")
+        If you enjoyed this demo, you should know that I'm available to build
+        automations and workflows for your business.""")
     self.wait_talking()
     self.driver.close()
 

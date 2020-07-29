@@ -51,10 +51,11 @@ class WebDemo(WebTest):
       # Hawking voice. You have to use ’ instead of ' otherwise Stephen
       # literally spells out the unicode.
       message_safe = message.replace("'", "’").replace('\n', ' ')
-      script = render_to_string('say.js', {'say_this': message_safe})
+      script = render_to_string('js/say.js', {'say_this': message_safe})
       self.execute_script(script)
       if wait:
         self.wait_talking()
+    self.maybe_pause()
 
   def move_mouse(
       self, element_or_clue, offset_x=5, offset_y=20, wait=False, quick=False):
@@ -71,10 +72,11 @@ class WebDemo(WebTest):
       context = {
           'x': location['x'] + offset_x, 'y': location['y'] + offset_y,
           'step': 3 if quick else 1}
-      script = render_to_string('move_fake_mouse.js', context)
+      script = render_to_string('js/move_fake_mouse.js', context)
       self.execute_script(script)
       if wait:
         self.wait_mouse()
+    self.maybe_pause()
 
   def show_photo_say(self, file_name, say):
     self.go_to_view('demo_photo', file_name=file_name)
@@ -197,6 +199,7 @@ class WebDemo(WebTest):
       def closure():
         return self._js_variable_undefined_or_true('done_talking')
       self.wait_closure(closure, wait_seconds=20)
+      self.maybe_pause()
 
   def wait_mouse(self):
     if self._go_slow:
@@ -204,6 +207,7 @@ class WebDemo(WebTest):
       def done():
         return self._js_variable_undefined_or_true('done_moving_fake_mouse')
       self.wait_closure(done, wait_seconds=20)
+      self.maybe_pause()
 
   def _js_variable_undefined_or_true(self, variable_name):
     script = 'return typeof(window.{}) == "undefined" || window.{};'.format(

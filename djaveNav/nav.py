@@ -28,7 +28,7 @@ class Nav(object):
       if is_current:
         self._title = nav_item.display
       found_current = found_current or is_current
-      css_class = '{}_nav'.format(
+      css_class = '{}_nav nav_item'.format(
           re.compile(r'[^\w]').sub('', nav_item.display.lower()))
       self.nav_items_current_or_not.append(
           NavItemCurrentOrNot(

@@ -28,9 +28,10 @@ class ToDosTableTests(TestCase):
 
     self.assertIsNone(table.headers)
     self.assertEqual(1, len(table.rows))
-    table.rows[0].assertEqual(Row([
+    cells = [
         TextAreaField('new_description', required=True, autofocus=True),
-        self._to_do_did_buttons()]))
+        self._to_do_did_buttons()]
+    table.rows[0].assertEqual(Row(cells, classes=['create-new-row']))
 
   def test_new_to_do(self):
     to_do_count_before = ToDo.live.count()
@@ -69,8 +70,8 @@ class ToDosTableTests(TestCase):
     expected_description = TextAreaField(
         'new_description', required=True, autofocus=True)
     expected_description.set_value('')  # This causes "Required" to show
-    table.rows[0].assertEqual(Row([
-        expected_description, self._to_do_did_buttons()]))
+    cells = [expected_description, self._to_do_did_buttons()]
+    table.rows[0].assertEqual(Row(cells, classes=['create-new-row']))
 
   def test_created_from_to(self):
     get_test_to_do(

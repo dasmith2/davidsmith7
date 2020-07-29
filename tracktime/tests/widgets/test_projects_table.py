@@ -22,8 +22,8 @@ class ProjectsTableTests(TestCase):
     self.assertEqual(1, len(ArchivedProjectsTable(user).rows))
 
     edit_url = reverse('edit_project', kwargs={'pk': project.pk})
-    buttons = ButtonsCell([
-        InHref('Edit', edit_url, button=True), Button('Un-archive')])
+    edit_href = InHref('Edit', edit_url, button=True, classes=['edit'])
+    buttons = ButtonsCell([edit_href, Button('Un-archive')])
     expected_row = Row(['Time Tracker!', buttons], pk=project.pk)
     got_row = ArchivedProjectsTable(user).rows[0]
     got_row.assertEqual(expected_row)

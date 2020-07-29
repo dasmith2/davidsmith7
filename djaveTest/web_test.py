@@ -63,6 +63,7 @@ class WebTest(object):
         pass
 
   def go_to_url(self, url):
+    self.maybe_pause()
     self.driver.get(url)
     self.close_django_toolbar()
     if self.on_django_server_error_screen():
@@ -133,6 +134,14 @@ class WebTest(object):
       attempts += 1
     if fail_on_timeout:
       raise Exception(error_message or 'Closure was never True')
+
+  def maybe_pause(self):
+    """ When you're using ./manage.py runserver --settings
+    main.web_test_settings you can press ` to pause and unpause during
+    web demos and tests. """
+    def done():
+      return self._js_variable_undefined_or_true('un_pause')
+    self.wait_closure(done, wait_seconds=8 * 60 * 60)
 
   def wait_for_class(self, class_name):
     from selenium.webdriver.common.by import By

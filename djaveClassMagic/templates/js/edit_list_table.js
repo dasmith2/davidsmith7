@@ -74,89 +74,80 @@ function setup_ajax_save_field(selector_or_elt, field_name) {
    * the user "Save" and "Cancel" buttons. selector_or_elt can be a string or a
    * jQuery object. Closures are a little tricky here because I want the same
    * save button to save all editing fields. */
-  setup_saved_value(selector_or_elt);
   $(selector_or_elt).each(function() {
     var elt = $(this);
     elt.attr('data-field-name', field_name);
   });
+}
 
-  var handle_row_maybe_changed = function(event) {
-    /* This is, like, an on_change event for the entire row. Element level
-     * stuff should be done in a loop over all_elts. */
-    var row = $(this).parents('tr');
-    var save_button = buttons_cell(row).find('.save-row');
-    var cancel_save_button = buttons_cell(row).find('.cancel-save-row');
+function setup_edit_list_table_buttons_cell(row) {
+  var save_button = buttons_cell(row).find('.save-row');
+  var cancel_save_button = buttons_cell(row).find('.cancel-save-row');
 
-    if (!save_button.length) {
-      var save_html = '<button class="save-row" type="button">Save</button>';
-      save_button = $(save_html).appendTo(buttons_cell(row)).hide();
-      var cancel_html =
-          '<button class="cancel-save-row" type="button">Cancel</button>';
-      cancel_save_button = $(cancel_html).appendTo(buttons_cell(row)).hide();
+  if (!save_button.length) {
+    var save_html = '<button class="save-row" type="button">Save</button>';
+    save_button = $(save_html).appendTo(buttons_cell(row)).hide();
+    var cancel_html =
+        '<button class="cancel-save-row" type="button">Cancel</button>';
+    cancel_save_button = $(cancel_html).appendTo(buttons_cell(row)).hide();
 
-      save_button.click(function() {
-        save_button.prop('disabled', true);
-        cancel_save_button.prop('disabled', true);
+    save_button.click(function() {
+      save_button.prop('disabled', true);
+      cancel_save_button.prop('disabled', true);
 
-        var data = {pk: find_pk(row), type: find_model(row)};
+      var data = {pk: find_pk(row), type: find_model(row)};
 
-        var got_all_elts = all_elts(row);
-        var first_feedback = null;
-        var last_edited_elt = null;
-        for (var i = 0; i < got_all_elts.length; i++) {
-          var elt = $(got_all_elts[i]);
-          if (is_editing(elt)) {
-            if (first_feedback === null) {
-              first_feedback = get_feedback_elt_after(elt);
-            }
-            data[elt.attr('data-field-name')] = elt.val()
-            last_edited_elt = elt;
+      var got_all_elts = all_elts(row);
+      var first_feedback = null;
+      var last_edited_elt = null;
+      for (var i = 0; i < got_all_elts.length; i++) {
+        var elt = $(got_all_elts[i]);
+        if (is_editing(elt)) {
+          if (first_feedback === null) {
+            first_feedback = get_feedback_elt_after(elt);
           }
+          data[elt.attr('data-field-name')] = elt.val()
+          last_edited_elt = elt;
         }
+      }
 
-        var handle_elt_was_saved = function(elt) {
-          var feedback = get_feedback_elt_after(elt);
-          feedback.show().text(SAVED);
-          elt.attr('data-saved-value', elt.val());
-          window.setTimeout(function() {
-            feedback.text('');
-          }, 1000);
-        };
+      var handle_elt_was_saved = function(elt) {
+        var feedback = get_feedback_elt_after(elt);
+        feedback.show().text(SAVED);
+        elt.attr('data-saved-value', elt.val());
+        window.setTimeout(function() {
+          feedback.text('');
+        }, 1000);
+      };
 
-        var success = function(response) {
-          if (!show_problem(response, first_feedback)) {
-            for (var i = 0; i < got_all_elts.length; i++) {
-              var elt = $(got_all_elts[i]);
-              if (is_editing(elt)) {
-                handle_elt_was_saved(elt);
-              }
+      var success = function(response) {
+        if (!show_problem(response, first_feedback)) {
+          for (var i = 0; i < got_all_elts.length; i++) {
+            var elt = $(got_all_elts[i]);
+            if (is_editing(elt)) {
+              handle_elt_was_saved(elt);
             }
-            // The save button disappears and you lose your tab location
-            // otherwise.
-            last_edited_elt.focus();
           }
-          calc_edit_mode_4_edit_list_table(row);
-        };
-        // DON'T use update_field here because data may have multiple fields.
-        post('{{ ajax_update_url }}', data, success, null, first_feedback);
-      });
-
-      cancel_save_button.click(function() {
-        row.find('.feedback').hide();
-        var got_all_elts = all_elts(row);
-        for (var i = 0; i < got_all_elts.length; i++) {
-          var elt = $(got_all_elts[i]);
-          elt.val(elt.attr('data-saved-value'));
+          // The save button disappears and you lose your tab location
+          // otherwise.
+          last_edited_elt.focus();
         }
         calc_edit_mode_4_edit_list_table(row);
-      });
-    }
+      };
+      // DON'T use update_field here because data may have multiple fields.
+      post('{{ ajax_update_url }}', data, success, null, first_feedback);
+    });
 
-    /* Actually respond to the event. */
-    calc_edit_mode_4_edit_list_table(row);
-  };
-
-  anything_happened(selector_or_elt, handle_row_maybe_changed);
+    cancel_save_button.click(function() {
+      row.find('.feedback').hide();
+      var got_all_elts = all_elts(row);
+      for (var i = 0; i < got_all_elts.length; i++) {
+        var elt = $(got_all_elts[i]);
+        elt.val(elt.attr('data-saved-value'));
+      }
+      calc_edit_mode_4_edit_list_table(row);
+    });
+  }
 }
 
 function calc_edit_mode_4_edit_list_table(row) {
@@ -165,26 +156,31 @@ function calc_edit_mode_4_edit_list_table(row) {
 }
 
 function turn_on_edit_mode_table_row(row) {
-  var save_cancel_buttons = buttons_cell(row).find(
-      '.save-row,.cancel-save-row');
-  other_buttons(row).hide();
-  save_cancel_buttons.show().prop('disabled', false);
+  if (row.attr('data-pk')) {
+    setup_edit_list_table_buttons_cell(row);
+    var save_cancel_buttons = buttons_cell(row).find(
+        '.save-row,.cancel-save-row');
+    other_buttons(row).hide();
+    save_cancel_buttons.show().prop('disabled', false);
+  }
 }
 
 var SAVED = 'Saved!';
 
 function turn_off_edit_mode_table_row(row) {
-  other_buttons(row).show();
-  buttons_cell(row).find('.save-row,.cancel-save-row').hide();
-  // Maybe you tried to blank out a field, hit save, got a required error,
-  // typed your original back in, that turns off edit mode, but we should now
-  // hide the required message. On the other hand, if you just successfully
-  // clicked save, we don't want to instantly remove the "Saved!" message.
-  row.find('.feedback').each(function() {
-    if ($(this).text() != SAVED) {
-      $(this).hide();
-    }
-  });
+  if (row.attr('data-pk')) {
+    other_buttons(row).show();
+    buttons_cell(row).find('.save-row,.cancel-save-row').hide();
+    // Maybe you tried to blank out a field, hit save, got a required error,
+    // typed your original back in, that turns off edit mode, but we should now
+    // hide the required message. On the other hand, if you just successfully
+    // clicked save, we don't want to instantly remove the "Saved!" message.
+    row.find('.feedback').each(function() {
+      if ($(this).text() != SAVED) {
+        $(this).hide();
+      }
+    });
+  }
 }
 
 function setup_set_clear_dt_green_mode(
@@ -277,6 +273,9 @@ function resize_textareas(selector_or_elt) {
   // what dimensions things are.
   on_display(function() {
     var textareas = $(selector_or_elt);
+    if (!textareas.length) {
+      return;
+    }
     var computed_style = getComputedStyle(textareas[0]);
     // min-height and max-height are set in all_sites.css min-height is the
     // height of a button.
@@ -284,17 +283,23 @@ function resize_textareas(selector_or_elt) {
     var max_height = px_to_int(computed_style.maxHeight);
     var width = px_to_int(computed_style.width);
 
-    var height_finder = $('<div/>').width(width).appendTo('body');
+    var height_finder = $(
+        '<div id="height_finder"/>').width(width).appendTo('body');
     height_finder.css({
+        'border': '1px solid',
         'font-size': computed_style.fontSize,
-        'font-family': computed_style.fontFamily});
-    var height_finder_content = $('<span/>').appendTo(height_finder);
+        'font-family': computed_style.fontFamily,
+        'font-weight': computed_style.fontWeight,
+        'padding-top': computed_style.paddingTop,
+        'padding-right': computed_style.paddingRight,
+        'padding-left': computed_style.paddingLeft,
+        'padding-bottom': computed_style.paddingBottom});
 
     var resize_textarea = function(textarea) {
       var row = textarea.parents('tr');
-      height_finder_content.text(textarea.val());
-      // If you try to get the height of the height_finder_content span, you'll
-      // only get the height up to the first line break.
+      height_finder.html(textarea.val().replace(/\n/g, '<br>'));
+      // If you try to get the height of the height_finder span, you'll only
+      // get the height up to the first line break.
       var wants_to_be_height = height_finder.height();
       var use_height = wants_to_be_height;
       if (wants_to_be_height < min_height) {
@@ -311,10 +316,16 @@ function resize_textareas(selector_or_elt) {
       resize_textarea(textarea);
       height_finder.hide();  // To debug this stuff, comment out.
     };
-    textareas.on('input', resize_on_change);
 
+    // If you put more than one edit list table on the page, resize_textareas
+    // will run twice, each time on all textareas.
     for (var i = 0; i < textareas.length; i++) {
-      resize_textarea($(textareas[i]));
+      var textarea = $(textareas[i]);
+      if (!textarea.attr('data-resized')) {
+        textarea.attr('data-resized', 'yep');
+        textarea.on('input', resize_on_change);
+        resize_textarea(textarea);
+      }
     }
     height_finder.hide();  // To debug this stuff, comment out.
   });

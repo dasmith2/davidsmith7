@@ -39,7 +39,8 @@ def find_widgets_helper(yes_tests):
   for (dir_name, d, files) in os.walk('.'):
     if is_widgets_dir(dir_name, yes_tests):
       for file_name in files:
-        if file_name not in ['__init__.py']:
+        if re.compile(r'.\.py$').findall(file_name) and (
+            file_name not in ['__init__.py']):
           to_return.append(os.path.join(dir_name, file_name))
   return to_return
 

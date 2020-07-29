@@ -96,7 +96,7 @@ NETWORK_WRITES_OK = PROD and NETWORK_READS_OK
 # Notifications for requests that take too long
 MAX_ALLOWED_REQUEST_TIME = 0.5  # seconds
 # Or do too many database queries
-MAX_ALLOWED_DB_QUERIES = 10
+MAX_ALLOWED_DB_QUERIES = 20
 
 
 """ URL stuff. """

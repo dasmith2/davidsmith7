@@ -16,3 +16,5 @@ echo "djaveCodeHealth/are_widgets_tested.py"
 python djaveCodeHealth/are_widgets_tested.py
 ./manage.py test
 ./manage.py web_test test
+echo "./manage.py raise_if_errors_or_problems"
+./manage.py raise_if_errors_or_problems

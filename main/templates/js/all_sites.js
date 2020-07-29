@@ -5,3 +5,6 @@
 {{ edit_list_table_js }}
 {% include "js/query_string.js" %}
 {% include "js/style.js" %}
+{% if in_web_test %}
+  {% include "js/pause_web_test.js" %}
+{% endif %}

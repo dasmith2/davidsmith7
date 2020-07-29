@@ -20,12 +20,16 @@ class EditListTable(Table):
     # I mean, probably it will, until I find out otherwise.
     self._has_objects = True
     self._create_new_button = None
+    self._setup_edit_anything = False
 
     if 'additional_attrs' not in kwargs or kwargs['additional_attrs'] is None:
       kwargs['additional_attrs'] = {}
     kwargs['additional_attrs']['data-model'] = model.__name__
 
     super().__init__(*args, **kwargs)
+
+    self.setup_edit_anything_turns_yellow()
+    self.setup_resize_textareas()
 
   def as_html(self):
     only_show_create_new_button = (
@@ -38,6 +42,14 @@ class EditListTable(Table):
       return mark_safe('<div {}>{}</div>'.format(
           self.css_classes_str(), content))
     return super().as_html()
+
+  def setup_edit_anything_turns_yellow(self):
+    if self._setup_edit_anything:
+      return
+    self.append_js(
+        "setup_edit_field_turns_yellow("
+        "'table[data-model]', 'tr', turn_on_edit_mode_table_row, "
+        "turn_off_edit_mode_table_row);")
 
   def setup_edit_ajax(self, column_or_columns, selector_or_selectors=None):
     """ Make it so when you change a text box the row turns yellow and the
@@ -52,12 +64,8 @@ class EditListTable(Table):
           "setup_ajax_save_field('{}', '{}');".format(selector, column))
     self.append_js('\n'.join(entries))
 
-  def setup_resize_textareas(
-      self, column_or_columns, selector_or_selectors=None):
-    columns, selectors = self._columns_selectors(
-        column_or_columns, selector_or_selectors)
-    for selector in selectors:
-      self.append_js("resize_textareas('{}');".format(selector))
+  def setup_resize_textareas(self):
+    self.append_js("resize_textareas('table[data-model] textarea');")
 
   def _columns_selectors(self, column_or_columns, selector_or_selectors):
     columns = column_or_columns

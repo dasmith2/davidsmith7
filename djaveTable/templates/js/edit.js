@@ -1,5 +1,6 @@
 function setup_edit_field_turns_yellow(
-    table_selector_or_elt, row_parent_finder) {
+    table_selector_or_elt, row_parent_finder, turn_on_edit_mode_callback,
+    turn_off_edit_mode_callback) {
   /* This isn't strictly for tables. table_selector_or_elt can be an outer div
    * or something, and row_parent_finder can point to inner divs. It waits
    * until you change something, then colors the "row" yellow so the user can
@@ -18,7 +19,8 @@ function setup_edit_field_turns_yellow(
 
   var handle_row_maybe_changed = function(event) {
     var row = $(this).parents(row_parent_finder);
-    calc_edit_mode(row);
+    calc_edit_mode(
+        row, turn_on_edit_mode_callback, turn_off_edit_mode_callback);
   };
 
   anything_happened(elts, handle_row_maybe_changed);

@@ -1,7 +1,7 @@
 {% extends "tracktime_base.html" %}
 
 {% block tracktime_body %}
-<form method="POST">
+<form method="POST" class="margin-top">
   {% csrf_token %}
   {{ table.as_html }}
 </form>
@@ -20,6 +20,14 @@ function show_archived_projects_link() {
 
 $(function() {
   $('.archive').click(show_archived_projects_link);
+  $('.archive').click(function() {
+    var archiving_pk = find_pk($(this));
+    var non_archived = $('tr[data-pk][data-pk!=' + archiving_pk + ']');
+    if (!non_archived.length) {
+      $('.create_new').remove().appendTo('form');
+      $('table[data-model]').hide();
+    }
+  });
 });
 {% if not archived_projects_exist %}
 hide_archived_projects_link();
