@@ -20,10 +20,34 @@ class Test(Demo):
     self.find('not_done')
 
   def api_key(self):
-    super().api_key()
+    self.say_move_type('username', 'daves_data', """
+        Here you can create an API key.""")
+    self.say_move_type('new_webhook_url', 'https://your.website', """
+        If you specify a webhook url, Track Time dot tech will send data to
+        your computers whenever your data changes.""")
+    self.move_click('create')
     api_key_username = self.find('username_cell').text
     api_key_password = self.find('plain_password').text
     self.web_test_the_api(HTTPBasicAuth(api_key_username, api_key_password))
+
+  def api(self):
+    self.api_key()
+
+    self.say_move_click('api_docs', """
+        Now that I have an API key username and password, let me explain the
+        significance.""")
+    self.say("""
+        The API gives you the option to hire your own software engineers to
+        write custom code that searches, reads, edits, or deletes your data
+        according to your own logic.""", wait=True)
+    self.say_scroll(self.find_with_text('h1', 'ManualLineItem'), """
+        For example you could dynamically add line items to your invoices.""")
+    self.say_scroll(self.find_with_text('h1', 'ProjectInvoice'), """
+        You could write an automation that bugs your customers for overdue
+        invoices.""")
+    self.say_scroll(self.find_with_text('h1', 'Welcome'), """
+        You're limited only by your imagination and the competence of
+        your engineers.""")
 
   def web_test_the_api(self, http_basic_auth):
     existing_project = self.web_test_list(http_basic_auth)

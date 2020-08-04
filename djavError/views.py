@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
@@ -18,6 +19,7 @@ from djavError.widgets.notifications_report import NotificationsReport
 from djavError.widgets.too_many_queries_requests_report import (
     TooManyQueriesRequestsReport)
 from djavError.widgets.trigger_errors import TriggerErrors
+from djaveTable.cell_content import Paragraph
 
 
 @superuser_required
@@ -39,8 +41,21 @@ def long_requests(request):
 
 @superuser_required
 def too_many_queries(request):
-  return _error_base(
-      request, TOO_MANY_QUERIES, TooManyQueriesRequestsReport(request.GET))
+  one_thing_on_page = None
+  if settings.DEBUG:
+    one_thing_on_page = TooManyQueriesRequestsReport(request.GET)
+  else:
+    one_thing_on_page = Paragraph("""
+        Django only logs database queries when settings.DEBUG is True, so this
+        won't work here I'm afraid. The best thing to do is to have your web
+        test create a bunch of test data so your web test pages get lengthy.
+        Then, when the web test runs, if there's a page that executes too many
+        database queries, your local machine will log the problem and
+        ./code_health.sh will report it to you. Also, pay attention to "Long
+        requests" because that works when settings.DEBUG is False and that
+        should catch any performance problem including way too many database
+        queries.""")
+  return _error_base(request, TOO_MANY_QUERIES, one_thing_on_page)
 
 
 @superuser_required

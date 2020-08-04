@@ -144,6 +144,9 @@ function setup_edit_list_table_buttons_cell(row) {
       for (var i = 0; i < got_all_elts.length; i++) {
         var elt = $(got_all_elts[i]);
         elt.val(elt.attr('data-saved-value'));
+        if (elt[0].tagName == 'TEXTAREA') {
+          resize_textarea(elt);
+        }
       }
       calc_edit_mode_4_edit_list_table(row);
     });
@@ -266,69 +269,6 @@ function setup_set_clear_dt_green_mode(
       unset_mode(find_pk(row));
     }
   }
-}
-
-function resize_textareas(selector_or_elt) {
-  // You have to wait until the page is visible in order to ask questions about
-  // what dimensions things are.
-  on_display(function() {
-    var textareas = $(selector_or_elt);
-    if (!textareas.length) {
-      return;
-    }
-    var computed_style = getComputedStyle(textareas[0]);
-    // min-height and max-height are set in all_sites.css min-height is the
-    // height of a button.
-    var min_height = px_to_int(computed_style.minHeight);
-    var max_height = px_to_int(computed_style.maxHeight);
-    var width = px_to_int(computed_style.width);
-
-    var height_finder = $(
-        '<div id="height_finder"/>').width(width).appendTo('body');
-    height_finder.css({
-        'border': '1px solid',
-        'font-size': computed_style.fontSize,
-        'font-family': computed_style.fontFamily,
-        'font-weight': computed_style.fontWeight,
-        'padding-top': computed_style.paddingTop,
-        'padding-right': computed_style.paddingRight,
-        'padding-left': computed_style.paddingLeft,
-        'padding-bottom': computed_style.paddingBottom});
-
-    var resize_textarea = function(textarea) {
-      var row = textarea.parents('tr');
-      height_finder.html(textarea.val().replace(/\n/g, '<br>'));
-      // If you try to get the height of the height_finder span, you'll only
-      // get the height up to the first line break.
-      var wants_to_be_height = height_finder.height();
-      var use_height = wants_to_be_height;
-      if (wants_to_be_height < min_height) {
-        use_height = min_height;
-      } else if (wants_to_be_height > max_height) {
-        use_height = max_height;
-      }
-      textarea.height(use_height);
-    };
-
-    var resize_on_change = function() {
-      var textarea = $(this);
-      height_finder.show();
-      resize_textarea(textarea);
-      height_finder.hide();  // To debug this stuff, comment out.
-    };
-
-    // If you put more than one edit list table on the page, resize_textareas
-    // will run twice, each time on all textareas.
-    for (var i = 0; i < textareas.length; i++) {
-      var textarea = $(textareas[i]);
-      if (!textarea.attr('data-resized')) {
-        textarea.attr('data-resized', 'yep');
-        textarea.on('input', resize_on_change);
-        resize_textarea(textarea);
-      }
-    }
-    height_finder.hide();  // To debug this stuff, comment out.
-  });
 }
 
 function px_to_int(px) {

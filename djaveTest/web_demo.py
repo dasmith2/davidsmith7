@@ -8,6 +8,7 @@ from django.template.loader import render_to_string
 class WebDemo(WebTest):
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
+    self.transcript = []
     self.go_slow()
 
   def warm_up(self):
@@ -46,6 +47,7 @@ class WebDemo(WebTest):
       raise ex
 
   def say(self, message, wait=False):
+    self.transcript.append(message)
     if self._go_slow:
       # Literally cause the browser to say the message out loud in a Stephen
       # Hawking voice. You have to use ’ instead of ' otherwise Stephen

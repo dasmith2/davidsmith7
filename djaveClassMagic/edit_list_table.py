@@ -29,7 +29,6 @@ class EditListTable(Table):
     super().__init__(*args, **kwargs)
 
     self.setup_edit_anything_turns_yellow()
-    self.setup_resize_textareas()
 
   def as_html(self):
     only_show_create_new_button = (
@@ -63,9 +62,6 @@ class EditListTable(Table):
       entries.append(
           "setup_ajax_save_field('{}', '{}');".format(selector, column))
     self.append_js('\n'.join(entries))
-
-  def setup_resize_textareas(self):
-    self.append_js("resize_textareas('table[data-model] textarea');")
 
   def _columns_selectors(self, column_or_columns, selector_or_selectors):
     columns = column_or_columns

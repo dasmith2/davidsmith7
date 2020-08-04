@@ -24,7 +24,6 @@ class Demo(WebDemo):
       self.archive_project()
       self.settings()
       self.zoom()
-      self.api_key()
       self.api()
       self.done()
 
@@ -383,33 +382,10 @@ class Demo(WebDemo):
         But you can adjust the zoom to your liking.""")
     self.move_click('zoomin', quick=True)
     self.move_click('zoomin', quick=True)
-    self.say_move_click(
-        'automatic', "I'll go back to automatic zoom for the rest of the demo")
-
-  def api_key(self):
-    self.say_move_type('username', 'daves_data', """
-        Here you can create an API key.""")
-    self.say_move_type('new_webhook_url', 'https://your.website', """
-        If you specify a webhook url, Track Time dot tech will send data to
-        your computers whenever your data changes.""")
-    self.move_click('create')
+    self.say_move_click('automatic', "I'll go back to automatic zoom.")
 
   def api(self):
-    self.say_move_click('api_docs', """
-        Now that I have an API key username and password, let me explain the
-        significance.""")
-    self.say("""
-        The API gives you the option to hire your own software engineers to
-        write custom code that searches, reads, edits, or deletes your data
-        according to your own logic.""", wait=True)
-    self.say_scroll(self.find_with_text('h1', 'ManualLineItem'), """
-        For example you could dynamically add line items to your invoices.""")
-    self.say_scroll(self.find_with_text('h1', 'ProjectInvoice'), """
-        You could write an automation that bugs your customers for overdue
-        invoices.""")
-    self.say_scroll(self.find_with_text('h1', 'Welcome'), """
-        You're limited only by your imagination and the competence of
-        your engineers.""")
+    pass
 
   def done(self):
     from selenium.common.exceptions import WebDriverException
@@ -422,8 +398,9 @@ class Demo(WebDemo):
       self.sleep(1)
       self.go_to_view('demo_done')
     self.say("""
-        If you enjoyed this demo, you should know that I'm available to build
-        automations and workflows for your business.""")
+        I hope you enjoyed this demo! I'm a software consultant and I
+        can build automations, workflows, and demos for your
+        business. Drop me a line if you're interested.""")
     self.wait_talking()
     self.driver.close()
 

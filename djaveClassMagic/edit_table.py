@@ -45,7 +45,6 @@ class EditTable(Table):
         js=confirm_delete_js, classes=['margin-top', 'edit-table'])
     self.append_js(
         "setup_edit_field_turns_yellow('.edit-table', 'tr');")
-    self.setup_resize_textareas()
 
     # You have to add_rows before you handle_clicks because handle_clicks has
     # to check to see if the widgets are valid.
@@ -58,9 +57,6 @@ class EditTable(Table):
       # we'd better redo the rows.
       self._redo_rows()
       self.buttons_cell.cell_contents.append(DisappearingFeedback())
-
-  def setup_resize_textareas(self):
-    self.append_js("resize_textareas('table.edit-table textarea');")
 
   def _redo_rows(self):
     self.rows = []
