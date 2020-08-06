@@ -99,7 +99,3 @@ def model_fields(model, specific_field=None):
   if specific_field:
     return None
   return fields
-
-
-def _display_name(field_name):
-  return 
