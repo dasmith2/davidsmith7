@@ -34,10 +34,12 @@ class Demo(WebDemo):
     self.bobs = 'Bob’s Science Laboratory'
     self.hotel = 'The Business Woman Hotel'
 
-    self.say_move_click('sign_up_button', """
+    self.say("""
         This is a fully automated test and demonstration, so please excuse my
-        robotic nature. Welcome to track time dot tech! Let me show you how it
-        works. First, I sign up.""")
+        robotic nature.""", wait=True)
+    self.say_move_click('sign_up_button', """
+        Welcome to track time dot tech! Let me show you how it works. First, I
+        sign up.""")
 
     email = 'dave@davebase.tech'
     self.sign_up(email)
@@ -52,7 +54,7 @@ class Demo(WebDemo):
 
     self.say_move_click('create_new', """
         First, I need to set up a project. In fact, that's the only thing I can
-        do at this point.""")
+        do.""")
 
     say = """
         If you were my client, I would put your name here. Let's start simple.

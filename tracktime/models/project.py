@@ -23,14 +23,17 @@ class Project(Publishable):
   creator = models.ForeignKey(User, on_delete=models.PROTECT, help_text=(
       'Who created this Project?'))
 
-  use_clock = models.BooleanField(default=False, help_text=(
-      'Do you want TrackTime.TECH to ask you to punch in on this project, and '
-      'then provide reports on the time you spent?'))
-  has_to_do_list = models.BooleanField(default=False, help_text=(
-      'Do you want TrackTime.TECH to show you screens where you can create '
-      'and complete tasks for this project?'))
-  has_invoices = models.BooleanField(default=False, help_text=(
-      'Will you create invoices for this project?'))
+  use_clock = models.BooleanField(
+      verbose_name='Clock', default=False, help_text=(
+          'Do you want TrackTime.TECH to ask you to punch in on this project, '
+          'and then provide reports on the time you spent?'))
+  has_to_do_list = models.BooleanField(
+      verbose_name='To do list', default=False, help_text=(
+          'Do you want TrackTime.TECH to show you screens where you can '
+          'create and complete tasks for this project?'))
+  has_invoices = models.BooleanField(
+      verbose_name='Invoices', default=False, help_text=(
+          'Will you create invoices for this project?'))
 
   @classmethod
   def model_description(cls):

@@ -89,17 +89,17 @@ def model_fields(model, specific_field=None):
         editable = True
         help_text = '"USD" typically'
 
-    field = ModelField(
-        name, _display_name(name), help_text, can_filter, field_type,
-        foreign_key_to, max_length, required, editable, default)
+    model_field = ModelField(
+        name, field.verbose_name.capitalize(), help_text, can_filter,
+        field_type, foreign_key_to, max_length, required, editable, default)
     if name == specific_field:
-      return field
+      return model_field
     else:
-      fields.append(field)
+      fields.append(model_field)
   if specific_field:
     return None
   return fields
 
 
 def _display_name(field_name):
-  return field_name.capitalize().replace('_', ' ')
+  return 
