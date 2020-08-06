@@ -54,15 +54,7 @@ class ProjectWorkSessionSummaryTable(Table):
               what_i_did_per_project.breakdown_url, classes=[css_class])
         cells.append(hours_href)
       if do_done:
-        done_href = None
-        if what_i_did_per_project.project.has_to_do_list:
-          if what_i_did_per_project.project.use_clock:
-            done_href = InHref(
-                what_i_did_per_project.done,
-                what_i_did_per_project.breakdown_url, classes=[css_class])
-          else:
-            done_href = what_i_did_per_project.done
-        cells.append(done_href)
+        cells.append(what_i_did_per_project.done)
       self.create_row(cells)
 
   def get_what_i_did_per_projects(

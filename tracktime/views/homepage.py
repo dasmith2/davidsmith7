@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.shortcuts import render, reverse
 from djaveTable.cell_content import InHref
 
@@ -16,5 +17,6 @@ def homepage(request):
       'logged_in_user_button': logged_in_user_button,
       'login_url': reverse('djave_login'),
       'sign_up_url': reverse('djave_sign_up'),
-      'api_docs_url': reverse('tracktime_api_docs')}
+      'api_docs_url': reverse('tracktime_api_docs'),
+      'show_video': not settings.WEB_TEST}
   return render(request, 'tracktime_homepage.html', context)

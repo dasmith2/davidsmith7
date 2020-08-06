@@ -18,11 +18,11 @@ DONE = 'Done'
 NOT_DONE = 'Not done'
 
 
-def get_status_filter():
+def get_status_filter(default=None):
   options = [Option(status, status) for status in [DONE, NOT_DONE]]
   return SelectField(
       key_prefix='to_do_status', options=options, required=False,
-      label='Status')
+      label='Status', default=default)
 
 
 class ToDoManager(LivePublishableManager):

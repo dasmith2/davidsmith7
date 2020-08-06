@@ -24,7 +24,7 @@ td { font-weight: 300;  }
 th { font-weight: 500; color: #555; }
 td, th { border-right: {% zoom 1 %}px solid #999;
   border-bottom: {% zoom 1 %}px solid #999; padding: {% zoom 10 %}px; }
-th, .row2, .row2 textarea { background-color: #eee; }
+th, .row2 { background-color: #eee; }
 
 .raised-rectangle {
   border: {% zoom 1 %}px solid #999; padding: {% zoom 10 %}px;

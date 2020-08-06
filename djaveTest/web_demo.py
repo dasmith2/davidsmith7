@@ -171,8 +171,7 @@ class WebDemo(WebTest):
     """ Pretend you're a user painstakingly manually typing in keys """
     element = self.get_element(element_or_clue)
     if self._go_slow:
-      if element.get_attribute('type') != 'number':
-        self.put_keyboard_caret_at_end(element)
+      self.put_keyboard_caret_at_end(element)
       for key in keys:
         element.send_keys(key)
         if self._go_slow:
@@ -181,19 +180,10 @@ class WebDemo(WebTest):
       element.send_keys(keys)
 
   def put_keyboard_caret_at_end(self, element_or_clue):
+    from selenium.webdriver.common.keys import Keys
     element = self.get_element(element_or_clue)
-    input_type = element.get_attribute('type')
-    if input_type in ['number']:
-      # I know for sure it works with textarea and text. I haven't tested the
-      # other varieties of input.
-      raise Exception((
-          'Firefox doesn\'t support setting the cursor position in '
-          '{} inputs').format(input_type))
-    script = """
-        arguments[0].focus();
-        var pos = $(arguments[0]).val().length;
-        arguments[0].setSelectionRange(pos, pos);"""
-    self.execute_script(script, element)
+    keys = [Keys.RIGHT] * len(element.get_property('value'))
+    element.send_keys(keys)
 
   def wait_talking(self):
     if self._go_slow:

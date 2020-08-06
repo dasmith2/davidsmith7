@@ -35,8 +35,9 @@ class Demo(WebDemo):
     self.hotel = 'The Business Woman Hotel'
 
     self.say_move_click('sign_up_button', """
-        Welcome to track time dot tech. Let me show you how it works. First,
-        I sign up.""")
+        This is a fully automated test and demonstration, so please excuse my
+        robotic nature. Welcome to track time dot tech! Let me show you how it
+        works. First, I sign up.""")
 
     email = 'dave@davebase.tech'
     self.sign_up(email)
@@ -96,8 +97,8 @@ class Demo(WebDemo):
         This project is getting complicated. I'm going to need a to do
         list.""")
     self.say_move_click('edit', 'I edit the project')
-    self.say_move_click('has_to_do_list', 'And turn on the to do list.')
-    self.say_move_click('save', 'Notice that unsaved info is colored yellow.')
+    self.say_move_click('has_to_do_list', 'Turn on the to do list.')
+    self.say_move_click('save', 'And click save.')
     self.say_move_click('clock_nav', 'Now when I punch the clock')
     self.move_click('startclock')
 
@@ -178,10 +179,6 @@ class Demo(WebDemo):
     self.move_mouse('h1')
     self.wait_talking()
 
-    self.move_mouse('project')
-    self.wait_mouse()
-    self.find_with_value('option', str(self.lab_id)).click()
-
     self.say_move_type('hourly_rate', '100', """
         Work sessions turn into a line item whose cost is equal to the hourly
         rate times the duration of the session.""")
@@ -251,22 +248,22 @@ class Demo(WebDemo):
         completed during that work session.""")
 
     say = """
-        The second line item uses the default line item description. I can put
-        something a little more descriptive in there now."""
+        A few of the line items use the default line item description. I can
+        put something a little more descriptive in there now."""
     self.say_move_type(
-        self.finds('describe_service')[1],
+        self.finds('describe_service')[2],
         'Met with Bob to discuss accessioning', say, clear_first=True)
     self.say_move_type(
-        self.finds('amount')[1], '40.00',
+        self.finds('amount')[2], '40.00',
         'I can also give Bob a bit of a discount', clear_first=True)
-    self.move_type(self.finds('amount_calculation')[1], ' - discount')
-    self.say_move_click('save-row', 'Remember that a yellow row is unsaved')
+    self.move_type(self.finds('amount_calculation')[2], ' - discount')
+    self.move_click('save-row')
 
     self.say_move_type(
         'new_description', 'Reimburse for test order',
         'I can create manual line items as necessary')
     self.move_type('new_amount', '7.23')
-    self.say_move_click('newmanuallineitem', "Don't forget to save")
+    self.move_click('newmanuallineitem')
     self.scroll_to_bottom()
     self.say_move('remove', """
         If I remove a line item that's based on a work session, the work
@@ -336,7 +333,10 @@ class Demo(WebDemo):
     self.say_move('to_do_status', """
         For instance maybe I want to see all complete tasks""")
     self.find_with_text('option', 'Done').click()
-    self.say_move_click('report', 'created in the last month for any project.')
+    self.say_move_enter_date(
+        'from_date', date.today() - timedelta(days=30),
+        'created in the last 30 days')
+    self.say_move_click('report', 'for any project.')
     self.say_move(self.finds('project')[1], """
         If I'm punched in on a different project, but I remember something I
         need to do for {}""".format(self.bobs))
@@ -401,8 +401,6 @@ class Demo(WebDemo):
         I hope you enjoyed this demo! I'm a software consultant and I
         can build automations, workflows, and demos for your
         business. Drop me a line if you're interested.""")
-    self.wait_talking()
-    self.driver.close()
 
   def demo_user_wasnt_destroyed(self):
     self.go_to_view('demo_done')
