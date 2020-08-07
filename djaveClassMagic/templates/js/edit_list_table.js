@@ -274,3 +274,19 @@ function setup_set_clear_dt_green_mode(
 function px_to_int(px) {
   return parseInt(px.replace('px', ''));
 }
+
+function setup_display_count() {
+  $('table[data-model]').each(function() {
+    var table = $(this);
+    if (!table.attr('data-displayed-count')) {
+      table.attr('data-displayed-count', 'yep');
+      var count = table.find('tr[data-pk]').length;
+      if (count > 3) {
+        var colspan = $(table.find('tr')[0]).find('td,th').length;
+        var tr = $('<tr></tr>').appendTo(table);
+        $('<td></td>').attr('colspan', colspan).addClass(
+            'bold-grey-text').text('Count: ' + count).appendTo(tr);
+      }
+    }
+  });
+}

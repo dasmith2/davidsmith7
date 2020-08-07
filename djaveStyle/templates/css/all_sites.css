@@ -70,6 +70,7 @@ form { margin: 0px; padding: 0px; }
 .max-width, p, ul { max-width: {% fit_to_screen 540 %}px; }
 .width-135 { width: {% zoom 135 %}px; }
 .border-5 { border: {% zoom 5 %}px solid #000; }
+.bold-grey-text { color: #999; font-weight: bold; }
 
 /* Buttons */
 {% include "css/button.css" %}

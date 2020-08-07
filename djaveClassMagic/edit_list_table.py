@@ -113,3 +113,6 @@ class EditListTable(Table):
         additional_attrs={'colspan': len(self.headers)})
     self.create_row([create_new_cell])
     return self._create_new_button
+
+  def setup_display_count(self):
+    self.append_js('$(setup_display_count);')

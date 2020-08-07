@@ -27,3 +27,7 @@ a.button { text-decoration: none; display: inline-block; }
  * to breath a little. */
 .spread-buttons button, .spread-buttons a.button, .spread-buttons a, .spread-buttons input {
     margin-right: {% zoom 20 %}px; }
+/* "Done" is right next to "Delete." Forcing them horizontal makes it harder to
+ * accidentally click "Delete," and it reduces the height of the table on my
+ * phone. */
+.buttons { white-space: nowrap; }

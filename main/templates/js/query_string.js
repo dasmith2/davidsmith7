@@ -2,14 +2,14 @@
 function query_string_obj_to_str(obj) {
   var parts = [];
   for (var key in obj) {
-    if (obj[key]) {
-      if (Array.isArray(obj[key])) {
-        for (var i = 0; i < obj[key].length; i++) {
-          parts.push(key + '=' + obj[key][i]);
-        }
-      } else {
-        parts.push(key + '=' + obj[key]);
+    /* Don't strip out keys with empty values because when the user specifies
+     * an empty value it may have to override a non-empty default. */
+    if (Array.isArray(obj[key])) {
+      for (var i = 0; i < obj[key].length; i++) {
+        parts.push(key + '=' + obj[key][i]);
       }
+    } else {
+      parts.push(key + '=' + obj[key]);
     }
   }
   if (parts.length) {
@@ -46,23 +46,9 @@ function refresh_with_query_string(query_str_or_obj) {
 function current_url_with_query_string(query_str_or_obj) {
   var str = query_str_or_obj;
   if (typeof(query_str_or_obj) == 'object') {
-    str = query_string_obj_to_str(strip_empty_values(query_str_or_obj));
+    str = query_string_obj_to_str(query_str_or_obj);
   }
   return window.location.pathname + str;
-}
-
-function strip_empty_values(query_string_obj) {
-  var delete_attrs = [];
-  for (key in query_string_obj) {
-    var value = query_string_obj[key];
-    if (value === null || value === '') {
-      delete_attrs.push(key);
-    }
-  }
-  for (var i = 0; i < delete_attrs.length; i++) {
-    delete query_string_obj[delete_attrs[i]];
-  }
-  return query_string_obj;
 }
 
 function refresh_with_qs(key, value) {
