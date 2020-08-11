@@ -1,10 +1,7 @@
 from datetime import date, timedelta
 import json
 
-from django.shortcuts import render, reverse, redirect
-from djaveAPI.ajax_endpoint import ajax_endpoint_login_required
-from djaveAPI.get_request_variable import get_request_variable
-from djaveAPI.problem import Problem
+from django.shortcuts import render, redirect
 from djaveLogin.login_required import login_required
 from djaveNav.date_roller import DateRoller
 from djaveURL import date_from_url
@@ -35,19 +32,9 @@ def enter_time(request):
       day - timedelta(days=2), day + timedelta(days=2), request.user)
   context = tracktime_context(
       request.user, ENTER_TIME,
-      delete_work_session_url=reverse('delete_work_session'),
       date_roller=date_roller,
       punch_the_clock=punch_the_clock,
       enter_time_table=enter_time_table,
       total_hours_per_date=json.dumps(totals),
       projects_exist=projects_exist)
   return render(request, 'enter_time.html', context)
-
-
-@ajax_endpoint_login_required
-def delete_work_session(request):
-  pk = get_request_variable(request.POST, 'pk', required=True)
-  work_session = ProjectWorkSession.live.filter(pk=pk).first()
-  if not work_session:
-    raise Problem('This ProjectWorkSession does not exist')
-  work_session.mark_deleted()

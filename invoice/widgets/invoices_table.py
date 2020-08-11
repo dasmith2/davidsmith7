@@ -17,7 +17,8 @@ class InvoicesTable(EditListTable):
     self._has_invoices = False
     self.add_invoice_rows()
 
-    context = {'ajax_get_url': reverse('ajax_get')}
+    context = {'list_invoice_api_url': reverse(
+        'list_or_save_new', kwargs={'model_name': 'Invoice'})}
     self.js = render_to_string('invoices_table.js', context=context)
     self.css = render_to_string('invoice_row_color.css')
 

@@ -27,7 +27,8 @@ You'll need to set up a database.
     # by default it tries to use a database user with the same username as the
     # Linux user, so in my case, it made sense to create a database user named
     # dave and grant it permission on everything and use it to create the
-    # databases.
+    # databases. I do know if you get something like "psql: FATAL:  database
+    # "dave" does not exist" then you can fix it simply by running createdb
 
 Then go create a main/local_settings.py file and put something like this in it
 

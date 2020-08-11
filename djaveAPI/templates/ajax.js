@@ -5,7 +5,9 @@ function ok(response) {
 
 function show_problem(response, feedback_or_append_to) {
   var feedback;
-  if (feedback_or_append_to.hasClass('feedback')) {
+  if (!feedback_or_append_to) {
+    feedback = default_feedback();
+  } else if (feedback_or_append_to.hasClass('feedback')) {
     feedback = feedback_or_append_to;
   } else {
     feedback = get_feedback_elt_append(feedback_or_append_to);
@@ -18,6 +20,14 @@ function show_problem(response, feedback_or_append_to) {
     feedback.hide();
     return false;
   }
+}
+
+function feedback_or_default(feedback) {
+  return feedback || default_feedback();
+}
+
+function default_feedback() {
+  return get_feedback_elt_append('body');
 }
 
 function alert_problem(response) {
@@ -47,28 +57,46 @@ function problem_in_response(response) {
 }
 
 function post(url, data, success, always, feedback) {
-  success = success || function() {};
-  always = always || function() {};
-  feedback = feedback || get_feedback_elt_append('body');
+  var success_callback = _success_callback(success, always, feedback);
+  var request_obj = $.post(url, add_csrf_token(data), success_callback);
+  _add_fail(request_obj, always, feedback);
+}
 
-  return $.post(url, add_csrf_token(data), function(response) {
+function get(url, success, always, feedback) {
+  var success_callback = _success_callback(success, always, feedback);
+  var request_obj = $.get(url, success_callback);
+  _add_fail(request_obj, always, feedback);
+}
+
+function _success_callback(success, always, feedback) {
+  return function(response) {
     if (!show_problem(response, feedback)) {
-      success(response);
+      if (success) {
+        success(response);
+      }
     }
-    always();
-  }).fail(function(response) {
+    if (always) {
+      always();
+    }
+  }
+}
+
+function _add_fail(request_obj, always, feedback) {
+  request_obj.fail(function(response) {
     if (!show_problem(response, feedback)) {
       if (response.status == 0 && response.statusText == 'error') {
         // Firefox is complaining because somebody closed the window before the
         // response could come back and be handled.
         return
       }
-      feedback.show().text('Server error :(');
+      feedback_or_default(feedback).show().text('Server error :(');
       console.log('Server error :(');
       window.onerror(
           'function post fail server error: ' + JSON.stringify(response));
     }
-    always();
+    if (always) {
+      always();
+    }
   });
 }
 
@@ -91,12 +119,8 @@ function get_csrf_token() {
 
 function update_field(
     model_name, pk, field_name, new_value, success, always, feedback) {
-  var data = {'type': model_name, 'pk': pk};
+  var data = {};
   data[field_name] = new_value;
-  var use_success = function(response) {
-    if (success) {
-      return success(pk);
-    }
-  };
-  return post('{{ ajax_update_url }}', data, use_success, always, feedback);
+  var url = '{{ api_root_url }}' + model_name + '/' + pk;
+  return post(url, data, success, always, feedback);
 }

@@ -1,13 +1,16 @@
 from datetime import date
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils.dateparse import parse_datetime, parse_date
-from djaveAPI.currency_field import corresponding_currency_value
-from djaveAPI.get_publishable_model import get_publishable_model
-from djaveAPI.problem import Problem
+from djaveAllowed.models import AllowedInterface
 from djaveClassMagic.model_fields import (
     model_fields, DATE_TIME, DATE, FLOAT, INTEGER, TEXT, CHAR, BOOLEAN)
 from djaveDT import now
 from djmoney.money import Money
+
+from djaveAPI.currency_field import corresponding_currency_value
+from djaveAPI.find_models import publishable_model_from_name
+from djaveAPI.problem import Problem
 
 
 def update(instance, request_data, credentials):
@@ -32,11 +35,20 @@ def _set_fields(instance, request_data, credentials):
       raw_value = request_data[field.name]
       if field.foreign_key_to:
         if raw_value:
-          # This line exists entirely because I need to use
+
+          # This stuff exists entirely because I need to use
           # djaveAPI.models.user.User when it's a foreign key to
           # django.contrib.auth.models.User
-          check_credentials_against = get_publishable_model(
-              field.foreign_key_to.__name__)
+          check_credentials_against = field.foreign_key_to
+          if not isinstance(check_credentials_against, AllowedInterface):
+            check_credentials_against = publishable_model_from_name(
+                check_credentials_against.__name__)
+          if not check_credentials_against:
+            raise Problem((
+                '{} doesnt appear to be a class with an '
+                'AllowedInterface or a corresponding '
+                'PretendPublishable').format(
+                    check_credentials_against.__name__))
 
           value = credentials.allowed_list(check_credentials_against).filter(
               pk=raw_value).first()
@@ -72,7 +84,12 @@ def _set_fields(instance, request_data, credentials):
       if specified:
         required_error = value in [None, '']
       else:
-        required_error = getattr(instance, field.name) in [None, '']
+        try:
+          # if Field is a foreign key and it isn't set, Django raises an
+          # exception when you try to access it.
+          required_error = getattr(instance, field.name) in [None, '']
+        except ObjectDoesNotExist:
+          required_error = True
       if required_error:
         raise Problem('"{}" is required'.format(field.display_name))
 
@@ -90,10 +107,16 @@ def _set_fields(instance, request_data, credentials):
 def _date_or_date_time(field, raw_value):
   if raw_value:
     if field.type == DATE:
-      value = parse_date(raw_value)
+      if raw_value == 'now':
+        value = date.today()
+      else:
+        value = parse_date(raw_value)
       example = date.today().isoformat()
     elif field.type == DATE_TIME:
-      value = parse_datetime(raw_value)
+      if raw_value == 'now':
+        value = now()
+      else:
+        value = parse_datetime(raw_value)
       example = now().isoformat()
     else:
       raise Exception(field.type)

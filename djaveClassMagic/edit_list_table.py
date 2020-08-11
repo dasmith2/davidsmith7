@@ -8,9 +8,7 @@ from djaveTable.cell_content import InHref
 
 
 def edit_list_table_js():
-  context = {
-      'ajax_update_url': reverse('ajax_update'),
-      'ajax_delete_url': reverse('ajax_delete')}
+  context = {'api_root_url': reverse('api_root')}
   return render_to_string('js/edit_list_table.js', context)
 
 

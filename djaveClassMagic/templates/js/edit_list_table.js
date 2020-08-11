@@ -21,7 +21,13 @@ function row_by_pk(pk) {
   return $('tr[data-pk=' + pk + ']');
 }
 
-function remove_row(pk) {
+function remove_row(pk_or_response) {
+  /* It's pretty handy to just have remove_row be the success of button clicks
+   * such as Archive. */
+  var pk = pk_or_response;
+  if (typeof pk_or_response == 'object') {
+    pk = pk_or_response['id'];
+  }
   var row = row_by_pk(pk);
   var table = row.parents('table');
   row.remove();
@@ -95,7 +101,7 @@ function setup_edit_list_table_buttons_cell(row) {
       save_button.prop('disabled', true);
       cancel_save_button.prop('disabled', true);
 
-      var data = {pk: find_pk(row), type: find_model(row)};
+      var data = {};
 
       var got_all_elts = all_elts(row);
       var first_feedback = null;
@@ -135,7 +141,8 @@ function setup_edit_list_table_buttons_cell(row) {
         calc_edit_mode_4_edit_list_table(row);
       };
       // DON'T use update_field here because data may have multiple fields.
-      post('{{ ajax_update_url }}', data, success, null, first_feedback);
+      var url = '{{ api_root_url }}' + find_model(row) + '/' + find_pk(row);
+      post(url, data, success, null, first_feedback);
     });
 
     cancel_save_button.click(function() {
@@ -235,11 +242,14 @@ function setup_set_clear_dt_green_mode(
     }
   };
 
-  var _update_field = function(row, new_value, success) {
+  var _update_field = function(row, new_value, success_accepts_pk) {
     var feedback = get_feedback_elt_append(buttons_cell(row));
+    var pk = find_pk(row);
+    var success = function() {
+      success_accepts_pk(pk);
+    };
     return update_field(
-        find_model(row), find_pk(row), field_name, new_value, success,
-        null, feedback);
+        find_model(row), pk, field_name, new_value, success, null, feedback);
   };
 
   var rows = $(table_finder).find('tr[data-pk]');

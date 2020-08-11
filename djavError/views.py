@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
-from djaveAPI.ajax_endpoint import ajax_endpoint
+from djaveAPI.ajax_or_api_endpoint import ajax_or_api_endpoint_authenticated
 from djaveClassMagic.find_models import model_from_name
 from djaveDT import now
 from djaveLogin.superuser_required import superuser_required
@@ -72,11 +72,11 @@ def _error_base(request, current_view_name, the_one_thing_on_the_page):
 
 
 @superuser_required
-@ajax_endpoint
-def all_fixed(request, model_name, pks):
+@ajax_or_api_endpoint_authenticated
+def all_fixed(request_method, request_dict, credentials, model_name, pks):
   model = model_from_name(model_name, subclass_of=Fixable)
   pks = [int(id) for id in pks.split(',')]
-  model.allowed_by_user(request.user).filter(pk__in=pks).update(fixed=now())
+  credentials.allowed_list(model).filter(pk__in=pks).update(fixed=now())
 
 
 @superuser_required

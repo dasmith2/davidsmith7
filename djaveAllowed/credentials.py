@@ -30,6 +30,14 @@ class HasUserCredentialsInterface(CredentialsInterface):
         'I do not know how to return a list of {} that a user has '
         'permission to').format(model))
 
+  def explain_why_can_not_create(self, of_model):
+    # A bit hacky, this is catching both django's user and the API's pretend
+    # user object.
+    if of_model.__name__ == 'User':
+      return (
+          'User level API keys only have access to a single user. They are '
+          'not powerful enough to create new users.')
+
 
 class UserCredentials(HasUserCredentialsInterface):
   def __init__(self, user):

@@ -1,7 +1,7 @@
 from django.urls import path
 
 from tracktime.views.api_docs import api_docs
-from tracktime.views.enter_time import enter_time, delete_work_session
+from tracktime.views.enter_time import enter_time
 from tracktime.views.invoices import (
     project_invoices, all_project_invoices, project_line_items,
     edit_project_invoice, view_project_invoice, project_invoice_rule)
@@ -39,10 +39,6 @@ tracktime_urls = [
     path(
         'invoice_rule/<pk>', project_invoice_rule,
         name='project_invoice_rule'),
-
-    path(
-        'delete_work_session', delete_work_session,
-        name='delete_work_session'),
 
     path('projects', projects, name='projects'),
     path(

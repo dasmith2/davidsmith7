@@ -3,8 +3,8 @@ function set_status(row) {
   // to run the status fetching AJAX query if something changed.
   var init_finder = 'data-status-initialized';
   if (row.attr(init_finder)) {
-    var data = {'pk': find_pk(row), 'type': 'Invoice'};
-    post('{{ ajax_get_url }}', data, function(response) {
+    var url = '{{ list_invoice_api_url }}/' + find_pk(row);
+    get(url, function(response) {
       row.find('.status_cell').text(response.status_with_date);
     });
   } else {

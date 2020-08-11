@@ -15,7 +15,7 @@ from main.views import all_sites_js
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin/', admin.site.urls),  # Purely a backup for logging in
     path('accounts/', include(auth_urls)),
     path('js/all_sites.js', all_sites_js, name='all_sites_js'),
     path('api/', include(djave_api_urls)),

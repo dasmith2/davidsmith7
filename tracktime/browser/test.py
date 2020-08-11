@@ -84,24 +84,24 @@ class Test(Demo):
     return new_project
 
   def web_test_get_one(self, http_basic_auth, project):
-    url = self._get_or_save_existing_url(project['id'])
+    url = self._get_save_or_delete_existing_url(project['id'])
     got_name = requests.get(url, auth=http_basic_auth).json()['name']
     assert project['name'] == got_name
 
   def web_test_update(self, http_basic_auth, project):
-    url = self._get_or_save_existing_url(project['id'])
+    url = self._get_save_or_delete_existing_url(project['id'])
     data = {'name': 'The EXTRA Grand Hotel'}
     project = requests.post(url, json=data, auth=http_basic_auth).json()
     assert project['name'] == 'The EXTRA Grand Hotel'
 
   def web_test_delete(self, http_basic_auth, project):
-    url = self._get_or_save_existing_url(project['id'])
+    url = self._get_save_or_delete_existing_url(project['id'])
     project = requests.delete(url, auth=http_basic_auth).json()
     assert project['deleted']
 
   def _list_or_save_new_url(self):
     return self.server_plus_reverse('list_or_save_new', model_name='Project')
 
-  def _get_or_save_existing_url(self, pk):
+  def _get_save_or_delete_existing_url(self, pk):
     return self.server_plus_reverse(
-        'get_or_save_existing', model_name='Project', pk=pk)
+        'get_save_or_delete_existing', model_name='Project', pk=pk)

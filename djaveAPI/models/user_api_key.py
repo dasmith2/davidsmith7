@@ -25,10 +25,3 @@ class UserAPIKey(APIKey, HasUserCredentialsInterface, Allowed):
   @classmethod
   def filter_allowed_by_user(cls, user, query_set):
     return query_set.filter(user=user)
-
-  def explain_why_can_not_create(self, of_model):
-    from djaveAPI.models.user import User as DjaveAPIUser
-    if issubclass(of_model, (DjangoUser, DjaveAPIUser)):
-      return (
-          'User level API keys only have access to a single user. They are '
-          'not powerful enough to create new users.')

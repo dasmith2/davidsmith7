@@ -9,8 +9,8 @@ from djaveAPI.problem import Problem
 from djaveDT import to_tz_dt
 
 
-def filter_model(model, api_key, request_GET):
-  queryset = api_key.allowed_list(model)
+def filter_model(model, credentials, request_GET):
+  queryset = credentials.allowed_list(model)
   for _filter in get_filters(model, request_GET):
     field = _filter.filter_field
     if field.foreign_key_to:

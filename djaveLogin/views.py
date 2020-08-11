@@ -4,7 +4,7 @@ from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth.models import User
 from django.shortcuts import redirect, reverse, render
-from djaveAPI.ajax_endpoint import ajax_endpoint
+from djaveAPI.ajax_or_api_endpoint import ajax_or_api_endpoint
 from djaveAPI.problem import Problem
 from djavError.log_error import log_error
 from djaveLogin.forms import LoginForm
@@ -16,14 +16,14 @@ from djaveLogin.widgets.login_email import LoginEmail
 from djaveURL import is_valid_url
 
 
-@ajax_endpoint
-def login_token(request):
+@ajax_or_api_endpoint
+def login_token(request_method, request_dict):
   """ This is for local webtests basically. I need to automatically log in
   without actually checking email or examining the output of ./manage.py
   runserver """
   if settings.LOCAL:
-    if 'email' in request.GET:
-      email = request.GET['email']
+    if 'email' in request_dict:
+      email = request_dict['email']
       login_token = None
 
       user = User.objects.filter(email=email).first()

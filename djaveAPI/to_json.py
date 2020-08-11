@@ -8,9 +8,9 @@ from djmoney.money import Money
 TYPE = 'type'
 
 
-def to_json_dict(instance, publishable_class=None):
+def to_json_dict(instance, allowed_class=None):
   model, instance = use_model_instance_for_api(
-      instance, publishable_class=publishable_class)
+      instance, allowed_class=allowed_class)
 
   as_dict = {TYPE: model.__name__}
   for field in model_fields(model):
