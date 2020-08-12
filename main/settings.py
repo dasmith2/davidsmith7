@@ -10,6 +10,10 @@ import warnings
 import django_heroku
 
 
+def any_arg_contains(contains):
+  return bool(len([arg for arg in sys.argv if arg.find(contains) >= 0]))
+
+
 """ What environment are you in? Just check your settings! """
 LOCAL = os.path.exists('main/local_settings.py')
 DEBUG = LOCAL
@@ -17,9 +21,9 @@ STAGE = os.environ.get('STAGE', default='False') == 'True'
 PROD = os.environ.get('PROD', default='False') == 'True'
 TEST = 'test' in sys.argv
 # In order to remove the Django Debug Toolbar from the web test, you have to
-# ./manage.py runserver --settings main.web_test_settings
-WEB_TEST = bool(len([  # In case --settings=main.web_test_settings
-    arg for arg in sys.argv if arg.find('main.web_test_settings') >= 0]))
+# ./manage.py runserver --settings main.web_test_settings or
+# --settings=main.web_test_settings
+WEB_TEST = any_arg_contains('main.web_test_settings')
 USE_DEBUG_TOOLBAR = DEBUG and not WEB_TEST
 RUNSERVER = 'runserver' in sys.argv
 GUNICORN = 'gunicorn' in sys.argv
@@ -27,7 +31,7 @@ WEB = RUNSERVER or GUNICORN
 MANAGE_COMMAND_FINDER = re.compile(r'[^\w]*manage.py')
 MANAGE_COMMAND = any([MANAGE_COMMAND_FINDER.match(arg) for arg in sys.argv])
 SHELL = MANAGE_COMMAND and 'shell' in sys.argv
-IN_WORKER = 'worker.py' in sys.argv
+IN_WORKER = any_arg_contains('worker.py')
 # This is a little ugly. There are two cases where you'd be in a background
 # thread. One is you're a task that was picked up by worker.py, the background
 # thread worker as defined in Procfile. The other is you're a custom management

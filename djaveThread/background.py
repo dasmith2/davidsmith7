@@ -5,7 +5,7 @@ from djavError.log_error import log_error
 from redis.connection import ResponseError
 from rq import Queue
 
-from worker import conn
+from djaveThread.worker import conn
 
 
 # The default default_timeout is 2 minutes. This makes it an hour.

@@ -8,7 +8,7 @@ from djavEmail.staff_email_sender import StaffEmailSender
 from djaveThread.models import LoggedCommand
 from rq import Queue
 
-from worker import conn
+from djaveThread.worker import conn
 
 
 # The default default_timeout is 2 minutes. This makes it an hour.
