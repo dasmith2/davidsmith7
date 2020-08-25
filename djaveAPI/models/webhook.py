@@ -10,6 +10,7 @@ from djaveClassMagic.models.rm_old import RmOld, RmOldManager
 from djaveDT import now
 try:
   from djaveThread.background_command import background_command
+
   @background_command
   def send_webhooks():
     Webhook.objects.send()
