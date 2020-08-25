@@ -1,6 +1,5 @@
 """ Turn an object into JSON suitable for publishing in an API. """
 from djaveAPI.currency_field import corresponding_currency_field_name
-from djaveAPI.find_models import use_model_instance_for_api
 from djaveClassMagic.model_fields import (
     model_fields, django_primary_key_field, DATE_TIME, DATE)
 from djmoney.money import Money
@@ -10,8 +9,7 @@ TYPE = 'type'
 
 
 def to_json_dict(instance, allowed_class=None):
-  model, instance = use_model_instance_for_api(
-      instance, allowed_class=allowed_class)
+  model = instance.__class__
 
   as_dict = {TYPE: model.__name__}
   for field in model_fields(model):

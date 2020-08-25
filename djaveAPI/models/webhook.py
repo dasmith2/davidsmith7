@@ -1,11 +1,11 @@
 import json
 
-from djaveAPI.models.api_key import api_key_types
+from djaveAPI.models.api_key import APIKey
 from djaveAPI.models.publishable import Publishable
-from djaveAPI.models.pretend_publishable import PretendPublishable
 from djaveAPI.post import post
 from djaveAPI.signals import publishable_post_save
 from djaveAPI.to_json import to_json_dict
+from djaveClassMagic.find_models import all_models
 from djaveClassMagic.models.rm_old import RmOld, RmOldManager
 from djaveDT import now
 try:
@@ -36,16 +36,15 @@ class WebhookManager(RmOldManager):
     return 1
 
   def create_webhooks(self, publishable):
-    if not isinstance(publishable, (Publishable, PretendPublishable)):
+    if not isinstance(publishable, Publishable):
       raise Exception(
           'You can only create webhooks for objects that inherit from '
-          'Publishable or PretendPublishable')
-    obj = publishable.published_object()
-    obj_id = obj.pk
-    obj_type = ContentType.objects.get_for_model(type(obj))
+          'Publishable')
+    obj_id = publishable.pk
+    obj_type = ContentType.objects.get_for_model(type(publishable))
     payload = json.dumps(to_json_dict(publishable))
 
-    for api_key_type in api_key_types():
+    for api_key_type in all_models(APIKey):
       allowed_keys = publishable.allowed_api_keys(api_key_type)
       if allowed_keys is None:
         raise Exception((

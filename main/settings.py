@@ -151,10 +151,6 @@ if (PROD or STAGE) and SECRET_KEY == DEFAULT_SECRET_KEY:
       'as from secrets import token_urlsafe; token_urlsafe()')
 
 
-""" API stuff """
-API_KEY_TYPES = ['djaveAPI.models.user_api_key.UserAPIKey']
-
-
 """ Telling Django about packages. Don't put site specific packages here. Put
 them in THIS_SITE_INSTALLED_APPS in main/this_site_installed_apps.py """
 from main.this_site_installed_apps import THIS_SITE_INSTALLED_APPS

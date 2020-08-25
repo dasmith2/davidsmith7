@@ -78,8 +78,6 @@ def _parsed_value(field, value):
         'An example of something I can parse is '
         '{}').format(field.name, value, example))
 
-  # As per Django's annoying habit, parse_date and parse_datetime swallow
-  # errors and simply return None.
   to_return = None
   try:
     if field.type == DATE_TIME:
@@ -95,6 +93,8 @@ def _parsed_value(field, value):
           'I dont know how to filter on type {}'.format(field.type))
   except ValueError:
     _raise_problem()
+  # As per Django's annoying habit, parse_date and parse_datetime swallow
+  # errors and simply return None.
   if to_return is None:
     _raise_problem()
   return to_return

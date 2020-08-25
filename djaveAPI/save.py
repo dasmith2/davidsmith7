@@ -9,7 +9,6 @@ from djaveDT import now
 from djmoney.money import Money
 
 from djaveAPI.currency_field import corresponding_currency_value
-from djaveAPI.find_models import publishable_model_from_name
 from djaveAPI.problem import Problem
 
 
@@ -35,26 +34,18 @@ def _set_fields(instance, request_data, credentials):
       raw_value = request_data[field.name]
       if field.foreign_key_to:
         if raw_value:
-
-          # This stuff exists entirely because I need to use
-          # djaveAPI.models.user.User when it's a foreign key to
-          # django.contrib.auth.models.User
-          check_credentials_against = field.foreign_key_to
-          if not isinstance(check_credentials_against, AllowedInterface):
-            check_credentials_against = publishable_model_from_name(
-                check_credentials_against.__name__)
-          if not check_credentials_against:
-            raise Problem((
-                '{} doesnt appear to be a class with an '
-                'AllowedInterface or a corresponding '
-                'PretendPublishable').format(
-                    check_credentials_against.__name__))
-
           if raw_value == 'me':
             value = credentials.user
           else:
-            value = credentials.allowed_list(check_credentials_against).filter(
-                pk=raw_value).first()
+            if not issubclass(field.foreign_key_to, AllowedInterface):
+              raise Problem((
+                  'Trying to save a {}, the {} field points to {} which isnt '
+                  'an Allowed class, so I cant check if you have permission '
+                  'to set it.').format(
+                      instance.__class__.__name__, field.name,
+                      field.foreign_key_to.__name__))
+            value = credentials.allowed_list(
+                field.foreign_key_to).filter(pk=raw_value).first()
             if value is None:
               raise Problem((
                   'Either {} {} does not exist, or your API key does not have '

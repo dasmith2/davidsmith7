@@ -1,6 +1,5 @@
 from unittest.mock import Mock
 
-from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
 from djaveAPI.models.webhook import Webhook
@@ -63,23 +62,3 @@ class PublishableTests(TestCase):
           last_send_attempt_at=to_tz_dt('2020-01-15 12:00'),
           attempts=1,
           success_at=to_tz_dt('2020-01-15 12:00')).count())
-
-
-class PretendPublishableTests(TestCase):
-  def setUp(self):
-    super().setUp()
-    self.user = get_test_user()
-    get_test_user_api_key(user=self.user, webhook_url='https://test')
-    get_test_user_api_key(user=get_test_user(), webhook_url='https://blargh')
-    if webhooks_work:
-      self.assertEqual(0, Webhook.objects.count())
-
-  def test_create_webhooks(self):
-    self.user.is_active = False
-    self.user.save()
-    if webhooks_work:
-      self.assertEqual(1, Webhook.objects.count())
-      obj_type = ContentType.objects.get_for_model(User)
-      Webhook.objects.get(
-          obj_id=self.user.pk, obj_type=obj_type, webhook_url='https://test',
-          last_send_attempt_at=None, attempts=0, success_at=None)

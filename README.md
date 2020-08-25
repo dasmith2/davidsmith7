@@ -139,3 +139,89 @@ my_specific_page.html should inherit from my_specific_section.html
 
 If the css is specifically for a particular widget, just inline the styles
 immediately above the widget in the template for the widget.
+
+## Retiring an entire Django app / Squashing migrations
+
+The trick is that migrations from other apps might reference your app which
+prevents you from removing the entire folder. I started with the directions on
+https://simpleisbetterthancomplex.com/tutorial/2016/07/26/how-to-reset-migrations.html
+but you should be able to just use these following directions.
+
+0. Update your code so that nothing at all references the app you want to
+delete. You can't yet remove the app from settings.py though. I'm not certain
+if you can delete all the app's tables themselves... you might get inscrutable
+error messages. Maybe work on a new branch and try it out. Then come back and
+update these docs.
+
+The point is, get the database to the state you want it to be at for this
+whole process. Migrating in the middle of this process gets real ugly so
+get all your changes in now.
+1. python manage.py makemigrations, commit, deploy, python manage.py migrate
+on all databases. Make sure everything is up to date everywhere and that tests
+are passing.
+2. This command helps you keep track of the migration situation. You'll run it
+often.
+
+    python manage.py showmigrations
+
+3. Locally,
+
+    python manage.py migrate --fake my_app zero
+
+That will undo the migrations in my_app, but ALSO the migrations that depend
+on those migrations! So do showmigrations to make sure you understand what's
+up. If it removed any migrations from other apps, zero those apps out too.
+python manage.py migrate --fake my_dependent_app zero
+
+4. Locally, remove the files for the migrations that got "undone".
+
+    rm my_app/migrations/0*
+    rm my_dependent_app/migrations/0*
+
+5. Now it's time to totally remove that app you don't want from settings.py and
+   also
+
+    git rm -r my_app
+    rm -rf my_app
+
+5. python manage.py makemigrations
+6. Locally, pretend you installed those new initial migrations you made.
+
+    python manage.py migrate --fake-initial
+
+7. Run the tests.
+8. DO NOT GIT COMMIT AND DEPLOY YET!
+8. On all other databases such as stage and production,
+
+    heroku run bash -a stayd-stage
+    ./manage.py migrate --fake my_app zero
+    ./manage.py migrate --fake my_dependent_app zero
+
+8. Remove this line from Procfile
+
+    release: bash post_release.sh
+
+9. NOW git commit and deploy.
+
+9. Then fake the migrations in stage and prod
+
+python manage.py migrate --fake-initial
+
+BUG ALERT
+
+Today when I tried to run that in stage I got
+
+TypeError: sequence index must be integer, not 'slice'
+
+at
+
+python3.6/site-packages/django/db/backends/postgresql/introspection.py", line 69, in <listcomp>
+
+So I basically just manually copied the entries in django_migrations from my
+local database to stage and prod instead.
+
+END BUG ALERT
+
+10. Finally, revert Procfile so it once again has the line
+
+    release: bash post_release.sh

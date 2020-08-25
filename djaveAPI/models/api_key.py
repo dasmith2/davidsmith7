@@ -1,27 +1,13 @@
 """ By itself, an APIKey isn't much use. You're probably going to inherit from
 APIKey in order to describe some kind of scope. djaveAPI.models.user_api_key is
 an example. It's an API Key created at the user level.  """
-from importlib import import_module
 from secrets import token_urlsafe
 
-from django.conf import settings
 from django.contrib.auth.hashers import check_password, make_password
 from django.db import models
 from djaveAllowed.credentials import CredentialsInterface
 from djaveClassMagic.models.base_knows_child import BaseKnowsChild
 from djaveForm.field import URLField
-
-
-def api_key_types():
-  types = []
-  if hasattr(settings, 'API_KEY_TYPES'):
-    for type_str in settings.API_KEY_TYPES:
-      parts = type_str.split('.')
-      module_str = '.'.join(parts[:-1])
-      class_str = parts[-1]
-      module = import_module(module_str)
-      types.append(getattr(module, class_str))
-  return types
 
 
 def username_available(username):

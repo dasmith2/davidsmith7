@@ -4,7 +4,6 @@ from djaveAPI.ajax_or_api_endpoint import ajax_or_api_endpoint_authenticated
 from djaveAPI.filters import filter_model
 from djaveAPI.find_models import allowed_model_from_name
 from djaveAPI.get_instance import get_instance
-from djaveAPI.models.pretend_publishable import PretendPublishable
 from djaveAPI.paged_results import paged_results, get_page
 from djaveAPI.problem import Problem
 from djaveAPI.response import OK
@@ -62,12 +61,7 @@ def api_root(request):
 def get_request_api_obj(model, pk, credentials):
   instance = None
   try:
-    find_with_model = model
-    if issubclass(model, PretendPublishable):
-      find_with_model = model.actually_publishing()
-    instance = credentials.allowed_list(find_with_model).filter(pk=pk).first()
-    if issubclass(model, PretendPublishable):
-      instance = model(instance)
+    instance = credentials.allowed_list(model).filter(pk=pk).first()
   except ValueError as ex:
     # "Field 'id' expected a number but got 'a'."
     if ex.args[0].find('number'):

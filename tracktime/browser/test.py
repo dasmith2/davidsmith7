@@ -75,7 +75,7 @@ class Test(Demo):
   def web_test_save_new(self, http_basic_auth, creator):
     url = self.server_plus_reverse('list_or_save_new', model_name='Project')
     data = {
-        'creator': creator, 'name': 'The Grand Hotel', 'use_clock': True,
+        'creator': 'me', 'name': 'The Grand Hotel', 'use_clock': True,
         'has_to_do_list': False}
     new_project = requests.post(url, json=data, auth=http_basic_auth).json()
     assert new_project['name'] == 'The Grand Hotel'
@@ -96,8 +96,7 @@ class Test(Demo):
 
   def web_test_delete(self, http_basic_auth, project):
     url = self._get_save_or_delete_existing_url(project['id'])
-    project = requests.delete(url, auth=http_basic_auth).json()
-    assert project['deleted']
+    assert requests.delete(url, auth=http_basic_auth).json()['OK']
 
   def _list_or_save_new_url(self):
     return self.server_plus_reverse('list_or_save_new', model_name='Project')

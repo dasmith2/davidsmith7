@@ -1,3 +1,10 @@
+"""
+Use this to help make sure your dev environment doesn't send unexpected
+requests to external APIs.
+
+if can_write_network():  # This will raise an exception locally
+  danger()
+"""
 from django.conf import settings
 
 

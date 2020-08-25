@@ -1,6 +1,5 @@
 from django.db import models
 from djaveAllowed.models import Allowed
-from djaveAPI.models.publishable_interface import PublishableInterface
 from djaveAPI.signals import publishable_post_save
 from djaveDT import now
 
@@ -13,13 +12,22 @@ class LivePublishableManager(models.Manager):
     return self.model.filter_allowed_by_user(user, self.get_queryset())
 
 
-class Publishable(Allowed, PublishableInterface):
+class Publishable(Allowed):
   """ Have your models inherit from this class if you want your models to be
   published online as part of a REST-ish API. """
 
   deleted = models.DateTimeField(blank=True, null=True, help_text=(
       'When was this object "deleted"? Deleted objects '
       'should basically be ignored.'))
+
+  def allowed_api_keys(self, api_key_type):
+    """ Return a list of api_keys that are allowed to see this particular
+    instance. So if you were to call bobs_car.allowed_api_keys(OwnerAPIKey)
+    you probably want it to return [bobs_api_key].
+
+    Pretty much the entire point of this function is to look up who we should
+    send webhooks to whenever we save a published object. """
+    raise NotImplementedError('allowed_api_keys {}'.format(self.__class__))
 
   def delete(self):
     raise Exception(
@@ -38,9 +46,6 @@ class Publishable(Allowed, PublishableInterface):
   def save(self, *args, **kwargs):
     super().save(*args, **kwargs)
     publishable_post_save.send(sender=self.__class__, instance=self)
-
-  def published_object(self):
-    return self
 
   @classmethod
   def filter_live(cls, query_set):
