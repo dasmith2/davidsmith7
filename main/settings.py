@@ -173,7 +173,6 @@ INSTALLED_APPS = [
     'djaveLogin',
     'djaveReport',
     'djaveRelease',
-    'djaveS3',
     'djaveStyle',
     'djaveTable',
     'djaveTest',

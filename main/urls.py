@@ -7,7 +7,6 @@ from django.urls import include, path
 from djaveAPI.urls import djave_api_urls
 from djavError.urls import djaverror_urls
 from djaveLogin.urls import djave_login_urls
-from djaveS3.urls import djave_s3_urls
 from djaveStyle.urls import djave_style_urls
 
 from main.this_site_urls import this_site_urls
@@ -22,7 +21,6 @@ urlpatterns = [
     path('', include(djave_style_urls)),
     path('', include(djave_login_urls)),
     path('', include(djaverror_urls)),
-    path('', include(djave_s3_urls)),
     path('', include(this_site_urls))
 ]
 

@@ -1,31 +1,52 @@
 <style>
 .api_docs table, p { max-width: 778px; }
-p, table { margin: 15px 0px 0px 0px; }
-.api_docs pre { max-width: 757px; overflow: auto; }
+p, pre, table { margin: 30px 0px 0px 0px; }
+pre { max-width: 757px; overflow: auto; }
 h1 { margin-top: 60px; }
 .examples { display: none; }
 </style>
 
 <h1>Welcome to the API</h1>
 <div class="margin-top-half">
-  <p>It speaks JSON and uses basic authentication.</p>
-  <p>
-    You can read and write any important object on demand using good old
-    fashioned GET and POST requests.
-  </p>
-  <p>
-    You can subscribe to webhooks and we'll let you know when any important
-    object changes in any way.
-  </p>
-  <p>
-    You can get your very own "API Key username" and "API Key password" and
-    tell us where to send webhooks under the "Settings" link in the upper
-    right hand corner when you're logged in.
-  </p>
-  <p>
-    The API is rate limited to one request a second. If you exceed the rate
-    limit, you'll get a response with status code 429.
-  </p>
+  <p>You can read and write any important object on demand.</p>
+  <p>You can subscribe to webhooks and we'll let you know when any important
+  object changes in any way. You can get your very own "API Key username" and
+  "API Key password" and tell us where to send webhooks under the "Settings"
+  link in the upper right hand corner when you're logged in.</p>
+  <p>Every API endpoint accepts posted JSON content, but as long as there are no
+  nested variables, it also accepts good old fashioned POST variables.</p>
+  <pre>
+# This style works
+$ curl -H "Content-Type: application/json" -d '{"foo":"bar"} https://TrackTime.TECH/api/Foo
+
+# This style also works
+$ curl -d 'foo=bar' https://TrackTime.TECH/api/Foo</pre>
+  <p>Not every API endpoint requires authentication, but those that do accept
+  two forms of authentication. You can be a logged in user and, in the case of
+  POST requests, include a csrf token to protect against CSRF.</p>
+  <pre>
+// If you're logged in to the browser, this kind of thing will work.
+var csrf = $('input[name=csrfmiddlewaretoken]').val();
+$.post('/api/bar', {'bar': 'foo', 'csrfmiddlewaretoken': csrf});</pre>
+  <p>Or, you can use your API key username and password with basic authentication.</p>
+  <pre>
+// On the command line or whatever, this kind of thing will work.
+$ curl -d 'bar=foo' -u 'your_username:your_password' https://TrackTime.TECH/api/bar</pre>
+  <p>When saving or updating objects, there are a few special strings you can
+  use. User fields accept the magic string 'me' to refer to the user who made the
+  API call. Obviously the 'me' magic string only works on API calls that require
+  authentication. For fields that accept datetimes, you can use the magic string
+  'now'.</p>
+  <p>When saving or updating objects, if you don't specify a field, the API will
+  use the default for new objects and the existing value for existing objects.
+  This is handy for when you want to only update a single field.  </p>
+  <p> Whenever you attempt to do something incorrectly, the API returns a
+  response like</p>
+  <pre>
+{"problem": "A (hopefully) clear explanation of the problem"}</pre>
+  <p>The API is rate limited to one request a second. If you exceed the rate
+  limit, you'll get a response with status code 429.</p>
+
 </div>
 
 <script>
