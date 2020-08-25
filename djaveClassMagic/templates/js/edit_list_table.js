@@ -281,10 +281,6 @@ function setup_set_clear_dt_green_mode(
   }
 }
 
-function px_to_int(px) {
-  return parseInt(px.replace('px', ''));
-}
-
 function setup_display_count() {
   $('table[data-model]').each(function() {
     var table = $(this);

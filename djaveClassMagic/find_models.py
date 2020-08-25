@@ -1,5 +1,5 @@
 """ Functions for locating models. More precisely, functions for locating
-classes in the `models` and `web_test` modules of INSTALLED_APPS. By default
+classes in the `models` and `browser` modules of INSTALLED_APPS. By default
 these functions pull back django.db.models.Model subclasses but you can specify
 a different base class. """
 from importlib import import_module

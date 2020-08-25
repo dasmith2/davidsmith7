@@ -14,12 +14,13 @@ from djaveForm.field import URLField
 
 def api_key_types():
   types = []
-  for type_str in settings.API_KEY_TYPES:
-    parts = type_str.split('.')
-    module_str = '.'.join(parts[:-1])
-    class_str = parts[-1]
-    module = import_module(module_str)
-    types.append(getattr(module, class_str))
+  if hasattr(settings, 'API_KEY_TYPES'):
+    for type_str in settings.API_KEY_TYPES:
+      parts = type_str.split('.')
+      module_str = '.'.join(parts[:-1])
+      class_str = parts[-1]
+      module = import_module(module_str)
+      types.append(getattr(module, class_str))
   return types
 
 

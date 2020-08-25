@@ -13,7 +13,7 @@ class Field(FormElement):
   # You can put djaveForm fields in djaveTables.
   def __init__(
       self, key_prefix, required=True, default=None, pk=None, value=None,
-      label=None, autofocus=False):
+      label=None, autofocus=False, additional_attrs=None):
     super().__init__(key_prefix, pk)
     self.required = required
     self.default = default
@@ -25,6 +25,7 @@ class Field(FormElement):
 
     self.label = label
     self.autofocus = autofocus
+    self.additional_attrs = additional_attrs or {}
 
     self._custom_invalid_reason = None
 
@@ -51,6 +52,14 @@ class Field(FormElement):
         return self.get_value()
     elif self.default:
       return self.default
+    return ''
+
+  def additional_attrs_string(self):
+    parts = []
+    for key, value in self.additional_attrs.items():
+      parts.append('{}="{}"'.format(key, value))
+    if parts:
+      return ' {}'.format(' '.join(parts))
     return ''
 
   def get_value_or_default(self):
@@ -134,7 +143,9 @@ class SelectField(Field):
     return option.id == self.default
 
   def widget_html(self):
-    render = ['<select name="{}"{}>'.format(self.key(), self.autofocus_str())]
+    render = ['<select name="{}"{}{}>'.format(
+        self.key(), self.autofocus_str(),
+        self.additional_attrs_string())]
     if not self.required:
       render.append('<option></option>')
     for option in self.options:
@@ -158,17 +169,18 @@ def datefield_string_to_date(day_string):
 
 class TextAreaField(Field):
   def widget_html(self):
-    return '<textarea name="{}" class="{}"{}>{}</textarea>'.format(
+    return '<textarea name="{}" class="{}"{}{}>{}</textarea>'.format(
         self.key(), self.key_prefix, self.autofocus_str(),
-        self.get_value_string())
+        self.additional_attrs_string(), self.get_value_string())
 
 
 class HtmlInputField(Field):
   """ This is for fields that start with <input type="... """
   def widget_html(self):
-    return '<input type="{}"{} name="{}" class="{}"{}{}>'.format(
+    return '<input type="{}"{} name="{}" class="{}"{}{}{}>'.format(
         self.input_type(), self.additional_attrs_str(), self.key(),
-        self.key_prefix, self.get_value_html_str(), self.autofocus_str())
+        self.key_prefix, self.get_value_html_str(), self.autofocus_str(),
+        self.additional_attrs_string())
 
   def get_value_html_str(self):
     return ' value="{}"'.format(self.get_value_string())

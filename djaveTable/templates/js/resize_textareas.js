@@ -40,21 +40,22 @@ function get_height_finder(computed_style) {
   return height_finder.width(width);
 }
 
-function resize_textareas() {
+function resize_textareas(wrapper_jquery_selector) {
   // You have to wait until the page is visible in order to ask questions about
   // what dimensions things are. Resizing can work incorrectly if you do a hard
   // refresh because then the browser fetches the fonts from scratch. But if
   // you do normal refreshes it's fine.
   on_display(function() {
-    var textareas = $('textarea');
+    wrapper_jquery_selector = wrapper_jquery_selector || 'body';
+    var textareas = $(wrapper_jquery_selector).find('textarea');
     for (var i = 0; i < textareas.length; i++) {
       var textarea = $(textareas[i]);
       if (!textarea.attr('data-initial-resize')) {
         textarea.attr('data-initial-resize', 'yep').on('input', function() {
           resize_textarea($(this));
         });
-        resize_textarea(textarea);
       }
+      resize_textarea(textarea);
     }
   });
 }

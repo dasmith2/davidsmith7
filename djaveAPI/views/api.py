@@ -7,6 +7,7 @@ from djaveAPI.get_instance import get_instance
 from djaveAPI.models.pretend_publishable import PretendPublishable
 from djaveAPI.paged_results import paged_results, get_page
 from djaveAPI.problem import Problem
+from djaveAPI.response import OK
 from djaveAPI.save import update, save_new
 from djaveAPI.to_json import to_json_dict
 
@@ -50,6 +51,7 @@ def get_save_or_delete_existing(
       instance.mark_deleted()
     else:
       instance.delete()
+    return OK
   return to_json_dict(instance, model)
 
 

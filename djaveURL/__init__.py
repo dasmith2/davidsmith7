@@ -95,6 +95,10 @@ def dict_as_query(query_dict):
   return '?{}'.format('&'.join(key_values))
 
 
+def kwargs_as_query(**kwargs):
+  return dict_as_query(kwargs)
+
+
 def url_with(request_get_full_path, **kwargs):
   # Add the given key value pairs to the query string. Why is this so hard haha
   # request_get_full_path can be a request object or a string.

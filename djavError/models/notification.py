@@ -1,7 +1,7 @@
 from datetime import timedelta
 
 from django.conf import settings
-from djaveClassMagic import RmOldManager
+from djaveClassMagic.models.rm_old import RmOldManager
 from djaveDT import now
 from djavError.models.staff_email_log import StaffEmailLog
 from djavEmail.staff_email_sender import StaffEmailSender

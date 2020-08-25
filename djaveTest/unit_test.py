@@ -1,3 +1,10 @@
+"""
+If you inherit from TestCase, then if your test runs over .5 seconds it'll
+print out the test's name. This is handy for when you have, like, 200 tests and
+all of a sudden one of them is really slow.
+
+This file also has get_test_user which practically every test uses.
+"""
 import secrets
 import string
 import time as time_time

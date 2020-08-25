@@ -1,12 +1,8 @@
-import base64
 
-from django.contrib.auth import authenticate
 from django.http import JsonResponse
-from django.middleware.csrf import CsrfViewMiddleware
 
-from djaveAllowed.credentials import UserCredentials
+from djaveAPI.get_credentials import get_credentials
 from djaveAPI.get_request_dict import get_request_dict
-from djaveAPI.models.api_key import APIKey
 from djaveAPI.problem import Problem
 from djaveAPI.response import problem_response, OK_RESPONSE
 
@@ -56,51 +52,9 @@ class ajax_or_api_endpoint_authenticated(ajax_or_api_endpoint):
   def my_view(request_method, request_dict, credentials, *args, **kwargs):
   """
   def get_response(self, request, *args, **kwargs):
-    credentials = self.get_credentials(request)
+    credentials = get_credentials(request)
     if credentials is None:
       return problem_response('This API function requires credentials', 403)
     return self.view_function(
         request.method, get_request_dict(request), credentials, *args,
         **kwargs)
-
-  def get_credentials(self, request):
-    uname_pword = self.get_uname_pword_header(request)
-    if uname_pword:
-      (username, plain_password) = uname_pword
-      maybe_user = authenticate(username=username, password=plain_password)
-      if maybe_user:
-        return UserCredentials(maybe_user)
-      maybe_api_key = APIKey.objects.get_api_key(username, plain_password)
-      if maybe_api_key:
-        return maybe_api_key.as_child_class()
-      raise Problem(
-          'I do not recognize this username and password', status_code=401)
-    if request.user.is_authenticated:
-      # In this case we need to check the csrf token.
-      csrf_invalid_reason = CsrfViewMiddleware().process_view(
-          request, None, (), {})
-      if csrf_invalid_reason:
-        raise Problem('I was unable to verify the CSRF token')
-      return UserCredentials(request.user)
-
-  def get_uname_pword_header(self, request):
-    auth_header = request.headers.get('Authorization', None)
-    if auth_header:
-      weird_formatting_response = Problem((
-          'This API uses basic authentication. Server side, I am looking for '
-          'a header titled "Authorization" with a value along the lines of '
-          '"Basic dW5hbWU6cHdvcmQ=" where that dW5... string is a base 64 '
-          'encoded string of your-username:your-password But probably you '
-          'just want to use a library.'), status_code=401)
-      if auth_header.find('Basic ') == -1:
-        raise weird_formatting_response
-      auth_header = auth_header.replace('Basic ', '')
-      uname_pword_str = base64.b64decode(auth_header).decode('utf-8')
-      if uname_pword_str.find(':') == -1:
-        raise weird_formatting_response
-      (username, plain_password) = uname_pword_str.split(':')
-      if not username:
-        raise Problem('You did not include a username', status_code=401)
-      if not plain_password:
-        raise Problem('You did not include a password', status_code=401)
-      return (username, plain_password)

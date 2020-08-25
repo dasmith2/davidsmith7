@@ -3,7 +3,7 @@ import traceback
 
 from django.conf import settings
 from django.db import models
-from djaveClassMagic import RmOldManager
+from djaveClassMagic.models.rm_old import RmOldManager
 from djaveDT import now
 from djavError.models.staff_email_log import StaffEmailLog
 from djavEmail.staff_email_sender import StaffEmailSender
@@ -59,7 +59,9 @@ class ErrorManager(RmOldManager):
     if value_:
       error_message = value_.__repr__()
 
-    to_emails = [settings.EMAIL_ERRORS_TO]
+    to_emails = []
+    if hasattr(settings, 'EMAIL_ERRORS_TO'):
+      to_emails.append(settings.EMAIL_ERRORS_TO)
     if extra_to:
       to_emails.extend(extra_to)
 
@@ -82,9 +84,6 @@ class ErrorManager(RmOldManager):
     subject = '{} on {}'.format(error.title, settings.THIS_SERVERS_BASE_URL)
     if error.to:
       email_sender.send_mail(subject, email_message, error.to.split(','))
-    else:
-      message = 'This error didnt specify to:\n\n{}'.format(email_message)
-      Error.objects.create(title=subject[:250], message=message)
 
 
 class Error(StaffEmailLog):

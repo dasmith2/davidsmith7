@@ -50,13 +50,16 @@ def _set_fields(instance, request_data, credentials):
                 'PretendPublishable').format(
                     check_credentials_against.__name__))
 
-          value = credentials.allowed_list(check_credentials_against).filter(
-              pk=raw_value).first()
-          if value is None:
-            raise Problem((
-                'Either {} {} does not exist, or your API key does not have '
-                'access to it').format(
-                    field.foreign_key_to.__name__, raw_value))
+          if raw_value == 'me':
+            value = credentials.user
+          else:
+            value = credentials.allowed_list(check_credentials_against).filter(
+                pk=raw_value).first()
+            if value is None:
+              raise Problem((
+                  'Either {} {} does not exist, or your API key does not have '
+                  'access to it').format(
+                      field.foreign_key_to.__name__, raw_value))
           if not isinstance(value, field.foreign_key_to):
             raise Exception('value should be a {}, not {}'.format(
                 field.foreign_key_to, value.__class__))
@@ -144,4 +147,6 @@ def _float_or_integer(field, raw_value):
 def _boolean(field, raw_value):
   if raw_value in ['', None]:
     return None
+  if isinstance(raw_value, str):
+    return raw_value.lower().find('true') >= 0
   return raw_value

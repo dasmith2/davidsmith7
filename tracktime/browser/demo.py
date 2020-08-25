@@ -1,5 +1,5 @@
 """ Don't put any asserts in here really. Put them in tracktime.browser.test
-which inherits from thisdemo. """
+which inherits from this demo. """
 from datetime import date, timedelta
 from djaveTest.web_demo import WebDemo
 
@@ -388,27 +388,3 @@ class Demo(WebDemo):
 
   def api(self):
     pass
-
-  def done(self):
-    from selenium.common.exceptions import WebDriverException
-    try:
-      # I often save a file and then immediately hit continue on a trace
-      # session, which then often flies immediately to this page, which then
-      # fails to load because ./manage.py runserver is reloading.
-      self.go_to_view('demo_done')
-    except WebDriverException:
-      self.sleep(1)
-      self.go_to_view('demo_done')
-    self.say("""
-        I hope you enjoyed this demo! I'm a software consultant and I
-        can build automations, workflows, and demos for your
-        business. Drop me a line if you're interested.""")
-
-  def demo_user_wasnt_destroyed(self):
-    self.go_to_view('demo_done')
-    self.say("""
-        It appears that the demo user wasn't successfully destroyed after the
-        last demo, so I destroyed them now. I'm afraid you will have to
-        restart the demo.""")
-    self.wait_talking()
-    self.driver.close()

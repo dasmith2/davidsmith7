@@ -1,3 +1,9 @@
+"""
+If you only want an E2E web test, not a demo, you probably just want to inherit
+from djaveTest/web_demo.py and put self.go_fast() as the first step in def run.
+But for the sake of keeping code organized, I collected functions that pertain
+only to web tests and not to web demos here.
+"""
 from abc import abstractmethod
 import os
 from pathlib import Path
@@ -6,10 +12,18 @@ import time
 
 from django.conf import settings
 from django.shortcuts import reverse
+from django.template.loader import render_to_string
 from djaveAPI.status_codes import is_server_error
 from djaveClassMagic.find_models import all_models
-from djaveLogin.calc_urls import append_next_url, NEXT_URL
-from djaveReport.date_range_report import FROM_DATE, TO_DATE
+try:
+  from djaveLogin.calc_urls import append_next_url, NEXT_URL
+except ModuleNotFoundError:
+  pass
+try:
+  from djaveReport.date_range_report import FROM_DATE, TO_DATE
+except ModuleNotFoundError:
+  FROM_DATE = 'from_date'
+  TO_DATE = 'to_date'
 from djaveURL import dict_as_query
 import requests
 
@@ -96,6 +110,9 @@ class WebTest(object):
       raise Exception('Server error. Check {}/admin/errors/stayderror/'.format(
           self.server))
     return response.json()
+
+  def post_json(self, view_name, data):
+    return requests.post(self.server_plus_reverse(view_name), data=data)
 
   def server_plus_reverse(self, view_name, *args, **kwargs):
     path = reverse(view_name, args=args, kwargs=kwargs)
@@ -260,20 +277,44 @@ class WebTest(object):
         self.server_plus_reverse(view_name, token=token), next_url)
     self.go_to_url(login_url)
 
+  def execute_script(self, script, *args):
+    from selenium.common.exceptions import JavascriptException
+    try:
+      return self.driver.execute_script(script, *args)
+    except JavascriptException as ex:
+      if self.on_error_screen():
+        raise Exception('Server error.')
+      raise ex
+
+  def jfind(self, jquery_selector):
+    return self.execute_script("return $('{}')[0];".format(jquery_selector))
+
+  def jfinds(self, jquery_selector):
+    script = render_to_string('js/get_elements.js', {
+        'jquery_selector': jquery_selector})
+    return self.execute_script(script)
+
   def find(self, clue):
     return self.finds(clue)[0]
 
   def finds(self, clue, raise_exception_if_not_found=True, attempt=0):
-    elts = self.driver.find_elements_by_class_name(clue)
-    if len(elts):
-      return elts
-    elts = self.driver.find_elements_by_name(clue)
-    if len(elts):
-      return elts
-    elts = self.driver.find_elements_by_id(clue)
-    if len(elts):
-      return elts
-    elts = self.driver.find_elements_by_tag_name(clue)
+    from selenium.common.exceptions import InvalidSelectorException
+    try:
+      elts = self.driver.find_elements_by_class_name(clue)
+      if len(elts):
+        return elts
+      elts = self.driver.find_elements_by_name(clue)
+      if len(elts):
+        return elts
+      elts = self.driver.find_elements_by_id(clue)
+      if len(elts):
+        return elts
+      elts = self.driver.find_elements_by_tag_name(clue)
+      if len(elts):
+        return elts
+    except InvalidSelectorException:
+      pass  # clue is probably a jquery_selector
+    elts = self.jfinds(clue)
     if len(elts):
       return elts
     if raise_exception_if_not_found:

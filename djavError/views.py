@@ -96,7 +96,7 @@ def js_error(request):
   post = request.POST
   message = (
       'This is a Javascript error caught by '
-      'main/templates/js/error.js\n\nuser: {}\n\n{} line {} column {}'
+      'djavError/templates/js/error.js\n\nuser: {}\n\n{} line {} column {}'
       '\nReferer {}\nStack {}').format(
           request.user, post.get('url', ''),
           post.get('line', ''), post.get('col', ''),

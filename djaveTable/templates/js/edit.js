@@ -15,7 +15,7 @@ function setup_edit_field_turns_yellow(
   table.attr(already_attr, 'yep');
 
   var elts = table.find('input,select,textarea');
-  setup_saved_value(elts);
+  set_saved_values(elts);
 
   var handle_row_maybe_changed = function(event) {
     var row = $(this).parents(row_parent_finder);
@@ -26,7 +26,7 @@ function setup_edit_field_turns_yellow(
   anything_happened(elts, handle_row_maybe_changed);
 }
 
-function setup_saved_value(selector_or_elt) {
+function set_saved_values(selector_or_elt) {
   $(selector_or_elt).each(function() {
     var elt = $(this);
     elt.attr('data-saved-value', val(elt));

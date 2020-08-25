@@ -40,7 +40,7 @@ class FixableTable(EditListTable):
           'model_name': self.get_model().__name__,
           'pks': ','.join(pks)})
       self.append_js(render_to_string(
-          'all_fixed.js', context={'all_fixed_url': all_fixed_url}))
+          'js/all_fixed.js', context={'all_fixed_url': all_fixed_url}))
     self.headers.append(last_header)
     self.setup_set_dt_green('fixed', 'Fixed', 'Not fixed')
 

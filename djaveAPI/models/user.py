@@ -7,12 +7,15 @@ But then there's a bunch of magic, which I'm not super excited about. """
 from django.contrib.auth.models import User as DjangoUser
 from django.db import connection
 from django.db.models.signals import pre_save, post_save
-from django.dispatch import receiver
+from django.dispatch import receiver, Signal
 
 from djaveAPI.models.pretend_publishable import PretendPublishable
 from djaveAPI.models.user_api_key import UserAPIKey
 from djaveAPI.signals import publishable_post_save
-from djaveRelease.signals import post_release
+try:
+  from djaveRelease.signals import post_release
+except ModuleNotFoundError:
+  post_release = Signal()
 
 
 class User(PretendPublishable):
@@ -55,7 +58,7 @@ class User(PretendPublishable):
 
 @receiver(pre_save, sender=DjangoUser)
 def pre_save_user(sender, instance, **kwargs):
-  if instance.username != instance.email:
+  if instance.email and not instance.username:
     instance.username = instance.email
 
 

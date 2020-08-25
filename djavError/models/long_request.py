@@ -1,7 +1,7 @@
 from datetime import timedelta
 
 from django.db import models
-from djaveClassMagic import RmOldManager
+from djaveClassMagic.models.rm_old import RmOldManager
 from djavError.models.problem_request import ProblemRequest
 from djaveDT import now
 

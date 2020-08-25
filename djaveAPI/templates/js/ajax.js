@@ -58,14 +58,28 @@ function problem_in_response(response) {
 
 function post(url, data, success, always, feedback) {
   var success_callback = _success_callback(success, always, feedback);
-  var request_obj = $.post(url, add_csrf_token(data), success_callback);
+  wire_up_ajax_csrf();
+  var request_obj = $.post(url, data, success_callback);
   _add_fail(request_obj, always, feedback);
 }
+
+function wire_up_ajax_csrf() {
+  /* The whole reason I do this is because backbone.js takes it upon itself to
+   * post to the server for you, but they don't include a great way to attach a
+   * csrf token. But you'll notice in function post I still
+   * add_csrf_token(data) because that seems to be necessary. */
+  $.ajaxSetup({
+    headers: {'X-CSRFToken': get_csrf_token()}
+  });
+}
+
+$(wire_up_ajax_csrf);
 
 function get(url, success, always, feedback) {
   var success_callback = _success_callback(success, always, feedback);
   var request_obj = $.get(url, success_callback);
   _add_fail(request_obj, always, feedback);
+  return request_obj;
 }
 
 function _success_callback(success, always, feedback) {
@@ -114,6 +128,17 @@ function before_send_delete() {
 }
 
 function get_csrf_token() {
+  return get_csrf_token_from_cookie() || get_csrf_token_from_html();
+}
+
+function get_csrf_token_from_cookie() {
+  var matched = document.cookie.match(/csrftoken=(\w+)/);
+  if (matched) {
+    return matched[1];
+  }
+}
+
+function get_csrf_token_from_html() {
   return $('input[name=csrfmiddlewaretoken]').val();
 }
 

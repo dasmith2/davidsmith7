@@ -8,7 +8,13 @@ from djaveAPI.signals import publishable_post_save
 from djaveAPI.to_json import to_json_dict
 from djaveClassMagic.models.rm_old import RmOld, RmOldManager
 from djaveDT import now
-from djaveThread.background_command import background_command
+try:
+  from djaveThread.background_command import background_command
+  @background_command
+  def send_webhooks():
+    Webhook.objects.send()
+except ModuleNotFoundError:
+  pass
 from django.core.exceptions import AppRegistryNotReady
 try:
   from django.contrib.contenttypes.models import ContentType
@@ -18,11 +24,6 @@ except AppRegistryNotReady:
       '`from djavError.log_error import log_error` in djavError.__init__')
 from django.db import models
 from django.dispatch import receiver
-
-
-@background_command
-def send_webhooks():
-  Webhook.objects.send()
 
 
 @receiver(publishable_post_save)

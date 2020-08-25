@@ -14,6 +14,7 @@ button, .button, input[type="submit"], input[type="button"], a.button {
   margin: {% zoom 3 %}px {% zoom 8 %}px {% zoom 3 %}px 0px;
   font-size: {% font_size .90 %};
   font-weight: 401; }
+.last-button { margin-right: {% zoom 3 %}px; }
 button:active, .button:active, input[type=submit]:active, input[type=button]:active,
 button:focus, .button:focus, input[type=submit]:focus, input[type=button]:focus,
 button:hover, .button:hover, input[type=submit]:hover, input[type=button]:hover,

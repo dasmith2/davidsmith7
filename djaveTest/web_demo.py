@@ -1,3 +1,10 @@
+"""
+Install Selenium, inherit from WebDemo, and you can create fully automated E2E
+tests and demonstrations narrated by a robotic voice.
+
+Functions that are useful for both web tests and web demos are probably in
+WebTest, which WebDemo inherits from.
+"""
 from random import choice
 import time
 
@@ -28,6 +35,9 @@ class WebDemo(WebTest):
   def go_to_first_view(self):
     self.go_to_view(self.first_view())
 
+  def first_view(self):
+    return 'homepage'
+
   def first_url(self):
     return 'djave_sign_up'
 
@@ -36,15 +46,6 @@ class WebDemo(WebTest):
 
   def go_slow(self):
     self._go_slow = True
-
-  def execute_script(self, script, *args):
-    from selenium.common.exceptions import JavascriptException
-    try:
-      return self.driver.execute_script(script, *args)
-    except JavascriptException as ex:
-      if self.on_error_screen():
-        raise Exception('Server error.')
-      raise ex
 
   def say(self, message, wait=False):
     self.transcript.append(message)
@@ -71,6 +72,10 @@ class WebDemo(WebTest):
     element = self.get_element(element_or_clue)
     if self._go_slow:
       location = element.location
+      while location['x'] == 0 and location['y'] == 0:
+        # No idea why this happens sometimes.
+        self.wait(0.1)
+        location = element.location
       context = {
           'x': location['x'] + offset_x, 'y': location['y'] + offset_y,
           'step': 3 if quick else 1}
@@ -97,6 +102,7 @@ class WebDemo(WebTest):
       else:
         element.clear()
     self.type(element, keys)
+    self.hover_off(element)
 
   def say_move_enter_date(self, element_or_clue, date, say):
     self.say(say)
@@ -115,9 +121,9 @@ class WebDemo(WebTest):
     self.wait_talking()
     self.wait_mouse()
 
-  def say_move_click(self, element_or_clue, say):
+  def say_move_click(self, element_or_clue, say, quick=False):
     self.say(say)
-    self.move_click(element_or_clue, wait_talking=True)
+    self.move_click(element_or_clue, wait_talking=True, quick=quick)
 
   def say_move_type(self, element_or_clue, keys, say, clear_first=False):
     self.say(say)
@@ -149,6 +155,12 @@ class WebDemo(WebTest):
         # demo and test should always halt in its tracks if it sees the error
         # screen.
         self.raise_if_on_error_screen()
+        try:
+          self.hover_off(element)
+        except StaleElementReferenceException:
+          # Clicking the button may have removed the button from the page,
+          # making hover_off pointless anyway.
+          pass
         return
       except StaleElementReferenceException:
         pass
@@ -225,3 +237,28 @@ class WebDemo(WebTest):
   def wait(self, seconds):
     if self._go_slow:
       super().wait(seconds)
+
+  def done(self, say=None):
+    from selenium.common.exceptions import WebDriverException
+    say = say or """
+        I hope you enjoyed this demo! I'm a software consultant and I
+        can build automations, workflows, and demos for your
+        business. Drop me a line if you're interested."""
+    try:
+      # I often save a file and then immediately hit continue on a trace
+      # session, which then often flies immediately to this page, which then
+      # fails to load because ./manage.py runserver is reloading.
+      self.go_to_view('demo_done')
+    except WebDriverException:
+      self.sleep(1)
+      self.go_to_view('demo_done')
+    self.say(say)
+
+  def demo_user_wasnt_destroyed(self):
+    self.go_to_view('demo_done')
+    self.say("""
+        It appears that the demo user wasn't successfully destroyed after the
+        last demo, so I destroyed them now. I'm afraid you will have to
+        restart the demo.""")
+    self.wait_talking()
+    self.driver.close()

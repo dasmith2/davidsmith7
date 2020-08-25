@@ -31,6 +31,12 @@ def model_fields_lookup(model):
   return lookup
 
 
+def django_primary_key_field(model):
+  for field in _get_django_model_fields(model):
+    if hasattr(field, 'primary_key') and field.primary_key:
+      return field
+
+
 def model_fields(model, specific_field=None):
   fields = []
   for field in _get_django_model_fields(model):
@@ -54,8 +60,11 @@ def model_fields(model, specific_field=None):
     foreign_key_to = None
     max_length = None
 
-    is_id = name == 'id'
+    is_id = field.primary_key
     if is_id:
+      # The name is typically already 'id', but not when the primary key is
+      # also a OneToOne foreign key.
+      name = 'id'
       required = False
       can_filter = False
       editable = False

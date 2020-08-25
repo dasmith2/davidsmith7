@@ -178,6 +178,7 @@ INSTALLED_APPS = [
     'djaveTable',
     'djaveTest',
     'djaveThread',
+    'djaveURL',
     'main'] + THIS_SITE_INSTALLED_APPS
 
 # Whichever of these test classes reference django.contrib.auth.User need
