@@ -1,19 +1,19 @@
 """ This table is for editing a single instance. It does one row per field.
 It's got helptext. """
 
+from djaveClassMagic.default_widget import default_widget
 from djaveClassMagic.model_fields import model_fields
-from djaveForm.button import Button
-from djaveForm.default_widget import default_widget
-from djaveForm.form import Form
-from djaveTable.table import Table, Cell
-from djaveTable.cell_content import (
+from djaveHTML.button import Button
+from djaveHTML.form import Form
+from djaveHTML.table import Table, Cell
+from djaveHTML.cell_content import (
     Tooltip, DisappearingFeedback, Feedback, InHref)
 from djmoney.money import Money
 
 
 WIRE_UP_CONFIRM_DELETE = """
 $(function() {
-  $('.delete').click(function() {
+  $('.edit-table .delete').click(function() {
     return confirm('Delete?');
   });
 });"""
@@ -60,7 +60,7 @@ class EditTable(Table):
 
   def _redo_rows(self):
     self.rows = []
-    self.buttons_cell = Cell([], additional_attrs={'colspan': 2})
+    self.buttons_cell = Cell([], **{'colspan': 2})
     self.add_rows()
 
   def add_rows(self):

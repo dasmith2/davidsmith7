@@ -1,7 +1,7 @@
 from django.shortcuts import reverse
-from djaveForm.button import Button
-from djaveTable.cell_content import InHref
-from djaveTable.table import Row, ButtonsCell
+from djaveHTML.button import Button
+from djaveHTML.cell_content import InHref
+from djaveHTML.table import Row, ButtonsCell
 from djaveTest.unit_test import TestCase, get_test_user
 
 from tracktime.tests.models.test_project import get_test_project

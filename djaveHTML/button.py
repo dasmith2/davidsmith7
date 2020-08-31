@@ -1,7 +1,6 @@
-import re
-
 from django.utils.safestring import mark_safe
-from djaveForm.form_element import FormElement
+from djaveHTML.form_element import FormElement
+from djaveHTML.slugify import slugify
 
 
 BUTTON_SPACER = '<div style="button_spacer"></div>'
@@ -10,12 +9,16 @@ BUTTON_SPACER = '<div style="button_spacer"></div>'
 class Button(FormElement):
   def __init__(
       self, text, key_prefix=None, pk=None, button_type='button',
-      css_class=None, additional_attrs=None):
-    key_prefix = key_prefix or re.compile(r'[^\w]').sub('', text).lower()
-    super().__init__(key_prefix, pk, additional_attrs=additional_attrs)
+      css_classes=None, **additional_attrs):
+    key_prefix = key_prefix or slugify(text)
+    super().__init__(key_prefix, pk, **additional_attrs)
     self.text = text
     self.button_type = button_type
-    self.css_class = css_class or key_prefix
+    self.css_classes = set()
+    if css_classes:
+      self.css_classes.update(css_classes)
+    if key_prefix:
+      self.css_classes.add(key_prefix)
 
     self._was_clicked = None
     self._was_clicked_set = False
@@ -40,10 +43,9 @@ class Button(FormElement):
     return ''
 
   def as_html(self):
-    use_css_class = self.css_class or self.key_prefix or ''
     css_class_str = ''
-    if use_css_class:
-      css_class_str = ' class="{}"'.format(use_css_class)
+    if self.css_classes:
+      css_class_str = ' class="{}"'.format(' '.join(self.css_classes))
     name_attr = ''
     if self.key():
       name_attr = ' name="{}" value="{}"'.format(self.key(), self.key())

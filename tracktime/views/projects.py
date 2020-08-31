@@ -1,12 +1,11 @@
 from django.shortcuts import reverse, render, get_object_or_404, redirect
-from djaveForm.form_wrapper import FormWrapper
+from djaveHTML.form_wrapper import FormWrapper
 from djaveLogin.login_required import login_required
 
 from tracktime.models.project import Project
 from tracktime.views.nav_context import tracktime_context, PROJECTS
 from tracktime.widgets.project_table import ProjectTable
-from tracktime.widgets.projects_table import (
-    ProjectsTable, ArchivedProjectsTable)
+from tracktime.widgets.projects import Projects, ArchivedProjects
 
 
 @login_required
@@ -14,7 +13,7 @@ def projects(request):
   archived_projects_exist = Project.allowed_by_user(request.user).filter(
       deleted__isnull=False).exists()
   context = projects_context(
-      request.user, table=ProjectsTable(request.user),
+      request.user, table=Projects(),
       archived_projects_url=reverse('archived_projects'),
       archived_projects_exist=archived_projects_exist)
   return render(request, 'projects.html', context)
@@ -22,8 +21,7 @@ def projects(request):
 
 @login_required
 def archived_projects(request):
-  context = projects_context(
-      request.user, table=ArchivedProjectsTable(request.user))
+  context = projects_context(request.user, table=ArchivedProjects())
   return render(request, 'archived_projects.html', context)
 
 

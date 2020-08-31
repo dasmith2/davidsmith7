@@ -6,6 +6,6 @@ from tracktime.views.homepage import homepage
 
 
 this_site_urls = [
-    path('tt/', include(tracktime_urls)),
+    path('', include(tracktime_urls)),
     path('invoice/', include(invoice_urls)),
     path('', homepage, name='tracktime_homepage')]

@@ -1,9 +1,9 @@
 from django.shortcuts import render, reverse, redirect, get_object_or_404
-from djaveForm.button import Button
-from djaveForm.form_wrapper import FormWrapper
+from djaveHTML.button import Button
+from djaveHTML.form_wrapper import FormWrapper
 from djaveLogin.login_required import login_required
-from djaveTable.cell_content import InHref
-from djaveTable.problem import Problem as HtmlProblem
+from djaveHTML.cell_content import InHref
+from djaveHTML.problem import Problem as HtmlProblem
 
 from tracktime.models.project import Project
 from tracktime.models.project_work_session import ProjectWorkSession

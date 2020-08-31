@@ -4,7 +4,7 @@ import csv
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.template.loader import render_to_string
-from djaveTable.cell_content import StringContent, InHref
+from djaveHTML.cell_content import StringContent, InHref
 
 
 def csv_writer_and_response(file_name='unhelpful_generic_file_name.csv'):

@@ -1,15 +1,15 @@
 from django.template import loader
-from djaveForm.button import Button
-from djaveForm.form import Form
-from djaveForm.form_element import FormElement
-from djaveTable.cell_content import Paragraph
-from djaveTable.table import Table
+from djaveHTML.button import Button
+from djaveHTML.form import Form
+from djaveHTML.form_element import FormElement
+from djaveHTML.cell_content import Paragraph
+from djaveHTML.table import Table
 
 
 class FilteredReport(object):
   def __init__(self, request_get=None, filters=None, contents=None):
     """ request_get is a dictionary like object, almost certainly request.GET
-    filters is a list of djaveForm.form_element.FormElement
+    filters is a list of djaveHTML.form_element.FormElement
     contents is a single, or list of objects with an as_html function """
     self.set_filters(filters, request_get)
     self.set_contents(contents)
@@ -47,7 +47,7 @@ class FilteredReport(object):
     for _filter in filters:
       if not isinstance(_filter, FormElement):
         raise Exception((
-            'Every filter should be a djaveForm.form_element.FormElement but '
+            'Every filter should be a djaveHTML.form_element.FormElement but '
             'this filter is a {}').format(_filter.__class__))
     return filters
 

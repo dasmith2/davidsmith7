@@ -1,9 +1,9 @@
 from djaveClassMagic.edit_list_table import EditListTable
 from djaveDT import now
-from djaveForm.button import Button
-from djaveForm.form import Form
-from djaveForm.field import TextAreaField
-from djaveTable.table import ButtonsCell
+from djaveHTML.button import Button
+from djaveHTML.form import Form
+from djaveHTML.field import TextAreaField
+from djaveHTML.table import ButtonsCell
 
 from tracktime.models.to_do import ToDo
 
@@ -93,7 +93,7 @@ class ToDosTable(EditListTable):
         classes = ['to_done']  # So as not to conflict with the done button
       self.create_row(
           self.cells_for_existing(to_do), pk=to_do.pk, classes=classes,
-          additional_attrs={'data-done': bool(to_do.done)})
+          **{'data-done': bool(to_do.done)})
 
   # From here on out it's stuff you probably want to override in your
   # FooToDosTable. See ProjectToDosTable for an example.

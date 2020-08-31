@@ -1,6 +1,6 @@
 from django.utils.safestring import mark_safe
 from djaveDT import d_to_str
-from djaveTable.table import Table, Cell
+from djaveHTML.table import Table, Cell
 from djmoney.money import Money
 
 from invoice.html_email_context import html_context
@@ -20,7 +20,7 @@ class ViewLineItems(Table):
       headers = ['Description', 'Calculation', 'Amount']
     super().__init__(
         self.style_cells(headers, is_header=True),
-        additional_attrs={'style': self.html_context['open_table_style']})
+        **{'style': self.html_context['open_table_style']})
 
     self.add_line_item_rows()
     self.add_total_rows()
@@ -69,8 +69,7 @@ class ViewLineItems(Table):
       self.additional_cell_attrs = {
           'style': self.html_context['open_cell_style'] + additional_style}
       actual_row.append(Cell(
-          cell, additional_attrs=self.additional_cell_attrs,
-          is_header=is_header))
+          cell, **self.additional_cell_attrs, is_header=is_header))
     return actual_row
 
   def _compute_any_calculations(self, line_items):

@@ -39,7 +39,6 @@ def list_or_save_new(request_method, request_dict, credentials, model_name):
 @ajax_or_api_endpoint_authenticated
 def get_save_or_delete_existing(
     request_method, request_dict, credentials, model_name, pk):
-  """ Well, get_save_or_delete_existing """
   model = allowed_model_from_name(model_name)
 
   instance = get_instance(model_name, model.objects, pk, credentials)

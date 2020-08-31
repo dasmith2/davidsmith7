@@ -1,8 +1,8 @@
 from djaveClassMagic.edit_list_table import EditListTable
 from djaveDT import dt_to_time_str
-from djaveTable.table import Cell
-from djaveForm.form import Form
-from djaveForm.button import Button
+from djaveHTML.table import Cell
+from djaveHTML.form import Form
+from djaveHTML.button import Button
 
 from tracktime.fields import project_field, hours_field
 from tracktime.models.project_work_session import ProjectWorkSession
@@ -52,7 +52,7 @@ class EnterTimeTable(EditListTable):
         self.save()
         self.form = EnterTimeForm(self.user)
     hours_cell = Cell(
-        self.form.hours_field, additional_attrs={'style': 'text-align: right'})
+        self.form.hours_field, **{'style': 'text-align: right'})
     row = [self.form.project_field, hours_cell, self.form.save_button]
     self.create_row(row, classes=['new'])
 

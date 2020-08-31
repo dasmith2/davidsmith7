@@ -3,12 +3,12 @@ from django.shortcuts import reverse
 from django.template.loader import render_to_string
 from djaveClassMagic.edit_list_table import EditListTable
 from djaveDT import now
-from djaveForm.button import Button
-from djaveForm.field import SelectField, Option
+from djaveHTML.button import Button
+from djaveHTML.field import SelectField, Option
 from djaveReport.date_range_report import DateRangeReport
 from djavError.models.fixable import (
     get_fixables, default_status, default_from_date, EITHER, FIXED, NOT_FIXED)
-from djaveTable.table import ButtonsCell
+from djaveHTML.table import ButtonsCell
 
 
 def get_fixable_status_filter():
@@ -31,7 +31,7 @@ class FixableTable(EditListTable):
           ButtonsCell(self.get_buttons(fixable))]
       self.create_row(
           cells, pk=fixable.pk,
-          additional_attrs={'data-fixed': bool(fixable.fixed)})
+          **{'data-fixed': bool(fixable.fixed)})
 
     last_header = ''
     if pks:

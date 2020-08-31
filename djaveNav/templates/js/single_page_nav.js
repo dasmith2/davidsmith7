@@ -94,7 +94,7 @@ $(function() {
         var data_url = $('#' + current_panel_id).attr('data-url');
         $('.nav_item').each(function() {
           var a = $(this);
-          var wrapper = a.parents('div');
+          var wrapper = $(a.parents('div')[0]);
           // data_url might be "/trips/:pk" and the nav might be to "/trips"
           if (data_url.indexOf(a.attr('href')) == 0) {
             wrapper.addClass('current');

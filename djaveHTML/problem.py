@@ -1,5 +1,5 @@
 from django.utils.safestring import mark_safe
-from djaveTable.cell_content import CellContent
+from djaveHTML.cell_content import CellContent
 
 
 class Problem(CellContent):

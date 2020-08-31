@@ -2,6 +2,7 @@ from datetime import datetime, date, timedelta, time
 
 from django.utils.safestring import mark_safe
 from djaveDT import tz_dt_to_str, time_to_time_str, d_to_str, tz_dt_to_tz_dt
+from djaveHTML.slugify import slugify
 from djmoney.money import Money
 
 
@@ -88,8 +89,11 @@ class InHref(CellContent):
 
 
 class ButtonInHref(InHref):
-  def __init__(self, cell_contents, url, classes=[]):
+  def __init__(self, cell_contents, url, classes=None):
+    classes = classes or []
     classes.append('button')
+    if isinstance(cell_contents, str):
+      classes.append(slugify(cell_contents))
     super().__init__(cell_contents, url, classes=classes)
 
 

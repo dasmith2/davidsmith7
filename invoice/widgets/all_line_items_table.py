@@ -1,5 +1,5 @@
 from django.template.loader import render_to_string
-from djaveTable.table import Table, Cell
+from djaveHTML.table import Table, Cell
 
 from invoice.models.invoice import STATUS_TOOLTIP
 

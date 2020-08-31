@@ -19,7 +19,7 @@ from djavError.widgets.notifications_report import NotificationsReport
 from djavError.widgets.too_many_queries_requests_report import (
     TooManyQueriesRequestsReport)
 from djavError.widgets.trigger_errors import TriggerErrors
-from djaveTable.cell_content import Paragraph
+from djaveHTML.cell_content import Paragraph
 
 
 @superuser_required

@@ -1,4 +1,4 @@
-from djaveTable.simple_list import SimpleList
+from djaveHTML.simple_list import SimpleList
 
 
 def simple_form_as_html(form):

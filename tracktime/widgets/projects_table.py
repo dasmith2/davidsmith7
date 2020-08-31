@@ -1,8 +1,8 @@
 from django.shortcuts import reverse
 from djaveClassMagic.edit_list_table import EditListTable
-from djaveForm.button import Button
-from djaveTable.cell_content import InHref
-from djaveTable.table import ButtonsCell
+from djaveHTML.button import Button
+from djaveHTML.cell_content import InHref
+from djaveHTML.table import ButtonsCell
 
 from tracktime.models.project import Project
 

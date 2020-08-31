@@ -1,7 +1,7 @@
 from djaveClassMagic.edit_list_table import EditListTable
-from djaveForm.button import Button
-from djaveForm.field import TextAreaField, TextField, MoneyField
-from djaveForm.form import Form
+from djaveHTML.button import Button
+from djaveHTML.field import TextAreaField, TextField, MoneyField
+from djaveHTML.form import Form
 from djmoney.money import Money
 
 from invoice.models.line_item import LineItem

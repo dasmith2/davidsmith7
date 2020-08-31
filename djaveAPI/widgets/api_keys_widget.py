@@ -1,10 +1,10 @@
 from django.template import loader
 from djaveAPI.models.api_key import username_available
 from djaveClassMagic.edit_list_table import EditListTable
-from djaveForm.button import Button
-from djaveForm.field import SlugField, URLField
-from djaveForm.form import Form
-from djaveTable.table import Cell
+from djaveHTML.button import Button
+from djaveHTML.field import SlugField, URLField
+from djaveHTML.form import Form
+from djaveHTML.table import Cell
 
 
 class APIKeysWidget(object):

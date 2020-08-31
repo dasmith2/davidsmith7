@@ -1,5 +1,5 @@
 from django.shortcuts import reverse
-from djaveTable.table import Cell
+from djaveHTML.table import Cell
 
 from invoice.widgets.invoices_table import InvoicesTable
 from tracktime.models.project_invoice import ProjectInvoice
@@ -22,6 +22,6 @@ class ProjectInvoicesTable(InvoicesTable):
         Cell(buttons, classes=['buttons'])]
     edit_url = reverse('edit_project_invoice', kwargs={'pk': invoice.pk})
     self.create_row(
-        cells, classes=[row_class], pk=invoice.pk, additional_attrs={
+        cells, classes=[row_class], pk=invoice.pk, **{
             'data-paid': bool(invoice.paid), 'data-edit-url': edit_url,
             'data-class-if-not-paid': invoice.status_if_not_paid().lower()})

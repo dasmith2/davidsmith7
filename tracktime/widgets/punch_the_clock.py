@@ -2,10 +2,10 @@ from collections import namedtuple
 
 from djaveClassMagic.edit_list_table import EditListTable
 from djaveDT import tz_dt_to_tz_dt, now
-from djaveForm.button import Button
-from djaveForm.form import Form
-from djaveForm.simple_form_as_html import simple_form_as_html
-from djaveTable.problem import Problem
+from djaveHTML.button import Button
+from djaveHTML.form import Form
+from djaveHTML.simple_form_as_html import simple_form_as_html
+from djaveHTML.problem import Problem
 
 from tracktime.models.project_work_session import (
     ProjectWorkSession, start_clock_on_project)

@@ -2,8 +2,8 @@ from datetime import timedelta
 
 from django.shortcuts import reverse
 from djaveDT import now
-from djaveTable.cell_content import InHref
-from djaveTable.table import Table
+from djaveHTML.cell_content import InHref
+from djaveHTML.table import Table
 from djaveReport.date_range_report import DateRangeReport
 from djaveURL import dict_as_query
 

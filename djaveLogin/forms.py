@@ -1,6 +1,6 @@
-from djaveForm.button import Button
-from djaveForm.field import TextField
-from djaveForm.form import Form
+from djaveHTML.button import Button
+from djaveHTML.field import TextField
+from djaveHTML.form import Form
 
 
 class LoginForm(Form):

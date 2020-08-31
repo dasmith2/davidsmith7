@@ -105,7 +105,7 @@ I use Django template inheritance to describe the hierarchy.
 
 ### All sites
 
-djaveForm.fields renders problems like <div style="problem">This field is
+djaveHTML.fields renders problems like <div style="problem">This field is
 required</div>. It's most helpful to just color all "problem" text red by
 default. So .problem { color: #f00; } belongs in
 main/templates/css/all_sites.css, which gets copied around to all the

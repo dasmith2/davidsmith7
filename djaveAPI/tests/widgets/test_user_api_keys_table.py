@@ -3,9 +3,9 @@ import re
 from djaveAPI.models.user_api_key import UserAPIKey
 from djaveAPI.tests.test_user_api_key import get_test_user_api_key
 from djaveAPI.widgets.user_api_keys_table import UserAPIKeysTable
-from djaveForm.button import Button
-from djaveForm.field import SlugField, URLField
-from djaveTable.table import Row, Cell
+from djaveHTML.button import Button
+from djaveHTML.field import SlugField, URLField
+from djaveHTML.table import Row, Cell
 from djaveTest.unit_test import TestCase, get_test_user
 
 

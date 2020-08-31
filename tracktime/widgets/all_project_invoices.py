@@ -3,10 +3,10 @@ from datetime import timedelta
 from django.shortcuts import reverse
 from django.template.loader import render_to_string
 from djaveDT import now
-from djaveForm.field import SelectField, Option
+from djaveHTML.field import SelectField, Option
 from djaveReport.date_range_report import DateRangeReport
-from djaveTable.cell_content import InHref
-from djaveTable.table import Table, Cell
+from djaveHTML.cell_content import InHref
+from djaveHTML.table import Table, Cell
 
 from invoice.models.invoice import STATUSES, STATUS_TOOLTIP
 from tracktime.fields import project_field

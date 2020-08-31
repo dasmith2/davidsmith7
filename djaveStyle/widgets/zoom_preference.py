@@ -1,7 +1,7 @@
 from django.template.loader import render_to_string
-from djaveForm.button import Button
-from djaveForm.field import HiddenField
-from djaveForm.form import Form
+from djaveHTML.button import Button
+from djaveHTML.field import HiddenField
+from djaveHTML.form import Form
 from djaveStyle.models import get_zoom_override, set_zoom_override
 
 

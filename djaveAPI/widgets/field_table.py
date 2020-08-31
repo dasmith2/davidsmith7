@@ -1,5 +1,5 @@
 from djaveClassMagic.model_fields import model_fields, TEXT, CHAR
-from djaveTable.table import Table
+from djaveHTML.table import Table
 
 
 def field_table(model):

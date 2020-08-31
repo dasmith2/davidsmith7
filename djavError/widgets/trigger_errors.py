@@ -4,9 +4,9 @@ from django.conf import settings
 from django.template.loader import render_to_string
 from djavError.models.too_many_queries_request import TooManyQueriesRequest
 from djavError.notify import notify
-from djaveForm.button import Button
-from djaveForm.field import TextField
-from djaveForm.form import Form
+from djaveHTML.button import Button
+from djaveHTML.field import TextField
+from djaveHTML.form import Form
 
 
 class TriggerErrorsForm(Form):

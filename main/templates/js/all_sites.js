@@ -7,6 +7,8 @@
 {% include "js/query_string.js" %}
 {% include "js/css.js" %}
 {% include "js/px_to_int.js" %}
+{% include "js/single_page_nav.js" %}
+{% include "js/crud_table.js" %}
 {% if in_web_test %}
   {% include "js/pause_web_test.js" %}
 {% endif %}

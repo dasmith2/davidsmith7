@@ -5,15 +5,15 @@ import re
 
 from django.utils.dateparse import parse_date
 from django.utils.safestring import mark_safe
-from djaveForm.form_element import FormElement
-from djaveTable.problem import Problem
+from djaveHTML.form_element import FormElement
+from djaveHTML.problem import Problem
 
 
 class Field(FormElement):
-  # You can put djaveForm fields in djaveTables.
+  # You can put djaveHTML fields in djaveHTMLs.
   def __init__(
       self, key_prefix, required=True, default=None, pk=None, value=None,
-      label=None, autofocus=False, additional_attrs=None):
+      label=None, autofocus=False, **additional_attrs):
     super().__init__(key_prefix, pk)
     self.required = required
     self.default = default

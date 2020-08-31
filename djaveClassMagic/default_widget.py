@@ -1,6 +1,6 @@
 from djaveClassMagic.model_fields import (
     ModelField, DATE, FLOAT, INTEGER, TEXT, CHAR, BOOLEAN)
-from djaveForm.field import (
+from djaveHTML.field import (
     DateField, PositiveFloatField, PositiveIntField, TextAreaField, TextField,
     TrueFalseField)
 

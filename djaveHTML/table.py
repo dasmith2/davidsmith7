@@ -1,7 +1,7 @@
 """ This is an HTML table. It's for displaying things and that's it. Don't get
 fancy.  """
 from django.utils.safestring import mark_safe
-from djaveTable.cell_content import (
+from djaveHTML.cell_content import (
     CellContent, cell_contents_as_html, cell_contents_as_csv,
     obj_as_cell_content)
 from djaveTest.unit_test import recursive_assert_equal
@@ -10,7 +10,7 @@ from djaveTest.unit_test import recursive_assert_equal
 class Table(object):
   def __init__(
       self, headers=None, rows=None, classes=[], title=None, js=None, css=None,
-      additional_attrs=None, post_table_buttons=None):
+      post_table_buttons=None, **additional_attrs):
     self.headers = headers  # headers can be strings or Cells or nothing.
     self.rows = rows or []
     self.classes = classes
@@ -21,10 +21,8 @@ class Table(object):
     self.post_table_buttons = post_table_buttons or []
 
   def create_row(
-      self, cells=None, additional_attrs=None, classes=None, pk=None):
-    row = Row(
-        cells=cells, additional_attrs=additional_attrs, classes=classes,
-        pk=pk)
+      self, cells=None, classes=None, pk=None, **additional_attrs):
+    row = Row(cells=cells, classes=classes, pk=pk, **additional_attrs)
     self.rows.append(row)
     return row
 
@@ -150,7 +148,7 @@ class Table(object):
 class Cell(object):
   def __init__(
       self, cell_contents, classes=[], is_header=False,
-      additional_attrs=None, color=None, none_is_nbsp=True):
+      color=None, none_is_nbsp=True, **additional_attrs):
     """ cell_contents can be a datetime, date, string, float, int, any object
     that inherits from CellContent, or a list of any of those things. """
     self.cell_contents = cell_contents
@@ -211,7 +209,7 @@ class ButtonsCell(Cell):
 
 
 class Row(object):
-  def __init__(self, cells=None, classes=None, additional_attrs=None, pk=None):
+  def __init__(self, cells=None, classes=None, pk=None, **additional_attrs):
     # cells can be primitives, CellContent objects, or Cells
     self.cells = []
     if cells:

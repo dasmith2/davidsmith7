@@ -4,7 +4,7 @@ now. """
 from django.shortcuts import reverse
 from django.template.loader import render_to_string
 from djaveClassMagic.edit_list_table import EditListTable
-from djaveTable.cell_content import InHref
+from djaveHTML.cell_content import InHref
 
 from invoice.models.invoice import Invoice
 

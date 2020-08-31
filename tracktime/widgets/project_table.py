@@ -1,7 +1,7 @@
 from django.db.models import Q
 from django.shortcuts import reverse
 from djaveClassMagic.edit_table import EditTable
-from djaveForm.field import TextField
+from djaveHTML.field import TextField
 
 from tracktime.models.project import Project
 

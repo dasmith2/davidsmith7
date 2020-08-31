@@ -1,9 +1,9 @@
 from datetime import date
 
 from djaveDT import to_tz_dt
-from djaveForm.button import Button
-from djaveForm.field import TextAreaField
-from djaveTable.table import Row, ButtonsCell
+from djaveHTML.button import Button
+from djaveHTML.field import TextAreaField
+from djaveHTML.table import Row, ButtonsCell
 from djaveTest.unit_test import TestCase, get_test_user
 
 from tracktime.models.to_do import ToDo
@@ -47,8 +47,7 @@ class ToDosTableTests(TestCase):
     description = TextAreaField(
         'description', default='Hello world!', required=False)
     table.rows[1].assertEqual(Row(
-        [description, ButtonsCell()], pk=to_do.pk,
-        additional_attrs={'data-done': False}))
+        [description, ButtonsCell()], pk=to_do.pk, **{'data-done': False}))
 
   def test_did(self):
     table = ToDosTable(self.user, {

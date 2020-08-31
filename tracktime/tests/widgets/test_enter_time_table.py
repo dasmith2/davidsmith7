@@ -1,8 +1,8 @@
 from datetime import date
 
 from djaveDT import to_tz_dt
-from djaveForm.button import Button
-from djaveTable.table import Cell, Row
+from djaveHTML.button import Button
+from djaveHTML.table import Cell, Row
 
 from tracktime.widgets.enter_time_table import EnterTimeTable
 from tracktime.models.project_work_session import ProjectWorkSession

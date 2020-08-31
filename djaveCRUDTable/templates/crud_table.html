@@ -1,0 +1,79 @@
+<div id="{{ lower_case_plural }}-wrapper">
+
+<div class="panel list" id="{{ lower_case_plural }}" data-url="{{ list_url }}">
+  {% if list_header %}
+    <h1 class="section-header">{{ list_header }}</h1>
+  {% endif %}
+
+  <div class="report margin-top">
+    {% if new_button %}
+      <div class="upper-new-button-wrapper">
+        {{ new_button.as_html }}
+      </div>
+    {% endif %}
+
+    <div class="filters">
+      {% for hidden_filter in hidden_filters %}
+        {{ hidden_filter.as_html }}
+      {% endfor %}
+      {% if filter_widgets %}
+        <div class="filter_widgets margin-top-half">
+          {% for filter in filter_widgets %}
+            {{ filter.as_html }}
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="margin-top-half list-table-wrapper">
+      <table class="start-hidden list-table">
+        <thead>
+          <tr>
+            {% for column in display_columns %}
+              <th{% if column.header_css_class %} class="{{ column.header_css_class }}"{% endif %}>
+                {{ column.header }}
+              </th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+        {% if new_button %}
+          <tfoot class="in-table-new-button-wrapper">
+            <tr>
+              <td colspan="{{ list_column_count }}">
+                {{ new_button.as_html }}
+              </td>
+            </tr>
+          </tfoot>
+        {% endif %}
+      </table>
+      <div class="start-hidden nothing bold-grey-text">Nothing to report</div>
+    </div>
+  </div>
+
+  <script class="list-item-template" type="text/html">
+    {% for column in display_columns %}
+      {{ column.cell_template }}
+    {% endfor %}
+  </script>
+</div>
+
+<div class="panel details" id="{{ lower_case_singular }}" data-url="{{ list_url }}/:pk">
+  <h1>{{ upper_case_singular }}</h1>
+  {{ edit_table.as_html }}
+  <div class="margin-top">
+    <div class="feedback"></div>
+    <button class="save button">Save</button>
+    <a href="{{ list_url }}"  class="cancel button">Cancel</a>
+  </div>
+</div>
+
+<script>
+  setup_crud_table(
+      '{{ list_api_url }}', '#{{ lower_case_plural }}-wrapper',
+      {{ save_new_defaults }}, '{{ label_edit_page_with_field }}',
+      '{{ delete_row_confirm_question }}');
+</script>
+
+</div>

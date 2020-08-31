@@ -1,7 +1,7 @@
 from django.shortcuts import reverse
-from djaveForm.button import Button
-from djaveTable.cell_content import InHref
-from djaveTable.simple_list import SimpleList
+from djaveHTML.button import Button
+from djaveHTML.cell_content import InHref
+from djaveHTML.simple_list import SimpleList
 
 from tracktime.models.project import Project
 from tracktime.models.project_work_session import start_clock_on_project

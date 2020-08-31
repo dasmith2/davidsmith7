@@ -1,6 +1,6 @@
 from django.shortcuts import reverse
-from djaveTable.cell_content import InHref
-from djaveTable.table import Row
+from djaveHTML.cell_content import InHref
+from djaveHTML.table import Row
 
 from tracktime.widgets.project_work_summary_table import (
     ProjectWorkSessionSummaryReport)

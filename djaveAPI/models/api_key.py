@@ -7,7 +7,7 @@ from django.contrib.auth.hashers import check_password, make_password
 from django.db import models
 from djaveAllowed.credentials import CredentialsInterface
 from djaveClassMagic.models.base_knows_child import BaseKnowsChild
-from djaveForm.field import URLField
+from djaveHTML.field import URLField
 
 
 def username_available(username):

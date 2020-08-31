@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.shortcuts import render, reverse
-from djaveTable.cell_content import InHref
+from djaveHTML.cell_content import InHref
 
 from tracktime.views.nav_context import tracktime_nav
 

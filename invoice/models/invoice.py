@@ -10,7 +10,7 @@ from djaveAPI.models.user_api_key import UserAPIKey
 from djaveClassMagic.models.base_knows_child import BaseKnowsChild
 from djaveClassMagic.signals import destroy_user
 from djaveDT import now, dt_to_d_str, d_to_str, midnight_from_date
-from djaveTable.cell_content import Tooltip
+from djaveHTML.cell_content import Tooltip
 from djmoney.models.fields import MoneyField
 from djmoney.money import Money
 

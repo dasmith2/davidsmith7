@@ -1,7 +1,7 @@
 from django.shortcuts import reverse
 from django.template.loader import render_to_string
 from djaveClassMagic.edit_table import EditTable
-from djaveForm.button import Button
+from djaveHTML.button import Button
 
 from invoice.models.invoice import Invoice
 from invoice.widgets.line_items_table import LineItemsTable

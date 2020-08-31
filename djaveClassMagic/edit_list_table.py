@@ -3,8 +3,8 @@
 from django.shortcuts import reverse
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
-from djaveTable.table import Table, Cell
-from djaveTable.cell_content import InHref
+from djaveHTML.table import Table, Cell
+from djaveHTML.cell_content import InHref
 
 
 def edit_list_table_js():
@@ -13,18 +13,16 @@ def edit_list_table_js():
 
 
 class EditListTable(Table):
-  def __init__(self, model, *args, **kwargs):
+  def __init__(self, model, *args, **additional_attrs):
     self.model = model
     # I mean, probably it will, until I find out otherwise.
     self._has_objects = True
     self._create_new_button = None
     self._setup_edit_anything = False
 
-    if 'additional_attrs' not in kwargs or kwargs['additional_attrs'] is None:
-      kwargs['additional_attrs'] = {}
-    kwargs['additional_attrs']['data-model'] = model.__name__
+    additional_attrs['data-model'] = model.__name__
 
-    super().__init__(*args, **kwargs)
+    super().__init__(*args, **additional_attrs)
 
     self.setup_edit_anything_turns_yellow()
 
@@ -107,8 +105,7 @@ class EditListTable(Table):
     self._create_new_button = InHref(
         button_text, href, classes=['create_new'], button=True)
     create_new_cell = Cell(
-        self._create_new_button,
-        additional_attrs={'colspan': len(self.headers)})
+        self._create_new_button, **{'colspan': len(self.headers)})
     self.create_row([create_new_cell])
     return self._create_new_button
 

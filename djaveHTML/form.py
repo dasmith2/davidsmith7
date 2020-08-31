@@ -1,5 +1,5 @@
-from djaveForm.button import Button
-from djaveForm.field import Field, TrueFalseField
+from djaveHTML.button import Button
+from djaveHTML.field import Field, TrueFalseField
 from djaveURL import dict_as_query
 
 

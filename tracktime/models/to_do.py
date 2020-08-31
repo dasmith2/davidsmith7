@@ -11,7 +11,7 @@ from django.db.models import Q
 from djaveAPI.models.user_api_key import UserAPIKey
 from djaveAPI.models.publishable import Publishable, LivePublishableManager
 from djaveDT import beginning_of_day, now
-from djaveForm.field import SelectField, Option
+from djaveHTML.field import SelectField, Option
 
 
 DONE = 'Done'

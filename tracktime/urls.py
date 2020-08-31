@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 
 from tracktime.views.api_docs import api_docs
 from tracktime.views.enter_time import enter_time
@@ -13,7 +13,7 @@ from tracktime.views.to_do import to_do, all_tasks
 
 
 tracktime_urls = [
-    path('', enter_time, name='enter_time'),
+    path('clock', enter_time, name='enter_time'),
     path('to_do', to_do, name='to_do'),
     path('to_do/<project_pk>', to_do, name='to_do'),
     path('all_tasks', all_tasks, name='all_tasks'),
@@ -40,7 +40,7 @@ tracktime_urls = [
         'invoice_rule/<pk>', project_invoice_rule,
         name='project_invoice_rule'),
 
-    path('projects', projects, name='projects'),
+    re_path(r'^projects.*$', projects, name='projects'),
     path(
         'archived_projects', archived_projects,
         name='archived_projects'),
