@@ -2,7 +2,7 @@ from django.shortcuts import reverse
 
 from djaveClassMagic.edit_list_table import EditListTable
 from djaveHTML.button import Button
-from djaveHTML.cell_content import InHref
+from djaveHTML.a import A
 
 from tracktime.models.project_invoice_rule import ProjectInvoiceRule
 
@@ -31,7 +31,7 @@ class ProjectInvoiceRulesTable(EditListTable):
           'Create new invoice', button_type='submit', pk=rule.pk)
       if create_new_invoice_button.get_was_clicked(self.request_POST):
         rule.create_invoice()
-      buttons = [InHref('Edit', href, button=True), create_new_invoice_button]
+      buttons = [A('Edit', href, button=True), create_new_invoice_button]
       self.create_row([
           rule.project.name, '{} / hr'.format(rule.hourly_rate),
           buttons], pk=rule.pk)

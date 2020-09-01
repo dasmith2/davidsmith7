@@ -1,6 +1,6 @@
 from django.shortcuts import reverse
 from djaveHTML.button import Button
-from djaveHTML.cell_content import InHref
+from djaveHTML.a import A
 from djaveHTML.table import Row, ButtonsCell
 from djaveTest.unit_test import TestCase, get_test_user
 
@@ -22,7 +22,7 @@ class ProjectsTableTests(TestCase):
     self.assertEqual(1, len(ArchivedProjectsTable(user).rows))
 
     edit_url = reverse('edit_project', kwargs={'pk': project.pk})
-    edit_href = InHref('Edit', edit_url, button=True, classes=['edit'])
+    edit_href = A('Edit', edit_url, button=True, classes=['edit'])
     buttons = ButtonsCell([edit_href, Button('Un-archive')])
     expected_row = Row(['Time Tracker!', buttons], pk=project.pk)
     got_row = ArchivedProjectsTable(user).rows[0]

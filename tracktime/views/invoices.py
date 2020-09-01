@@ -2,7 +2,7 @@
 from django.shortcuts import render, redirect, get_object_or_404, reverse
 from djaveHTML.form_wrapper import FormWrapper
 from djaveLogin.login_required import login_required
-from djaveHTML.cell_content import Tooltip
+from djaveHTML.tooltip import Tooltip
 from djaveCSV import CanCSVResponse, CanCSV
 
 from invoice.models.invoice import Invoice

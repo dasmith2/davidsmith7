@@ -1,6 +1,6 @@
 from django.shortcuts import reverse
 from djaveHTML.button import Button
-from djaveHTML.cell_content import InHref
+from djaveHTML.a import A
 from djaveHTML.simple_list import SimpleList
 
 from tracktime.models.project import Project
@@ -25,6 +25,6 @@ class ToDoProjectPicker(SimpleList):
           start_clock_on_project(user, project)
       else:
         url = reverse('to_do', kwargs={'project_pk': project.pk})
-        button = InHref(project.name, url, button=True)
+        button = A(project.name, url, button=True)
       buttons.append(button)
     super().__init__(buttons)

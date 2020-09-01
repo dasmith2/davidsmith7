@@ -1,15 +1,22 @@
 from abc import abstractmethod
 
-from djaveHTML.cell_content import CellContent
+from djaveHTML.element import Element
 
 
-class FormElement(CellContent):
+class FormElement(Element):
   """ A FormElement is a button or html input that can be rendered in the cell
   of a djaveHTML, and when the form submits, the FormElement will be
   represented in the data that goes to the server. """
-  def __init__(self, key_prefix, pk, **additional_attrs):
+  def __init__(self, key_prefix, pk, css_classes=None, **additional_attrs):
     self.key_prefix = key_prefix
     self.pk = pk
+
+    self.css_classes = set()
+    if css_classes:
+      self.css_classes.update(css_classes)
+    if key_prefix:
+      self.css_classes.add(key_prefix)
+
     self.additional_attrs = additional_attrs
 
   def key(self):
@@ -19,6 +26,14 @@ class FormElement(CellContent):
         return '{}_{}'.format(self.key_prefix, self.pk)
       return self.key_prefix
     return ''
+
+  def css_class_str(self):
+    if self.css_classes:
+      return ' class="{}"'.format(' '.join(self.css_classes))
+    return ''
+
+  def add_class(self, css_class):
+    self.css_classes.add(css_class)
 
   def additional_attrs_str(self):
     if self.additional_attrs:

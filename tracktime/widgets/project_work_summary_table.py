@@ -2,7 +2,7 @@ from datetime import timedelta
 
 from django.shortcuts import reverse
 from djaveDT import now
-from djaveHTML.cell_content import InHref
+from djaveHTML.a import A
 from djaveHTML.table import Table
 from djaveReport.date_range_report import DateRangeReport
 from djaveURL import dict_as_query
@@ -49,7 +49,7 @@ class ProjectWorkSessionSummaryTable(Table):
       if do_hours:
         hours_href = None
         if what_i_did_per_project.project.use_clock:
-          hours_href = InHref(
+          hours_href = A(
               what_i_did_per_project.hours,
               what_i_did_per_project.breakdown_url, classes=[css_class])
         cells.append(hours_href)

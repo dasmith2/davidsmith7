@@ -11,14 +11,10 @@ class Button(FormElement):
       self, text, key_prefix=None, pk=None, button_type='button',
       css_classes=None, **additional_attrs):
     key_prefix = key_prefix or slugify(text)
-    super().__init__(key_prefix, pk, **additional_attrs)
+    super().__init__(
+        key_prefix, pk, css_classes=css_classes, **additional_attrs)
     self.text = text
     self.button_type = button_type
-    self.css_classes = set()
-    if css_classes:
-      self.css_classes.update(css_classes)
-    if key_prefix:
-      self.css_classes.add(key_prefix)
 
     self._was_clicked = None
     self._was_clicked_set = False
@@ -43,14 +39,11 @@ class Button(FormElement):
     return ''
 
   def as_html(self):
-    css_class_str = ''
-    if self.css_classes:
-      css_class_str = ' class="{}"'.format(' '.join(self.css_classes))
     name_attr = ''
     if self.key():
       name_attr = ' name="{}" value="{}"'.format(self.key(), self.key())
     return mark_safe((
         '<button type="{}"{}{}{}>'
         '{}</button>').format(
-            self.button_type, css_class_str, name_attr,
+            self.button_type, self.css_class_str(), name_attr,
             self.additional_attrs_str(), self.text))

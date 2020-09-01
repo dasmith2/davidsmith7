@@ -2,7 +2,7 @@ from django.shortcuts import render, reverse, redirect, get_object_or_404
 from djaveHTML.button import Button
 from djaveHTML.form_wrapper import FormWrapper
 from djaveLogin.login_required import login_required
-from djaveHTML.cell_content import InHref
+from djaveHTML.a import A
 from djaveHTML.problem import Problem as HtmlProblem
 
 from tracktime.models.project import Project
@@ -35,7 +35,7 @@ def to_do(request, project_pk=None):
         return redirect('enter_time')
       stop_problem = HtmlProblem(clock_running.explain_why_can_not_stop())
   use_clock = False
-  see_all_tasks = InHref(
+  see_all_tasks = A(
       'See ALL tasks', reverse('all_tasks'), classes=['all_tasks'])
   if project and project.has_to_do_list:
     to_dos_table = ProjectToDosTable(

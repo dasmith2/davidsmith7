@@ -6,71 +6,18 @@ import json
 from django.shortcuts import reverse
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
+from djaveClassMagic.cases import (
+    upper_case_singular, lower_case_singular, upper_case_plural,
+    lower_case_plural)
 from djaveClassMagic.edit_table import EditTable
 from djaveHTML.field import Field, HiddenField
-from djaveHTML.cell_content import InHref, ButtonInHref
+from djaveHTML.a import A
 
 
 HIDDEN_NOT_DELETED_FILTER = HiddenField(
     'deleted', value='true', **{'data-query-key': 'deleted__isnull'})
 HIDDEN_DELETED_FILTER = HiddenField(
     'deleted', value='false', **{'data-query-key': 'deleted__isnull'})
-
-
-class DisplayColumn(object):
-  """ This is an abstract base class. You probably want to use
-  DisplayFieldColumn or ButtonsColumn or make your own type of column. """
-  def __init__(self, header, cell_template, header_css_class=None):
-    self.header = header
-    self.cell_template = cell_template
-    self.header_css_class = header_css_class
-
-
-class DisplayFieldColumn(DisplayColumn):
-  def __init__(self, header, field_name, header_css_class=None):
-    cell_template = mark_safe('<td class="{}"><%= {} %></td>'.format(
-        field_name, field_name))
-    super().__init__(header, cell_template, header_css_class)
-
-
-class ButtonsColumn(DisplayColumn):
-  def __init__(self, buttons):
-    self.buttons = buttons
-    if buttons:
-      self.buttons[-1].add_class('last-button')
-    super().__init__(mark_safe('&nbsp;'), self.cell_template())
-
-  def cell_template(self):
-    """ DO NOT SUBMIT <td class="buttons">
-      <a href="/{}/<%= id %>" class="button edit">Edit</a>
-      <button class="delete last-button">{}</a>
-    </td>"""
-    button_str = ''.join([button.as_html() for button in self.buttons])
-    return mark_safe('<td class="buttons">{}</td>'.format(button_str))
-
-
-class EditDeleteColumn(ButtonsColumn):
-  def __init__(self, model, delete_button_text='Delete'):
-    edit_url = '/{}/<%= id %>'.format(lower_case_plural(model))
-    edit = ButtonInHref('Edit', edit_url)
-    delete = Button(self.delete_button_text, 'delete')
-    super().__init__([edit, delete])
-
-
-def upper_case_singular(model):
-  return model.__name__
-
-
-def lower_case_singular(model):
-  return upper_case_singular(model).lower()
-
-
-def upper_case_plural(model):
-  return upper_case_singular(model) + 's'
-
-
-def lower_case_plural(model):
-  return upper_case_plural(model).lower()
 
 
 USE_DEFAULT = 'USE_DEFAULT'
@@ -81,7 +28,9 @@ class CRUDTable(object):
       self, model, filter_widgets, display_columns, edit_field_names,
       save_new_defaults=None, label_edit_page_with_field=None, list_url=None,
       list_header=USE_DEFAULT, delete_row_confirm_question=USE_DEFAULT,
-      hidden_filters=None, can_create_new=True):
+      hidden_filters=None, can_create_new=True, new_row_callback=None,
+      saved_model_callback=None, deleted_model_callback=None,
+      nav_css_class=None):
     self.model = model
 
     # A list of djaveHTML.field#Field
@@ -119,6 +68,14 @@ class CRUDTable(object):
       else:
         self.delete_row_confirm_question = delete_row_confirm_question
     self.can_create_new = can_create_new
+    self.new_row_callback = new_row_callback
+    self.saved_model_callback = saved_model_callback
+    self.deleted_model_callback = deleted_model_callback
+    # When the list or edit panel is shown, explicitly say the css class of the
+    # nav item that should get highlighted. In this way, you can have multiple
+    # crud tables highlight the same navigation. For instance, the live and
+    # archived project lists are both under the "Projects" nav.
+    self.nav_css_class = nav_css_class
 
   def as_html(self):
     list_api_url = reverse(
@@ -143,7 +100,11 @@ class CRUDTable(object):
         'list_header': self.list_header,
         'list_column_count': len(self.display_columns),
         'new_button': self.new_button(),
-        'delete_row_confirm_question': self.delete_row_confirm_question}
+        'delete_row_confirm_question': self.delete_row_confirm_question,
+        'new_row_callback': self.new_row_callback or 'null',
+        'saved_model_callback': self.saved_model_callback or 'null',
+        'deleted_model_callback': self.deleted_model_callback or 'null',
+        'nav_css_class': self.nav_css_class or ''}
     return render_to_string('crud_table.html', context)
 
   def new_button(self):
@@ -151,7 +112,7 @@ class CRUDTable(object):
       new_button_text = 'New {}'.format(upper_case_singular(self.model))
       new_button_url = '{}/0'.format(self.list_url)
       new_button_css = 'new-{}'.format(lower_case_singular(self.model))
-      return InHref(
+      return A(
           new_button_text, new_button_url, classes=[new_button_css],
           button=True)
 

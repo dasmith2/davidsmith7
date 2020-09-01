@@ -1,6 +1,6 @@
 <div id="{{ lower_case_plural }}-wrapper">
 
-<div class="panel list" id="{{ lower_case_plural }}" data-url="{{ list_url }}">
+<div class="panel list start-hidden" id="{{ lower_case_plural }}" data-url="{{ list_url }}" data-nav-css-class="{{ nav_css_class }}">
   {% if list_header %}
     <h1 class="section-header">{{ list_header }}</h1>
   {% endif %}
@@ -26,7 +26,7 @@
     </div>
 
     <div class="margin-top-half list-table-wrapper">
-      <table class="start-hidden list-table">
+      <table class="start-hidden list-table" data-model="{{ upper_case_singular }}">
         <thead>
           <tr>
             {% for column in display_columns %}
@@ -59,7 +59,7 @@
   </script>
 </div>
 
-<div class="panel details" id="{{ lower_case_singular }}" data-url="{{ list_url }}/:pk">
+<div class="panel details start-hidden" id="{{ lower_case_singular }}" data-url="{{ list_url }}/:pk" data-nav-css-class="{{ nav_css_class }}">
   <h1>{{ upper_case_singular }}</h1>
   {{ edit_table.as_html }}
   <div class="margin-top">
@@ -73,7 +73,8 @@
   setup_crud_table(
       '{{ list_api_url }}', '#{{ lower_case_plural }}-wrapper',
       {{ save_new_defaults }}, '{{ label_edit_page_with_field }}',
-      '{{ delete_row_confirm_question }}');
+      '{{ delete_row_confirm_question }}', {{ new_row_callback }},
+      {{ saved_model_callback }}, {{ deleted_model_callback }});
 </script>
 
 </div>

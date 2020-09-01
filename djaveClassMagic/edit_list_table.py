@@ -4,7 +4,7 @@ from django.shortcuts import reverse
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 from djaveHTML.table import Table, Cell
-from djaveHTML.cell_content import InHref
+from djaveHTML.a import A
 
 
 def edit_list_table_js():
@@ -102,7 +102,7 @@ class EditListTable(Table):
     # table. I keep track of that so when I render the table I can not bother
     # to show the headers if there aren't any rows.
     self._has_objects = bool(len(self.rows))
-    self._create_new_button = InHref(
+    self._create_new_button = A(
         button_text, href, classes=['create_new'], button=True)
     create_new_cell = Cell(
         self._create_new_button, **{'colspan': len(self.headers)})

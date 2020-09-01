@@ -1,9 +1,9 @@
 """ This is an HTML table. It's for displaying things and that's it. Don't get
 fancy.  """
 from django.utils.safestring import mark_safe
-from djaveHTML.cell_content import (
-    CellContent, cell_contents_as_html, cell_contents_as_csv,
-    obj_as_cell_content)
+from djaveHTML.element import (
+    Element, elements_as_html, elements_as_csv,
+    obj_as_element)
 from djaveTest.unit_test import recursive_assert_equal
 
 
@@ -32,15 +32,15 @@ class Table(object):
       if isinstance(header, Cell):
         header_row.append(header.as_csv())
       else:
-        header_row.append(cell_contents_as_csv(header))
+        header_row.append(elements_as_csv(header))
     writer.writerow(header_row)
     for row in self.rows:
       csv_row = []
       for cell in row.cells:
-        if isinstance(cell, (Cell, CellContent)):
+        if isinstance(cell, (Cell, Element)):
           csv_row.append(cell.as_csv())
         else:
-          csv_row.append(cell_contents_as_csv(cell))
+          csv_row.append(elements_as_csv(cell))
       writer.writerow(csv_row)
 
   def css_classes_str(self):
@@ -70,7 +70,7 @@ class Table(object):
         if isinstance(header, Cell):
           to_return.append(header.as_html())
         else:
-          to_return.append('<th>{}</th>'.format(obj_as_cell_content(header)))
+          to_return.append('<th>{}</th>'.format(obj_as_element(header)))
       to_return.extend([
           '    </tr>',
           '  </thead>'])
@@ -135,10 +135,10 @@ class Table(object):
         for cell in row.cells:
           use_cell = cell
           if not isinstance(cell, Cell):
-            cell_content = cell
-            if not isinstance(cell, CellContent):
-              cell_content = obj_as_cell_content(cell)
-            use_cell = Cell(cell_content)
+            element = cell
+            if not isinstance(cell, Element):
+              element = obj_as_element(cell)
+            use_cell = Cell(element)
           to_return.append(use_cell.as_html())
         to_return.append('    </tr>')
       to_return.append('  </tbody>')
@@ -147,16 +147,16 @@ class Table(object):
 
 class Cell(object):
   def __init__(
-      self, cell_contents, classes=[], is_header=False,
+      self, elements, classes=[], is_header=False,
       color=None, none_is_nbsp=True, **additional_attrs):
-    """ cell_contents can be a datetime, date, string, float, int, any object
-    that inherits from CellContent, or a list of any of those things. """
-    self.cell_contents = cell_contents
+    """ elements can be a datetime, date, string, float, int, any object
+    that inherits from Element, or a list of any of those things. """
+    self.elements = elements
 
     # This just makes sure we populate cells with stuff we can turn into html
     # later. By checking at this point, I prevent garbage in, and make problems
     # much easier to debug.
-    obj_as_cell_content(cell_contents)
+    obj_as_element(elements)
 
     self.classes = classes
     self.is_header = is_header
@@ -170,8 +170,8 @@ class Cell(object):
       t_what = 'th'
 
     content_str = ''
-    if self.none_is_nbsp or self.cell_contents is not None:
-      content_str = cell_contents_as_html(self.cell_contents)
+    if self.none_is_nbsp or self.elements is not None:
+      content_str = elements_as_html(self.elements)
 
     open_tag_parts = [t_what]
     if self.classes:
@@ -190,7 +190,7 @@ class Cell(object):
         '<{}>{}</{}>'.format(open_tag_str, content_str, t_what))
 
   def as_csv(self):
-    return cell_contents_as_csv(self.cell_contents)
+    return elements_as_csv(self.elements)
 
   def __str__(self):
     return self.as_html()
@@ -204,13 +204,13 @@ class Cell(object):
 
 
 class ButtonsCell(Cell):
-  def __init__(self, cell_contents=None):
-    super().__init__(cell_contents, classes=['buttons'], none_is_nbsp=False)
+  def __init__(self, elements=None):
+    super().__init__(elements, classes=['buttons'], none_is_nbsp=False)
 
 
 class Row(object):
   def __init__(self, cells=None, classes=None, pk=None, **additional_attrs):
-    # cells can be primitives, CellContent objects, or Cells
+    # cells can be primitives, Element objects, or Cells
     self.cells = []
     if cells:
       for cell in cells:
@@ -237,7 +237,7 @@ class Row(object):
       # This just makes sure we populate cells with stuff we can turn into html
       # later. By checking at this point, I prevent garbage in, and make
       # problems much easier to debug.
-      obj_as_cell_content(cell)
+      obj_as_element(cell)
     self.cells.append(cell)
 
   def extend(self, cells):

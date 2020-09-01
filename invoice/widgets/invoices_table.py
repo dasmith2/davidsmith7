@@ -4,7 +4,7 @@ now. """
 from django.shortcuts import reverse
 from django.template.loader import render_to_string
 from djaveClassMagic.edit_list_table import EditListTable
-from djaveHTML.cell_content import InHref
+from djaveHTML.a import A
 
 from invoice.models.invoice import Invoice
 
@@ -39,7 +39,7 @@ class InvoicesTable(EditListTable):
       view_text = 'View' if invoice.sent else 'Preview'
       view_url = reverse(
           self.view_invoice_view_name(), kwargs={'pk': invoice.pk})
-      view_button = InHref(view_text, view_url, classes=['button view'])
+      view_button = A(view_text, view_url, classes=['button view'])
 
       row_class = invoice.status().lower()
       self.add_invoice_row(invoice, [view_button], row_class)

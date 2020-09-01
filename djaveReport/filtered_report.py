@@ -2,7 +2,7 @@ from django.template import loader
 from djaveHTML.button import Button
 from djaveHTML.form import Form
 from djaveHTML.form_element import FormElement
-from djaveHTML.cell_content import Paragraph
+from djaveHTML.paragraph import Paragraph
 from djaveHTML.table import Table
 
 

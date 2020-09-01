@@ -5,9 +5,9 @@ from django.shortcuts import reverse
 from django.template.loader import render_to_string
 
 
-NavItem = namedtuple('NavItem', 'view_name display')
+NavItem = namedtuple('NavItem', 'view_name display is_visible')
 NavItemCurrentOrNot = namedtuple(
-    'NavItemCurrentOrNot', 'url display is_current css_class')
+    'NavItemCurrentOrNot', 'url display is_current css_class is_visible')
 
 
 class Nav(object):
@@ -33,7 +33,7 @@ class Nav(object):
       self.nav_items_current_or_not.append(
           NavItemCurrentOrNot(
               reverse(nav_item.view_name), nav_item.display, is_current,
-              css_class))
+              css_class, nav_item.is_visible))
     # Don't raise an exception here if current_view_name and not found_current.
     # Nav entries disappear now depending on what features you have enabled. So
     # if, for instance, you have one project with a clock so "Enter time" is

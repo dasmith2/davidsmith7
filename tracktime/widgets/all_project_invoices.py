@@ -5,7 +5,7 @@ from django.template.loader import render_to_string
 from djaveDT import now
 from djaveHTML.field import SelectField, Option
 from djaveReport.date_range_report import DateRangeReport
-from djaveHTML.cell_content import InHref
+from djaveHTML.a import A
 from djaveHTML.table import Table, Cell
 
 from invoice.models.invoice import STATUSES, STATUS_TOOLTIP
@@ -15,7 +15,7 @@ from tracktime.models.project_invoice import ProjectInvoice
 
 class AllProjectInvoicesTable(Table):
   def __init__(self, user):
-    see_line_items_button = InHref(
+    see_line_items_button = A(
         'See all line items', reverse('project_line_items'),
         classes=['all_line_items'])
     status = Cell(STATUS_TOOLTIP, is_header=True)

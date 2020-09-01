@@ -1,10 +1,19 @@
 {% extends "projects.html" %}
 
-{% block call_setup_functions %}
-$(setup_unarchive);
-$(setup_name_change);
-{% endblock %}
-
 {% block tracktime_body %}
+  <script>
+    function setup_unarchive(row) {
+      row.find('.unarchive').click(function() {
+        var button = $(this);
+        button.prop('disabled', true);
+        var always = function() {
+          button.prop('disabled', false);
+        };
+        update_field(
+            find_model(row), find_pk(row), 'deleted', null, remove_row,
+            always);
+      });
+    }
+  </script>
   {{ table.as_html }}
 {% endblock tracktime_body %}

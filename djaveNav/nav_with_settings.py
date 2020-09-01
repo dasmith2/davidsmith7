@@ -6,7 +6,7 @@ from djaveNav.nav import Nav, NavItem
 
 class NavWithAccount(Nav):
   def __init__(self, nav_list, settings_view_name, current_view_name):
-    settings_nav_item = NavItem(settings_view_name, 'Settings')
+    settings_nav_item = NavItem(settings_view_name, 'Settings', True)
     super().__init__(nav_list + [settings_nav_item], current_view_name)
 
   def template(self):

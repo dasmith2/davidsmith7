@@ -1,8 +1,8 @@
 from django.utils.safestring import mark_safe
-from djaveHTML.cell_content import CellContent
+from djaveHTML.element import Element
 
 
-class Problem(CellContent):
+class Problem(Element):
   def __init__(self, text):
     self.text = text
 

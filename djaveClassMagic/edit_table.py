@@ -6,8 +6,10 @@ from djaveClassMagic.model_fields import model_fields
 from djaveHTML.button import Button
 from djaveHTML.form import Form
 from djaveHTML.table import Table, Cell
-from djaveHTML.cell_content import (
-    Tooltip, DisappearingFeedback, Feedback, InHref)
+
+from djaveHTML.tooltip import Tooltip
+from djaveHTML.feedback import Feedback, DisappearingFeedback
+from djaveHTML.a import A
 from djmoney.money import Money
 
 
@@ -32,7 +34,7 @@ class EditTable(Table):
 
     self.save_button = Button('Save', button_type='submit')
     self.delete_button = Button('Delete', button_type='delete')
-    self.cancel_button = InHref('Cancel', cancel_url, button=True)
+    self.cancel_button = A('Cancel', cancel_url, button=True)
 
     self.form = Form(
         [self.save_button, self.delete_button] + self.extra_buttons)
@@ -56,7 +58,7 @@ class EditTable(Table):
       # saved, then the old call to add_rows might have out of date data, so
       # we'd better redo the rows.
       self._redo_rows()
-      self.buttons_cell.cell_contents.append(DisappearingFeedback())
+      self.buttons_cell.elements.append(DisappearingFeedback())
 
   def _redo_rows(self):
     self.rows = []
@@ -95,7 +97,7 @@ class EditTable(Table):
         setattr(self.instance, self._get_model_field_key(key), value)
       why_invalid = self.instance.explain_why_invalid()
       if why_invalid:
-        self.buttons_cell.cell_contents.append(Feedback(why_invalid))
+        self.buttons_cell.elements.append(Feedback(why_invalid))
       else:
         self.instance.save()
         self._saved = True
@@ -129,7 +131,7 @@ class EditTable(Table):
       buttons.append(self.delete_button)
     if self.extra_buttons:
       buttons.extend(self.extra_buttons)
-    self.buttons_cell.cell_contents.extend(buttons)
+    self.buttons_cell.elements.extend(buttons)
     self.create_row([self.buttons_cell])
 
   def add_field_rows(self, *field_names):

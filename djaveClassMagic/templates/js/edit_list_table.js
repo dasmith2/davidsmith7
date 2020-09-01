@@ -5,9 +5,9 @@ function find_pk($element) {
   // Search up the dom for a data-pk attribute. So you might do something like
   // my_button.click(function() { var pk = find_pk($(this)); });
   if ($element.attr('data-pk')) {
-    return $element.attr('data-pk');
+    return parseInt($element.attr('data-pk'));
   }
-  return $element.parents('[data-pk]').attr('data-pk');
+  return parseInt($element.parents('[data-pk]').attr('data-pk'));
 }
 
 function find_model($element) {

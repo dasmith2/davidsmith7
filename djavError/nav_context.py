@@ -6,11 +6,11 @@ from djavError.models.too_many_queries_request import TooManyQueriesRequest
 from djavError.widgets.fixable_report import get_fixables
 
 
-ERRORS = NavItem('errors', 'Errors')
-NOTIFICATIONS = NavItem('notifications', 'Notifications')
-LONG_REQUESTS = NavItem('long_requests', 'Long requests')
-TOO_MANY_QUERIES = NavItem('too_many_queries', 'Too many queries')
-TRIGGER_ERRORS = NavItem('trigger_errors', 'Trigger')
+ERRORS = NavItem('errors', 'Errors', True)
+NOTIFICATIONS = NavItem('notifications', 'Notifications', True)
+LONG_REQUESTS = NavItem('long_requests', 'Long requests', True)
+TOO_MANY_QUERIES = NavItem('too_many_queries', 'Too many queries', True)
+TRIGGER_ERRORS = NavItem('trigger_errors', 'Trigger', True)
 
 NAV_LIST = [
     ERRORS, NOTIFICATIONS, LONG_REQUESTS, TOO_MANY_QUERIES, TRIGGER_ERRORS]

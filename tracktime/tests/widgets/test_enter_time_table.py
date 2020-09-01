@@ -26,7 +26,7 @@ class EnterTimeTableTests(TestCaseWithData):
     save_new_row = table.rows[0].cells
     self.assertEqual('project', save_new_row[0].key())
     self.assertEqual(None, save_new_row[0].default)
-    self.assertEqual('hours', save_new_row[1].cell_contents.key())
+    self.assertEqual('hours', save_new_row[1].elements.key())
     self.assertEqual('savenew', save_new_row[2].key())
 
     expected_cells_row_1 = [

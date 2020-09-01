@@ -30,15 +30,11 @@ def tracktime_nav(user, current_view):
       has_to_do_list = has_to_do_list or project.has_to_do_list
       has_invoices = has_invoices or project.has_invoices
     nav_list = []
-    if use_clock:
-      nav_list.append(NavItem(ENTER_TIME, 'Clock'))
-    if has_to_do_list:
-      nav_list.append(NavItem(TO_DO, 'To do'))
-    if use_clock:
-      nav_list.append(NavItem(PROJECT_WORK_SESSION_SUMMARY, 'Report'))
-    if has_invoices:
-      nav_list.append(NavItem(INVOICES, 'Invoices'))
-    nav_list.append(NavItem(PROJECTS, 'Projects'))
+    nav_list.append(NavItem(ENTER_TIME, 'Clock', use_clock))
+    nav_list.append(NavItem(TO_DO, 'To do', has_to_do_list))
+    nav_list.append(NavItem(PROJECT_WORK_SESSION_SUMMARY, 'Report', use_clock))
+    nav_list.append(NavItem(INVOICES, 'Invoices', has_invoices))
+    nav_list.append(NavItem(PROJECTS, 'Projects', True))
     return NavWithAccount(nav_list, SETTINGS, current_view)
   else:
     return Nav(

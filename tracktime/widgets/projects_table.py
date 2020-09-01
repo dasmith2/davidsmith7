@@ -1,7 +1,7 @@
 from django.shortcuts import reverse
 from djaveClassMagic.edit_list_table import EditListTable
 from djaveHTML.button import Button
-from djaveHTML.cell_content import InHref
+from djaveHTML.a import A
 from djaveHTML.table import ButtonsCell
 
 from tracktime.models.project import Project
@@ -14,7 +14,7 @@ class BaseProjectsTable(EditListTable):
 
   def create_row_for_existing(self, project, archive_action):
     archive_button = Button(archive_action)
-    edit_button = InHref(
+    edit_button = A(
         'Edit', reverse('edit_project', kwargs={'pk': project.pk}),
         classes=['edit'], button=True)
     buttons_cell = ButtonsCell([edit_button, archive_button])

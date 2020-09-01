@@ -7,7 +7,8 @@
  * save_new_defaults will be something like {} or {'user': 'me'} */
 function setup_crud_table(
     base_api_url, wrapper_finder, save_new_defaults,
-    label_edit_page_with_field, delete_row_confirm_question) {
+    label_edit_page_with_field, delete_row_confirm_question,
+    new_row_callback, saved_model_callback, deleted_model_callback) {
   var wrapper = $(wrapper_finder);
   var base_url = wrapper.find('.list').attr('data-url');
   if (!base_url) {
@@ -83,7 +84,6 @@ function setup_crud_table(
       initialize: function() {
         this.listenTo(this.model, 'change', this.render);
         this.listenTo(this.model, 'destroy', this.remove);
-        var view = this;
       },
 
       events: {
@@ -95,12 +95,17 @@ function setup_crud_table(
         if (!delete_row_confirm_question || confirm(
             delete_row_confirm_question)) {
           this.model.destroy();
+          if (deleted_model_callback) {
+            deleted_model_callback(this.model);
+          }
         }
         event.preventDefault();
       },
 
       render: function() {
-        return this.$el.html(this.template(this.model.toJSON()));
+        var row = this.$el.html(this.template(this.model.toJSON()));
+        row.attr('data-pk', this.model.get('id'));
+        return row;
       }
     });
 
@@ -129,7 +134,11 @@ function setup_crud_table(
           this.table().show();
           this.$el.find('.nothing').hide();
           var view = new ModelsItemView({model: model});
-          this.tbody().append(view.render());
+          var row = view.render()
+          this.tbody().append(row);
+          if (new_row_callback) {
+            new_row_callback(row);
+          }
           var in_table_button_wrapper = this.$el.find(
               '.in-table-new-button-wrapper');
           if (in_table_button_wrapper.length) {
@@ -139,7 +148,6 @@ function setup_crud_table(
           this.color_alternate_rows();
         },
         color_alternate_rows: function() {
-          window.thisel = this.$el;
           this.$el.find('tbody tr').each(function(i) {
             if (i % 2 == 0) {
               $(this).removeClass('row2');
@@ -212,12 +220,15 @@ function setup_crud_table(
             });
 
             var feedback = view.$el.find('.feedback');
-            var success = function() {
+            var success = function(success_data) {
               // I used to think, hey, update the model right on the page and
               // you don't even have to fetch the list. But the user could
               // easily update a field that causes the item to move around in
               // the list, leave entirely, whatever. Let's not outsmart myself
               // here.
+              if (saved_model_callback) {
+                saved_model_callback(success_data);
+              }
               models.fetch();
               var list_panel_id = wrapper.find('.list').attr('id');
               navigate_to_panel(list_panel_id);

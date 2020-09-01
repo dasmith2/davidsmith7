@@ -91,15 +91,25 @@ $(function() {
     router.on('route', function(panel_id) {
       this.current = panel_id;
       var set_current_nav_item = function(current_panel_id) {
-        var data_url = $('#' + current_panel_id).attr('data-url');
+        var panel = $('#' + current_panel_id).removeClass('start-hidden');
+        var data_url = panel.attr('data-url');
+        var data_nav_css_class = panel.attr('data-nav-css-class');
         $('.nav_item').each(function() {
           var a = $(this);
           var wrapper = $(a.parents('div')[0]);
-          // data_url might be "/trips/:pk" and the nav might be to "/trips"
-          if (data_url.indexOf(a.attr('href')) == 0) {
-            wrapper.addClass('current');
+          if (data_nav_css_class) {
+            if (a.hasClass(data_nav_css_class)) {
+              wrapper.addClass('current');
+            } else {
+              wrapper.removeClass('current');
+            }
           } else {
-            wrapper.removeClass('current');
+            // data_url might be "/trips/:pk" and the nav might be to "/trips"
+            if (data_url.indexOf(a.attr('href')) == 0) {
+              wrapper.addClass('current');
+            } else {
+              wrapper.removeClass('current');
+            }
           }
         });
       };

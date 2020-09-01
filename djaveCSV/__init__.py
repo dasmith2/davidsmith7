@@ -4,7 +4,8 @@ import csv
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.template.loader import render_to_string
-from djaveHTML.cell_content import StringContent, InHref
+from djaveHTML.a import A
+from djaveHTML.element import StringElement
 
 
 def csv_writer_and_response(file_name='unhelpful_generic_file_name.csv'):
@@ -44,9 +45,9 @@ class CanCSV(object):
 
 
 def download_csv_button():
-  button = InHref(
+  button = A(
       'Download CSV', '', classes=['download_csv_button'], button=True)
-  return StringContent(
+  return StringElement(
       render_to_string('download_csv_button.html', {'button': button}))
 
 

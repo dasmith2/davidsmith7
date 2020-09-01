@@ -1,36 +1,35 @@
 {% extends "tracktime_base.html" %}
 
 {% block tracktime_body %}
-<form method="POST" class="margin-top">
-  {% csrf_token %}
-  {{ table.as_html }}
-</form>
+<script>
+function post_save_project(project) {
+  if (project.has_to_do_list) {
+    $('.todo_nav').parent().show();
+  }
+  if (project.use_clock) {
+    $('.clock_nav').parent().show();
+    $('.report_nav').parent().show();
+  }
+  if (project.has_invoices) {
+    $('.invoices_nav').parent().show();
+  }
+}
+
+function post_delete_project() {
+  $('#archived_projects_link').show();
+}
+</script>
+
+{{ table.as_html }}
 
 <div class="margin-top" id="archived_projects_link">
   <a href="{{ archived_projects_url }}" class="archived_projects">See archived projects</a>
 </div>
-<script>
-function hide_archived_projects_link() {
-  $('#archived_projects_link').hide();
-}
 
-function show_archived_projects_link() {
-  $('#archived_projects_link').show();
-}
-
-$(function() {
-  $('.archive').click(show_archived_projects_link);
-  $('.archive').click(function() {
-    var archiving_pk = find_pk($(this));
-    var non_archived = $('tr[data-pk][data-pk!=' + archiving_pk + ']');
-    if (!non_archived.length) {
-      $('.create_new').remove().appendTo('form');
-      $('table[data-model]').hide();
-    }
-  });
-});
 {% if not archived_projects_exist %}
-hide_archived_projects_link();
+  <script>
+    $('#archived_projects_link').hide();
+  </script>
 {% endif %}
-</script>
+
 {% endblock tracktime_body %}
