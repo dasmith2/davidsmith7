@@ -14,23 +14,28 @@ from djaveHTML.field import Field, HiddenField
 from djaveHTML.a import A
 
 
-HIDDEN_NOT_DELETED_FILTER = HiddenField(
-    'deleted', value='true', **{'data-query-key': 'deleted__isnull'})
-HIDDEN_DELETED_FILTER = HiddenField(
-    'deleted', value='false', **{'data-query-key': 'deleted__isnull'})
+def hidden_filter(field_name, value, data_query_key=None):
+  return HiddenField(
+      field_name, value=value,
+      **{'data-query-key': data_query_key or field_name})
 
 
+HIDDEN_NOT_DELETED_FILTER = hidden_filter('deleted', 'true', 'deleted__isnull')
+HIDDEN_DELETED_FILTER = hidden_filter('deleted', 'false', 'deleted__isnull')
 USE_DEFAULT = 'USE_DEFAULT'
 
 
 class CRUDTable(object):
   def __init__(
-      self, model, filter_widgets, display_columns, edit_field_names,
+      self, model, filter_widgets, display_columns, edit_field_names=None,
       save_new_defaults=None, label_edit_page_with_field=None, list_url=None,
       list_header=USE_DEFAULT, delete_row_confirm_question=USE_DEFAULT,
       hidden_filters=None, can_create_new=True, new_row_callback=None,
       saved_model_callback=None, deleted_model_callback=None,
-      nav_css_class=None):
+      nav_css_class=None, display_column_headers=True, inline_create=False):
+
+    self.js = []
+
     self.model = model
 
     # A list of djaveHTML.field#Field
@@ -48,7 +53,7 @@ class CRUDTable(object):
             'data-query-key e.g. create_date__lte or project__isnull')
 
     self.display_columns = display_columns  # A list of DisplayColumns
-    self.edit_field_names = edit_field_names  # A list of strings
+    self.edit_field_names = edit_field_names or []  # A list of strings
     # A dict, perhaps like {'user': 'me'}. These values get passed along to
     # /api/Project/2 or whatever when you save.
     self.save_new_defaults = save_new_defaults or {}
@@ -64,7 +69,7 @@ class CRUDTable(object):
     if delete_row_confirm_question:
       if delete_row_confirm_question == USE_DEFAULT:
         self.delete_row_confirm_question = 'Delete this {}?'.format(
-            lower_case_singular(model))
+            model._meta.verbose_name)
       else:
         self.delete_row_confirm_question = delete_row_confirm_question
     self.can_create_new = can_create_new
@@ -76,6 +81,11 @@ class CRUDTable(object):
     # crud tables highlight the same navigation. For instance, the live and
     # archived project lists are both under the "Projects" nav.
     self.nav_css_class = nav_css_class
+    self.display_column_headers = display_column_headers
+    self.inline_create = inline_create
+
+  def add_js(self, js):
+    self.js.append(js)
 
   def as_html(self):
     list_api_url = reverse(
@@ -104,11 +114,13 @@ class CRUDTable(object):
         'new_row_callback': self.new_row_callback or 'null',
         'saved_model_callback': self.saved_model_callback or 'null',
         'deleted_model_callback': self.deleted_model_callback or 'null',
-        'nav_css_class': self.nav_css_class or ''}
+        'nav_css_class': self.nav_css_class or '',
+        'inline_create': str(self.inline_create).lower(),
+        'js': mark_safe('\n'.join(self.js))}
     return render_to_string('crud_table.html', context)
 
   def new_button(self):
-    if self.can_create_new:
+    if self.can_create_new and not self.inline_create:
       new_button_text = 'New {}'.format(upper_case_singular(self.model))
       new_button_url = '{}/0'.format(self.list_url)
       new_button_css = 'new-{}'.format(lower_case_singular(self.model))

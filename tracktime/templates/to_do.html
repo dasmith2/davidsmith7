@@ -1,31 +1,5 @@
 {% extends "tracktime_base.html" %}
 
-{% block tracktime_head %}
-<script>
-function append_delete_button(row) {
-  var html = '<button type="button" class="delete">Delete</button>';
-  var button = $(html).appendTo(buttons_cell(row));
-  setup_click_deletes(button, 'Delete To Do?');
-}
-
-function remove_delete_button(row) {
-  row.find('.delete').remove();
-}
-
-function init_done_mode() {
-  var table_finder = 'table[data-model="ToDo"]';
-  var field_name = 'done';
-  var set_mode_callback = remove_delete_button;
-  var unset_mode_callback = append_delete_button;
-  setup_set_clear_dt_green_mode(
-      table_finder, field_name, 'Done', 'Not done',
-      set_mode_callback, unset_mode_callback);
-}
-$(init_done_mode);
-</script>
-
-{% endblock tracktime_head %}
-
 {% block tracktime_body %}
 
 <form method="POST">

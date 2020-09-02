@@ -193,8 +193,20 @@ function turn_off_edit_mode_table_row(row) {
   }
 }
 
+function space_out_buttons(row) {
+  var buttons = row.find('button,.button');
+  for (var i = 0; i < buttons.length; i++) {
+    var button = $(buttons[i]);
+    if (i == buttons.length - 1) {
+      button.addClass('last-button');
+    } else {
+      button.removeClass('last-button');
+    }
+  }
+}
+
 function setup_set_clear_dt_green_mode(
-    table_finder, field_name, set_button_text, unset_button_text,
+    row, field_name, set_button_text, unset_button_text,
     set_mode_callback, unset_mode_callback) {
   /* You have a model where, when a field is set, the row should be colored
    * green, but when the field is not set, the row is uncolored. You need
@@ -202,8 +214,8 @@ function setup_set_clear_dt_green_mode(
    * null. For instance, ToDos have a `done` field and invoices have a `paid`
    * field. */
 
-  var set_mode = function(pk) {
-    var row = row_by_pk(pk).addClass('green');
+  var set_mode = function() {
+    row.addClass('green');
     var buttons = buttons_cell(row);
     buttons.find('.set').remove();
     // This code uses the .unset class, but the web tests probably find it
@@ -216,14 +228,15 @@ function setup_set_clear_dt_green_mode(
     });
 
     buttons.append(unset);
+    space_out_buttons(row);
 
     if (set_mode_callback) {
       set_mode_callback(row);
     }
   };
 
-  var unset_mode = function(pk) {
-    var row = row_by_pk(pk).removeClass('green');
+  var unset_mode = function() {
+    row.removeClass('green');
     var buttons = buttons_cell(row);
     buttons.find('.unset').remove();
     // This code uses the .set class, but the web tests probably find it makes
@@ -236,6 +249,7 @@ function setup_set_clear_dt_green_mode(
     });
 
     buttons.append(set);
+    space_out_buttons(row);
 
     if (unset_mode_callback) {
       unset_mode_callback(row);
@@ -252,32 +266,27 @@ function setup_set_clear_dt_green_mode(
         find_model(row), pk, field_name, new_value, success, null, feedback);
   };
 
-  var rows = $(table_finder).find('tr[data-pk]');
-  for (var i = 0; i < rows.length; i++) {
-    // I used a for loop so if I throw an exception the loop stops.
-    var row = $(rows[i]);
-    if (buttons_cell(row).length == 0) {
-      window.log_error(
-          'Unable to find the buttons cell for a row in ' + table_finder);
-      return;
-    }
-    var field_data_attr = 'data-' + field_name;
-    var field_data_val = row.attr(field_data_attr);
-    if (field_data_val != 'True' && field_data_val != 'False') {
-      var message = (
-          table_finder + ' rows should have a True or False '
-          + field_data_attr);
-      // Don't throw message because then Firefox just hands blank information
-      // to onerror.
-      window.log_error(message);
-      return;
-    }
-    var is_set = field_data_val == 'True';
-    if (is_set) {
-      set_mode(find_pk(row));
-    } else {
-      unset_mode(find_pk(row));
-    }
+  if (buttons_cell(row).length == 0) {
+    window.log_error(
+        'Unable to find the buttons cell for a row in ' + table_finder);
+    return;
+  }
+  var field_data_attr = 'data-' + field_name;
+  var field_data_val = row.attr(field_data_attr).toLowerCase();
+  if (field_data_val != 'true' && field_data_val != 'false') {
+    var message = (
+        'These rows should have a True or False '
+        + field_data_attr);
+    // Don't throw message because then Firefox just hands blank information
+    // to onerror.
+    window.log_error(message);
+    return;
+  }
+  var is_set = field_data_val == 'true';
+  if (is_set) {
+    set_mode(find_pk(row));
+  } else {
+    unset_mode(find_pk(row));
   }
 }
 

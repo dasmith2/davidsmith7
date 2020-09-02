@@ -5,26 +5,46 @@
  * happens without page reloads. base_api_url will be something like
  * /api/Project wrapper_finder will be something like '#projects' and
  * save_new_defaults will be something like {} or {'user': 'me'} */
-function setup_crud_table(
-    base_api_url, wrapper_finder, save_new_defaults,
-    label_edit_page_with_field, delete_row_confirm_question,
-    new_row_callback, saved_model_callback, deleted_model_callback) {
-  var wrapper = $(wrapper_finder);
+
+function crud_table_options(base_api_url, wrapper_finder) {
+  return {
+      base_api_url: base_api_url,  // e.g. '/api/Projects'
+      wrapper_finder: wrapper_finder,  // e.g. '#project_list_wrapper'
+      save_new_defaults: {},  // e.g. {'creator': 'me'}
+      // e.g. 'name' as in, "When editing a project with name Foo, label the
+      // edit panel like, "Edit Foo"
+      label_edit_page_with_field: null,
+      // Ask this question before deleting a row. The default question is
+      // something like "Delete <model lower case singular name>?"
+      delete_row_confirm_question: null,
+      // function new_row_callback(row, model_data) {}
+      new_row_callback: null,
+      // function saved_model_callback(new_project_data_or_whatever) {}
+      saved_model_callback: null,
+      // function deleted_model_callback(backbone_model) {}
+      deleted_model_callback: null,
+      // Should the table display a row up top that allows the user to create
+      // new instances?
+      inline_create: null};
+}
+
+function setup_crud_table(options) {
+  var wrapper = $(options.wrapper_finder);
   var base_url = wrapper.find('.list').attr('data-url');
   if (!base_url) {
     window.onerror(
-        'I expect ' + wrapper_finder + ' to contain something like '
+        'I expect ' + options.wrapper_finder + ' to contain something like '
         + '<div class="list" data-url="/whatever"');
   }
 
   var Model = Backbone.Model.extend({
     url: function() {
-      return base_api_url + '/' + this.get('id');
+      return options.base_api_url + '/' + this.get('id');
     }
   });
 
   function api_list_url() {
-    return base_api_url + query();
+    return options.base_api_url + query();
   }
 
   function query() {
@@ -77,37 +97,7 @@ function setup_crud_table(
   var edit_view = null;
   var initialized = false;
   function init() {
-    var ModelsItemView = Backbone.View.extend({
-      tagName: 'tr',
-      template: _.template(wrapper.find('.list-item-template').html()),
-
-      initialize: function() {
-        this.listenTo(this.model, 'change', this.render);
-        this.listenTo(this.model, 'destroy', this.remove);
-      },
-
-      events: {
-        'click .delete': 'delete'
-      },
-
-      delete: function(event) {
-        // `destroy` is a Backbone-ism. This simply fires a delete request.
-        if (!delete_row_confirm_question || confirm(
-            delete_row_confirm_question)) {
-          this.model.destroy();
-          if (deleted_model_callback) {
-            deleted_model_callback(this.model);
-          }
-        }
-        event.preventDefault();
-      },
-
-      render: function() {
-        var row = this.$el.html(this.template(this.model.toJSON()));
-        row.attr('data-pk', this.model.get('id'));
-        return row;
-      }
-    });
+    {% include "js/models_item_view.js" %}
 
     if (!initialized) {
       initialized = true;
@@ -121,165 +111,14 @@ function setup_crud_table(
       });
       models = new Models();
 
-      var ModelsView = Backbone.View.extend({
-        el: wrapper.find('.list-table-wrapper'),
-        initialize: function() {
-          this.listenTo(this.collection, 'add', this.add_one);
-          this.listenTo(this.collection, 'reset', this.remove_all);
-          this.listenTo(this.collection, 'all', this.log_event);
-          this.listenTo(this.collection, 'remove', this.maybe_hide);
-          reload_list_if_qs_sets_filters();
-        },
-        add_one: function(model) {
-          this.table().show();
-          this.$el.find('.nothing').hide();
-          var view = new ModelsItemView({model: model});
-          var row = view.render()
-          this.tbody().append(row);
-          if (new_row_callback) {
-            new_row_callback(row);
-          }
-          var in_table_button_wrapper = this.$el.find(
-              '.in-table-new-button-wrapper');
-          if (in_table_button_wrapper.length) {
-            in_table_button_wrapper.show();
-            wrapper.find('.upper-new-button-wrapper').hide();
-          }
-          this.color_alternate_rows();
-        },
-        color_alternate_rows: function() {
-          this.$el.find('tbody tr').each(function(i) {
-            if (i % 2 == 0) {
-              $(this).removeClass('row2');
-            } else {
-              $(this).addClass('row2');
-            }
-          });
-        },
-        remove_all: function() {
-          this.tbody().empty();
-          this.show_nothing();
-        },
-        maybe_hide: function() {
-          if (!this.tbody().find('tr').length) {
-            this.show_nothing();
-          }
-        },
-        show_nothing: function() {
-          this.table().hide();
-          // If there are no filter_widgets and no rows, then the only thing
-          // worth showing is the create new button.
-          if (this.$el.find('.filter_widgets').length) {
-            this.$el.find('.nothing').show();
-          } else {
-            wrapper.find('.upper-new-button-wrapper').show();
-          }
-        },
-        log_event: function(action) {
-          // console.log(action); // Not sure what events are happening when?
-        },
-        table: function() {
-          return wrapper.find('.list-table');
-        },
-        tbody: function() {
-          return this.table().find('tbody');
+      function extend_by_save_new_defaults(data) {
+        for (const [key, value] of Object.entries(options.save_new_defaults)) {
+          data[key] = value;
         }
-      });
+      }
 
-      var EditModelView = Backbone.View.extend({
-        el: wrapper.find('.details'),
-        initialize: function() {
-          var view = this;
-          if (view.$el.is(':visible')) {
-            var id = parseInt(location.pathname.split('/')[2]);
-            view.edit(id);
-          }
-
-          var save_button = view.$el.find('.save').off();
-          save_button.click(function(event) {
-            event.preventDefault();
-            save_button.prop('disabled', true);
-            var always = function() {
-              save_button.prop('disabled', false);
-            };
-
-            var data = {};
-            if (!view.model.get('id')) {  // The id is undefined for new
-              for (const [key, value] of Object.entries(save_new_defaults)) {
-                data[key] = value;
-              }
-            }
-            view.$el.find('table').find('input,textarea').each(function() {
-              var field = $(this);
-              var field_name = field.attr('class');
-              var value = field.val();
-              if (field.attr('type') == 'checkbox') {
-                value = field[0].checked;
-              }
-              data[field_name] = value;
-            });
-
-            var feedback = view.$el.find('.feedback');
-            var success = function(success_data) {
-              // I used to think, hey, update the model right on the page and
-              // you don't even have to fetch the list. But the user could
-              // easily update a field that causes the item to move around in
-              // the list, leave entirely, whatever. Let's not outsmart myself
-              // here.
-              if (saved_model_callback) {
-                saved_model_callback(success_data);
-              }
-              models.fetch();
-              var list_panel_id = wrapper.find('.list').attr('id');
-              navigate_to_panel(list_panel_id);
-            };
-            post(view.url, data, success, always, feedback)
-          });
-        },
-        edit: function(id) {
-          // Resets the whole row turns yellow on edit thing.
-          set_saved_values(this.$el.find('input,textarea'));
-          this.$el.find('.edit-table tr').each(function() {
-            calc_edit_mode($(this));
-          });
-
-          var id_int = parseInt(id);
-          var view = this;
-          var got_model_callback = function(model) {
-            view.model = model;
-            view.url = base_api_url;
-            if (id_int > 0) {
-              view.url += '/' + id_int;
-            }
-
-            var model = view.model;
-            var lower_case_singular = wrapper.find('.details').attr('id');
-            var title = 'New ' + lower_case_singular;
-            if (model.get('id') > 0) {
-              what_to_call_it = lower_case_singular;
-              if (label_edit_page_with_field) {
-                what_to_call_it = model.get(label_edit_page_with_field);
-              }
-              title = 'Edit ' + what_to_call_it;
-            }
-            view.$el.find('h1').text(title);
-            view.$el.find('table').find('input,textarea').each(function() {
-              var field = $(this);
-              var field_name = field.attr('class');
-              var value = model.get(field_name);
-              if (field.attr('type') == 'checkbox') {
-                field[0].checked = value;
-              } else {
-                field.val(value);
-                if (field[0].tagName == 'TEXTAREA') {
-                  resize_textarea(field);
-                }
-              }
-            });
-          };
-          get_model(id_int, got_model_callback);
-        }
-      });
+      {% include "js/models_view.js" %}
+      {% include "js/edit_model_view.js" %}
 
       models_view = new ModelsView({collection: models});
       edit_view = new EditModelView();
@@ -320,7 +159,7 @@ function setup_crud_table(
       }
     });
     found = new Model();
-    found.url = base_api_url;
+    found.url = options.base_api_url;
     if (id) {
       found.url += '/' + id;
       found.fetch({success: function() {
@@ -330,4 +169,15 @@ function setup_crud_table(
       callback(found);
     }
   }
+}
+
+function str_to_native(my_str) {
+  if (my_str === 'null') {
+    return null;
+  } else if (my_str === 'true') {
+    return true;
+  } else if (my_str === 'false') {
+    return false;
+  }
+  return my_str;
 }
