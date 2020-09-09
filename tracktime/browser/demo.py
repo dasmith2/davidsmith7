@@ -20,7 +20,7 @@ class Demo(WebDemo):
       self.edit_invoice()
       self.send_invoice()
       self.all_invoices()
-      self.all_tasks()
+      self.all_to_dos()
       self.archive_project()
       self.settings()
       self.zoom()
@@ -325,12 +325,12 @@ class Demo(WebDemo):
     self.say_move('from_date', 'You can filter')
     self.say_move('download_csv_button', "And download line items as a CSV.")
 
-  def all_tasks(self):
+  def all_to_dos(self):
     self.say_move_click('todo_nav', """
         Let me point out a few more features related to tasks.""")
     self.say_move('button', """
         Ideally, I'm on the clock any time I'm thinking about a project.""")
-    self.say_move_click('all_tasks', """
+    self.say_move_click('all_to_dos', """
         But sometimes it makes sense to dig through all the tasks.""")
     self.say_move('to_do_status', """
         For instance maybe I want to see all complete tasks""")

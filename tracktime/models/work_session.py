@@ -10,7 +10,7 @@ from djaveAPI.models.user_api_key import UserAPIKey
 from djaveAPI.models.publishable import Publishable, LivePublishableManager
 from djaveDT import (
     now, d_to_str, time_to_time_str, tz_dt_to_tz_dt,
-    tz_dt_to_str, beginning_of_day)
+    tz_dt_to_str, beginning_of_day, dt_to_time_str)
 from djaveNav import date_to_url_str
 
 
@@ -128,7 +128,7 @@ class WorkSession(Publishable):
     if api_key_type is UserAPIKey:
       return UserAPIKey.objects.filter(user=self.user)
 
-  def describe_time_span(self, tz_str=None):
+  def describe_time_span_for_invoices(self, tz_str=None):
     if self.started and self.stopped:
       started = self.get_started(tz_str=tz_str)
       stopped = tz_dt_to_tz_dt(self.stopped, tz_str=tz_str)
@@ -145,6 +145,15 @@ class WorkSession(Publishable):
     elif self.clock_running():
       started = self.get_started(tz_str=tz_str)
       return '{}, still working'.format(tz_dt_to_str(started))
+
+  def describe_time_span_for_time_entry(self):
+    if self.started:
+      return '{} starting at {}'.format(
+          self.hours, dt_to_time_str(self.started))
+    return self.hours
+
+  def add_to_json(self, data):
+    data['time_entry_description'] = self.describe_time_span_for_time_entry()
 
   def stop(self, nnow=None):
     nnow = nnow or now()

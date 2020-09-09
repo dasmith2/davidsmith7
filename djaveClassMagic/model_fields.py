@@ -49,10 +49,7 @@ def model_fields(model, specific_field=None):
     if 'child_class' == name:
       continue
 
-    # The deleted column is kind of a special case. I expect most queries to
-    # include deleted__isnull=True. Database indexes on every single deleted
-    # column seems like overkill to support that though.
-    can_filter = field.db_index or field.name == 'deleted'
+    can_filter = field.db_index
     help_text = field.help_text
     field_type = field.get_internal_type()
     required = not field.null

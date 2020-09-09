@@ -1,6 +1,7 @@
 from django.db import models
 from django.dispatch import receiver
 from djaveClassMagic.signals import destroy_user
+from djaveDT import d_to_str
 
 from tracktime.models.project import Project
 from tracktime.models.to_do import ToDo, ToDoManager
@@ -34,3 +35,7 @@ class ProjectToDo(ToDo):
         can see a steady rhythm. """
 
   live = ProjectToDoManager()
+
+  def add_to_json(self, data):
+    data['project_name'] = self.project.name
+    data['create_date_str'] = d_to_str(self.created.date())

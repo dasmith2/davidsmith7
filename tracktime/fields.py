@@ -26,7 +26,7 @@ def project_field(
       has_invoices=has_invoices)
   field = SelectField(
       key_prefix=PROJECT, options=options,
-      required=required, default=default, label=label)
+      required=required, default=default, label=label, query_key='project')
   return field
 
 

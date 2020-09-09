@@ -24,7 +24,7 @@ class ToDoProjectPicker(SimpleList):
         if button.get_was_clicked(request_POST):
           start_clock_on_project(user, project)
       else:
-        url = reverse('to_do', kwargs={'project_pk': project.pk})
+        url = reverse('to_dos', kwargs={'project_pk': project.pk})
         button = A(project.name, url, button=True)
       buttons.append(button)
     super().__init__(buttons)

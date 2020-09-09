@@ -1,3 +1,5 @@
+/* Goes away. */
+
 function setup_edit_field_turns_yellow(
     table_selector_or_elt, row_parent_finder, turn_on_edit_mode_callback,
     turn_off_edit_mode_callback) {
@@ -76,7 +78,6 @@ var turn_on_edit_mode = function(row, turn_on_edit_mode_callback) {
     turn_on_edit_mode_callback(row);
   }
 };
-
 
 var turn_off_edit_mode = function(row, turn_off_edit_mode_callback) {
   row.removeClass('editing');

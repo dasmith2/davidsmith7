@@ -160,14 +160,17 @@ def naive_dt_to_tz_dt(naive, tz_str=None):
   return pytz.timezone(tz_str).localize(naive, is_dst=None)
 
 
-def beginning_of_day(d, tz_str=None):
+def beginning_of_day(d=None, tz_str=None):
   """ Given a plain old date, this will return the beginning of that day in
   New York time or whatever. """
+  d = d or date.today()
   return naive_dt_to_tz_dt(d_to_naive_dt(d), tz_str=tz_str)
 
 
-def end_of_day(d, tz_str=None):
-  return beginning_of_day(d, tz_str=tz_str) + timedelta(days=1)
+def end_of_day(d=None, tz_str=None):
+  d = d or date.today()
+  almost_24_hours = timedelta(days=1) - timedelta(microseconds=1)
+  return beginning_of_day(d, tz_str=tz_str) + almost_24_hours
 
 
 def tz_dt_to_tz_dt(tz_dt, tz_str=None):

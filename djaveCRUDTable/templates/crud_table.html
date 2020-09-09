@@ -7,7 +7,7 @@
     <h1 class="section-header">{{ list_header }}</h1>
   {% endif %}
 
-  <div class="report margin-top">
+  <div class="report {{ margin_top_css }}">
     {% if new_button %}
       <div class="upper-new-button-wrapper">
         {{ new_button.as_html }}
@@ -19,7 +19,7 @@
         {{ hidden_filter.as_html }}
       {% endfor %}
       {% if filter_widgets %}
-        <div class="filter_widgets margin-top-half">
+        <div class="filter_widgets margin-top-half spread-labels">
           {% for filter in filter_widgets %}
             {{ filter.as_html }}
           {% endfor %}
@@ -27,12 +27,12 @@
       {% endif %}
     </div>
 
-    <div class="margin-top-half list-table-wrapper">
+    <div class="{{ margin_top_css }} list-table-wrapper">
       <table
           class="start-hidden list-table"
           data-model="{{ upper_case_singular }}">
         <thead>
-          {% if display_column_headers %}
+          {% if show_column_headers %}
             <tr class="headers">
               {% for column in display_columns %}
                 <th{% if column.header_css_class %} class="{{ column.header_css_class }}"{% endif %}>
@@ -44,7 +44,7 @@
           {% if inline_create %}
             <tr class="inline-create-row">
               {% for column in display_columns %}
-                {{ column.inline_create_cell }}
+                {{ column.safe_inline_create_cell }}
               {% endfor %}
             </tr>
           {% endif %}
@@ -85,6 +85,11 @@
 </div>
 
 <script>
+{% comment %}
+djaveCRUDTable/(crud_table.py (def __init__ args and body, as_html),
+templates/(crud_table.html bottom of the page, js/crud_table.js
+crud_table_options))
+{% endcomment %}
 (function() {
   {{ js }}
   var options = crud_table_options(
@@ -96,6 +101,8 @@
   options.saved_model_callback = {{ saved_model_callback }};
   options.deleted_model_callback = {{ deleted_model_callback }};
   options.inline_create = {{ inline_create }};
+  options.inline_create_callback = {{ inline_create_callback }};
+  options.fetch_list_callback = {{ fetch_list_callback }};
   setup_crud_table(options);
 })();
 </script>

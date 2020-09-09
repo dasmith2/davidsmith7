@@ -267,8 +267,7 @@ function setup_set_clear_dt_green_mode(
   };
 
   if (buttons_cell(row).length == 0) {
-    window.log_error(
-        'Unable to find the buttons cell for a row in ' + table_finder);
+    window.log_error('Unable to find the buttons cell for a row');
     return;
   }
   var field_data_attr = 'data-' + field_name;

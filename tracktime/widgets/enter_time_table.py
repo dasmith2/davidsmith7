@@ -1,87 +1,39 @@
-from djaveClassMagic.edit_list_table import EditListTable
-from djaveDT import dt_to_time_str
-from djaveHTML.table import Cell
-from djaveHTML.form import Form
+from datetime import date
+
+from django.shortcuts import reverse
+from django.template.loader import render_to_string
+from djaveCRUDTable.columns import ButtonsColumn
+from djaveCRUDTable.crud_table import (
+    CRUDTable, hidden_filter, HIDDEN_NOT_DELETED_FILTER)
 from djaveHTML.button import Button
 
-from tracktime.fields import project_field, hours_field
+from tracktime.columns import ProjectColumn, HoursColumn
 from tracktime.models.project_work_session import ProjectWorkSession
-from tracktime.models.project import Project
-from tracktime.models.latest_project import set_latest_project
 
 
-class EnterTimeForm(Form):
-  def __init__(self, user):
-    self.project_field = project_field(user, use_clock=True)
-    self.hours_field = hours_field()
-    self.save_button = Button('Save new', button_type='submit')
-    super().__init__([
-        self.project_field, self.hours_field,
-        self.save_button])
+class EnterTimeButtonsColumn(ButtonsColumn):
+  def __init__(self):
+    super().__init__([Button('Delete')])
+
+  def inline_create_cell(self):
+    return self.buttons_cell([Button('Save new')])
 
 
-class EnterTimeTable(EditListTable):
-  """ Saving a new one is done by posting a form. Deleting an existing one is
-  done by AJAX. In general, I think that when a page is talking about a single
-  instance of something it should be manipulated through posting the page,
-  but when you have a list of things, those should be done through AJAX. """
-  def __init__(self, user, day, form_data, nnow=None):
-    self.day = day
+class EnterTimeTable2(CRUDTable):
+  def __init__(self, user, day):
     self.user = user
-    self.form_data = form_data
-    super().__init__(ProjectWorkSession, classes=['margin-top-half'])
-
-    # This might save a new one if the form is valid so it has to go before we
-    # load this user's WorkSessions.
-    self.setup_enter_new()
-
-    work_session = ProjectWorkSession.live.done_by_user_and_date(
-        self.user, self.day, nnow=nnow)
-    self.setup_edit_existing(work_session)
-
-    hours = self.total_hours(work_session)
-    self.headers = ['Project', 'Hours: {}'.format(hours), '']
-    self.setup_delete_ajax(
-        '.delete', confirm_question='Delete work session?')
-
-  def setup_enter_new(self):
-    self.form = EnterTimeForm(self.user)
-    if self.form.a_button_was_clicked(self.form_data):
-      self.form.set_form_data(self.form_data)
-      if self.is_valid():
-        self.save()
-        self.form = EnterTimeForm(self.user)
-    hours_cell = Cell(
-        self.form.hours_field, **{'style': 'text-align: right'})
-    row = [self.form.project_field, hours_cell, self.form.save_button]
-    self.create_row(row, classes=['new'])
-
-  def total_hours(self, got_work_session):
-    total = 0.0
-    for work_session in got_work_session:
-      if work_session.hours:
-        total += work_session.hours
-    return round(total, 2)
-
-  def setup_edit_existing(self, got_work_session):
-    for work_session in got_work_session:
-      delete = Button('Delete')
-      hours = work_session.hours
-      if work_session.started:
-        hours = '{} starting at {}'.format(
-            hours, dt_to_time_str(work_session.started))
-      self.create_row([
-          work_session.project.name,
-          Cell(hours, classes=['hours', 'width-135']),
-          delete], pk=work_session.pk)
-
-  def is_valid(self):
-    return self.form.is_valid()
-
-  def save(self):
-    project = Project.live.get(pk=self.form.project_field.get_value())
-    hours = self.form.hours_field.get_value()
-    set_latest_project(self.user, project)
-    return ProjectWorkSession.live.create(
-        user=self.user, project=project, date=self.day,
-        hours=hours)
+    self.day = day
+    display_columns = [
+        ProjectColumn(user), HoursColumn(), EnterTimeButtonsColumn()]
+    hidden_filters = [
+        hidden_filter('date', date.today().isoformat()),
+        hidden_filter('hours', False, 'hours__isnull'),
+        HIDDEN_NOT_DELETED_FILTER]
+    save_new_defaults = {'user': 'me', 'date': 'today'}
+    super().__init__(
+        ProjectWorkSession, display_columns,
+        save_new_defaults=save_new_defaults, list_url=reverse('enter_time'),
+        delete_row_confirm_question='Delete?', hidden_filters=hidden_filters,
+        inline_create=True, list_header=None, margin_top_css='margin-top-half',
+        fetch_list_callback='put_sum_hours_in_header')
+    self.add_js(render_to_string('js/enter_time.js'))

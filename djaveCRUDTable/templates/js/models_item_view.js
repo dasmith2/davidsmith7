@@ -38,6 +38,8 @@ var ModelsItemView = Backbone.View.extend({
     if (options.new_row_callback) {
       options.new_row_callback(row, model_data);
     }
+    setup_edit_row_turns_yellow(
+        row, show_edit_mode_buttons, show_original_buttons);
     return row;
   }
 });

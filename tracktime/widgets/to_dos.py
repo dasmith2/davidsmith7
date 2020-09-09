@@ -24,23 +24,30 @@ class ToDoButtonsColumn(ButtonsColumn):
 
 
 class ToDos(CRUDTable):
-  def __init__(self, buttons_column):
-    filters = None
-    display_columns = [
-        EditFieldColumn(self.model(), 'description'), buttons_column]
-    list_url = reverse('to_dos')
+  def __init__(self, *additional_columns):
     # In this case, there's a "Punch out" button next to the title. The
     # template handles it.
     list_header = None
     super().__init__(
-        self.model(), filters, display_columns,
+        self.model(), self.filters(), self.columns(),
         save_new_defaults={'creator': 'me'},
-        list_url=list_url, list_header=list_header,
+        list_url=self.list_url(), list_header=list_header,
         hidden_filters=self.hidden_filters(),
-        display_column_headers=False, inline_create=True,
+        show_column_headers=False, inline_create=True,
         new_row_callback='new_to_do_row',
-        delete_row_confirm_question='Delete to do?')
+        delete_row_confirm_question='Delete to do?',
+        inline_create_callback='inline_create_to_do_callback',
+        nav_css_class='todo_nav')
     self.add_js(render_to_string('js/to_dos.js'))
+
+  def filters(self):
+    return None
+
+  def columns(self):
+    return [EditFieldColumn(self.model(), 'description')]
+
+  def list_url(self):
+    return reverse('to_dos')
 
   def hidden_filters(self):
     return [HIDDEN_NOT_DELETED_FILTER]

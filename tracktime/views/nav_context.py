@@ -7,7 +7,7 @@ from tracktime.models.project import Project
 
 
 ENTER_TIME = 'enter_time'
-TO_DO = 'to_do'
+TO_DO = 'to_dos'
 PROJECT_WORK_SESSION_SUMMARY = 'project_work_summary'
 PROJECTS = 'projects'
 INVOICES = 'project_invoices'

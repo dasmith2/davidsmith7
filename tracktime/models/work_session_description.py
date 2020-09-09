@@ -123,7 +123,7 @@ class WorkSessionDescriptions(object):
     return manager.filter_done(to_dos, from_date, self.to_date)
 
   def time_description(self, work_session):
-    return work_session.describe_time_span(self.tz_str)
+    return work_session.describe_time_span_for_invoices(self.tz_str)
 
   def to_do_description(self, to_do):
     return to_do.description

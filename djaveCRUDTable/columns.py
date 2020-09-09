@@ -17,6 +17,9 @@ class DisplayColumn(object):
   def inline_create_cell(self):
     return self.cell_template
 
+  def safe_inline_create_cell(self):
+    return mark_safe(self.inline_create_cell())
+
   def td_around(self, td_css_class, content):
     return mark_safe('<td class="{}">{}</td>'.format(td_css_class, content))
 
@@ -30,10 +33,13 @@ class EditFieldColumn(DisplayColumn):
 
 
 class DisplayFieldColumn(DisplayColumn):
-  def __init__(self, header, field_name, header_css_class=None):
-    cell_template = mark_safe('<td class="{}"><%= {} %></td>'.format(
-        field_name, field_name))
-    cell_template = self.td_around(field_name, '<%= {} %>'.format(field_name))
+  def __init__(
+      self, header, field_name, header_css_class=None, cell_css_class=None):
+    _cell_css_class = field_name
+    if cell_css_class:
+      _cell_css_class += ' {}'.format(cell_css_class)
+    cell_template = self.td_around(
+        _cell_css_class, '<%= {} %>'.format(field_name))
     super().__init__(header, cell_template, header_css_class)
 
 

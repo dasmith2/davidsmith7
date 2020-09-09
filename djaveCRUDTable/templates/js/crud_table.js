@@ -4,7 +4,11 @@
  * edit, you're jumped to a panel where you can edit the details. All this
  * happens without page reloads. base_api_url will be something like
  * /api/Project wrapper_finder will be something like '#projects' and
- * save_new_defaults will be something like {} or {'user': 'me'} */
+ * save_new_defaults will be something like {} or {'user': 'me'}
+ *
+ * djaveCRUDTable/(crud_table.py (def __init__ args and body, as_html),
+ * templates/(crud_table.html bottom of the page, js/crud_table.js
+ * crud_table_options)) */
 
 function crud_table_options(base_api_url, wrapper_finder) {
   return {
@@ -25,7 +29,11 @@ function crud_table_options(base_api_url, wrapper_finder) {
       deleted_model_callback: null,
       // Should the table display a row up top that allows the user to create
       // new instances?
-      inline_create: null};
+      inline_create: null,
+      // function inline_create_callback(model_data, create_row) {}
+      inline_create_callback: null,
+      // function fetch_list_callback(models) {}
+      fetch_list_callback: null};
 }
 
 function setup_crud_table(options) {
@@ -44,18 +52,37 @@ function setup_crud_table(options) {
   });
 
   function api_list_url() {
-    return options.base_api_url + query();
+    return options.base_api_url + api_query();
   }
 
-  function query() {
+  function api_query() {
+    return query_helper(true);
+  }
+
+  function browser_query() {
+    return query_helper(false);
+  }
+
+  function filters() {
+    return wrapper.find('.filters').find('input,select');
+  }
+
+  function query_helper(for_api) {
     var url_parts = {};
-    wrapper.find('.filters input').each(function() {
+    filters().each(function() {
       var filter = $(this);
       var val = filter.val();
       var query_key = filter.attr('data-query-key');
+      var append_to_val = filter.attr('data-append-to-val');
+      var default_val = filter.attr('data-default') || '';
+      var changed = filter.attr('type') != 'hidden' && (
+          filter.val() != default_val);
+      if (append_to_val && for_api) {
+        val += append_to_val;
+      }
       if (!query_key) {
         console.log('a filter doesnt have a data-query-key');
-      } else if (val) {
+      } else if ((val && for_api) || (changed && !for_api)) {
         url_parts[query_key] = val;
       }
     });
@@ -63,8 +90,8 @@ function setup_crud_table(options) {
   }
 
   function setup_filter_change() {
-    wrapper.find('.filter_widgets input').change(function() {
-      Backbone.history.navigate(base_url + query(), true);
+    filters().change(function() {
+      Backbone.history.navigate(base_url + browser_query(), true);
       reload_list();
     });
   }
@@ -102,6 +129,7 @@ function setup_crud_table(options) {
     if (!initialized) {
       initialized = true;
       setup_filter_change();
+
       var Models = Backbone.Collection.extend({
         model: Model,
         url: api_list_url(),
@@ -110,6 +138,16 @@ function setup_crud_table(options) {
         }
       });
       models = new Models();
+      function call_fetch_list_callback_on(event_name) {
+        models.on(event_name, function() {
+          if (options.fetch_list_callback) {
+            options.fetch_list_callback(models.models);
+          }
+        });
+      }
+      call_fetch_list_callback_on('sync');
+      call_fetch_list_callback_on('destroy');
+      call_fetch_list_callback_on('add');
 
       function extend_by_save_new_defaults(data) {
         for (const [key, value] of Object.entries(options.save_new_defaults)) {
@@ -169,7 +207,11 @@ function setup_crud_table(options) {
       callback(found);
     }
   }
+  {% include "js/edit_mode_buttons.js" %}
 }
+
+{% include "js/edit_row.js" %}
+{% include "js/set_clear_dt_green_mode.js" %}
 
 function str_to_native(my_str) {
   if (my_str === 'null') {
@@ -180,4 +222,67 @@ function str_to_native(my_str) {
     return false;
   }
   return my_str;
+}
+
+var buttons_cell = function(row) {
+  return row.find('.buttons');
+};
+
+var other_buttons = function(row) {
+  return row.find('button,.button');
+};
+
+function find_pk($element) {
+  // Search up the dom for a data-pk attribute. So you might do something like
+  // my_button.click(function() { var pk = find_pk($(this)); });
+  if ($element.attr('data-pk')) {
+    return parseInt($element.attr('data-pk'));
+  }
+  return parseInt($element.parents('[data-pk]').attr('data-pk'));
+}
+
+function find_model($element) {
+  if ($element.attr('data-model')) {
+    return $element.attr('data-model');
+  }
+  return $element.parents('[data-model]').attr('data-model');
+}
+
+function row_by_pk(pk) {
+  return $('tr[data-pk=' + pk + ']');
+}
+
+function remove_row(pk_or_response) {
+  /* It's pretty handy to just have remove_row be the success of button clicks
+   * such as Archive. */
+  var pk = pk_or_response;
+  if (typeof pk_or_response == 'object') {
+    pk = pk_or_response['id'];
+  }
+  var row = row_by_pk(pk);
+  var table = row.parents('table');
+  row.remove();
+  if (!table.find('tbody tr').length) {
+    $('<p class="margin-top">Nothing to report</p>').insertAfter(table);
+    table.hide();
+  }
+}
+
+function space_out_buttons(row) {
+  var buttons = row.find('button,.button');
+  for (var i = 0; i < buttons.length; i++) {
+    var button = $(buttons[i]);
+    if (i == buttons.length - 1) {
+      button.addClass('last-button');
+    } else {
+      button.removeClass('last-button');
+    }
+  }
+}
+
+function val(elt) {
+  if (elt.attr('type') == 'checkbox') {
+    return elt.is(':checked');
+  }
+  return elt.val();
 }

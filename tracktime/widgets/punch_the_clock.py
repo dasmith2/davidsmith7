@@ -1,11 +1,11 @@
 from collections import namedtuple
 
-from djaveClassMagic.edit_list_table import EditListTable
 from djaveDT import tz_dt_to_tz_dt, now
 from djaveHTML.button import Button
 from djaveHTML.form import Form
-from djaveHTML.simple_form_as_html import simple_form_as_html
 from djaveHTML.problem import Problem
+from djaveHTML.table import Table
+from djaveHTML.simple_form_as_html import simple_form_as_html
 
 from tracktime.models.project_work_session import (
     ProjectWorkSession, start_clock_on_project)
@@ -106,9 +106,8 @@ class StopTheClockForm(Form):
     self.stoppable.mark_deleted(nnow=nnow)
 
   def get_table(self):
-    table = EditListTable(
-        ProjectWorkSession, ['Project', 'Started', ''],
-        classes=['margin-top-half'])
+    table = Table(
+        ['Project', 'Started', ''], classes=['margin-top-half'])
 
     start_time = tz_dt_to_tz_dt(self.stoppable.started).time()
     problem = ''

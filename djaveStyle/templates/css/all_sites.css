@@ -60,6 +60,7 @@ form { margin: 0px; padding: 0px; }
  * */
 .editing { background-color: #ffb; }
 .green, .green textarea { background-color: #dfd; }
+.white-background { background-color: #fff; }
 
 .margin-top, p.margin-top { margin: {% zoom 60 %}px 0px 0px 0px; }
 .margin-top-half, p { margin: {% zoom 25 %}px 0px 0px 0px; }
@@ -71,6 +72,7 @@ form { margin: 0px; padding: 0px; }
 .width-135 { width: {% zoom 135 %}px; }
 .border-5 { border: {% zoom 5 %}px solid #000; }
 .bold-grey-text { color: #999; font-weight: bold; }
+.spread-labels label { margin-right: {% zoom 10 %}px; }
 
 /* Buttons */
 {% include "css/button.css" %}

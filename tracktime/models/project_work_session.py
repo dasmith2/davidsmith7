@@ -43,7 +43,14 @@ class ProjectWorkSession(WorkSession):
         'A ProjectWorkSession describes a single time span that a User worked '
         'on a Project.')
 
+  def add_to_json(self, data):
+    super().add_to_json(data)
+    data['project_name'] = self.project.name
+
   def __repr__(self, nnow=None):
     return '<ProjectWorkSession {}: {} {} {} {} for {} hrs>'.format(
         self.pk, self.user.username, self.date, self.project.name,
         self.status(nnow=nnow), self.hours)
+
+  def select_related_list(self):
+    return ['project']

@@ -1,6 +1,11 @@
 """ This requires backbone.js and works together with crud_table.js to create
 an html list that allows you to CRUD a filterable list of objects without any
-page reloads. """
+page reloads.
+
+If your table stays invisible, a likely culprit is that the browser's url
+doesn't match the list_url. It's programmed to show the list and the edit panel
+only when they match the browser's url. """
+from datetime import date, timedelta
 import json
 
 from django.shortcuts import reverse
@@ -10,7 +15,7 @@ from djaveClassMagic.cases import (
     upper_case_singular, lower_case_singular, upper_case_plural,
     lower_case_plural)
 from djaveClassMagic.edit_table import EditTable
-from djaveHTML.field import Field, HiddenField
+from djaveHTML.field import Field, HiddenField, DateField
 from djaveHTML.a import A
 
 
@@ -25,14 +30,37 @@ HIDDEN_DELETED_FILTER = hidden_filter('deleted', 'false', 'deleted__isnull')
 USE_DEFAULT = 'USE_DEFAULT'
 
 
+def from_filter(field_name, default=None):
+   default = default or date.today() - timedelta(days=7)
+   field = DateField(
+       'from_date', default=default, label='From',
+       query_key='{}__gte'.format(field_name))
+   field.do_beginning_of_day()
+   return field
+
+
+def to_filter(field_name, default=None):
+  default = default or date.today()
+  field = DateField(
+      'to_date', default=default, label='To',
+      query_key='{}__lte'.format(field_name))
+  field.do_end_of_day()
+  return field
+
+
 class CRUDTable(object):
+  # djaveCRUDTable/(crud_table.py (def __init__ args and body, as_html),
+  # templates/(crud_table.html bottom of the page, js/crud_table.js
+  # crud_table_options))
   def __init__(
-      self, model, filter_widgets, display_columns, edit_field_names=None,
+      self, model, display_columns, filter_widgets=None, edit_field_names=None,
       save_new_defaults=None, label_edit_page_with_field=None, list_url=None,
       list_header=USE_DEFAULT, delete_row_confirm_question=USE_DEFAULT,
       hidden_filters=None, can_create_new=True, new_row_callback=None,
       saved_model_callback=None, deleted_model_callback=None,
-      nav_css_class=None, display_column_headers=True, inline_create=False):
+      nav_css_class=None, show_column_headers=True, inline_create=False,
+      inline_create_callback=None, margin_top_css=None,
+      fetch_list_callback=None):
 
     self.js = []
 
@@ -50,7 +78,7 @@ class CRUDTable(object):
       if not filter_widget.additional_attrs.get('data-query-key', None):
         raise Exception(
             'Every filter widget and hidden filter must specify a '
-            'data-query-key e.g. create_date__lte or project__isnull')
+            'query_key e.g. DateField(query_key=\'create_date__lte\')')
 
     self.display_columns = display_columns  # A list of DisplayColumns
     self.edit_field_names = edit_field_names or []  # A list of strings
@@ -81,8 +109,11 @@ class CRUDTable(object):
     # crud tables highlight the same navigation. For instance, the live and
     # archived project lists are both under the "Projects" nav.
     self.nav_css_class = nav_css_class
-    self.display_column_headers = display_column_headers
+    self.show_column_headers = show_column_headers
     self.inline_create = inline_create
+    self.inline_create_callback = inline_create_callback
+    self.margin_top_css = margin_top_css or 'margin-top'
+    self.fetch_list_callback = fetch_list_callback
 
   def add_js(self, js):
     self.js.append(js)
@@ -94,11 +125,15 @@ class CRUDTable(object):
     # 'None'
     label_edit_page_with_field = self.label_edit_page_with_field or ''
 
+    # djaveCRUDTable/(crud_table.py (def __init__ args and body, as_html),
+    # templates/(crud_table.html bottom of the page, js/crud_table.js
+    # crud_table_options))
     context = {
         'list_api_url': list_api_url,
         'filter_widgets': self.filter_widgets,
         'hidden_filters': self.hidden_filters,
         'display_columns': self.display_columns,
+        'show_column_headers': self.show_column_headers,
         'edit_table': EditModelTable(self.model, self.edit_field_names),
         'upper_case_singular': upper_case_singular(self.model),
         'upper_case_plural': upper_case_plural(self.model),
@@ -116,6 +151,9 @@ class CRUDTable(object):
         'deleted_model_callback': self.deleted_model_callback or 'null',
         'nav_css_class': self.nav_css_class or '',
         'inline_create': str(self.inline_create).lower(),
+        'inline_create_callback': self.inline_create_callback or 'null',
+        'margin_top_css': self.margin_top_css,
+        'fetch_list_callback': self.fetch_list_callback or 'null',
         'js': mark_safe('\n'.join(self.js))}
     return render_to_string('crud_table.html', context)
 

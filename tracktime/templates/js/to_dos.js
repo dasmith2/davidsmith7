@@ -15,3 +15,7 @@ function new_to_do_row(row, model_data) {
       row, 'done', 'Done', 'Not done', remove_delete_button,
       append_delete_button);
 }
+
+function inline_create_to_do_callback(model_data, create_row) {
+  create_row.find('textarea').focus();
+}

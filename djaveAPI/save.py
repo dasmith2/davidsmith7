@@ -101,7 +101,7 @@ def _set_fields(instance, request_data, credentials):
 def _date_or_date_time(field, raw_value):
   if raw_value:
     if field.type == DATE:
-      if raw_value == 'now':
+      if raw_value in ('now', 'today'):
         value = date.today()
       else:
         value = parse_date(raw_value)

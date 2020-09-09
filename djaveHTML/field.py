@@ -5,6 +5,7 @@ import re
 
 from django.utils.dateparse import parse_date
 from django.utils.safestring import mark_safe
+from djaveDT import beginning_of_day, end_of_day
 from djaveHTML.form_element import FormElement
 from djaveHTML.problem import Problem
 
@@ -13,7 +14,7 @@ class Field(FormElement):
   # You can put djaveHTML fields in djaveHTMLs.
   def __init__(
       self, key_prefix, required=True, default=None, pk=None, value=None,
-      label=None, autofocus=False, **additional_attrs):
+      label=None, autofocus=False, query_key=None, **additional_attrs):
     super().__init__(key_prefix, pk)
     self.required = required
     self.default = default
@@ -26,6 +27,10 @@ class Field(FormElement):
     self.label = label
     self.autofocus = autofocus
     self.additional_attrs = additional_attrs or {}
+    if query_key:
+      self.additional_attrs['data-query-key'] = query_key
+    if default:
+      self.additional_attrs['data-default'] = default
 
     self._custom_invalid_reason = None
 
@@ -68,7 +73,7 @@ class Field(FormElement):
     return self.default
 
   def explain_why_not_valid(self):
-    if self.required and not self.get_value():
+    if self.required and self.get_value() in ['', None]:
       return 'Required'
     if self._custom_invalid_reason:
       return self._custom_invalid_reason
@@ -240,6 +245,20 @@ class DateField(HtmlInputField):
 
   def input_type(self):
     return 'date'
+
+  def do_beginning_of_day(self):
+    """ This helps bridge the gap between wanting to use a date input to filter
+    on a datetime field. For instance, a "From" field would probably call
+    this function so queries can be, like, created__gte=from_date with
+    timepart 0 """
+    beginning = re.compile(r'T.*').findall(beginning_of_day().isoformat())[0]
+    self.additional_attrs['data-append-to-val'] = beginning
+
+  def do_end_of_day(self):
+    """ A "To" field will probably use this to accomplish, like,
+    created__lte=to_date at 11:59:59. """
+    end = re.compile(r'T.*').findall(end_of_day().isoformat())[0]
+    self.additional_attrs['data-append-to-val'] = end
 
 
 class TextField(HtmlInputField):

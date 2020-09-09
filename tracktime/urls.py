@@ -9,18 +9,16 @@ from tracktime.views.projects import projects, archived_projects
 from tracktime.views.report import (
     project_work_summary, project_work_report)
 from tracktime.views.settings import settings
-from tracktime.views.to_do import to_do as old_to_do, all_tasks, to_dos
+from tracktime.views.to_do import to_dos, all_to_dos
 
 
 tracktime_urls = [
     path('clock', enter_time, name='enter_time'),
 
-    path('to_do', old_to_do, name='to_do'),
-    path('to_do/<project_pk>', old_to_do, name='to_do'),
-
+    re_path(r'^to_dos/project/(?P<project_pk>\d+).*$', to_dos, name='to_dos'),
     re_path(r'^to_dos.*$', to_dos, name='to_dos'),
+    re_path(r'^all_to_dos.*$', all_to_dos, name='all_to_dos'),
 
-    path('all_tasks', all_tasks, name='all_tasks'),
     path(
         'report', project_work_summary,
         name='project_work_summary'),

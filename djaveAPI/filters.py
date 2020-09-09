@@ -38,18 +38,25 @@ def get_filters(model, request_GET):
     if key == PAGE or not value:
       continue
     field_name, operator = field_operator(key)
-    if field_name not in _available_filter_fields:
+
+    filter_field = None
+    if field_name in _available_filter_fields:
+      filter_field = _available_filter_fields[field_name]
+    elif operator == ISNULL:
+      # I'll allow __isnull checks on non-indexed fields.
+      filter_field = model_fields(model, specific_field=field_name)
+    else:
       raise Problem((
           '{} is not an available filter on {}. The available filters are '
           '{}').format(
               field_name, model.__name__,
               ', '.join(_available_filter_fields.keys())))
+
     if operator and operator not in AVAILABLE_OPERATORS:
       raise Problem((
           'You tried to filter on {}, but {} is not an available operator. '
           'The available operators are {}').format(
               key, operator, ', '.join(AVAILABLE_OPERATORS)))
-    filter_field = _available_filter_fields[field_name]
     if operator == ISNULL:
       value = value.lower() == 'true'
     else:

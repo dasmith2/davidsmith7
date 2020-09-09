@@ -19,14 +19,20 @@ var ModelsView = Backbone.View.extend({
     this.extend_by_button_attrs(create_data, button);
     this.extend_by_create_row(create_data);
     extend_by_save_new_defaults(create_data);
-    var buttons_wrapper = this.$el.find('.inline-create-row .buttons');
+    var create_row = this.$el.find('.inline-create-row');
+    var buttons_wrapper = create_row.find('.buttons');
     var inputs = this.create_row_inputs();
     var me = this;
     var success = function(response_data) {
       inputs.each(function() {
-        $(this).val('');
+        if (this.tagName != 'SELECT') {
+          $(this).val('');
+        }
       });
       me.collection.add(response_data);
+      if (options.inline_create_callback) {
+        options.inline_create_callback(response_data, create_row);
+      }
     };
     buttons_wrapper.find('button').prop('disabled', true);
     var always = function() {
@@ -95,13 +101,15 @@ var ModelsView = Backbone.View.extend({
     }
   },
   show_nothing: function() {
-    this.table().hide();
-    // If there are no filter_widgets and no rows, then the only thing
-    // worth showing is the create new button.
-    if (this.$el.find('.filter_widgets').length) {
-      this.$el.find('.nothing').show();
-    } else {
-      wrapper.find('.upper-new-button-wrapper').show();
+    if (!this.$el.find('.inline-create-row')) {
+      this.table().hide();
+      // If there are no filter_widgets and no rows, then the only thing
+      // worth showing is the create new button.
+      if (this.$el.find('.filter_widgets').length) {
+        this.$el.find('.nothing').show();
+      } else {
+        wrapper.find('.upper-new-button-wrapper').show();
+      }
     }
   },
   log_event: function(action) {

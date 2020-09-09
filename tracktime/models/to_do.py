@@ -19,10 +19,16 @@ NOT_DONE = 'Not done'
 
 
 def get_status_filter(default=None):
-  options = [Option(status, status) for status in [DONE, NOT_DONE]]
+  key_to_value = {NOT_DONE: True, DONE: False}
+  options = [
+      Option(key_to_value[NOT_DONE], NOT_DONE),
+      Option(key_to_value[DONE], DONE)]
+  use_default = None
+  if default:
+    use_default = key_to_value[default]
   return SelectField(
       key_prefix='to_do_status', options=options, required=False,
-      label='Status', default=default)
+      label='Status', default=use_default, query_key='done__isnull')
 
 
 class ToDoManager(LivePublishableManager):
@@ -67,7 +73,7 @@ class ToDoManager(LivePublishableManager):
 class ToDo(Publishable):
   description = models.TextField(help_text=(
       'Describe what you intend to do, or what you did.'))
-  created = models.DateTimeField(auto_now_add=True)
+  created = models.DateTimeField(auto_now_add=True, db_index=True)
   done = models.DateTimeField(null=True, blank=True, db_index=True, help_text=(
       'When, if ever, was this marked done?'))
   creator = models.ForeignKey(
