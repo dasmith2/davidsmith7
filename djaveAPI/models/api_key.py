@@ -85,6 +85,7 @@ class APIKey(BaseKnowsChild, CredentialsInterface):
     if self.has_plain_password():
       plain_password = (
           '<b>Write this down because you\'ll never see it again:</b><br>'
-          '{}').format(self.get_plain_password())
+          '<span class="plain_password">{}</span>').format(
+              self.get_plain_password())
     data['plain_password'] = plain_password
     del data['hashed_password']

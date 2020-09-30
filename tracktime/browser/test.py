@@ -20,14 +20,14 @@ class Test(Demo):
     self.find('not_done')
 
   def api_key(self):
-    self.say_move_type('username', 'daves_data', """
+    self.say_move_type('input.username', 'daves_data', """
         Here you can create an API key.""")
-    self.say_move_type('new_webhook_url', 'https://your.website', """
+    self.say_move_type('input.webhook_url', 'https://your.website', """
         If you specify a webhook url, Track Time dot tech will send data to
         your computers whenever your data changes.""")
-    self.move_click('create')
-    api_key_username = self.find('username_cell').text
-    api_key_password = self.find('plain_password').text
+    self.move_click('button.savenew')
+    api_key_username = self.find('tbody td.username').text
+    api_key_password = self.find('span.plain_password').text
     self.web_test_the_api(HTTPBasicAuth(api_key_username, api_key_password))
 
   def api(self):
