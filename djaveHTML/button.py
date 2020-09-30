@@ -11,6 +11,10 @@ class Button(FormElement):
       self, text, key_prefix=None, pk=None, button_type='button',
       css_classes=None, **additional_attrs):
     key_prefix = key_prefix or slugify(text)
+
+    css_classes = css_classes or set()
+    css_classes.add(key_prefix)
+
     super().__init__(
         key_prefix, pk, css_classes=css_classes, **additional_attrs)
     self.text = text

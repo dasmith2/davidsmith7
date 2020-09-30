@@ -4,6 +4,7 @@ from djaveHTML.element import Element
 
 class Problem(Element):
   def __init__(self, text):
+    super().__init__()
     self.text = text
 
   def as_html(self):

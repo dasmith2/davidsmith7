@@ -1,95 +1,72 @@
-
 from django.shortcuts import render, redirect, get_object_or_404, reverse
-from djaveHTML.form_wrapper import FormWrapper
+from djaveAPI.ajax_or_api_endpoint import ajax_or_api_endpoint_authenticated
+from djaveAPI.get_request_variable import get_request_variable
+from djaveAPI.get_instance import get_instance
+from djaveAPI.views.api import (
+    do_list_or_save_new, do_get_save_or_delete_existing)
 from djaveLogin.login_required import login_required
-from djaveHTML.tooltip import Tooltip
 from djaveCSV import CanCSVResponse, CanCSV
 
 from invoice.models.invoice import Invoice
 from invoice.widgets.edit_invoice import EditInvoice
+from invoice.widgets.line_items import LineItems
 from invoice.widgets.view_invoice import ViewInvoice
 from tracktime.models.project_invoice import ProjectInvoice
 from tracktime.models.project_invoice_rule import ProjectInvoiceRule
 from tracktime.views.nav_context import tracktime_context, INVOICES
-from tracktime.widgets.all_project_invoices import AllProjectInvoices
 from tracktime.widgets.all_project_line_items import AllProjectLineItems
-from tracktime.widgets.project_invoice_rule_table import (
-    ProjectInvoiceRuleTable)
-from tracktime.widgets.project_invoice_rules_table import (
-    ProjectInvoiceRulesTable)
-from tracktime.widgets.project_invoices_table import ProjectInvoicesTable
+from tracktime.widgets.project_invoice_rules import ProjectInvoiceRules
+from tracktime.widgets.project_invoices import (
+    ProjectInvoices, AllProjectInvoices)
 
 
 @login_required
 def project_invoices(request):
-  project_invoice_rules_table = ProjectInvoiceRulesTable(
-      request.user, request.POST)
-  project_invoices_table = ProjectInvoicesTable(request.user)
+  project_invoice_rules = ProjectInvoiceRules(request.user)
+  project_invoices = ProjectInvoices(request.user)
 
-  unpaid_help_text = 'Well, technically, unpaid and recently paid.'
-  invoice_rule_help_text = (
-      'An Invoice Rule has a "Create new invoice" button. When you click '
-      'that button,')
-  if project_invoice_rules_table.has_rules():
-    invoice_rule_help_text = (
-        'When you click the "Create new invoice" button,')
-  invoice_rule_help_text += (
-      ' it will find all un-invoiced work for that '
-      'project and put it in an Invoice.')
-  invoice_rules_header = Tooltip(
-      'Invoice rules', invoice_rule_help_text, width=300)
+  line_items = LineItems()
 
   invoices_exist = ProjectInvoice.live.allowed_by_user(request.user).exists()
 
   context = tracktime_context(
       request.user, INVOICES,
-      project_invoice_rules_table=project_invoice_rules_table,
-      project_invoices_table=project_invoices_table,
-      invoice_rules_header=invoice_rules_header,
-      the_word_unpaid=Tooltip('Unpaid', unpaid_help_text),
+      project_invoice_rules_table=project_invoice_rules,
+      project_invoices=project_invoices,
+      line_items=line_items,
       invoices_exist=invoices_exist,
       all_invoices_url=reverse('all_project_invoices'))
   return render(request, 'project_invoices.html', context)
 
 
+@ajax_or_api_endpoint_authenticated
+def create_invoice(request_method, request_dict, credentials):
+  project_invoice_rule_id = get_request_variable(
+      request_dict, 'project_invoice_rule_id')
+  project_invoice_rule = get_instance(
+      ProjectInvoiceRule.live, project_invoice_rule_id, credentials)
+  project_invoice_rule.create_invoice()
+
+
 @login_required
 @CanCSV
 def all_project_invoices(request):
-  report = AllProjectInvoices(request.user, request.GET)
+  all_invoices = AllProjectInvoices(request.user)
   context = tracktime_context(
-      request.user, INVOICES, the_one_thing_on_the_page=report)
+      request.user, INVOICES, all_invoices=all_invoices,
+      all_line_items_url=reverse('project_line_items'))
   return CanCSVResponse(
-      'tracktime_base.html', context, report.table, 'invoices.csv')
+      'all_project_invoices.html', context, all_invoices, 'invoices.csv')
 
 
 @login_required
 @CanCSV
 def project_line_items(request):
-  report = AllProjectLineItems(request.user, request.GET)
+  all_line_items = AllProjectLineItems(request.user)
   context = tracktime_context(
-      request.user, INVOICES, the_one_thing_on_the_page=report,
-      title='Line items')
+      request.user, INVOICES, the_one_thing_on_the_page=all_line_items)
   return CanCSVResponse(
-      'tracktime_base.html', context, report.table, 'line_items.csv')
-
-
-@login_required
-def edit_project_invoice(request, pk=None):
-  invoice = _get_invoice(request, pk=pk)
-  if invoice.paid:
-    return redirect(reverse('view_project_invoice', kwargs={'pk': invoice.pk}))
-
-  the_one_thing_on_the_page = None
-  the_one_thing_on_the_page = EditInvoice(request, request.POST, invoice)
-  if the_one_thing_on_the_page.deleted():
-    return redirect('project_invoices')
-  elif the_one_thing_on_the_page.redirect_to():
-    return redirect(the_one_thing_on_the_page.redirect_to())
-
-  context = tracktime_context(
-      request.user, INVOICES,
-      the_one_thing_on_the_page=the_one_thing_on_the_page)
-  return render(request, 'tracktime_base.html', context)
+      'tracktime_base.html', context, all_line_items, 'line_items.csv')
 
 
 @login_required
@@ -108,19 +85,20 @@ def _get_invoice(request, pk=None):
   return get_object_or_404(Invoice.allowed_by_user_live(request.user), pk=pk)
 
 
-@login_required
-def project_invoice_rule(request, pk=None):
-  invoice_rule = None
-  if pk:
-    invoice_rule = get_object_or_404(
-        ProjectInvoiceRule.allowed_by_user_live(request.user), pk=pk)
+@ajax_or_api_endpoint_authenticated
+def list_or_save_new_line_item(request_method, request_dict, credentials):
+  """ These views exist so that the UI can have an API endpoint that will list
+  all LineItems regarldess of subclass, will update just the LineItem fields,
+  when you save a new line item it will create a ManualLineItem. """
+  if request_method == 'GET':
+    return do_list_or_save_new(  # Well, do_list basically.
+        request_method, request_dict, credentials, 'LineItem')
+  return do_list_or_save_new(  # Well, do_save_new basically.
+      request_method, request_dict, credentials, 'ManualLineItem')
 
-  table = ProjectInvoiceRuleTable(request.user, request.POST, invoice_rule)
-  if table.saved() or table.deleted():
-    return redirect('project_invoices')
 
-  form_wrapper = FormWrapper(table, request)
-  context = tracktime_context(
-      request.user, INVOICES, the_one_thing_on_the_page=form_wrapper,
-      title='Invoice Rule')
-  return render(request, 'tracktime_base.html', context)
+@ajax_or_api_endpoint_authenticated
+def get_save_or_delete_existing_line_item(
+    request_method, request_dict, credentials, pk):
+  return do_get_save_or_delete_existing(
+      request_method, request_dict, credentials, 'LineItem', pk)

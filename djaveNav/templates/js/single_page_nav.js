@@ -1,5 +1,5 @@
 /* Single page app nav stuff. This is about creating the ability to navigate to
- * a new url, show the corresponding panel, but not reload the page. */
+ * a new url, show the corresponding panels, but not reload the page. */
 
 // Public stuff
 var router = null;  // So you can router.on("route:help", function(page) {
@@ -36,89 +36,109 @@ var nav_is_ready = false;
 var on_display_callbacks = [];
 var router_exists_callbacks = [];
 
+function route_url_from_data_url(data_url) {
+  if (data_url.length && data_url.substring(0, 1) == '/') {
+    // Typically the case because data-url='/projects' makes more sense
+    // than data-url='projects' but Backbone.js requires no leading /
+    return data_url.substring(1, data_url.length);
+  }
+  return data_url;
+}
+
+function panel_route_name(panel_or_panel_id) {
+  var panel = panel_or_panel_id;
+  if (typeof panel_or_panel_id == 'string') {
+    panel = $('#' + panel_or_panel_id);
+  }
+  return route_name_from_url(panel.attr('data-url'));
+}
+
+function route_name_from_url(data_url) {
+  var route_url = route_url_from_data_url(data_url);
+  return route_url.replace(/:\w+/g, '_param').replace(/[^\w]/g, '');
+}
+
 $(function() {
   if (!$('.panel').length) {
     // For instance, /errors doesn't have single page navigation.
     return;
   }
-  var find_panel_routes = function() {
-    var panel_routes = {};
-    $('.panel').each(function() {
-      var url = $(this).attr('data-url');
-      var name = $(this).attr('id');
-      var route_url = url;
-      if (route_url.length && route_url.substring(0, 1) == '/') {
-        route_url = route_url.substring(1, route_url.length);
-      }
-      panel_routes[route_url] = name;
-    });
-    return panel_routes;
-  };
 
-  var show_panel = function(panel_name) {
-    $('.panel').each(function() {
-      var panel = $(this);
-      if (panel_name == panel.attr('id')) {
-        single_page_panel = panel;
-        panel.show();
-      } else {
-        panel.hide();
-      }
-    });
-  };
-
-  var get_extend_router_by = function() {
+  var router_routes_etc = function() {
+    // In Backbone.js land, routes are key value pairs where the key is a url
+    // pattern like invoices/:pk or whatever, and the value is the NAME of the
+    // function on the router that should get called when the browser URL
+    // matches that pattern. I guess Backbone.js doesn't do routes[route_url] =
+    // route_function because multiple route_urls can point to the same
+    // function, and whoever built Backbone.js didn't know about function
+    // pointers? I don't know.
+    var routes = {};
     var extend_router_by = {
-      routes: find_panel_routes()
+      routes: routes
     };
     $('.panel').each(function() {
-      var panel_name = $(this).attr('id');
-      extend_router_by[panel_name] = function() {
-        show_panel(panel_name);
+      var panel = $(this);
+      // Every panel describes what url should make it appear. Multiple panels
+      // may share the same data-url. If your panel isn't showing up, this is a
+      // likely culprit: the panel's data-url doesn't match the browser url.
+      var data_url = panel.attr('data-url');
+      var route_url = route_url_from_data_url(data_url);
+      var route_name = panel_route_name(panel);
+      panel.attr('data-route-name', route_name);
+      routes[route_url] = route_name;
+      extend_router_by[route_name] = function() {
+        $('.panel').each(function() {
+          var panel = $(this);
+          if (panel_route_name(panel) == route_name) {
+            panel.removeClass('start-hidden').show();
+          } else {
+            panel.hide();
+          }
+        });
       };
     });
+    // At this point, extend_router_by probably looks something like
+    // {'projectspk': function() { $('.panel[data-url="/projects/:pk"]').show()
+    // }, routes: {'projects/:pk': 'projectspk'}}
+    window.extend_router_by = extend_router_by; // DO NOT SUBMIT
     return extend_router_by;
   };
 
   var init_router = function() {
-    var Router = Backbone.Router.extend(get_extend_router_by());
+    var Router = Backbone.Router.extend(router_routes_etc());
     router = new Router();
 
     for (var i = 0; i < router_exists_callbacks.length; i++) {
       router_exists_callbacks[i]();
     }
 
-    router.on('route', function(panel_id) {
-      this.current = panel_id;
-      var set_current_nav_item = function(current_panel_id) {
-        var panel = $('#' + current_panel_id).removeClass('start-hidden');
+    var highlight_nav = function(route_function_name) {
+      this.current = route_function_name;
+      $('.panel[data-route-name="' + route_function_name + '"]').each(function() {
+        var panel = $(this);
         var data_url = panel.attr('data-url');
         var data_nav_css_class = panel.attr('data-nav-css-class');
+        $('.nav div').removeClass('current');
         $('.nav_item').each(function() {
           var a = $(this);
           var wrapper = $(a.parents('div')[0]);
           if (data_nav_css_class) {
             if (a.hasClass(data_nav_css_class)) {
               wrapper.addClass('current');
-            } else {
-              wrapper.removeClass('current');
             }
-          } else {
+          } else if (data_url.indexOf(a.attr('href')) == 0) {
             // data_url might be "/trips/:pk" and the nav might be to "/trips"
-            if (data_url.indexOf(a.attr('href')) == 0) {
-              wrapper.addClass('current');
-            } else {
-              wrapper.removeClass('current');
-            }
+            wrapper.addClass('current');
           }
         });
-      };
+      });
+    };
 
-      set_current_nav_item(panel_id);
-    });
+    router.on('route', highlight_nav);
+    return router;
   };
 
-  init_router();
+  window.router = init_router();
 
   Backbone.history.start({pushState: true});
 

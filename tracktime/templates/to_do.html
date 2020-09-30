@@ -18,18 +18,18 @@
       {% endif %}
       {{ to_dos_table.as_html }}
       <div class="margin-top">
-        {{ see_all_tasks }}
+        {{ see_all_tasks.as_html }}
       </div>
     {% else %}
       <h2>{{ project.name }}</h2>
-      <p>doesn't have a to do list. But you could {{ see_all_tasks }}</p>
+      <p>doesn't have a to do list. But you could {{ see_all_tasks.as_html }}</p>
     {% endif %}
   {% elif to_do_project_picker.has_projects %}
     <div class="margin-top">
       {{ to_do_project_picker.as_html }}
     </div>
     <div class="margin-top">
-      {{ see_all_tasks }}
+      {{ see_all_tasks.as_html }}
     </div>
   {% else %}
     <h2>You don't have any projects with a to do list.</h2>

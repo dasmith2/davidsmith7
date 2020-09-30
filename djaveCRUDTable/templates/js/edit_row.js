@@ -12,15 +12,21 @@ function setup_edit_row_turns_yellow(
    * but it's also used on each row in the list table for inline editing by
    * models_item_view.js The callbacks are basically to show and hide buttons.
    * */
-  var elts = row.find('input,select,textarea');
+  var elts = inputs(row);
   set_saved_values(elts);
 
   var handle_row_maybe_changed = function(event) {
+    // Turning off edit mode is happening in this case because the user changed
+    // the data back to what it was and no save is necessary.
     calc_edit_mode(
         row, turn_on_edit_mode_callback, turn_off_edit_mode_callback);
   };
 
   anything_happened(elts, handle_row_maybe_changed);
+}
+
+function inputs(wrapper) {
+  return wrapper.find('input,select,textarea')
 }
 
 function set_saved_values(selector_or_elt) {
@@ -61,14 +67,14 @@ var is_editing = function(elt) {
 };
 
 var turn_on_edit_mode = function(row, turn_on_edit_mode_callback) {
-  row.addClass('editing');
+  row.addClass('yellow');
   if (turn_on_edit_mode_callback) {
     turn_on_edit_mode_callback(row);
   }
 };
 
 var turn_off_edit_mode = function(row, turn_off_edit_mode_callback) {
-  row.removeClass('editing');
+  row.removeClass('yellow');
   if (turn_off_edit_mode_callback) {
     turn_off_edit_mode_callback(row);
   }

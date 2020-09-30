@@ -2,7 +2,7 @@ from django.shortcuts import reverse
 from djavError.models.error import Error
 from djavError.widgets.fixable_report import FixableReport
 from djavError.widgets.staff_email_log_table import StaffEmailLogTable
-from djaveHTML.a import A
+from djaveHTML.a import AButton
 
 
 class ErrorsReport(FixableReport):
@@ -17,6 +17,5 @@ class ErrorsTable(StaffEmailLogTable):
     return Error
 
   def get_buttons(self, staff_email_log):
-    return A(
-        'View', reverse('see_error', kwargs={'pk': staff_email_log.pk}),
-        button=True)
+    return AButton(
+        'View', reverse('see_error', kwargs={'pk': staff_email_log.pk}))

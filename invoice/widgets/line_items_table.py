@@ -40,7 +40,7 @@ class LineItemsTable(EditListTable):
 
     super().__init__(
         LineItem, ['Description', 'Calculation', 'Amount', ''],
-        classes=['margin-top-half'])
+        css_classes=['margin-top-half'])
 
     self.create_top_row()
     self.create_line_item_rows()

@@ -36,7 +36,7 @@ def to_dos(request, project_pk=None):
       stop_problem = HtmlProblem(clock_running.explain_why_can_not_stop())
   use_clock = False
   see_all_tasks = A(
-      'See ALL tasks', reverse('all_to_dos'), classes=['all_to_dos'])
+      'See ALL tasks', reverse('all_to_dos'), css_classes=['all_to_dos'])
   if project and project.has_to_do_list:
     to_dos_table = ProjectToDos(project, list_url)
     use_clock = project.use_clock

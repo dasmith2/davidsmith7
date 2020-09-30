@@ -5,6 +5,7 @@ from djaveHTML.element import Element
 
 class Tooltip(Element):
   def __init__(self, label, help_text, width=None):
+    super().__init__()
     self.label = label
     self.help_text = help_text
     self.width = width
@@ -19,3 +20,9 @@ class Tooltip(Element):
 
   def as_csv(self):
     return self.label
+
+  def __str__(self):
+    return self.as_html()
+
+  def __repr__(self):
+    return self.as_html()

@@ -31,13 +31,13 @@ class LiveLineItemManager(LivePublishableManager):
 class LineItem(Publishable, BaseKnowsChild):
   invoice = models.ForeignKey(Invoice, on_delete=models.PROTECT, help_text=(
       'What Invoice is this in?'))
-  describe_service = models.TextField(help_text=(
+  describe_service = models.TextField(verbose_name='Description', help_text=(
       'What did somebody do that was worth charging money for?'))
   amount = MoneyField(max_digits=10, decimal_places=2, help_text=(
       'How much should be charged for this?'))
   amount_calculation = models.TextField(
-      null=False, blank=True, default='', help_text=(
-          'Describe the exact forumula used to arrive at the amount'))
+      null=False, blank=True, default='', verbose_name='Calculation',
+      help_text='Describe the exact forumula used to arrive at the amount')
 
   @classmethod
   def filter_allowed_by_user(cls, user, query_set):
@@ -47,4 +47,15 @@ class LineItem(Publishable, BaseKnowsChild):
     if api_key_type is UserAPIKey:
       return UserAPIKey.objects.filter(user=self.invoice.creator)
 
+  def select_related_list(self):
+    return ['invoice', 'child_class']
+
+  def add_to_json(self, data):
+    data['invoice_id'] = self.invoice.invoice_id
+    data['invoice_status'] = self.invoice.status
+    data['line_item_type'] = self.child_class.model
+
+  # Keep all first so my_invoice.lineitem_set uses all instead of live so
+  # my_invoice.lineitem_set.all() actually returns all and not just all live.
+  all = models.Manager()
   live = LiveLineItemManager()

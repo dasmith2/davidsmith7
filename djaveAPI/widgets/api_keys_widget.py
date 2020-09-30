@@ -1,3 +1,4 @@
+""" DO NOT SUBMIT Goes away """
 from django.template import loader
 from djaveAPI.models.api_key import username_available
 from djaveClassMagic.edit_list_table import EditListTable
@@ -44,7 +45,7 @@ class NewAPIKeyForm(Form):
 class APIKeysTable(EditListTable):
   def __init__(self, model, request_POST):
     headers = ['API Key username', 'API Key password', 'Webhook URL', '']
-    super().__init__(model, headers, classes=['margin-top-half'])
+    super().__init__(model, headers, css_classes=['margin-top-half'])
     self.form = NewAPIKeyForm()
     keys = list(self.existing_keys())
 
@@ -80,7 +81,7 @@ class APIKeysTable(EditListTable):
                 key.get_plain_password())
       webhook_url_field = URLField(
           'webhook_url', required=False, default=key.webhook_url)
-      username_cell = Cell(key.username, classes=['username_cell'])
+      username_cell = Cell(key.username, css_classes=['username_cell'])
       self.create_row([
           username_cell, password, webhook_url_field, Button('Delete')],
           pk=key.pk)

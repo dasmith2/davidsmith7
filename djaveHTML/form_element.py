@@ -8,15 +8,9 @@ class FormElement(Element):
   of a djaveHTML, and when the form submits, the FormElement will be
   represented in the data that goes to the server. """
   def __init__(self, key_prefix, pk, css_classes=None, **additional_attrs):
+    super().__init__(css_classes=css_classes)
     self.key_prefix = key_prefix
     self.pk = pk
-
-    self.css_classes = set()
-    if css_classes:
-      self.css_classes.update(css_classes)
-    if key_prefix:
-      self.css_classes.add(key_prefix)
-
     self.additional_attrs = additional_attrs
 
   def key(self):
@@ -26,14 +20,6 @@ class FormElement(Element):
         return '{}_{}'.format(self.key_prefix, self.pk)
       return self.key_prefix
     return ''
-
-  def css_class_str(self):
-    if self.css_classes:
-      return ' class="{}"'.format(' '.join(self.css_classes))
-    return ''
-
-  def add_class(self, css_class):
-    self.css_classes.add(css_class)
 
   def additional_attrs_str(self):
     if self.additional_attrs:

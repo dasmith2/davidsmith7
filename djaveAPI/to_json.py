@@ -2,13 +2,14 @@
 from djaveAPI.currency_field import corresponding_currency_field_name
 from djaveClassMagic.model_fields import (
     model_fields, django_primary_key_field, DATE_TIME, DATE)
+from djaveDT import d_to_str, dt_to_str
 from djmoney.money import Money
 
 
 TYPE = 'type'
 
 
-def to_json_dict(instance, allowed_class=None):
+def to_json_dict(instance):
   model = instance.__class__
 
   as_dict = {TYPE: model.__name__}
@@ -30,6 +31,17 @@ def to_json_dict(instance, allowed_class=None):
             'I don\'t know how to get the id from {}'.format(instance))
     else:
       value = getattr(instance, field.name)
+
+      if field.type in [DATE_TIME, DATE]:
+        str_name = '{}_str'.format(use_field_name)
+        str_val = ''
+        if value is not None:
+          if field.type == DATE_TIME:
+            str_val = dt_to_str(value)
+          else:
+            str_val = d_to_str(value)
+        as_dict[str_name] = str_val
+
       if value is not None:
         if field.type in [DATE_TIME, DATE]:
           value = value.isoformat()

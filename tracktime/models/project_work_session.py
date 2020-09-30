@@ -35,6 +35,10 @@ class ProjectWorkSession(WorkSession):
       Project, on_delete=models.PROTECT, help_text=(
           'What Project did the User work on?'))
 
+  # Keep all first so my_project.projectworksession_set uses all instead of
+  # live so my_project.projectworksession_set.all() actually returns all and
+  # not just all live.
+  all = models.Manager()
   live = ProjectWorkSessionManager()
 
   @classmethod

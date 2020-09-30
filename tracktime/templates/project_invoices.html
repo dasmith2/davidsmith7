@@ -2,18 +2,12 @@
 
 {% block tracktime_body %}
 
-<h2>{{ invoice_rules_header }}</h2>
-<form method="POST">
-  {% csrf_token %}
-  {{ project_invoice_rules_table.as_html }}
-</form>
-
-<h2>{{ the_word_unpaid }} invoices</h2>
-
-{{ project_invoices_table.as_html }}
+{{ project_invoice_rules_table.as_html }}
+{{ project_invoices.as_html }}
+{{ line_items.as_html }}
 
 {% if invoices_exist %}
-<div class="margin-top">
+<div class="margin-top panel" data-url="/invoices">
   <a href="{{ all_invoices_url }}" class="all_invoices">See all invoices</a>
 </div>
 {% endif %}

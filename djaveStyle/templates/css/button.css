@@ -11,10 +11,10 @@ button, .button, input[type="submit"], input[type="button"], a.button {
   color: #fff;
   cursor: pointer;
   box-shadow: {% zoom 4 %}px {% zoom 4 %}px {% zoom 2 %}px grey;
-  margin: {% zoom 3 %}px {% zoom 8 %}px {% zoom 3 %}px 0px;
+  margin: {% zoom 3 %}px {% zoom 10 %}px {% zoom 3 %}px 0px;
   font-size: {% font_size .90 %};
   font-weight: 401; }
-.last-button { margin-right: {% zoom 3 %}px; }
+.last-button, a.last-button { margin-right: 0px; }
 button:active, .button:active, input[type=submit]:active, input[type=button]:active,
 button:focus, .button:focus, input[type=submit]:focus, input[type=button]:focus,
 button:hover, .button:hover, input[type=submit]:hover, input[type=button]:hover,

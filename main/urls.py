@@ -17,11 +17,13 @@ urlpatterns = [
     path('admin/', admin.site.urls),  # Purely a backup for logging in
     path('accounts/', include(auth_urls)),
     path('js/all_sites.js', all_sites_js, name='all_sites_js'),
-    path('api/', include(djave_api_urls)),
     path('', include(djave_style_urls)),
     path('', include(djave_login_urls)),
     path('', include(djaverror_urls)),
-    path('', include(this_site_urls))
+    path('', include(this_site_urls)),
+    # This will match on api/* so it's best that it comes last so anything in
+    # this_site_urls has a chance to create an /api/whatever view.
+    path('api/', include(djave_api_urls))
 ]
 
 if settings.DEBUG:

@@ -72,10 +72,19 @@ class WebDemo(WebTest):
     element = self.get_element(element_or_clue)
     if self._go_slow:
       location = element.location
+      x_y_0_times = 0
+      wait_for = 0.1
       while location['x'] == 0 and location['y'] == 0:
         # No idea why this happens sometimes.
-        self.wait(0.1)
+        self.wait(wait_for)
         location = element.location
+        if x_y_0_times >= 20:
+          import pdb
+          pdb.set_trace()
+          raise Exception(
+              '{} stayed at 0, 0 for {} seconds. Giving up.'.format(
+                  element_or_clue, x_y_0_times * wait_for))
+        x_y_0_times += 1
       context = {
           'x': location['x'] + offset_x, 'y': location['y'] + offset_y,
           'step': 3 if quick else 1}
@@ -194,7 +203,11 @@ class WebDemo(WebTest):
   def put_keyboard_caret_at_end(self, element_or_clue):
     from selenium.webdriver.common.keys import Keys
     element = self.get_element(element_or_clue)
-    keys = [Keys.RIGHT] * len(element.get_property('value'))
+    val = element.get_property('value')
+    if not val:
+      # If element is an empty textarea, val is None
+      return
+    keys = [Keys.RIGHT] * len(val)
     element.send_keys(keys)
 
   def wait_talking(self):

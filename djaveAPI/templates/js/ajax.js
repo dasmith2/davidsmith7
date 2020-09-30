@@ -47,6 +47,14 @@ function problem_in_response(response) {
   return response['problem'];
 }
 
+function ajax_delete(url, success, always, feedback) {
+  var request_obj = $.ajax({
+      url: url,
+      type: 'DELETE',
+      success: _success_callback(success, always, feedback)});
+  _add_fail(request_obj, always, feedback);
+}
+
 function post(url, data, success, always, feedback) {
   var success_callback = _success_callback(success, always, feedback);
   // Not every site I build uses single-page. In a single-page scenario, the
@@ -55,15 +63,6 @@ function post(url, data, success, always, feedback) {
   wire_up_ajax_csrf();
   var request_obj = $.post(url, data, success_callback);
   _add_fail(request_obj, always, feedback);
-}
-
-function wire_up_ajax_csrf() {
-  /* The whole reason I do this is because backbone.js takes it upon itself to
-   * post to the server for you, but they don't include a great way to attach a
-   * csrf token. Every time you call this it clears out the last one. */
-  $.ajaxSetup({
-    headers: {'X-CSRFToken': get_csrf_token()}
-  });
 }
 
 $(wire_up_ajax_csrf);
@@ -108,16 +107,19 @@ function _add_fail(request_obj, always, feedback) {
 }
 
 /* csrf token stuff */
+function wire_up_ajax_csrf() {
+  /* The whole reason I do this is because backbone.js takes it upon itself to
+   * post to the server for you, but they don't include a great way to attach a
+   * csrf token. This is also necessary for DELETE requests. Every time you
+   * call this it clears out the last one so it's safe to call again. */
+  $.ajaxSetup({
+    headers: {'X-CSRFToken': get_csrf_token()}
+  });
+}
+
 function add_csrf_token(data) {
   data['csrfmiddlewaretoken'] = get_csrf_token();
   return data;
-}
-
-function before_send_delete() {
-  // https://stackoverflow.com/questions/13089613/ajax-csrf-and-delete
-  return function(xhr) {
-    xhr.setRequestHeader("X-CSRFToken", get_csrf_token());
-  };
 }
 
 function get_csrf_token() {
@@ -143,4 +145,20 @@ function update_field(
   data[field_name] = new_value;
   var url = '{{ api_root_url }}' + model_name + '/' + pk;
   return post(url, data, success, always, feedback);
+}
+
+function button_updates_field(
+    button, model_name, pk, field_name, new_value, success, always) {
+  var feedback = button.parent();
+  button.click(function() {
+    button.prop('disabled', true);
+    var use_always = function() {
+      button.prop('disabled', false);
+      if (always) {
+        always();
+      }
+    };
+    update_field(
+        model_name, pk, field_name, new_value, success, use_always, feedback);
+  });
 }

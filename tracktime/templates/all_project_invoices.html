@@ -1,0 +1,11 @@
+{% extends "tracktime_base.html" %}
+
+{% block tracktime_body %}
+
+{{ all_invoices.as_html }}
+
+<div class="margin-top">
+  <a href="{{ all_line_items_url }}" class="all_line_items">See all line items</a>
+</div>
+
+{% endblock tracktime_body %}

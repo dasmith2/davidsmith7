@@ -1,15 +1,18 @@
-from invoice.models.line_item import LineItem
-from invoice.widgets.all_line_items_table import AllLineItemsTable
-from tracktime.widgets.all_project_invoices import AllProjectInvoices
+from django.shortcuts import reverse
+
+from invoice.widgets.all_line_items import AllLineItems
+from tracktime.widgets.project_invoices import get_filter_widgets
 
 
-class AllProjectLineItems(AllProjectInvoices):
-  def get_table(self):
-    return AllLineItemsTable(self.user)
+class AllProjectLineItems(AllLineItems):
+  def get_filters(self):
+    return get_filter_widgets(
+        self.user, project_query_key='invoice__projectinvoice__project',
+        created_query_key_prefix='invoice__created',
+        status_query_key='invoice__status')
 
-  def get_line_items(self):
-    return LineItem.live.get_line_items_from_invoices(
-        self.get_invoices())
+  def get_list_url(self):
+    return reverse('project_line_items')
 
-  def add_rows(self):
-    self.table.add_rows(self.get_line_items())
+  def get_list_api_url(self):
+    return reverse('list_or_save_new_line_item')

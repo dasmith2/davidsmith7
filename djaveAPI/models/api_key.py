@@ -32,9 +32,10 @@ class APIKeyManager(models.Manager):
 
 
 class APIKey(BaseKnowsChild, CredentialsInterface):
-  username = models.CharField(unique=True, max_length=100, help_text=(
-      'Because passwords are encrypted in the database, we need a username '
-      'to look up the key.'))
+  username = models.CharField(
+      unique=True, max_length=100, verbose_name='API Key username', help_text=(
+          'Because passwords are encrypted in the database, we need a '
+          'username to look up the key.'))
 
   # Actually this isn't really true. If a hacker gainst readonly access to the
   # database, they can read the django_session table which stores unencrypted
@@ -46,7 +47,8 @@ class APIKey(BaseKnowsChild, CredentialsInterface):
       'immediately executing requests on behalf of teams.'))
 
   webhook_url = models.CharField(
-      max_length=400, null=False, blank=True, default='', help_text=(
+      max_length=400, null=False, blank=True, default='',
+      verbose_name='Webhook URL', help_text=(
           'When any important object changes, what URL should we POST the new '
           'object data to?'))
 
@@ -77,3 +79,12 @@ class APIKey(BaseKnowsChild, CredentialsInterface):
     return url_field.explain_why_not_valid()
 
   objects = APIKeyManager()
+
+  def add_to_json(self, data):
+    plain_password = '(Hidden forever)'
+    if self.has_plain_password():
+      plain_password = (
+          '<b>Write this down because you\'ll never see it again:</b><br>'
+          '{}').format(self.get_plain_password())
+    data['plain_password'] = plain_password
+    del data['hashed_password']

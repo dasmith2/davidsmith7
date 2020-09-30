@@ -25,5 +25,5 @@ class ProjectWorkSessionSummaryTableTests(TestCaseWithData):
     url = reverse('project_work_report') + (
         '?project={}&from_date=2020-01-15&to_date=2020-01-15'.format(
             self.project_1.pk))
-    href = A(3.2, url, classes=['details_{}'.format(self.project_1.pk)])
+    href = A(3.2, url, css_classes=['details_{}'.format(self.project_1.pk)])
     table.rows[0].assertEqual(Row([self.project_1.name, href, 1]))

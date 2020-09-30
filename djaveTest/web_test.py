@@ -13,6 +13,7 @@ import time
 from django.conf import settings
 from django.shortcuts import reverse
 from django.template.loader import render_to_string
+from django.utils.safestring import mark_safe
 from djaveAPI.status_codes import is_server_error
 from djaveClassMagic.find_models import all_models
 try:
@@ -291,7 +292,7 @@ class WebTest(object):
 
   def jfinds(self, jquery_selector):
     script = render_to_string('js/get_elements.js', {
-        'jquery_selector': jquery_selector})
+        'jquery_selector': mark_safe(jquery_selector)})
     return self.execute_script(script)
 
   def find(self, clue):

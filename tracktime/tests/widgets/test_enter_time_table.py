@@ -31,13 +31,13 @@ class EnterTimeTableTests(TestCaseWithData):
 
     expected_cells_row_1 = [
         'Project 1',
-        Cell(2.1, classes=['hours', 'width-135']), Button('Delete')]
+        Cell(2.1, css_classes=['hours', 'width-135']), Button('Delete')]
     expected_row_1 = Row(expected_cells_row_1, pk=self.work_session_2.pk)
     table.rows[1].assertEqual(expected_row_1)
 
     expected_cells_row_2 = [
         'Project 1',
-        Cell('1.1 starting at 11 a.m.', classes=['hours', 'width-135']),
+        Cell('1.1 starting at 11 a.m.', css_classes=['hours', 'width-135']),
         Button('Delete')]
     expected_row_2 = Row(expected_cells_row_2, pk=self.work_session_1.pk)
     table.rows[2].assertEqual(expected_row_2)
@@ -58,5 +58,5 @@ class EnterTimeTableTests(TestCaseWithData):
     first_work_session_row = table.rows[1]
     self.assertEqual('Project 2', first_work_session_row.cells[0])
     self.assertEqual(
-        Cell(3.1, classes=['hours', 'width-135']),
+        Cell(3.1, css_classes=['hours', 'width-135']),
         first_work_session_row.cells[1])

@@ -1,24 +1,21 @@
 """ This table is for editing a single instance. It does one row per field.
 It's got helptext. """
 
+from collections import namedtuple
+
 from djaveClassMagic.default_widget import default_widget
 from djaveClassMagic.model_fields import model_fields
 from djaveHTML.button import Button
 from djaveHTML.form import Form
-from djaveHTML.table import Table, Cell
+from djaveHTML.table import Table, Cell, ButtonsCell
 
 from djaveHTML.tooltip import Tooltip
 from djaveHTML.feedback import Feedback, DisappearingFeedback
-from djaveHTML.a import A
+from djaveHTML.a import AButton
 from djmoney.money import Money
 
 
-WIRE_UP_CONFIRM_DELETE = """
-$(function() {
-  $('.edit-table .delete').click(function() {
-    return confirm('Delete?');
-  });
-});"""
+FieldRow = namedtuple('FieldRow', 'name widget read_only')
 
 
 class EditTable(Table):
@@ -34,19 +31,16 @@ class EditTable(Table):
 
     self.save_button = Button('Save', button_type='submit')
     self.delete_button = Button('Delete', button_type='delete')
-    self.cancel_button = A('Cancel', cancel_url, button=True)
+    self.cancel_button = AButton('Cancel', cancel_url)
 
     self.form = Form(
         [self.save_button, self.delete_button] + self.extra_buttons)
     self._saved = False
     self._deleted = False
 
-    question = 'Delete this {}?'.format(model.__name__)
-    confirm_delete_js = WIRE_UP_CONFIRM_DELETE.replace('Delete?', question)
-    super().__init__(
-        js=confirm_delete_js, classes=['margin-top', 'edit-table'])
-    self.append_js(
-        "setup_edit_table_turns_yellow('.edit-table');")
+    super().__init__(css_classes=['margin-top', 'edit-table', model.__name__])
+    self.append_js("setup_edit_table_turns_yellow('.edit-table.{}');".format(
+        model.__name__))
 
     # You have to add_rows before you handle_clicks because handle_clicks has
     # to check to see if the widgets are valid.
@@ -62,7 +56,7 @@ class EditTable(Table):
 
   def _redo_rows(self):
     self.rows = []
-    self.buttons_cell = Cell([], **{'colspan': 2})
+    self.buttons_cell = ButtonsCell([], **{'colspan': 2})
     self.add_rows()
 
   def add_rows(self):
@@ -134,16 +128,36 @@ class EditTable(Table):
     self.buttons_cell.elements.extend(buttons)
     self.create_row([self.buttons_cell])
 
-  def add_field_rows(self, *field_names):
-    for field_name in field_names:
-      self.add_field_row(field_name)
+  def add_field_rows(self, *field_names_or_rows):
+    for field_name_or_row in field_names_or_rows:
+      self.add_field_row(field_name_or_row)
 
-  def add_field_row(self, field_name, widget=None, read_only=False):
+  def add_field_row(self, field_name_or_row, widget=None, read_only=False):
+    """
+    These are all correct:
+
+    add_field_row('title')
+    add_field_row('title', widget=TextField('title'), read_only=False)
+    add_field_row(FieldRow('title', TextField('title'), False))
+
+    If you do this, it'll ignore the kwargs and just use the FieldRow:
+    add_field_row(my_field_row, widget=whatever, read_only=whatever)
+    """
+    if isinstance(field_name_or_row, str):
+      field_name = field_name_or_row
+    elif isinstance(field_name_or_row, FieldRow):
+      field_name = field_name_or_row.name
+      read_only = field_name_or_row.read_only
+      widget = field_name_or_row.widget or widget
+    else:
+      raise Exception('Im not sure how to handle {}'.format(field_name_or_row))
     field = self._get_field(field_name)
     current_value = self.get_current_value(field)
-    second_cell = current_value
 
-    if not read_only:
+    if read_only:
+      second_cell = Cell(
+          '', css_classes=['readonly'], **{'data-field': field_name})
+    else:
       if not widget:
         widget = default_widget(field)
       if current_value:

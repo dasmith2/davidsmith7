@@ -1,10 +1,24 @@
 from datetime import datetime, date, timedelta, time
 
+from django.utils.safestring import mark_safe
 from djaveDT import tz_dt_to_str, time_to_time_str, d_to_str, tz_dt_to_tz_dt
 from djmoney.money import Money
 
 
 class Element(object):
+  def __init__(self, css_classes=None):
+    self.css_classes = set()
+    if css_classes:
+      self.css_classes.update(css_classes)
+
+  def css_class_str(self):
+    if self.css_classes:
+      return ' class="{}"'.format(' '.join(self.css_classes))
+    return ''
+
+  def add_css_class(self, css_class):
+    self.css_classes.add(css_class)
+
   def as_html(self):
     raise NotImplementedError('as_html')
 
@@ -12,17 +26,29 @@ class Element(object):
     raise NotImplementedError('as_csv')
 
   def __eq__(self, other):
-    return self.as_html() == other.as_html()
+    if isinstance(other, Element):
+      return self.as_html() == other.as_html()
+    return False
 
-  def __str__(self):
-    return self.as_html()
 
-  def __repr__(self):
-    return self.as_html()
+class TagElement(Element):
+  def __init__(self, contents, css_classes=None):
+    super().__init__(css_classes=css_classes)
+    self.contents = contents
+
+  def tag_name(self):
+    raise NotImplementedError('tag_name')
+
+  def as_html(self):
+    return mark_safe('<{tag_name}{attrs}>{content}</{tag_name}>'.format(
+        tag_name=self.tag_name(),
+        attrs=self.css_class_str(),
+        content=elements_as_html(self.contents)))
 
 
 class StringElement(Element):
   def __init__(self, the_string):
+    super().__init__()
     self.the_string = the_string
 
   def as_html(self):
@@ -38,6 +64,7 @@ class StringElement(Element):
 
 class ElementList(Element):
   def __init__(self, elements):
+    super().__init__()
     self.elements = elements
 
   def as_html(self):

@@ -33,7 +33,7 @@ def get_page(request_GET):
       return page
 
 
-def paged_results(model, query, page):
+def paged_results(query, page):
   count = query.count()
   total_pages = math.ceil(1.0 * count / USE_PAGE_SIZE)
   page = page or USE_FIRST_PAGE
@@ -41,7 +41,7 @@ def paged_results(model, query, page):
   from_row = (page - 1) * USE_PAGE_SIZE
   to_row = page * USE_PAGE_SIZE
   for obj in query.order_by('pk')[from_row:to_row]:
-    results.append(to_json_dict(obj, model))
+    results.append(to_json_dict(obj))
   return construct_paged_results(results, count, page, total_pages)
 
 

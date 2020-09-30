@@ -3,6 +3,7 @@ from djaveHTML.element import Element
 
 class Img(Element):
   def __init__(self, img_src):
+    super().__init__()
     self.img_src = img_src
 
   def as_html(self):

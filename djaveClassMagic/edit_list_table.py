@@ -4,7 +4,7 @@ from django.shortcuts import reverse
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 from djaveHTML.table import Table, Cell
-from djaveHTML.a import A
+from djaveHTML.a import AButton
 
 
 def edit_list_table_js():
@@ -35,7 +35,7 @@ class EditListTable(Table):
       if only_show_create_new_button:
         content = self._create_new_button.as_html()
       return mark_safe('<div {}>{}</div>'.format(
-          self.css_classes_str(), content))
+          self.css_class_str(), content))
     return super().as_html()
 
   def setup_edit_anything_turns_yellow(self):
@@ -102,8 +102,8 @@ class EditListTable(Table):
     # table. I keep track of that so when I render the table I can not bother
     # to show the headers if there aren't any rows.
     self._has_objects = bool(len(self.rows))
-    self._create_new_button = A(
-        button_text, href, classes=['create_new'], button=True)
+    self._create_new_button = AButton(
+        button_text, href, css_classes=['create_new'])
     create_new_cell = Cell(
         self._create_new_button, **{'colspan': len(self.headers)})
     self.create_row([create_new_cell])

@@ -4,8 +4,9 @@ from djaveHTML.element import Element
 
 
 class Feedback(Element):
-  def __init__(self, text, html_finder=None):
-    self.text = text
+  def __init__(self, text=None, html_finder=None):
+    super().__init__()
+    self.text = text or ''
     self.html_finder = html_finder
 
   def as_html(self):

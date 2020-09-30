@@ -10,7 +10,8 @@ ZOOM_CHANGE_FACTOR = 1.05  # Bump it up or down by 5%
 
 class ZoomForm(Form):
   def __init__(self, user, request_POST):
-    self.hidden_automatic_zoom = HiddenField('hiddenautomaticzoom')
+    self.hidden_automatic_zoom = HiddenField(
+        'hiddenautomaticzoom', key_prefix_is_class=True)
     self.zoom_in_button = Button('Zoom in', button_type='submit')
     self.zoom_out_button = Button('Zoom out', button_type='submit')
     self.automatic_button = Button('Automatic', button_type='submit')

@@ -11,10 +11,10 @@ class UserAPIKeyManager(APIKeyManager):
     if api_key:
       return api_key.user
 
-  def create_key(self, username, user):
+  def create_key(self, username, user, **kwargs):
     # I know this function looks redundant, but without it I ran into some
     # confusion about how, exactly, you create a UserAPIKey.
-    return super().create_key(username, user=user)
+    return super().create_key(username, user=user, **kwargs)
 
 
 class UserAPIKey(APIKey, HasUserCredentialsInterface, Allowed):

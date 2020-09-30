@@ -7,13 +7,13 @@ from djaveHTML.element import (
 from djaveTest.unit_test import recursive_assert_equal
 
 
-class Table(object):
+class Table(Element):
   def __init__(
-      self, headers=None, rows=None, classes=[], title=None, js=None, css=None,
-      post_table_buttons=None, **additional_attrs):
+      self, headers=None, rows=None, css_classes=None, title=None, js=None,
+      css=None, post_table_buttons=None, **additional_attrs):
+    super().__init__(css_classes=css_classes)
     self.headers = headers  # headers can be strings or Cells or nothing.
     self.rows = rows or []
-    self.classes = classes
     self.title = title
     self.js = js or ''
     self.css = css
@@ -21,8 +21,8 @@ class Table(object):
     self.post_table_buttons = post_table_buttons or []
 
   def create_row(
-      self, cells=None, classes=None, pk=None, **additional_attrs):
-    row = Row(cells=cells, classes=classes, pk=pk, **additional_attrs)
+      self, cells=None, css_classes=None, pk=None, **additional_attrs):
+    row = Row(cells=cells, css_classes=css_classes, pk=pk, **additional_attrs)
     self.rows.append(row)
     return row
 
@@ -43,15 +43,12 @@ class Table(object):
           csv_row.append(elements_as_csv(cell))
       writer.writerow(csv_row)
 
-  def css_classes_str(self):
-    return 'class="{}"'.format(' '.join(self.classes))
-
   def as_html(self):
     table_start = []
     for key, value in self.additional_attrs.items():
       table_start.append('{}="{}"'.format(key, value))
-    if self.classes:
-      table_start.append(self.css_classes_str())
+    if self.css_classes:
+      table_start.append(self.css_class_str())
     table_start_str = '<table>'
     if table_start:
       table_start_str = '<table {}>'.format(' '.join(table_start))
@@ -70,7 +67,8 @@ class Table(object):
         if isinstance(header, Cell):
           to_return.append(header.as_html())
         else:
-          to_return.append('<th>{}</th>'.format(obj_as_element(header)))
+          to_return.append('<th>{}</th>'.format(
+              obj_as_element(header).as_html()))
       to_return.extend([
           '    </tr>',
           '  </thead>'])
@@ -126,8 +124,9 @@ class Table(object):
       to_return.append('  <tbody>')
 
       for index, row in enumerate(self.rows):
-        classes = row.classes + ['row1' if index % 2 == 0 else 'row2']
-        row_start = ['    <tr class="{}"'.format(' '.join(classes))]
+        css_classes = list(
+            row.css_classes | {'row1' if index % 2 == 0 else 'row2'})
+        row_start = ['    <tr class="{}"'.format(' '.join(css_classes))]
         for key, value in row.additional_attrs.items():
           row_start.append(' {}="{}"'.format(key, value))
         row_start.append('>')
@@ -145,10 +144,11 @@ class Table(object):
     return to_return
 
 
-class Cell(object):
+class Cell(Element):
   def __init__(
-      self, elements, classes=[], is_header=False,
+      self, elements, css_classes=None, is_header=False,
       color=None, none_is_nbsp=True, **additional_attrs):
+    super().__init__(css_classes=css_classes)
     """ elements can be a datetime, date, string, float, int, any object
     that inherits from Element, or a list of any of those things. """
     self.elements = elements
@@ -158,7 +158,6 @@ class Cell(object):
     # much easier to debug.
     obj_as_element(elements)
 
-    self.classes = classes
     self.is_header = is_header
     self.additional_attrs = additional_attrs
     self.color = color
@@ -174,8 +173,8 @@ class Cell(object):
       content_str = elements_as_html(self.elements)
 
     open_tag_parts = [t_what]
-    if self.classes:
-      open_tag_parts.append('class="{}"'.format(' '.join(self.classes)))
+    if self.css_classes:
+      open_tag_parts.append(self.css_class_str())
     if self.color:
       use_color = self.color
       if use_color[0] != '#':
@@ -204,18 +203,21 @@ class Cell(object):
 
 
 class ButtonsCell(Cell):
-  def __init__(self, elements=None):
-    super().__init__(elements, classes=['buttons'], none_is_nbsp=False)
+  def __init__(self, elements=None, **additional_attrs):
+    super().__init__(
+        elements, css_classes={'buttons'}, none_is_nbsp=False,
+        **additional_attrs)
 
 
-class Row(object):
-  def __init__(self, cells=None, classes=None, pk=None, **additional_attrs):
+class Row(Element):
+  def __init__(
+      self, cells=None, css_classes=None, pk=None, **additional_attrs):
+    super().__init__(css_classes=css_classes)
     # cells can be primitives, Element objects, or Cells
     self.cells = []
     if cells:
       for cell in cells:
         self.add(cell)
-    self.classes = classes or []
     self.additional_attrs = additional_attrs or {}
     self.pk = pk
     if pk is not None:
@@ -228,8 +230,8 @@ class Row(object):
     attrs = []
     if self.cells:
       attrs.extend([cell.__repr__() for cell in self.cells])
-    if self.classes:
-      attrs.append('classes={}'.format(self.classes))
+    if self.css_classes:
+      attrs.append('css_classes={}'.format(self.css_classes))
     return 'Row({})'.format(', '.join(attrs))
 
   def add(self, cell):
@@ -244,15 +246,12 @@ class Row(object):
     for cell in cells:
       self.add(cell)
 
-  def add_class(self, css_class):
-    self.classes.append(css_class)
-
   def assertEqual(self, expected_row):
     """ Handy for tests. """
-    if set(self.classes) != set(expected_row.classes):
+    if set(self.css_classes) != set(expected_row.css_classes):
       raise AssertionError(
-          'I\'m expecting classes {} on this row but I have {}'.format(
-              expected_row.classes, self.classes))
+          'I\'m expecting css_classes {} on this row but I have {}'.format(
+              expected_row.css_classes, self.css_classes))
     if self.additional_attrs != expected_row.additional_attrs:
       raise AssertionError((
           'I\'m expecting additional_attrs {} on this row but I '

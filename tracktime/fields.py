@@ -13,9 +13,10 @@ PROJECT = 'project'
 
 def project_field(
     user, label=None, required=True, use_clock=None, has_to_do_list=None,
-    has_invoices=None):
-  """ use_clock can be True, False, or None, meaning you only want projects
-  that use the clock, or don't, or it doesn't matter, respectively. """
+    has_invoices=None, query_key=None):
+  """ use_clock, has_to_do_list, and has_invoices can be True, False, or None,
+  meaning you only want projects that use the clock, or don't, or it doesn't
+  matter, respectively. """
   default = None
   if user and required:
     latest_project = get_latest_project(user)
@@ -26,7 +27,8 @@ def project_field(
       has_invoices=has_invoices)
   field = SelectField(
       key_prefix=PROJECT, options=options,
-      required=required, default=default, label=label, query_key='project')
+      required=required, default=default, label=label,
+      query_key=query_key or 'project')
   return field
 
 

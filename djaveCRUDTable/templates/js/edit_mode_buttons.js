@@ -1,6 +1,6 @@
-function show_edit_mode_buttons(row) {
+function show_edit_mode_buttons(row, saved_callback) {
   if (row.attr('data-pk')) {
-    init_edit_mode_buttons(row);
+    init_edit_mode_buttons(row, saved_callback);
     var save_cancel_buttons = buttons_cell(row).find(
         '.save-row,.cancel-save-row');
     other_buttons(row).hide();
@@ -26,20 +26,20 @@ function show_original_buttons(row) {
   }
 }
 
-function init_edit_mode_buttons(row) {
+function init_edit_mode_buttons(row, saved_callback) {
   var save_button = buttons_cell(row).find('.save-row');
-  var cancel_save_button = buttons_cell(row).find('.cancel-save-row');
+  var cancel_button = buttons_cell(row).find('.cancel-save-row');
 
   if (!save_button.length) {
     var save_html = '<button class="save-row" type="button">Save</button>';
     save_button = $(save_html).appendTo(buttons_cell(row)).hide();
     var cancel_html =
         '<button class="cancel-save-row" type="button">Cancel</button>';
-    cancel_save_button = $(cancel_html).appendTo(buttons_cell(row)).hide();
+    cancel_button = $(cancel_html).appendTo(buttons_cell(row)).hide();
 
     save_button.click(function() {
       save_button.prop('disabled', true);
-      cancel_save_button.prop('disabled', true);
+      cancel_button.prop('disabled', true);
 
       var data = {};
 
@@ -79,13 +79,16 @@ function init_edit_mode_buttons(row) {
           last_edited_elt.focus();
         }
         calc_edit_mode_4_edit_list_table(row);
+        if (saved_callback) {
+          saved_callback();
+        }
       };
       // DON'T use update_field here because data may have multiple fields.
       var url = options.base_api_url + '/' + find_pk(row);
       post(url, data, success, null, first_feedback);
     });
 
-    cancel_save_button.click(function() {
+    cancel_button.click(function() {
       row.find('.feedback').hide();
       var got_all_elts = all_elts(row);
       for (var i = 0; i < got_all_elts.length; i++) {
@@ -101,5 +104,5 @@ function init_edit_mode_buttons(row) {
 }
 
 function calc_edit_mode_4_edit_list_table(row) {
-    calc_edit_mode(row, show_edit_mode_buttons, show_original_buttons);
+  calc_edit_mode(row, show_edit_mode_buttons, show_original_buttons);
 }

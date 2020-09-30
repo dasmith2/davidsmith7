@@ -2,7 +2,7 @@ from datetime import date, timedelta
 
 from django.shortcuts import reverse
 from djaveCRUDTable.columns import DisplayFieldColumn
-from djaveCRUDTable.crud_table import hidden_filter, from_filter, to_filter
+from djaveCRUDTable.filters import hidden_filter, from_filter, to_filter
 
 from tracktime.columns import ProjectColumn
 from tracktime.fields import project_field
@@ -53,6 +53,7 @@ class AllProjectToDos(ToDos):
   def __init__(self, user):
     self.user = user
     super().__init__()
+    self.add_js_from_template('js/all_project_to_dos.js')
 
   def filters(self):
     default_from_date = date.today() - timedelta(days=365 / 2)

@@ -4,7 +4,7 @@ import csv
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.template.loader import render_to_string
-from djaveHTML.a import A
+from djaveHTML.a import AButton
 from djaveHTML.element import StringElement
 
 
@@ -38,15 +38,15 @@ class CanCSV(object):
       return table_to_csv_response(
           can_csv_response.table, can_csv_response.csv_file_name)
     else:
-      can_csv_response.table.post_table_buttons.insert(
+      can_csv_response.table.footer_buttons.insert(
           0, download_csv_button())
       return render(
           request, can_csv_response.template, can_csv_response.context)
 
 
 def download_csv_button():
-  button = A(
-      'Download CSV', '', classes=['download_csv_button'], button=True)
+  button = AButton(
+      'Download CSV', '', css_classes=['download_csv_button'])
   return StringElement(
       render_to_string('download_csv_button.html', {'button': button}))
 

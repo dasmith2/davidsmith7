@@ -64,7 +64,14 @@ class ProjectInvoiceRule(Publishable):
 
   @classmethod
   def filter_allowed_by_user(cls, user, query_set):
-    return query_set.filter(creator=user).select_related('project')
+    return query_set.filter(creator=user)
+
+  @classmethod
+  def select_related_list(self):
+    return ['project', 'creator']
+
+  def add_to_json(self, existing_json):
+    existing_json['project_name'] = self.project.name
 
   def allowed_api_keys(self, api_key_type):
     if api_key_type is UserAPIKey:

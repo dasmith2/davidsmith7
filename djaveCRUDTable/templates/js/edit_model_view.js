@@ -1,5 +1,12 @@
 var EditModelView = Backbone.View.extend({
   el: wrapper.find('.details'),
+
+  refresh_and_return_to_list: function() {
+    models.fetch();
+    var list_panel_id = wrapper.find('.list').attr('id');
+    navigate_to_panel(list_panel_id);
+  },
+
   initialize: function() {
     var view = this;
     if (view.$el.is(':visible')) {
@@ -7,21 +14,16 @@ var EditModelView = Backbone.View.extend({
       view.edit(id);
     }
 
-    var save_button = view.$el.find('.save').off();
-    save_button.click(function(event) {
-      event.preventDefault();
-      save_button.prop('disabled', true);
-      var always = function() {
-        save_button.prop('disabled', false);
-      };
 
+    var save_button = view.$el.find('.save');
+    wire_up_button(save_button, function(always, feedback) {
       var data = {};
       if (!view.model.get('id')) {  // The id is undefined for new
         extend_by_save_new_defaults(data);
       }
-      view.$el.find('table').find('input,textarea').each(function() {
+      view.$el.find('table').find('input,textarea,select').each(function() {
         var field = $(this);
-        var field_name = field.attr('class');
+        var field_name = field.attr('name');
         var value = field.val();
         if (field.attr('type') == 'checkbox') {
           value = field[0].checked;
@@ -29,7 +31,6 @@ var EditModelView = Backbone.View.extend({
         data[field_name] = value;
       });
 
-      var feedback = view.$el.find('.feedback');
       var success = function(success_data) {
         // I used to think, hey, update the model right on the page and
         // you don't even have to fetch the list. But the user could
@@ -39,14 +40,12 @@ var EditModelView = Backbone.View.extend({
         if (options.saved_model_callback) {
           options.saved_model_callback(success_data);
         }
-        models.fetch();
-        var list_panel_id = wrapper.find('.list').attr('id');
-        navigate_to_panel(list_panel_id);
+        view.refresh_and_return_to_list();
       };
-      post(view.url, data, success, always, feedback)
+      post(view.url, data, success, always, feedback);
     });
   },
-  edit: function(id) {
+  edit: function(id, edit_callback) {
     // Resets the whole row turns yellow on edit thing.
     set_saved_values(this.$el.find('input,textarea'));
     this.$el.find('.edit-table tr').each(function() {
@@ -56,13 +55,24 @@ var EditModelView = Backbone.View.extend({
     var id_int = parseInt(id);
     var view = this;
     var got_model_callback = function(model) {
+      var table = view.$el.find('table');
+
       view.model = model;
       view.url = options.base_api_url;
       if (id_int > 0) {
         view.url += '/' + id_int;
       }
 
-      var model = view.model;
+      var delete_button = table.find('.delete');
+      if (!model.get('id')) {
+        delete_button.hide();
+      } else {
+        delete_button.show();
+        wire_up_delete_button(view, view.url, function() {
+          view.refresh_and_return_to_list();
+        });
+      }
+
       var lower_case_singular = wrapper.find('.details').attr('id');
       var title = 'New ' + lower_case_singular;
       if (model.get('id') > 0) {
@@ -73,7 +83,8 @@ var EditModelView = Backbone.View.extend({
         title = 'Edit ' + what_to_call_it;
       }
       view.$el.find('h1').text(title);
-      view.$el.find('table').find('input,textarea').each(function() {
+
+      table.find('input,textarea').each(function() {
         var field = $(this);
         var field_name = field.attr('class');
         var value = model.get(field_name);
@@ -86,6 +97,14 @@ var EditModelView = Backbone.View.extend({
           }
         }
       });
+      table.find('.readonly').each(function() {
+        var cell = $(this);
+        cell.html(model.get(cell.attr('data-field')));
+      });
+
+      if (edit_callback) {
+        edit_callback(model.toJSON());
+      }
     };
     get_model(id_int, got_model_callback);
   }

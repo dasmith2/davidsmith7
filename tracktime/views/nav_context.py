@@ -38,5 +38,5 @@ def tracktime_nav(user, current_view):
     return NavWithAccount(nav_list, SETTINGS, current_view)
   else:
     return Nav(
-        [NavItem('tracktime_homepage', mark_safe('&laquo; Home'))],
+        [NavItem('tracktime_homepage', mark_safe('&laquo; Home'), True)],
         'tracktime_homepage')

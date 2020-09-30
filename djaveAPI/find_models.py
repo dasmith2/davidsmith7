@@ -18,11 +18,16 @@ def allowed_models_in_app(app_name):
   return models_in_app(app_name, AllowedInterface)
 
 
-def allowed_model_from_name(model_name):
-  for model in allowed_models():
-    if model.__name__ == model_name:
-      return model
-  raise Exception('Unable to find {}'.format(model_name))
+def allowed_model_from_name(model_or_model_name):
+  if isinstance(model_or_model_name, str):
+    for model in allowed_models():
+      if model.__name__ == model_or_model_name:
+        return model
+    raise Exception('Unable to find {}'.format(model_or_model_name))
+  if isinstance(model_or_model_name, AllowedInterface):
+    return model_or_model_name
+  raise Exception('{} is not an instance of AllowedInterface'.format(
+      model_or_model_name))
 
 
 def publishable_model_from_name(model_name):

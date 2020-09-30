@@ -14,8 +14,12 @@ class Field(FormElement):
   # You can put djaveHTML fields in djaveHTMLs.
   def __init__(
       self, key_prefix, required=True, default=None, pk=None, value=None,
-      label=None, autofocus=False, query_key=None, **additional_attrs):
-    super().__init__(key_prefix, pk)
+      label=None, autofocus=False, query_key=None, key_prefix_is_class=True,
+      **additional_attrs):
+    css_classes = set()
+    if key_prefix_is_class:
+      css_classes.add(key_prefix)
+    super().__init__(key_prefix, pk, css_classes=css_classes)
     self.required = required
     self.default = default
 
@@ -182,9 +186,9 @@ class TextAreaField(Field):
 class HtmlInputField(Field):
   """ This is for fields that start with <input type="... """
   def widget_html(self):
-    return '<input type="{}"{} name="{}" class="{}"{}{}{}>'.format(
+    return '<input type="{}"{} name="{}"{}{}{}{}>'.format(
         self.input_type(), self.additional_attrs_str(), self.key(),
-        self.key_prefix, self.get_value_html_str(), self.autofocus_str(),
+        self.css_class_str(), self.get_value_html_str(), self.autofocus_str(),
         self.additional_attrs_string())
 
   def get_value_html_str(self):
@@ -267,6 +271,11 @@ class TextField(HtmlInputField):
 
 
 class HiddenField(HtmlInputField):
+  def __init__(self, *args, **kwargs):
+    if 'key_prefix_is_class' not in kwargs:
+      kwargs['key_prefix_is_class'] = False
+    super().__init__(*args, **kwargs)
+
   def input_type(self):
     return 'hidden'
 

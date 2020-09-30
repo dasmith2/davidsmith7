@@ -51,7 +51,7 @@ class ProjectWorkSessionSummaryTable(Table):
         if what_i_did_per_project.project.use_clock:
           hours_href = A(
               what_i_did_per_project.hours,
-              what_i_did_per_project.breakdown_url, classes=[css_class])
+              what_i_did_per_project.breakdown_url, css_classes=[css_class])
         cells.append(hours_href)
       if do_done:
         cells.append(what_i_did_per_project.done)

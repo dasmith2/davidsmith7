@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Q
 from django.dispatch import receiver
+from django.shortcuts import reverse
 from djaveAPI.models.publishable import Publishable, LivePublishableManager
 from djaveAPI.models.user_api_key import UserAPIKey
 from djaveClassMagic.models.base_knows_child import BaseKnowsChild
@@ -110,6 +111,8 @@ class Invoice(Publishable, BaseKnowsChild):
       'The due date is set automatically based on the Sent date and Net Days'))
   paid = models.DateTimeField(null=True, blank=True, help_text=(
       'When was this Invoice marked paid?'))
+  status = models.CharField(max_length=20, null=True, blank=True, help_text=(
+      'This is a cache of the status'))
 
   total = MoneyField(max_digits=10, decimal_places=2, help_text=(
       'What is the total amount due for this Invoice? This field gets set '
@@ -134,7 +137,7 @@ class Invoice(Publishable, BaseKnowsChild):
         self.total += line_item.amount
     self.save()
 
-  def status(self, nnow=None):
+  def calc_status(self, nnow=None):
     return self._just_status(self.status_with_date(nnow=nnow))
 
   def _just_status(self, status_with_date):
@@ -151,25 +154,31 @@ class Invoice(Publishable, BaseKnowsChild):
   def _calc_status_with_date(self, sent, due, paid, nnow=None):
     nnow = nnow or now()
     if paid:
-      return 'Paid {}'.format(dt_to_d_str(paid))
+      return '{} {}'.format(PAID, dt_to_d_str(paid))
     elif sent:
       past_due = due and due < nnow.date()
       if past_due:
-        return 'Late. Due {}'.format(d_to_str(due))
+        return '{}. Due {}'.format(LATE, d_to_str(due))
       if sent <= nnow.date():
-        return 'Due {}'.format(d_to_str(due))
-      return 'Sending {}'.format(d_to_str(sent))
-    return 'Created {}'.format(dt_to_d_str(self.created))
+        return '{} {}'.format(DUE, d_to_str(due))
+      return '{} {}'.format(SENDING, d_to_str(sent))
+    if self.pk:
+      return '{} {}'.format(CREATED, dt_to_d_str(self.created))
+    return CREATED
+
+  def view_url(self):
+    return reverse('view_invoice', kwargs={'pk': self.pk})
 
   def add_to_json(self, existing_json):
-    existing_json['status'] = self.status()
     existing_json['status_with_date'] = self.status_with_date()
+    existing_json['view_url'] = self.view_url()
 
   def save(self, *args, **kwargs):
     if self.sent:
       self.due = (self.sent + timedelta(days=self.net_days))
     else:
       self.due = None
+    self.status = self.calc_status()
     super().save(*args, **kwargs)
 
   @classmethod
@@ -179,5 +188,8 @@ class Invoice(Publishable, BaseKnowsChild):
   def allowed_api_keys(self, api_key_type):
     if api_key_type is UserAPIKey:
       return UserAPIKey.objects.filter(user=self.creator)
+
+  def select_related_list(self):
+    return ['creator']
 
   live = LiveInvoiceManager()

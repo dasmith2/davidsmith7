@@ -58,8 +58,8 @@ form { margin: 0px; padding: 0px; }
 /* If you change the background color of a <input type="date"> Firefox
  * re-renders the control with a different font size and rectangular corners.
  * */
-.editing { background-color: #ffb; }
-.green, .green textarea { background-color: #dfd; }
+.yellow { background-color: #ffb; }
+.green { background-color: #dfd; }
 .white-background { background-color: #fff; }
 
 .margin-top, p.margin-top { margin: {% zoom 60 %}px 0px 0px 0px; }

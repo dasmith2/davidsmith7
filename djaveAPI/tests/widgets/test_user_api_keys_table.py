@@ -40,7 +40,7 @@ class TestUserAPIKeysTable(TestCase):
     api_key = user_keys.first()
 
     row = table.rows[1]
-    self.assertEqual(Cell('asdf', classes=['username_cell']), row.cells[0])
+    self.assertEqual(Cell('asdf', css_classes=['username_cell']), row.cells[0])
     description_tester = re.compile(
         r"Write this down because you'll never see it "
         r"again:<br><br><b class=\"plain_password\">[\w-]{10}")

@@ -107,7 +107,7 @@ class StopTheClockForm(Form):
 
   def get_table(self):
     table = Table(
-        ['Project', 'Started', ''], classes=['margin-top-half'])
+        ['Project', 'Started', ''], css_classes=['margin-top-half'])
 
     start_time = tz_dt_to_tz_dt(self.stoppable.started).time()
     problem = ''

@@ -4,7 +4,8 @@ var ModelsView = Backbone.View.extend({
     this.listenTo(this.collection, 'add', this.add_one);
     this.listenTo(this.collection, 'reset', this.remove_all);
     this.listenTo(this.collection, 'all', this.log_event);
-    this.listenTo(this.collection, 'remove', this.maybe_hide);
+    this.listenTo(this.collection, 'remove', this.remove_one);
+    this.listenTo(this.collection, 'sync', this.maybe_hide);
     reload_list_if_qs_sets_filters();
     if (options.inline_create) {
       this.setup_inline_create();
@@ -21,14 +22,18 @@ var ModelsView = Backbone.View.extend({
     extend_by_save_new_defaults(create_data);
     var create_row = this.$el.find('.inline-create-row');
     var buttons_wrapper = create_row.find('.buttons');
-    var inputs = this.create_row_inputs();
     var me = this;
     var success = function(response_data) {
-      inputs.each(function() {
+      var _inputs = me.create_row_inputs();
+      _inputs.each(function() {
         if (this.tagName != 'SELECT') {
           $(this).val('');
         }
       });
+      set_saved_values(_inputs);
+      calc_edit_mode(create_row);
+      resize_textareas(create_row);
+
       me.collection.add(response_data);
       if (options.inline_create_callback) {
         options.inline_create_callback(response_data, create_row);
@@ -52,8 +57,7 @@ var ModelsView = Backbone.View.extend({
     }
   },
   create_row_inputs: function() {
-    return this.$el.find('.inline-create-row').find(
-        'textarea,select,input');
+    return inputs(this.$el.find('.inline-create-row'));
   },
   extend_by_create_row: function(data) {
     this.create_row_inputs().each(function() {
@@ -63,6 +67,9 @@ var ModelsView = Backbone.View.extend({
   },
   setup_inline_create: function() {
     this.table().removeClass('start-hidden');
+    var create_row = this.table().find('.inline-create-row');
+    setup_edit_row_turns_yellow(create_row);
+    resize_textareas(create_row);
   },
   add_one: function(model) {
     this.table().show();
@@ -71,7 +78,7 @@ var ModelsView = Backbone.View.extend({
     var row = view.render()
     this.tbody().prepend(row);
     var in_table_button_wrapper = this.$el.find(
-        '.in-table-new-button-wrapper');
+        '.in-table-button-wrapper');
     if (in_table_button_wrapper.length) {
       in_table_button_wrapper.show();
       wrapper.find('.upper-new-button-wrapper').hide();
@@ -95,20 +102,24 @@ var ModelsView = Backbone.View.extend({
     this.tbody().empty();
     this.show_nothing();
   },
+  remove_one: function(model) {
+    this.tbody().find(`tr[data-pk=${model.get('id')}]`).remove();
+    this.maybe_hide();
+  },
   maybe_hide: function() {
     if (!this.tbody().find('tr').length && !options.inline_create) {
       this.show_nothing();
     }
   },
   show_nothing: function() {
-    if (!this.$el.find('.inline-create-row')) {
+    if (!this.$el.find('.inline-create-row').length) {
       this.table().hide();
-      // If there are no filter_widgets and no rows, then the only thing
-      // worth showing is the create new button.
-      if (this.$el.find('.filter_widgets').length) {
-        this.$el.find('.nothing').show();
+      var can_create_new = this.$el.find('.createnew').length;
+      if (can_create_new) {
+        wrapper.find('.upper-new-button-wrapper').removeClass(
+            'start-hidden').show();
       } else {
-        wrapper.find('.upper-new-button-wrapper').show();
+        this.$el.find('.nothing').removeClass('start-hidden').show();
       }
     }
   },

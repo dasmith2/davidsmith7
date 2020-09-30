@@ -1,35 +1,11 @@
 {% extends "tracktime_base.html" %}
 
 {% block tracktime_body %}
-<script>
-function post_save_project(project) {
-  if (project.has_to_do_list) {
-    $('.todo_nav').parent().show();
-  }
-  if (project.use_clock) {
-    $('.clock_nav').parent().show();
-    $('.report_nav').parent().show();
-  }
-  if (project.has_invoices) {
-    $('.invoices_nav').parent().show();
-  }
-}
-
-function post_delete_project() {
-  $('#archived_projects_link').show();
-}
-</script>
 
 {{ table.as_html }}
 
-<div class="margin-top" id="archived_projects_link">
-  <a href="{{ archived_projects_url }}" class="archived_projects">See archived projects</a>
+<div class="margin-top">
+  {{ archived_projects_link.as_html }}
 </div>
-
-{% if not archived_projects_exist %}
-  <script>
-    $('#archived_projects_link').hide();
-  </script>
-{% endif %}
 
 {% endblock tracktime_body %}

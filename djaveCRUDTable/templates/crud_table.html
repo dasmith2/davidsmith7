@@ -4,7 +4,7 @@
     class="panel list start-hidden" id="{{ lower_case_plural }}"
     data-url="{{ list_url }}" data-nav-css-class="{{ nav_css_class }}">
   {% if list_header %}
-    <h1 class="section-header">{{ list_header }}</h1>
+    {{ list_header.as_html }}
   {% endif %}
 
   <div class="report {{ margin_top_css }}">
@@ -27,7 +27,7 @@
       {% endif %}
     </div>
 
-    <div class="{{ margin_top_css }} list-table-wrapper">
+    <div class="margin-top-half list-table-wrapper">
       <table
           class="start-hidden list-table"
           data-model="{{ upper_case_singular }}">
@@ -52,7 +52,7 @@
         <tbody>
         </tbody>
         {% if new_button %}
-          <tfoot class="in-table-new-button-wrapper">
+          <tfoot class="in-table-button-wrapper">
             <tr>
               <td colspan="{{ list_column_count }}">
                 {{ new_button.as_html }}
@@ -74,14 +74,10 @@
 
 <div
     class="panel details start-hidden" id="{{ lower_case_singular }}"
-    data-url="{{ list_url }}/:pk" data-nav-css-class="{{ nav_css_class }}">
-  <h1>{{ upper_case_singular }}</h1>
+    data-url="{{ details_url_root }}/:pk"
+    data-nav-css-class="{{ nav_css_class }}">
+  <h1></h1>
   {{ edit_table.as_html }}
-  <div class="margin-top">
-    <div class="feedback"></div>
-    <button class="save button">Save</button>
-    <a href="{{ list_url }}"  class="cancel button">Cancel</a>
-  </div>
 </div>
 
 <script>
@@ -96,13 +92,16 @@ crud_table_options))
       '{{ list_api_url }}', '#{{ lower_case_plural }}-wrapper');
   options.save_new_defaults = {{ save_new_defaults }};
   options.label_edit_page_with_field = '{{ label_edit_page_with_field }}';
-  options.delete_row_confirm_question = '{{ delete_row_confirm_question }}';
-  options.new_row_callback = {{ new_row_callback }};
+  options.confirm_delete_question = '{{ confirm_delete_question }}';
+  options.modified_row_callback = {{ modified_row_callback }};
   options.saved_model_callback = {{ saved_model_callback }};
   options.deleted_model_callback = {{ deleted_model_callback }};
-  options.inline_create = {{ inline_create }};
+  options.inline_create = {{ inline_create_js }};
   options.inline_create_callback = {{ inline_create_callback }};
   options.fetch_list_callback = {{ fetch_list_callback }};
+  options.global_reload_function_name = '{{ global_reload_function_name }}';
+  options.edit_callback = {{ edit_callback }};
+  options.global_options_variable_name = '{{ global_options_variable_name }}';
   setup_crud_table(options);
 })();
 </script>

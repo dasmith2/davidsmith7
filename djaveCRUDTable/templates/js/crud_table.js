@@ -20,9 +20,9 @@ function crud_table_options(base_api_url, wrapper_finder) {
       label_edit_page_with_field: null,
       // Ask this question before deleting a row. The default question is
       // something like "Delete <model lower case singular name>?"
-      delete_row_confirm_question: null,
-      // function new_row_callback(row, model_data) {}
-      new_row_callback: null,
+      confirm_delete_question: null,
+      // function modified_row_callback(row, model_data, model) {}
+      modified_row_callback: null,
       // function saved_model_callback(new_project_data_or_whatever) {}
       saved_model_callback: null,
       // function deleted_model_callback(backbone_model) {}
@@ -33,10 +33,25 @@ function crud_table_options(base_api_url, wrapper_finder) {
       // function inline_create_callback(model_data, create_row) {}
       inline_create_callback: null,
       // function fetch_list_callback(models) {}
-      fetch_list_callback: null};
+      fetch_list_callback: null,
+      // Sometimes actions in one panel mean you need to reload a different
+      // list. This option allows you to put a function in the global namespace
+      // that will reload this list.
+      global_reload_function_name: null,
+      // function edit_callback(details_panel, model_data) {}
+      edit_callback: null,
+      // When you have nested lists, you'll probably have to update the
+      // save_new_defaults for inner lists. For instance, when you click
+      // through to an invoice and want to create a new manual line item, it'll
+      // need a dynamic invoice id. But just in case there are other options
+      // you'll have to update, I make the entire options object available.
+      global_options_variable_name: null};
 }
 
 function setup_crud_table(options) {
+  if (options.global_options_variable_name) {
+    window[options.global_options_variable_name] = options;
+  }
   var wrapper = $(options.wrapper_finder);
   var base_url = wrapper.find('.list').attr('data-url');
   if (!base_url) {
@@ -96,10 +111,16 @@ function setup_crud_table(options) {
     });
   }
 
-  function reload_list() {
+  var reload_list = function() {
     models.reset();
     models.url = api_list_url();
     models.fetch();
+  }
+
+  if (options.global_reload_function_name) {
+    // Now totally unrelated code in completely different files can refresh
+    // these models.
+    window[options.global_reload_function_name] = reload_list;
   }
 
   function reload_list_if_qs_sets_filters() {
@@ -160,9 +181,13 @@ function setup_crud_table(options) {
 
       models_view = new ModelsView({collection: models});
       edit_view = new EditModelView();
-      var panel_id = wrapper.find('.details').attr('id');
-      on_route(panel_id, function(id) {
-        edit_view.edit(id);
+      var details_panel = wrapper.find('.details');
+      on_route(panel_route_name(details_panel), function(id) {
+        edit_view.edit(id, function(model_data) {
+          if (options.edit_callback) {
+            options.edit_callback(details_panel, model_data);
+          }
+        });
       });
     }
     models.fetch();
@@ -192,10 +217,13 @@ function setup_crud_table(options) {
     id = parseInt(id);
     models.each(function(model) {
       if (model.id == id) {
-        callback(model);
-        return;
+        found = model;
       }
     });
+    if (found) {
+      callback(found);
+      return;
+    }
     found = new Model();
     found.url = options.base_api_url;
     if (id) {
@@ -207,6 +235,43 @@ function setup_crud_table(options) {
       callback(found);
     }
   }
+
+  function wire_up_button(button, click) {
+    button.off();
+    button.click(function(event) {
+      event.preventDefault();
+      button.prop('disabled', true);
+      var always = function() {
+        button.prop('disabled', false);
+      };
+      var feedback = button.parent();
+      click(always, feedback);
+    });
+  }
+
+  function wire_up_delete_button(view, delete_url, success) {
+    var delete_button = view.$el.find('.delete');
+    wire_up_button(delete_button, function(always, feedback) {
+      if (!options.confirm_delete_question || confirm(
+          options.confirm_delete_question)) {
+        var use_success = function(response) {
+          if (success) {
+            success(response);
+          }
+          // DON'T models.fetch() here in order to reload the list because that
+          // creates a race.
+          window.models = models; // DO NOT SUBMIT
+        };
+        ajax_delete(delete_url, use_success, always, feedback);
+        if (options.deleted_model_callback) {
+          options.deleted_model_callback(view.model);
+        }
+      } else {
+        always();
+      }
+    });
+  }
+
   {% include "js/edit_mode_buttons.js" %}
 }
 
@@ -263,20 +328,37 @@ function remove_row(pk_or_response) {
   var table = row.parents('table');
   row.remove();
   if (!table.find('tbody tr').length) {
-    $('<p class="margin-top">Nothing to report</p>').insertAfter(table);
+    var existing = table.parent().find('.nothing');
+    if (existing.length) {
+      existing.removeClass('start-hidden').show();
+    } else {
+      $('<p class="margin-top">Nothing to report</p>').insertAfter(table);
+    }
     table.hide();
   }
 }
 
 function space_out_buttons(row) {
-  var buttons = row.find('button,.button');
-  for (var i = 0; i < buttons.length; i++) {
-    var button = $(buttons[i]);
-    if (i == buttons.length - 1) {
-      button.addClass('last-button');
-    } else {
-      button.removeClass('last-button');
+  var do_space_out = function() {
+    var buttons = row.find('button:visible,.button:visible');
+    for (var i = 0; i < buttons.length; i++) {
+      var button = $(buttons[i]);
+      if (i == buttons.length - 1) {
+        button.addClass('last-button');
+      } else {
+        button.removeClass('last-button');
+      }
     }
+  };
+
+  var all_buttons = row.find('button,.button');
+  var buttons = row.find('button:visible,.button:visible');
+  if (all_buttons.length && !buttons.length) {
+    /* In Firefox I'm getting a race. $('button').show();
+     * $('button:visible').length == 0; */
+    window.setTimeout(do_space_out, 1);
+  } else {
+    do_space_out();
   }
 }
 

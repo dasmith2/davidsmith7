@@ -29,13 +29,13 @@ class ToDos(CRUDTable):
     # template handles it.
     list_header = None
     super().__init__(
-        self.model(), self.filters(), self.columns(),
+        self.model(), self.columns(), filter_widgets=self.filters(),
         save_new_defaults={'creator': 'me'},
         list_url=self.list_url(), list_header=list_header,
         hidden_filters=self.hidden_filters(),
         show_column_headers=False, inline_create=True,
-        new_row_callback='new_to_do_row',
-        delete_row_confirm_question='Delete to do?',
+        modified_row_callback='new_to_do_row',
+        confirm_delete_question='Delete to do?',
         inline_create_callback='inline_create_to_do_callback',
         nav_css_class='todo_nav')
     self.add_js(render_to_string('js/to_dos.js'))

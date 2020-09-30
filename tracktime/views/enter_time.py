@@ -7,7 +7,7 @@ from djaveNav.date_roller import DateRoller
 from djaveURL import date_from_url
 
 from tracktime.models.project_work_session import ProjectWorkSession
-from tracktime.widgets.enter_time_table import EnterTimeTable2
+from tracktime.widgets.enter_time import EnterTime
 from tracktime.widgets.punch_the_clock import PunchTheClock
 from tracktime.views.nav_context import tracktime_context, ENTER_TIME
 
@@ -25,7 +25,7 @@ def enter_time(request):
   if day != date.today():
     punch_the_clock = None
 
-  enter_time_table = EnterTimeTable2(request.user, day)
+  enter_time_table = EnterTime(request.user, day)
   date_roller = DateRoller(ENTER_TIME, day, max_day=date.today())
   totals = ProjectWorkSession.live.total_hours_per_date(
       day - timedelta(days=2), day + timedelta(days=2), request.user)

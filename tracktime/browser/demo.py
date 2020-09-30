@@ -45,14 +45,18 @@ class Demo(WebDemo):
     self.sign_up(email)
 
   def create_first_project(self):
-    if self.finds('archive', raise_exception_if_not_found=False):
+    archived_projects_exist = self.find(
+        '.archived-projects-link').is_displayed()
+    unarchived_projects_exist = bool(self.finds(
+        '#projects table tbody tr', raise_exception_if_not_found=False))
+    if archived_projects_exist or unarchived_projects_exist:
       # Whoops, if there's an archive button, that means there's an existing
       # project, which means that the demo user wasn't destroyed after the last
       # demo.
       self.demo_user_wasnt_destroyed()
       return False
 
-    self.say_move_click('create_new', """
+    self.say_move_click('newproject', """
         First, I need to set up a project. In fact, that's the only thing I can
         do.""")
 
@@ -91,7 +95,7 @@ class Demo(WebDemo):
     self.say('Where I can manually enter time.', wait=True)
     self.say_move('project', """
         The project select remembers the last project I worked on.""")
-    self.say_move_type('hours', '1', 'I enter my time')
+    self.say_move_type('input.hours', '1', 'I enter my time')
     self.say_move_click('savenew', 'and click save new')
 
   def add_to_do_list(self):
@@ -137,7 +141,7 @@ class Demo(WebDemo):
     self.wait(2)
 
   def create_to_do(self, text):
-    self.move_type('new_description', text)
+    self.move_type('textarea.description', text)
     self.move_click('todo', wait_talking=True)
 
   def report(self):
@@ -173,11 +177,11 @@ class Demo(WebDemo):
     self.say(
         'Whenever I see a dotted underline, I can hover and see an '
         'explanation.')
-    self.move_mouse('tooltip')
+    self.move_mouse('.ProjectInvoiceRule .tooltip')
     self.wait_mouse()
-    self.hover('tooltip')
+    self.hover('.ProjectInvoiceRule .tooltip')
     self.wait(3)
-    self.hover_off('tooltip')
+    self.hover_off('.ProjectInvoiceRule .tooltip')
     self.move_mouse('h1')
     self.wait_talking()
 
@@ -221,9 +225,9 @@ class Demo(WebDemo):
 
     self.say_move(self.find_with_text('td', 'Created'), """
         If an invoice still has the created status""")
-    self.say_move_click('edit', 'I can edit it.')
+    self.say_move_click('#projectinvoices .edit', 'I can edit it.')
 
-    self.say_move('h1', """
+    self.say_move('#projectinvoice h1', """
         The invoice ID reflects the invoice ID prefix and the date the invoice
         was created.""")
 
@@ -235,47 +239,52 @@ class Demo(WebDemo):
     self.say_move('service_to', """
         Service to is automatically set to the date I created the invoice.""")
 
-    self.say_move(self.find_with_text('div', 'Due'), 'The due date')
+    self.say_move('[data-field="due"]', 'The due date')
     self.say_move('sent', 'is calculated based on when I send the invoice')
-    self.say_move('net_days', 'and net days.')
+    self.say_move('#projectinvoice .net_days', 'and net days.')
     self.say_move_enter_date(
         'sent', date.today(), 'I will send my invoice today.')
-    self.move_click('save')
+    self.move_click('#projectinvoice .save')
+    self.say_move('.status_with_date', 'So the due date is 30 days from now.')
 
-    self.say("Let's take a look at the line items")
+    self.say_move_click(
+        '#projectinvoices .edit', "Let's take a look at the line items")
     self.scroll_to_bottom()
 
-    self.say_move('describe_service', """
-        The first line item has a great description. It's the tasks I
+    service_descriptions = self.finds('textarea.describe_service')
+    self.say_move(service_descriptions[-1], """
+        The last line item has a great description. It's the tasks I
         completed during that work session.""")
 
     say = """
         A few of the line items use the default line item description. I can
         put something a little more descriptive in there now."""
     self.say_move_type(
-        self.finds('describe_service')[2],
+        service_descriptions[-3],
         'Met with Bob to discuss accessioning', say, clear_first=True)
     self.say_move_type(
-        self.finds('amount')[2], '40.00',
+        self.finds('input.amount')[-3], '40.00',
         'I can also give Bob a bit of a discount', clear_first=True)
-    self.move_type(self.finds('amount_calculation')[2], ' - discount')
+    self.move_type(
+        self.finds('textarea.amount_calculation')[-3], ' - discount')
     self.move_click('save-row')
 
     self.say_move_type(
-        'new_description', 'Reimburse for test order',
+        '.inline-create-row textarea.describe_service',
+        'Reimburse for test order',
         'I can create manual line items as necessary')
-    self.move_type('new_amount', '7.23')
-    self.move_click('newmanuallineitem')
+    self.move_type('.inline-create-row input.amount', '7.23')
+    self.move_click('.inline-create-row .savenew')
     self.scroll_to_bottom()
-    self.say_move('remove', """
+    self.say_move('.remove', """
         If I remove a line item that's based on a work session, the work
         session will appear in the next invoice.""")
-    self.say_move('delete_line_item', """
+    self.say_move('#lineitems .delete:contains(Delete)', """
         If I delete a manual line item, it disappears forever.""")
 
   def send_invoice(self):
-    self.say_move_click('saveandpreview', """
-        I'm pretty happy with my invoice. Let me see the preview.""")
+    say = "I'm pretty happy with my invoice. Let me see the preview."
+    self.say_move_click('#projectinvoice a.view', say)
     self.say("""
         It's up to me to deliver the invoice. I can copy this page and paste it
         in an email, or print this page out and mail it, whatever
@@ -285,7 +294,8 @@ class Demo(WebDemo):
         My invoice now has the status due, and the invoice row is colored
         yellow.""")
     self.say_move(
-        'edit', 'I can still edit the invoice in case Bob is unhappy.')
+        '#projectinvoices .edit',
+        'I can still edit the invoice in case Bob is unhappy.')
     self.say_move_click('paid', """
         But hopefully everything goes well and I can click
         paid.""")
@@ -302,7 +312,7 @@ class Demo(WebDemo):
         Green invoices linger on this page for two days, but I can find any
         invoice at any time here.""")
 
-    self.say_move('status', "For instance I can find all Created")
+    self.say_move('select[name=status]', "For instance I can find all Created")
     self.find_with_text('option', 'Created').click()
     self.say('Due', wait=True)
     self.find_with_text('option', 'Due').click()
@@ -317,13 +327,17 @@ class Demo(WebDemo):
     self.say_move_enter_date(
         'from_date', date.today() - timedelta(days=365), 'In the last year')
     self.move_click('report')
-    self.say_move('download_csv_button', """
+    """
+    self.say_move('download_csv_button',
         And now a few features for the accountants. You can download this table
-        as a CSV.""")
+        as a CSV.)
+    """
     self.say_move_click('all_line_items', """
         You can also dig through the line items.""")
-    self.say_move('from_date', 'You can filter')
+    self.say_move('#lineitems .from_date', 'You can filter')
+    """
     self.say_move('download_csv_button', "And download line items as a CSV.")
+    """
 
   def all_to_dos(self):
     self.say_move_click('todo_nav', """
@@ -337,13 +351,12 @@ class Demo(WebDemo):
     self.find_with_text('option', 'Done').click()
     self.say_move_enter_date(
         'from_date', date.today() - timedelta(days=30),
-        'created in the last 30 days')
-    self.say_move_click('report', 'for any project.')
-    self.say_move(self.finds('project')[1], """
+        'created in the last 30 days for any project.')
+    self.say_move('.inline-create-row select[name=project]', """
         If I'm punched in on a different project, but I remember something I
         need to do for {}""".format(self.bobs))
     to_do = 'When a customer calls, Front should display their name'
-    self.say_move_type('new_description', to_do, """
+    self.say_move_type('.inline-create-row textarea.description', to_do, """
         I can do that here. It's best to plan your work and work your plan, but
         sometimes you end up describing what you did after you did it.""")
     self.say_move_click('did', """
@@ -351,7 +364,7 @@ class Demo(WebDemo):
     self.say_move_click('not_done', """
         If I accidentally clicked done, I can undo""")
     self.say_move_type(
-        'description', 'typos typos blah blah blah', """
+        '.row2 textarea.description', 'typos typos blah blah blah', """
             If I don't like the edits I'm making""")
     self.say_move_click('cancel-save-row', 'I can cancel them.')
 
@@ -359,13 +372,14 @@ class Demo(WebDemo):
     self.say_move_click('projects_nav', """
         When I'm completely done with a project and I don't want to see it any
         more""")
-    self.say_move_click('archive', 'I can archive it.')
-    self.say_move_click('archived_projects', """
+    self.say_move_click('.list-table button.delete', 'I can archive it.')
+    self.say_move_click('.archived-projects-link', """
         When I realize I'm actually not done with a project""")
     self.say_move_click('unarchive', 'I can resurrect it.')
 
   def settings(self):
-    self.say_move_click('settings_url', "Let's take a look at settings.")
+    self.say_move_click(
+        'settings_url', "Let's take a look at settings.", quick=True)
     self.say_move('logout', 'I can log out here.')
 
   def zoom(self):

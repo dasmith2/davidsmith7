@@ -13,12 +13,17 @@ from djaveAPI.to_json import to_json_dict
 
 @ajax_or_api_endpoint_authenticated
 def list_or_save_new(request_method, request_dict, credentials, model_name):
-  model = allowed_model_from_name(model_name)
+  return do_list_or_save_new(
+      request_method, request_dict, credentials, model_name)
+
+
+def do_list_or_save_new(request_method, request_dict, credentials, model_name):
   if request_method == 'GET':
     return paged_results(
-        model, filter_model(model, credentials, request_dict),
+        filter_model(model_name, credentials, request_dict),
         page=get_page(request_dict))
   elif request_method in ['POST', 'PUT']:
+    model = allowed_model_from_name(model_name)
     if 'id' in request_dict:
       raise Problem(
           'When saving a new {}, you should not specify an id'.format(
@@ -29,7 +34,7 @@ def list_or_save_new(request_method, request_dict, credentials, model_name):
           'type variable that says {}').format(
               model_name, request_dict['type']))
     instance = save_new(model, request_dict, credentials)
-    return to_json_dict(instance, model)
+    return to_json_dict(instance)
   else:
     raise Problem((
         'This API endpoint is not sure what to do with the {} '
@@ -39,9 +44,15 @@ def list_or_save_new(request_method, request_dict, credentials, model_name):
 @ajax_or_api_endpoint_authenticated
 def get_save_or_delete_existing(
     request_method, request_dict, credentials, model_name, pk):
+  return do_get_save_or_delete_existing(
+      request_method, request_dict, credentials, model_name, pk)
+
+
+def do_get_save_or_delete_existing(
+    request_method, request_dict, credentials, model_name, pk):
   model = allowed_model_from_name(model_name)
 
-  instance = get_instance(model_name, model.objects, pk, credentials)
+  instance = get_instance(model.objects, pk, credentials)
   if request_method == 'POST':
     update(instance, request_dict, credentials)
   elif request_method == 'DELETE':
@@ -50,7 +61,7 @@ def get_save_or_delete_existing(
     else:
       instance.delete()
     return OK
-  return to_json_dict(instance, model)
+  return to_json_dict(instance)
 
 
 def api_root(request):
