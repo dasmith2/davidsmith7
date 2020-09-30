@@ -13,37 +13,35 @@ from djavError.models.fixable import Fixable
 from djavError.nav_context import (
     nav_context, ERRORS, NOTIFICATIONS, LONG_REQUESTS, TOO_MANY_QUERIES,
     TRIGGER_ERRORS)
-from djavError.widgets.errors_report import ErrorsReport
-from djavError.widgets.long_requests_report import LongRequestsReport
-from djavError.widgets.notifications_report import NotificationsReport
-from djavError.widgets.too_many_queries_requests_report import (
-    TooManyQueriesRequestsReport)
+from djavError.widgets.errors import Errors
+from djavError.widgets.long_requests import LongRequests
+from djavError.widgets.notifications import Notifications
+from djavError.widgets.too_many_queries_requests import TooManyQueriesRequests
 from djavError.widgets.trigger_errors import TriggerErrors
 from djaveHTML.paragraph import Paragraph
 
 
 @superuser_required
 def errors(request):
-  return _error_base(request, ERRORS, ErrorsReport(request.GET))
+  return _error_base(request, ERRORS, Errors())
 
 
 @superuser_required
 def notifications(request):
-  return _error_base(
-      request, NOTIFICATIONS, NotificationsReport(request.GET))
+  return _error_base(request, NOTIFICATIONS, Notifications())
 
 
 @superuser_required
 def long_requests(request):
-  return _error_base(
-      request, LONG_REQUESTS, LongRequestsReport(request.GET))
+  report = LongRequests()  # LongRequestsReport(request.GET) DO NOT SUBMIT
+  return _error_base(request, LONG_REQUESTS, report)
 
 
 @superuser_required
 def too_many_queries(request):
   one_thing_on_page = None
   if settings.DEBUG:
-    one_thing_on_page = TooManyQueriesRequestsReport(request.GET)
+    one_thing_on_page = TooManyQueriesRequests()
   else:
     one_thing_on_page = Paragraph("""
         Django only logs database queries when settings.DEBUG is True, so this

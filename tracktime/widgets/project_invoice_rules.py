@@ -39,10 +39,10 @@ class ProjectInvoiceRules(CRUDTable):
         ProjectInvoiceRule, display_columns,
         list_url=list_url, details_url_root=details_url_root,
         save_new_defaults={'creator': 'me'},
-        nav_css_class='invoices_nav',
+        nav_css_class='project_invoices_nav',
         list_header=self.get_header(),
         margin_top_css='margin-top-half', new_button_text='Create new rule',
-        modified_row_callback='new_project_invoice_rule_row_callback',
+        modified_row_callback='modified_project_invoice_rule_row_callback',
         edit_field_names_or_rows=edit_field_names_or_rows,
         edit_callback='edit_project_invoice_rule_callback')
     self.add_js_from_template(

@@ -150,7 +150,7 @@ function update_field(
 function button_updates_field(
     button, model_name, pk, field_name, new_value, success, always) {
   var feedback = button.parent();
-  button.click(function() {
+  button.off().click(function() {
     button.prop('disabled', true);
     var use_always = function() {
       button.prop('disabled', false);

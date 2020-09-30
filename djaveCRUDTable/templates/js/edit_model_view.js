@@ -32,11 +32,10 @@ var EditModelView = Backbone.View.extend({
       });
 
       var success = function(success_data) {
-        // I used to think, hey, update the model right on the page and
-        // you don't even have to fetch the list. But the user could
-        // easily update a field that causes the item to move around in
-        // the list, leave entirely, whatever. Let's not outsmart myself
-        // here.
+        // I used to think, hey, update the model right on the page and you
+        // don't even have to fetch the list. But the user could easily update
+        // a field that causes the item to move around in the list, leave
+        // entirely, whatever. Let's not outsmart myself here.
         if (options.saved_model_callback) {
           options.saved_model_callback(success_data);
         }

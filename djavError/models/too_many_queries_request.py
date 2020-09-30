@@ -18,3 +18,6 @@ class TooManyQueriesRequest(ProblemRequest):
     if user.is_superuser:
       return query_set
     return query_set.none()
+
+  def add_to_json(self, data):
+    data['average_query_count'] = round(self.average_query_count(), 2)

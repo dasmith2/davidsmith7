@@ -77,7 +77,7 @@ class Demo(WebDemo):
     return self.find_pk(self.find_with_text('td', name))
 
   def punch_clock(self):
-    self.say_move_click('clock_nav', (
+    self.say_move_click('enter_time_nav', (
         "Now that I have a project with a clock, the navigation "
         "shows new things I can do."))
     self.say_move_click('startclock_{}'.format(self.lab_id), (
@@ -105,7 +105,7 @@ class Demo(WebDemo):
     self.say_move_click('edit', 'I edit the project')
     self.say_move_click('has_to_do_list', 'Turn on the to do list.')
     self.say_move_click('save', 'And click save.')
-    self.say_move_click('clock_nav', 'Now when I punch the clock')
+    self.say_move_click('enter_time_nav', 'Now when I punch the clock')
     self.move_click('startclock')
 
   def do_stuff(self):
@@ -145,7 +145,8 @@ class Demo(WebDemo):
     self.move_click('todo', wait_talking=True)
 
   def report(self):
-    self.say_move_click('report_nav', "Let's go take a look at the report.")
+    self.say_move_click(
+        'project_work_summary_nav', "Let's go take a look at the report.")
     self.say("""
         By default, the report shows how much time I spent on each project
         in the last week.""")
@@ -168,7 +169,7 @@ class Demo(WebDemo):
     self.say_move_click('edit', 'I edit the project')
     self.say_move_click('has_invoices', 'And turn on invoices')
     self.say_move_click('save', 'This time when I click save')
-    self.say_move_click('invoices_nav', 'An invoices tab appears.')
+    self.say_move_click('project_invoices_nav', 'An invoices tab appears.')
 
     self.say_move_click('button', """
         In order to create an invoice for {} I first create an invoice
@@ -340,7 +341,7 @@ class Demo(WebDemo):
     """
 
   def all_to_dos(self):
-    self.say_move_click('todo_nav', """
+    self.say_move_click('to_dos_nav', """
         Let me point out a few more features related to tasks.""")
     self.say_move('button', """
         Ideally, I'm on the clock any time I'm thinking about a project.""")

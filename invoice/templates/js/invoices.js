@@ -65,8 +65,6 @@ function edit_invoice_callback(details_panel, invoice_data) {
   // global_options_variable_name option.
   line_items_options.save_new_defaults['invoice'] = invoice_data.id;
 
-  window.details_panel = details_panel; // DO NOT SUBMIT
-  window.invoice_data = invoice_data; // DO NOT SUBMIT
   var view_button = details_panel.find('a.view');
   if (!view_button.length) {
     view_button = $('<a class="view button">View</a>').appendTo(

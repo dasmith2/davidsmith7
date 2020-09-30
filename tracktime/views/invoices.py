@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect, get_object_or_404, reverse
+from django.shortcuts import render, get_object_or_404, reverse
 from djaveAPI.ajax_or_api_endpoint import ajax_or_api_endpoint_authenticated
 from djaveAPI.get_request_variable import get_request_variable
 from djaveAPI.get_instance import get_instance
@@ -8,7 +8,6 @@ from djaveLogin.login_required import login_required
 from djaveCSV import CanCSVResponse, CanCSV
 
 from invoice.models.invoice import Invoice
-from invoice.widgets.edit_invoice import EditInvoice
 from invoice.widgets.line_items import LineItems
 from invoice.widgets.view_invoice import ViewInvoice
 from tracktime.models.project_invoice import ProjectInvoice

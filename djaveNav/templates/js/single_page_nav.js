@@ -100,7 +100,6 @@ $(function() {
     // At this point, extend_router_by probably looks something like
     // {'projectspk': function() { $('.panel[data-url="/projects/:pk"]').show()
     // }, routes: {'projects/:pk': 'projectspk'}}
-    window.extend_router_by = extend_router_by; // DO NOT SUBMIT
     return extend_router_by;
   };
 

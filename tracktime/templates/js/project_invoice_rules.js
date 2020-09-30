@@ -1,4 +1,4 @@
-function new_project_invoice_rule_row_callback(row, model_data) {
+function modified_project_invoice_rule_row_callback(row, model_data) {
   var button_html =
       '<button class="createnewinvoice">Create new invoice</button>';
   var data = {'project_invoice_rule_id': find_pk(row)};

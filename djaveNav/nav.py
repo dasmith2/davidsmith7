@@ -29,7 +29,7 @@ class Nav(object):
         self._title = nav_item.display
       found_current = found_current or is_current
       css_class = '{}_nav nav_item'.format(
-          re.compile(r'[^\w]').sub('', nav_item.display.lower()))
+          re.compile(r'[^\w]').sub('', nav_item.view_name.lower()))
       self.nav_items_current_or_not.append(
           NavItemCurrentOrNot(
               reverse(nav_item.view_name), nav_item.display, is_current,

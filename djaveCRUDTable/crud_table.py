@@ -29,31 +29,40 @@ class CRUDTable(object):
   # templates/(crud_table.html bottom of the page, js/crud_table.js
   # crud_table_options))
   def __init__(
-      self, model, display_columns, filter_widgets=None,
+      self, model, display_columns, visible_filters=None,
       edit_field_names_or_rows=None, save_new_defaults=None,
       label_edit_page_with_field=None, list_url=None, details_url_root=None,
       list_api_url=None, list_header=USE_DEFAULT,
       confirm_delete_question=USE_DEFAULT, hidden_filters=USE_DEFAULT,
-      can_create_new=True, modified_row_callback=None,
-      saved_model_callback=None, deleted_model_callback=None,
-      nav_css_class=None, show_column_headers=True, inline_create=False,
-      inline_create_callback=None, margin_top_css=None,
-      fetch_list_callback=None, new_button_text=None,
-      global_reload_function_name=None, edit_callback=None,
-      global_options_variable_name=None, footer_buttons=None):
+      can_create_new=True, nav_css_class=None, show_column_headers=True,
+      inline_create=False, margin_top_css=None, new_button_text=None,
+      global_reload_function_name=None, global_options_variable_name=None,
+      footer_buttons=None,
+      # function modified_row_callback(row, model_data, model) {}
+      modified_row_callback=None,
+      # saved_model_callback(new_project_data_or_whatever) {}
+      saved_model_callback=None,
+      # deleted_model_callback(backbone_model) {}
+      deleted_model_callback=None,
+      # inline_create_callback(model_data, create_row) {}
+      inline_create_callback=None,
+      # fetch_list_callback(models) {}
+      fetch_list_callback=None,
+      # edit_callback(details_panel, model_data) {}
+      edit_callback=None):  # noqa: E129
 
     self.js = []
 
     self.model = model
 
     # A list of djaveHTML.field#Field
-    self.filter_widgets = filter_widgets or []
+    self.visible_filters = visible_filters or []
     # A list of djaveHTML.field#HiddenField
     if hidden_filters == USE_DEFAULT:
       self.hidden_filters = [HIDDEN_NOT_DELETED_FILTER]
     else:
       self.hidden_filters = hidden_filters or []
-    for filter_widget in self.filter_widgets + self.hidden_filters:
+    for filter_widget in self.visible_filters + self.hidden_filters:
       if not isinstance(filter_widget, Field):
         raise Exception(
             'Every filter widget and hidden filter must be a '
@@ -74,7 +83,7 @@ class CRUDTable(object):
     # 'Exercise' then the edit panel will be titled "Edit Exercise" as opposed
     # to just "Edit project"
     self.label_edit_page_with_field = label_edit_page_with_field
-    self.list_url = list_url or lower_case_plural(self.model)
+    self.list_url = list_url or '/{}'.format(lower_case_plural(self.model))
     if list_header == USE_DEFAULT:
       list_header = H1([upper_case_plural(self.model)])
     elif isinstance(list_header, str):
@@ -133,7 +142,7 @@ class CRUDTable(object):
     govn = self.global_options_variable_name or ''
     context = {
         'list_api_url': list_api_url,
-        'filter_widgets': self.filter_widgets,
+        'visible_filters': self.visible_filters,
         'hidden_filters': self.hidden_filters,
         'display_columns': self.display_columns,
         'show_column_headers': self.show_column_headers,

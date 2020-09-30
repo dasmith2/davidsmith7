@@ -18,9 +18,9 @@
       {% for hidden_filter in hidden_filters %}
         {{ hidden_filter.as_html }}
       {% endfor %}
-      {% if filter_widgets %}
-        <div class="filter_widgets margin-top-half spread-labels">
-          {% for filter in filter_widgets %}
+      {% if visible_filters %}
+        <div class="visible_filters margin-top-half spread-labels">
+          {% for filter in visible_filters %}
             {{ filter.as_html }}
           {% endfor %}
         </div>
@@ -36,7 +36,7 @@
             <tr class="headers">
               {% for column in display_columns %}
                 <th{% if column.header_css_class %} class="{{ column.header_css_class }}"{% endif %}>
-                  {{ column.header }}
+                  {{ column.header_contents }}
                 </th>
               {% endfor %}
             </tr>

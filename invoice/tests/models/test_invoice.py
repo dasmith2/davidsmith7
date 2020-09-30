@@ -76,8 +76,7 @@ class StatusIfNotPaidTests(TestCase):
     invoice = get_test_invoice(
         created=to_tz_dt('2020-01-01 12:00'), sent=date(2020, 1, 1),
         paid=to_tz_dt('2020-01-01 12:00'), net_days=10)
-    self.assertEqual(
-        PAID, invoice.status(nnow=to_tz_dt('2020-01-15 12:00')))
+    self.assertEqual(PAID, invoice.status)
     self.assertEqual(
         LATE, invoice.status_if_not_paid(nnow=to_tz_dt('2020-01-15 12:00')))
     self.assertEqual(

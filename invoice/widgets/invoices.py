@@ -16,7 +16,7 @@ class Invoices(CRUDTable):
     self.user = user
     super().__init__(
         self.get_model(), self.get_display_columns(),
-        filter_widgets=self.get_filter_widgets(),
+        visible_filters=self.get_filter_widgets(),
         edit_field_names_or_rows=self.get_edit_field_names_or_rows(),
         list_url=self.get_list_url(),
         label_edit_page_with_field='invoice_id',
@@ -24,7 +24,8 @@ class Invoices(CRUDTable):
         margin_top_css=self.get_margin_top_css(), can_create_new=False,
         modified_row_callback='modified_invoice_row_callback',
         global_reload_function_name='reload_invoices',
-        edit_callback='edit_invoice_callback', nav_css_class='invoices_nav')
+        edit_callback='edit_invoice_callback',
+        nav_css_class='project_invoices_nav')
     js_context = {
         'view_invoice_url_base': self.get_view_invoice_url_base()}
     self.add_js(render_to_string('js/invoices.js', context=js_context))

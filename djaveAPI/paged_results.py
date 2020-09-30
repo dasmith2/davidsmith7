@@ -45,7 +45,7 @@ def paged_results(query, page):
   return construct_paged_results(results, count, page, total_pages)
 
 
-def construct_paged_results(results, count, page, total_pages):
+def construct_paged_results(results, count=None, page=None, total_pages=None):
   return {
       RESULTS: results,
       PAGING: {

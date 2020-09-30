@@ -32,6 +32,11 @@ class DisplayColumn(object):
     widget = default_widget(field)
     return self.td_around(field_name, widget.as_html())
 
+  def header_contents(self):
+    if isinstance(self.header, str):
+      return self.header
+    return self.header.as_html()
+
 
 class EditFieldColumn(DisplayColumn):
   """ The inline-create-cell and the regular rows all have the default widget
@@ -45,19 +50,20 @@ class EditFieldColumn(DisplayColumn):
 
 class DisplayFieldColumn(DisplayColumn):
   """ The inline-create-cell has the default widget to edit this field, but the
-  regular rows simply display the field. """
+  regular rows simply display the field. The model argument is only necessary
+  if you allow inline create. """
   def __init__(
-      self, header, field_name, header_css_class=None, cell_css_class=None,
-      model=None):
+      self, header, field_name=None, header_css_class=None,
+      cell_css_class=None, model=None):
 
-    self.field_name = field_name
+    self.field_name = field_name or header.lower()
     self.model = model
 
-    _cell_css_class = field_name
+    _cell_css_class = self.field_name
     if cell_css_class:
       _cell_css_class += ' {}'.format(cell_css_class)
     cell_template = self.td_around(
-        _cell_css_class, self.template_template().format(field_name))
+        _cell_css_class, self.template_template().format(self.field_name))
     super().__init__(header, cell_template, header_css_class)
 
   def template_template(self):
@@ -89,7 +95,10 @@ class DisplayMoneyColumn(DisplayFieldColumn):
 class ButtonsColumn(DisplayColumn):
   def __init__(self, buttons):
     self.buttons = buttons
-    super().__init__(mark_safe('&nbsp;'), self.cell_template())
+    super().__init__(self.buttons_header(), self.cell_template())
+
+  def buttons_header(self):
+    return mark_safe('&nbsp;')
 
   def cell_template(self):
     return self.buttons_cell(self.buttons)

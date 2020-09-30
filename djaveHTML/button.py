@@ -12,7 +12,7 @@ class Button(FormElement):
       css_classes=None, **additional_attrs):
     key_prefix = key_prefix or slugify(text)
 
-    css_classes = css_classes or set()
+    css_classes = (css_classes and set(css_classes)) or set()
     css_classes.add(key_prefix)
 
     super().__init__(

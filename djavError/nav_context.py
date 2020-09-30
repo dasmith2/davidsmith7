@@ -3,7 +3,7 @@ from djavError.models.error import Error
 from djavError.models.notification import Notification
 from djavError.models.long_request import LongRequest
 from djavError.models.too_many_queries_request import TooManyQueriesRequest
-from djavError.widgets.fixable_report import get_fixables
+from djavError.models.fixable import get_last_week_unfixed_count
 
 
 ERRORS = NavItem('errors', 'Errors', True)
@@ -23,7 +23,7 @@ def nav_context(current_view, **kwargs):
     display = '{} ({})'.format(nav.display, how_many)
     if how_many is None:
       display = nav.display
-    use_nav_list.append(NavItem(nav.view_name, display))
+    use_nav_list.append(NavItem(nav.view_name, display, True))
   context = {'nav': Nav(use_nav_list, current_view)}
   context.update(kwargs)
   return context
@@ -33,11 +33,11 @@ def get_how_many(view_name):
   if view_name == 'trigger_errors':
     return None
   elif view_name == 'errors':
-    return get_fixables(Error).count()
+    return get_last_week_unfixed_count(Error)
   elif view_name == 'notifications':
-    return get_fixables(Notification).count()
+    return get_last_week_unfixed_count(Notification)
   elif view_name == 'long_requests':
-    return get_fixables(LongRequest).count()
+    return get_last_week_unfixed_count(LongRequest)
   elif view_name == 'too_many_queries':
-    return get_fixables(TooManyQueriesRequest).count()
-  return 0
+    return get_last_week_unfixed_count(TooManyQueriesRequest)
+  raise Exception(view_name)

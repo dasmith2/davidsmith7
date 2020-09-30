@@ -5,7 +5,7 @@ from djaveLogin.login_required import login_required
 from djaveLogin.widgets.settings_widget import (
     SettingsWidget as DjaveLoginSettingsWidget)
 
-from tracktime.views.nav_context import tracktime_context
+from tracktime.views.nav_context import SETTINGS, tracktime_context
 
 
 @login_required
@@ -14,10 +14,10 @@ def settings(request):
       request.get_full_path(), request.user)
   zoom_preference = ZoomPreference(request, request.POST, request.user)
 
-  user_api_keys = UserAPIKeys(reverse('settings_tracktime'))
+  user_api_keys = UserAPIKeys(reverse(SETTINGS))
 
   context = tracktime_context(
-      request.user, 'settings_tracktime',
+      request.user, SETTINGS,
       zoom_preference=zoom_preference,
       user_api_keys=user_api_keys,
       djave_login_settings_widget=djave_login_settings_widget,

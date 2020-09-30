@@ -1,5 +1,5 @@
 /* This requires backbone.js and works together with
- * djaveCRUDTable.crud_table.CRUDTable to create a table (with filter_widgets)
+ * djaveCRUDTable.crud_table.CRUDTable to create a table (with visible_filters)
  * where each row is an object with an edit and delete button. When you click
  * edit, you're jumped to a panel where you can edit the details. All this
  * happens without page reloads. base_api_url will be something like
@@ -125,7 +125,7 @@ function setup_crud_table(options) {
 
   function reload_list_if_qs_sets_filters() {
     /* Returns true iff any values were copied from the query string to the
-     * filter_widgets. */
+     * visible_filters. */
     var any_copied = false;
     var from_qs = get_query_string_obj();
     for (const [key, value] of Object.entries(from_qs)) {

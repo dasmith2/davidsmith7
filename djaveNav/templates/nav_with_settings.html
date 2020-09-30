@@ -4,9 +4,9 @@
 </style>
 <div class="nav nav_and_account_wrapper">
   {% include 'nav.html' %}
-  <div class="account">
+  <div class="nav account">
     <div{% if settings_nav.is_current %} class="current"{% endif %}>
-      <a class="settings_url" href="{{ settings_nav.url }}">
+      <a class="settings_url nav_item" href="{{ settings_nav.url }}">
         {{ settings_nav.display }}
       </a>
     </div>

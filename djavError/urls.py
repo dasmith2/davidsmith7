@@ -15,7 +15,7 @@ djaverror_urls = [
 
     path('errors', errors, name='errors'),
     path('notifications', notifications, name='notifications'),
-    path('long_requests', long_requests, name='long_requests'),
-    path('too_many_queries', too_many_queries, name='too_many_queries'),
+    path('longrequests', long_requests, name='long_requests'),
+    path('toomanyqueriesrequests', too_many_queries, name='too_many_queries'),
     path('trigger', trigger_errors, name='trigger_errors'),
     path('all_fixed/<model_name>/<pks>', all_fixed, name='all_fixed')]

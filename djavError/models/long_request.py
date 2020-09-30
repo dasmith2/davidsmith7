@@ -50,3 +50,6 @@ class LongRequest(ProblemRequest):
 
   class Meta:
     ordering = ('-created',)
+
+  def add_to_json(self, data):
+    data['avg_sec'] = round(self.average_duration(), 2)

@@ -6,6 +6,6 @@ from djaveLogin.widgets.settings_widget import SettingsWidget
 class SettingsWidgetTests(TestCase):
   def test_display(self):
     user = get_test_user(email='jill@jill.jill')
-    settings_widget = SettingsWidget(reverse('to_do'), user)
+    settings_widget = SettingsWidget(reverse('djave_sign_up'), user)
     html = settings_widget.as_html()
     self.assertTrue(html.find('jill@jill.jill') > 0)

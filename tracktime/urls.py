@@ -7,9 +7,10 @@ from tracktime.views.invoices import (
     view_project_invoice,
     create_invoice, list_or_save_new_line_item,
     get_save_or_delete_existing_line_item)
+from tracktime.views.nav_context import SETTINGS
 from tracktime.views.projects import projects, archived_projects
 from tracktime.views.report import (
-    project_work_summary, project_work_report)
+    project_work_summary, project_work_report, project_work_summary_data)
 from tracktime.views.settings import settings
 from tracktime.views.to_do import to_dos, all_to_dos
 
@@ -27,6 +28,9 @@ tracktime_urls = [
     path(
         'project_work_report', project_work_report,
         name='project_work_report'),
+    path(
+        'api/project_work_summary_data', project_work_summary_data,
+        name='project_work_summary_data'),
 
     re_path(r'^invoices.*$', project_invoices, name='project_invoices'),
     re_path(
@@ -45,7 +49,7 @@ tracktime_urls = [
         'archived_projects', archived_projects,
         name='archived_projects'),
 
-    path('settings', settings, name='settings_tracktime'),
+    path('settings', settings, name=SETTINGS),
     path('api_docs', api_docs, name='tracktime_api_docs'),
 
     path('api/create_invoice', create_invoice, name='create_invoice'),
