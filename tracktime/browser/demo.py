@@ -6,6 +6,7 @@ from djaveTest.web_demo import WebDemo
 
 class Demo(WebDemo):
   def run(self):
+    self.go_fast()
     self.warm_up()
     self.demo_sign_up()
     if self.create_first_project():
@@ -69,9 +70,12 @@ class Demo(WebDemo):
   def create_a_project(self, name, say, *checkboxes):
     """ checkboxes can be use_clock, has_to_do_list, and has_invoices. """
     self.say(say)
+    self.go_slow()
     self.move_type('name', name)
+    import pdb
+    pdb.set_trace()
     for checkbox in checkboxes:
-      self.move_click(checkbox)
+      self.move_click('input.{}'.format(checkbox))
     self.move_click('save', wait_talking=True)
 
     return self.find_pk(self.find_with_text('td', name))
