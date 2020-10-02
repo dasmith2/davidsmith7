@@ -13,7 +13,7 @@ var EditModelView = Backbone.View.extend({
       var id = parseInt(location.pathname.split('/')[2]);
       view.edit(id);
     }
-
+    checkbox_easy_click(view.$el);
 
     var save_button = view.$el.find('.save');
     wire_up_button(save_button, function(always, feedback) {

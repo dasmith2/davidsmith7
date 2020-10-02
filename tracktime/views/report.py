@@ -43,13 +43,12 @@ def project_work_summary_data(request_method, request_dict, credentials):
   work_to = parse_dt(get_request_variable(request_dict, 'work_from__lte'))
 
   results = []
-  for what_i_did_per_project in get_what_i_did_per_projects(
+  for per_project in get_what_i_did_per_projects(
       user, work_from, work_to, request_dict):
-    hours = A(
-        what_i_did_per_project.hours, what_i_did_per_project.breakdown_url)
+    project_name = A(per_project.project.name, per_project.breakdown_url)
     results.append({
-        'project': what_i_did_per_project.project.name,
-        'hours': hours.as_html(), 'done': what_i_did_per_project.done})
+        'project': project_name.as_html(), 'id': per_project.project.pk,
+        'hours': per_project.hours, 'done': per_project.done})
   return construct_paged_results(results)
 
 

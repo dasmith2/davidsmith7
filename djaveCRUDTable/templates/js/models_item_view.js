@@ -23,6 +23,7 @@ var ModelsItemView = Backbone.View.extend({
       control.val(model.get(control.attr('name')));
     });
     resize_textareas(row);
+    checkbox_easy_click(row);
 
     var show_edit_mode_buttons_with_save_callback = function(row) {
       show_edit_mode_buttons(row, function() {

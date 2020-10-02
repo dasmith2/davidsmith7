@@ -2,6 +2,7 @@
 {% include "js/feedback.js" %}
 {{ ajax_js }}
 {% include "js/resize_textareas.js" %}
+{% include "js/checkbox_easy_click.js" %}
 {% include "js/query_string.js" %}
 {% include "js/css.js" %}
 {% include "js/px_to_int.js" %}

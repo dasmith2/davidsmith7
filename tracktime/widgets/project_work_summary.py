@@ -44,7 +44,7 @@ def get_what_i_did_per_projects(
   work_sessions = ProjectWorkSession.live.done_by_user_and_date_range(
       user, work_from.date(), work_to.date())
   for work_session in work_sessions:
-    if work_session.hours:
+    if work_session.project.use_clock:
       if work_session.project not in projects:
         projects[work_session.project] = WhatIDidPerProject(
             work_session.project, current_query_dict)
@@ -64,7 +64,7 @@ class WhatIDidPerProject(object):
   def __init__(self, project, current_query_dict):
     self.project = project
     self.name = project.name
-    self.hours = 0.0
+    self.hours = 0.0 if project.use_clock else None
     self.done = 0
     # This is why the WhatIDidPerProject filters should be exactly the same as
     # the WorkReport filters, except time breakdown is also by project.
