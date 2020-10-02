@@ -20,7 +20,7 @@ function setup_set_clear_dt_green_mode(
       _update_field(row, null, unset_mode);
     });
 
-    buttons.append(unset);
+    buttons.prepend(unset);
     space_out_buttons(row);
 
     if (set_mode_callback) {
@@ -41,7 +41,7 @@ function setup_set_clear_dt_green_mode(
       _update_field(row, 'now', set_mode);
     });
 
-    buttons.append(set);
+    buttons.prepend(set);
     space_out_buttons(row);
 
     if (unset_mode_callback) {

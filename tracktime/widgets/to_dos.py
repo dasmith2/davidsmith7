@@ -1,17 +1,13 @@
 from django.shortcuts import reverse
 from django.template.loader import render_to_string
-from djaveCRUDTable.columns import ButtonsColumn, EditFieldColumn
+from djaveCRUDTable.columns import DeleteColumn, EditFieldColumn
 from djaveCRUDTable.crud_table import CRUDTable, HIDDEN_NOT_DELETED_FILTER
 from djaveHTML.button import Button
 
 
-class ToDoButtonsColumn(ButtonsColumn):
-  def __init__(self):
-    # In the case of rows that represent existing ToDos, the Done button is
-    # added via Javascript by setup_set_clear_dt_green_mode. The Delete button
-    # is wired up by to_dos.js
-    super().__init__([])
-
+class ToDoButtonsColumn(DeleteColumn):
+  # In the case of rows that represent existing ToDos, the Done button is added
+  # via Javascript by setup_set_clear_dt_green_mode.
   def inline_create_cell(self):
     to_do = Button('To do', **{'data-done': 'null'})
     self.add_button_attrs(to_do)
