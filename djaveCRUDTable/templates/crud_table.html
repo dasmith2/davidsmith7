@@ -51,15 +51,15 @@
         </thead>
         <tbody>
         </tbody>
-        {% if new_button %}
-          <tfoot class="in-table-button-wrapper">
-            <tr>
-              <td colspan="{{ list_column_count }}">
-                {{ new_button.as_html }}
-              </td>
-            </tr>
-          </tfoot>
-        {% endif %}
+        <tfoot class="in-table-button-wrapper" data-column-count="{{ list_column_count }}">
+          {% if new_button %}
+              <tr>
+                <td colspan="{{ list_column_count }}">
+                  {{ new_button.as_html }}
+                </td>
+              </tr>
+          {% endif %}
+        </tfoot>
       </table>
       <div class="start-hidden nothing bold-grey-text">Nothing to report</div>
     </div>

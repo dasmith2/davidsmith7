@@ -84,6 +84,7 @@ var ModelsView = Backbone.View.extend({
       wrapper.find('.upper-new-button-wrapper').hide();
     }
     this.color_alternate_rows();
+    this.update_row_count();
   },
   color_alternate_rows: function() {
     // If there's a create new row, that'll be white, so the first model
@@ -104,7 +105,29 @@ var ModelsView = Backbone.View.extend({
   },
   remove_one: function(model) {
     this.tbody().find(`tr[data-pk=${model.get('id')}]`).remove();
+    this.update_row_count();
+    this.color_alternate_rows();
     this.maybe_hide();
+  },
+  update_row_count: function() {
+    window.collection = this.collection; // DO NOT SUBMIT
+    var tfoot = this.tfoot();
+    var count_row = tfoot.find('tr.count');
+    var count = this.collection.length;
+    if (count > 5) {
+      if (!count_row.length) {
+        count_row = $('<tr class="count"></tr>').appendTo(tfoot);
+      }
+      var count_cell = count_row.find('td');
+      if (!count_cell.length) {
+        var colspan = parseInt(tfoot.attr('data-column-count'));
+        count_cell = $('<td class="bold-grey-text"></td>').attr(
+            'colspan', colspan).appendTo(count_row);
+      }
+      count_cell.text(`Count: ${count}`);
+    } else {
+      count_row.remove();
+    }
   },
   maybe_hide: function() {
     if (!this.tbody().find('tr').length && !options.inline_create) {
@@ -131,5 +154,8 @@ var ModelsView = Backbone.View.extend({
   },
   tbody: function() {
     return this.table().find('tbody');
+  },
+  tfoot: function() {
+    return this.table().find('tfoot');
   }
 });
