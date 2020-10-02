@@ -10,6 +10,11 @@ function modified_fixable_row_callback(row, model_data, model) {
     var model_name = find_model(row);
     var pk = find_pk(row);
 
+    var view_button = row.find('.view')
+    if (view_button.length) {
+      view_button.attr('href', view_button.attr('href').replace('pk', pk));
+    }
+
     var fixed_button = row.find('button.fixed');
     var not_fixed_button = row.find('button.notfixed');
     button_updates_field(fixed_button, model_name, pk, 'fixed', 'now', function() {
