@@ -123,10 +123,13 @@ def get_delete_button_for_column(delete_button_text='Delete'):
 
 class DeleteColumn(ButtonsColumn):
   def __init__(
-      self, delete_button_text='Delete', prepend_buttons=None):
+      self, delete_button_text='Delete', prepend_buttons=None,
+      append_buttons=None):
     prepend_buttons = prepend_buttons or []
-    buttons = prepend_buttons + [
+    append_buttons = append_buttons or []
+    delete_buttons = [
         get_delete_button_for_column(delete_button_text=delete_button_text)]
+    buttons = prepend_buttons + delete_buttons + append_buttons
     super().__init__(buttons)
 
 

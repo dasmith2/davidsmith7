@@ -40,7 +40,9 @@ def paged_results(query, page):
   results = []
   from_row = (page - 1) * USE_PAGE_SIZE
   to_row = page * USE_PAGE_SIZE
-  for obj in query.order_by('pk')[from_row:to_row]:
+  if not query.ordered:
+    query = query.order_by('pk')
+  for obj in query[from_row:to_row]:
     results.append(to_json_dict(obj))
   return construct_paged_results(results, count, page, total_pages)
 

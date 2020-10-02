@@ -41,7 +41,7 @@ class ProjectToDos(ToDos):
     return self._list_url
 
   def get_list_api_url(self):
-    return reverse('list_or_save_new_project_to_do')
+    return reverse('project_to_dos_for_ui')
 
 
 class CreatedColumn(DisplayFieldColumn):

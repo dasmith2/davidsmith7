@@ -158,7 +158,12 @@ function button_updates_field(
         always();
       }
     };
+    var use_new_value = new_value;
+    if (typeof new_value == 'function') {
+      use_new_value = new_value();
+    }
     update_field(
-        model_name, pk, field_name, new_value, success, use_always, feedback);
+        model_name, pk, field_name, use_new_value, success, use_always,
+        feedback);
   });
 }

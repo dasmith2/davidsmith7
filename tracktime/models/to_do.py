@@ -3,13 +3,15 @@ phrase that should refer to undone Tasks for a particular project. But
 ProjectToDo already inherits from ToDo, and the Django migration tools can't
 handle renaming base classes without quite a lot of effort, and renaming ToDo
 to Task won't actually accomplish much, so I will reluctantly let it stand. """
-from datetime import timedelta
+from datetime import datetime, timedelta
+import time
 
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Q
 from djaveAPI.models.user_api_key import UserAPIKey
 from djaveAPI.models.publishable import Publishable, LivePublishableManager
+from djaveClassMagic.models.base_knows_child import BaseKnowsChildTransition
 from djaveDT import beginning_of_day, now
 from djaveHTML.field import SelectField, Option
 
@@ -69,7 +71,7 @@ class ToDoManager(LivePublishableManager):
     return ['creator']
 
 
-class ToDo(Publishable):
+class ToDo(Publishable, BaseKnowsChildTransition):
   description = models.TextField(help_text=(
       'Describe what you intend to do, or what you did.'))
   created = models.DateTimeField(auto_now_add=True, db_index=True)
@@ -78,8 +80,22 @@ class ToDo(Publishable):
   creator = models.ForeignKey(
       User, on_delete=models.PROTECT, related_name='creator', help_text=(
           'Who created this?'))
+  sort_timestamp = models.IntegerField(default=0, help_text=(
+      'The sort_timestamp defaults to the current timestamp so that the '
+      'latest show up top by default. But you can update this field to '
+      'change the sort order.'))
 
   live = ToDoManager()
+
+  def save(self, *args, **kwargs):
+    if self.done:
+      self.sort_timestamp = 0
+    elif self.sort_timestamp == 0:
+      if self.pk:
+        self.sort_timestamp = int(datetime.timestamp(self.created))
+      else:
+        self.sort_timestamp = time.time()
+    super().save(*args, **kwargs)
 
   @classmethod
   def filter_allowed_by_user(cls, user, query_set):
@@ -96,3 +112,6 @@ class ToDo(Publishable):
         is a bit of an art form. Ideally, you click "Done" on a few ToDos every
         WorkSession. Then when you Report, you can see a steady rhythm.
         """
+
+  class Meta:
+    ordering = ['sort_timestamp', 'pk']

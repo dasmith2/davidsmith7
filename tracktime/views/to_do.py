@@ -77,18 +77,19 @@ MODEL_NAME = 'ProjectToDo'
 
 
 @ajax_or_api_endpoint_authenticated
-def list_or_save_new_project_to_do(request_method, request_dict, credentials):
+def project_to_dos_for_ui(request_method, request_dict, credentials):
   if request_method == 'GET':
     done_cutoff = now() - timedelta(days=1)
     filtered = filter_model(MODEL_NAME, credentials, request_dict).filter(
-        Q(done__gte=done_cutoff) | Q(done__isnull=True))
+        Q(done__gte=done_cutoff) | Q(done__isnull=True)).order_by(
+            'sort_timestamp', 'pk')
     return paged_results(filtered, page=get_page(request_dict))
   return do_list_or_save_new(
       request_method, request_dict, credentials, MODEL_NAME)
 
 
 @ajax_or_api_endpoint_authenticated
-def get_save_or_delete_existing_project_to_do(
+def project_to_do_for_ui(
     request_method, request_dict, credentials, pk):
   return do_get_save_or_delete_existing(
       request_method, request_dict, credentials, MODEL_NAME, pk)

@@ -6,8 +6,12 @@ from djaveHTML.button import Button
 
 
 class ToDoButtonsColumn(DeleteColumn):
+  def __init__(self):
+    super().__init__(append_buttons=[Button('Top')])
+
   # In the case of rows that represent existing ToDos, the Done button is added
   # via Javascript by setup_set_clear_dt_green_mode.
+
   def inline_create_cell(self):
     to_do = Button('To do', **{'data-done': 'null'})
     self.add_button_attrs(to_do)
@@ -31,7 +35,7 @@ class ToDos(CRUDTable):
         list_header=list_header,
         hidden_filters=self.hidden_filters(),
         show_column_headers=False, inline_create=True,
-        modified_row_callback='new_to_do_row',
+        modified_row_callback='modified_to_do_row',
         confirm_delete_question='Delete to do?',
         inline_create_callback='inline_create_to_do_callback',
         nav_css_class='to_dos_nav')
