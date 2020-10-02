@@ -13,7 +13,9 @@ from tracktime.views.report import (
     project_work_summary, project_work_report, project_work_summary_data,
     project_work_session_description_data)
 from tracktime.views.settings import settings
-from tracktime.views.to_do import to_dos, all_to_dos
+from tracktime.views.to_do import (
+    to_dos, all_to_dos, list_or_save_new_project_to_do,
+    get_save_or_delete_existing_project_to_do)
 
 
 tracktime_urls = [
@@ -63,4 +65,12 @@ tracktime_urls = [
         name='list_or_save_new_line_item'),
     path(
         'api/line_items_for_ui/<pk>', get_save_or_delete_existing_line_item,
-        name='get_save_or_delete_existing_line_item')]
+        name='get_save_or_delete_existing_line_item'),
+
+    path(
+        'api/project_to_dos_for_ui', list_or_save_new_project_to_do,
+        name='list_or_save_new_project_to_do'),
+    path(
+        'api/project_to_dos_for_ui/<pk>',
+        get_save_or_delete_existing_project_to_do,
+        name='get_save_or_delete_existing_project_to_do')]

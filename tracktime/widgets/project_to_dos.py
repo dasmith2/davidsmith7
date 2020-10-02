@@ -40,6 +40,9 @@ class ProjectToDos(ToDos):
   def list_url(self):
     return self._list_url
 
+  def get_list_api_url(self):
+    return reverse('list_or_save_new_project_to_do')
+
 
 class CreatedColumn(DisplayFieldColumn):
   def __init__(self):

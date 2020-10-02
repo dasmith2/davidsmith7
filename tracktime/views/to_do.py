@@ -1,8 +1,18 @@
+from datetime import timedelta
+
+from django.db.models import Q
 from django.shortcuts import render, reverse, redirect, get_object_or_404
+
+from djaveAPI.ajax_or_api_endpoint import ajax_or_api_endpoint_authenticated
+from djaveAPI.filters import filter_model
+from djaveAPI.paged_results import paged_results, get_page
+from djaveAPI.views.api import (
+    do_list_or_save_new, do_get_save_or_delete_existing)
+from djaveDT import now
 from djaveHTML.button import Button
-from djaveLogin.login_required import login_required
 from djaveHTML.a import A
 from djaveHTML.problem import Problem as HtmlProblem
+from djaveLogin.login_required import login_required
 
 from tracktime.models.project import Project
 from tracktime.models.project_work_session import ProjectWorkSession
@@ -61,3 +71,24 @@ def all_to_dos(request):
 def to_do_context(to_dos_table, request, **kwargs):
   return tracktime_context(
       request.user, TO_DO, to_dos_table=to_dos_table, **kwargs)
+
+
+MODEL_NAME = 'ProjectToDo'
+
+
+@ajax_or_api_endpoint_authenticated
+def list_or_save_new_project_to_do(request_method, request_dict, credentials):
+  if request_method == 'GET':
+    done_cutoff = now() - timedelta(days=1)
+    filtered = filter_model(MODEL_NAME, credentials, request_dict).filter(
+        Q(done__gte=done_cutoff) | Q(done__isnull=True))
+    return paged_results(filtered, page=get_page(request_dict))
+  return do_list_or_save_new(
+      request_method, request_dict, credentials, MODEL_NAME)
+
+
+@ajax_or_api_endpoint_authenticated
+def get_save_or_delete_existing_project_to_do(
+    request_method, request_dict, credentials, pk):
+  return do_get_save_or_delete_existing(
+      request_method, request_dict, credentials, MODEL_NAME, pk)

@@ -1,5 +1,5 @@
 from collections import namedtuple
-from datetime import date
+from datetime import date, datetime
 import html
 import re
 
@@ -58,7 +58,10 @@ class Field(FormElement):
   def get_value_string(self):
     if self._value_set:
       if self.get_value() is not None:
-        return self.get_value()
+        value = self.get_value()
+        if isinstance(value, (datetime, date)):
+          return value.isoformat()
+        return value
     elif self.default:
       return self.default
     return ''

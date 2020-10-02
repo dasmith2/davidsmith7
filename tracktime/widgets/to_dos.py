@@ -31,7 +31,8 @@ class ToDos(CRUDTable):
     super().__init__(
         self.model(), self.columns(), visible_filters=self.filters(),
         save_new_defaults={'creator': 'me'},
-        list_url=self.list_url(), list_header=list_header,
+        list_url=self.list_url(), list_api_url=self.get_list_api_url(),
+        list_header=list_header,
         hidden_filters=self.hidden_filters(),
         show_column_headers=False, inline_create=True,
         modified_row_callback='new_to_do_row',
@@ -48,6 +49,9 @@ class ToDos(CRUDTable):
 
   def list_url(self):
     return reverse('to_dos')
+
+  def get_list_api_url(self):
+    return None
 
   def hidden_filters(self):
     return [HIDDEN_NOT_DELETED_FILTER]
