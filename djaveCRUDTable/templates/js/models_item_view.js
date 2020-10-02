@@ -10,6 +10,12 @@ var ModelsItemView = Backbone.View.extend({
     var model = this.model;
     var model_data = model.toJSON();
     var id = this.model.get('id');
+    if (typeof id == 'undefined') {
+      console.log(
+          'An API endpoint is returning objects with no id attribute which ' +
+          'may cause duplicates in the CRUDTable because you need an id to ' +
+          'identify if a row exists already.');
+    }
     var row = this.$el.html(this.template(model_data));
     row.attr('data-pk', id);
     inputs(row).each(function() {

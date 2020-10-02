@@ -1,3 +1,5 @@
+import hashlib
+
 from django.conf import settings
 from django.shortcuts import render
 from djaveAPI.ajax_or_api_endpoint import ajax_or_api_endpoint_authenticated
@@ -68,15 +70,18 @@ def project_work_session_description_data(
       project=project, user=user, from_dt=work_from, to=work_to,
       tz_str=settings.TIME_ZONE)
 
-  def describe(css_class, description, hours):
+  def describe(id, css_class, description, hours):
     return {
-        'css_class': css_class, 'description': description, 'hours': hours}
+        'id': id, 'css_class': css_class, 'description': description,
+        'hours': hours}
 
   for work_session in descriptions.get_work_session_descriptions():
     results.append(describe(
+        'ws_{}'.format(work_session.work_session.pk),
         'work-session slightly-bigger-font', work_session.time_description,
         work_session.hours))
     for to_do_description in work_session.to_do_descriptions:
-      results.append(describe('to-do', to_do_description, 0))
+      to_do_id = hashlib.md5(str.encode(to_do_description)).hexdigest()[:7]
+      results.append(describe(to_do_id, 'to-do', to_do_description, 0))
 
   return construct_paged_results(results)
