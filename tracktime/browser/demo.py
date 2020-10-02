@@ -155,8 +155,8 @@ class Demo(WebDemo):
     self.move_mouse('to_date')
     self.wait_mouse()
     self.wait_talking()
-    self.say_move_click('.hours a', """
-        I can click on the hours to get a more detailed report.""")
+    self.say_move_click('.list-table a', """
+        I can click on the project name to get a more detailed report.""")
     self.say("""
         The report shows my work sessions and the tasks I completed during
         those times.""", wait=True)
