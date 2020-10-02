@@ -73,6 +73,7 @@ form { margin: 0px; padding: 0px; }
 .border-5 { border: {% zoom 5 %}px solid #000; }
 .bold-grey-text { color: #999; font-weight: bold; }
 .spread-labels label { margin-right: {% zoom 10 %}px; }
+.slightly-bigger-font { font-size: {% font_size 1.25 %} }
 
 /* Buttons */
 {% include "css/button.css" %}

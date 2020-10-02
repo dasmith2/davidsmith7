@@ -20,13 +20,12 @@ try:
   from djaveLogin.calc_urls import append_next_url, NEXT_URL
 except ModuleNotFoundError:
   pass
-try:
-  from djaveReport.date_range_report import FROM_DATE, TO_DATE
-except ModuleNotFoundError:
-  FROM_DATE = 'from_date'
-  TO_DATE = 'to_date'
 from djaveURL import dict_as_query
 import requests
+
+
+FROM_DATE = 'from_date'
+TO_DATE = 'to_date'
 
 
 # all_web_tests means that I don't have to maintain a list of existing web

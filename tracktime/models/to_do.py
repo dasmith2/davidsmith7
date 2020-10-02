@@ -50,9 +50,8 @@ class ToDoManager(LivePublishableManager):
     (from_dt, to_dt) = self._from_dt_to_dt(from_date, to_date, tz_str=tz_str)
     return qs.filter(created__gte=from_dt, created__lte=to_dt)
 
-  def filter_done(self, qs, from_date, to_date, tz_str=None):
-    (from_dt, to_dt) = self._from_dt_to_dt(from_date, to_date, tz_str=tz_str)
-    return qs.filter(done__gte=from_dt, done__lte=to_dt)
+  def filter_done(self, qs, from_dt, to):
+    return qs.filter(done__gte=from_dt, done__lte=to)
 
   def filter_status(self, qs, status):
     if status == DONE:

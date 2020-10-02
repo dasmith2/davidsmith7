@@ -1,4 +1,5 @@
 from datetime import date
+import re
 
 from django.shortcuts import reverse
 from djaveDT import add_months
@@ -10,6 +11,12 @@ from djaveURL import dict_as_query
 from tracktime.models.project import Project
 from tracktime.models.project_to_do import ProjectToDo
 from tracktime.models.project_work_session import ProjectWorkSession
+
+
+def visible_filters():
+  return [
+      from_filter('work_from', default=add_months(date.today(), -1)),
+      to_filter('work_from')]
 
 
 class ProjectWorkSummary(CRUDTable):
@@ -25,12 +32,8 @@ class ProjectWorkSummary(CRUDTable):
       display_columns.append(DisplayFieldColumn('Hours'))
     if show_done:
       display_columns.append(DisplayFieldColumn('Done'))
-
-    visible_filters = [
-        from_filter('work_from', default=add_months(date.today(), -1)),
-        to_filter('work_from')]
     super().__init__(
-        Project, display_columns, visible_filters=visible_filters,
+        Project, display_columns, visible_filters=visible_filters(),
         list_url=reverse('project_work_summary'), can_create_new=False,
         list_header=None, list_api_url=reverse('project_work_summary_data'))
 
@@ -66,6 +69,8 @@ class WhatIDidPerProject(object):
     # This is why the WhatIDidPerProject filters should be exactly the same as
     # the WorkReport filters, except time breakdown is also by project.
     use_query_dict = {'project': project.pk}
-    use_query_dict.update(current_query_dict)
+    strip_out_time = re.compile(r'T\d\d:\d.*')
+    for key, value in current_query_dict.items():
+      use_query_dict[key] = strip_out_time.sub('', value)
     self.breakdown_url = reverse(
         'project_work_report') + dict_as_query(use_query_dict)

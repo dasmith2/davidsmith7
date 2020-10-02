@@ -1,0 +1,32 @@
+{% extends "tracktime_base.html" %}
+
+{% block tracktime_head %}
+<style>
+table.list-table .to-do td { padding-left: 20px; }
+table.list-table { border: 0; box-shadow: 0px 0px 0px; }
+table.list-table td { border: 0; padding: 3px; }
+table.list-table tr.row2 { background-color: transparent; }
+</style>
+<script>
+function modified_project_work_report_row_callback(row, model_data, model) {
+  row.addClass(model_data['css_class']);
+}
+
+function fetch_project_work_report_list_callback(models) {
+  var hours = 0;
+  for (var i = 0; i < models.length; i++) {
+    hours += models[i].get('hours');
+  }
+  var title = `${hours} hour${hours == 1 ? '' : 's'}`;
+  var project_name = $('select[name=project] option:selected').text();
+  if (project_name) {
+    title = `${project_name}: ${title}`;
+  }
+  $('.list h1').text(title);
+}
+</script>
+{% endblock tracktime_head %}
+
+{% block tracktime_body %}
+  {{ the_one_thing_on_the_page.as_html }}
+{% endblock tracktime_body %}

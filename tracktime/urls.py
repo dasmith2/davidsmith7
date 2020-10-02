@@ -10,7 +10,8 @@ from tracktime.views.invoices import (
 from tracktime.views.nav_context import SETTINGS
 from tracktime.views.projects import projects, archived_projects
 from tracktime.views.report import (
-    project_work_summary, project_work_report, project_work_summary_data)
+    project_work_summary, project_work_report, project_work_summary_data,
+    project_work_session_description_data)
 from tracktime.views.settings import settings
 from tracktime.views.to_do import to_dos, all_to_dos
 
@@ -31,6 +32,10 @@ tracktime_urls = [
     path(
         'api/project_work_summary_data', project_work_summary_data,
         name='project_work_summary_data'),
+    path(
+        'api/project_work_session_description_data',
+        project_work_session_description_data,
+        name='project_work_session_description_data'),
 
     re_path(r'^invoices.*$', project_invoices, name='project_invoices'),
     re_path(

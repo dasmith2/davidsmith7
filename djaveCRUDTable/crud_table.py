@@ -30,14 +30,20 @@ class CRUDTable(object):
   # crud_table_options))
   def __init__(
       self, model, display_columns, visible_filters=None,
+      hidden_filters=USE_DEFAULT,
+
+      can_create_new=True, inline_create=False,
       edit_field_names_or_rows=None, save_new_defaults=None,
-      label_edit_page_with_field=None, list_url=None, details_url_root=None,
-      list_api_url=None, list_header=USE_DEFAULT,
-      confirm_delete_question=USE_DEFAULT, hidden_filters=USE_DEFAULT,
-      can_create_new=True, nav_css_class=None, show_column_headers=True,
-      inline_create=False, margin_top_css=None, new_button_text=None,
+      new_button_text=None,
+
+      list_url=None, details_url_root=None, list_api_url=None,
+
+      list_header=USE_DEFAULT, label_edit_page_with_field=None,
+      nav_css_class=None, show_column_headers=True, margin_top_css=None,
+      confirm_delete_question=USE_DEFAULT, footer_buttons=None,
+
       global_reload_function_name=None, global_options_variable_name=None,
-      footer_buttons=None,
+
       # function modified_row_callback(row, model_data, model) {}
       modified_row_callback=None,
       # saved_model_callback(new_project_data_or_whatever) {}

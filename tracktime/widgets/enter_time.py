@@ -1,5 +1,3 @@
-from datetime import date
-
 from django.shortcuts import reverse
 from django.template.loader import render_to_string
 from djaveCRUDTable.columns import ButtonsColumn
@@ -19,12 +17,11 @@ class EnterTimeButtonsColumn(ButtonsColumn):
 class EnterTime(CRUDTable):
   def __init__(self, user, day):
     self.user = user
-    self.day = day
     display_columns = [
         ProjectColumn(user, has_to_do_list=None, use_clock=True),
         HoursColumn(), EnterTimeButtonsColumn()]
     hidden_filters = [
-        hidden_filter('date', date.today().isoformat()),
+        hidden_filter('date', day.isoformat()),
         hidden_filter('hours', False, 'hours__isnull'),
         HIDDEN_NOT_DELETED_FILTER]
     save_new_defaults = {'user': 'me', 'date': 'today'}

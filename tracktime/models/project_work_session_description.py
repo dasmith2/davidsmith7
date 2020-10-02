@@ -5,10 +5,10 @@ from tracktime.models.project_to_do import ProjectToDo
 
 class ProjectWorkSessionDescriptions(WorkSessionDescriptions):
   def __init__(
-      self, project, user, from_date, to_date, tz_str, include_invoiced=True):
+      self, project, user, from_dt, to, tz_str, include_invoiced=True):
     self.project = project
     self.include_invoiced = include_invoiced
-    super().__init__(user, from_date, to_date, tz_str)
+    super().__init__(user, from_dt, to, tz_str)
 
   def list_params(self):
     return super().list_params() + [self.project]

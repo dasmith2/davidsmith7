@@ -3,16 +3,13 @@ import re
 from djaveCodeHealth.ignore import ignore
 
 
-TEST_TEMPLATE = """from djaveTest.unit_test import TestCase, get_test_user
+TEST_TEMPLATE = """from djaveTest.unit_test import TestCase
 from {class_path} import {widget_name}
 
 
 class {widget_name}Tests(TestCase):
   def test_display(self):
-    user = get_test_user()
-    {lower_widget_name} = {widget_name}(user)
-    html = {lower_widget_name}.as_html()
-    self.assertTrue(html.find('???') > 0)"""
+    {widget_name}().as_html()"""
 
 
 def test_path_from_widget(widget_path):

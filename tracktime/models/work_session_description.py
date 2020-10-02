@@ -1,5 +1,6 @@
 from collections import namedtuple
 
+from djaveDT import beginning_of_day
 from djavError.log_error import log_error
 
 from tracktime.models.to_do import ToDo
@@ -8,16 +9,16 @@ from tracktime.models.work_session import WorkSession
 
 WorkSessionDescription = namedtuple(
     'WorkSessionDescription',
-    'work_session time_description to_do_descriptions')
+    'work_session time_description hours to_do_descriptions')
 
 
 class WorkSessionDescriptions(object):
-  def __init__(self, user, from_date, to_date, tz_str):
-    """ from_date is optional so derived classes can pull back all unbilled
+  def __init__(self, user, from_dt, to, tz_str):
+    """ from_dt is optional so derived classes can pull back all unbilled
     descriptions. """
     self.user = user
-    self.from_date = from_date
-    self.to_date = to_date
+    self.from_dt = from_dt
+    self.to = to
     self.tz_str = tz_str
 
     self._calc_work_session_descriptions()
@@ -72,7 +73,7 @@ class WorkSessionDescriptions(object):
                   to_dos[to_do_i].done))):
         if not on_work_session:
           on_work_session = WorkSessionDescription(
-              None, '(marked done outside a work session)', [])
+              None, '(marked done outside a work session)', 0, [])
           self._work_session_descriptions.append(on_work_session)
           log_error(
               'How does a to do not have a work session?',
@@ -85,7 +86,8 @@ class WorkSessionDescriptions(object):
         work_session = work_sessions[work_session_i]
         work_session_i += 1
         on_work_session = WorkSessionDescription(
-            work_session, self.time_description(work_session), [])
+            work_session, self.time_description(work_session),
+            work_session.hours, [])
         self._work_session_descriptions.append(on_work_session)
 
     self._work_session_descriptions.reverse()
@@ -101,7 +103,7 @@ class WorkSessionDescriptions(object):
 
   def get_work_sessions(self):
     return self._work_session_class().live.done_by_user_and_date_range(
-        self.user, self.from_date, self.to_date)
+        self.user, self.from_dt, self.to)
 
   def to_do_class(self):
     return ToDo
@@ -116,11 +118,12 @@ class WorkSessionDescriptions(object):
     if not work_sessions:
       return manager.none()
 
-    # Don't use self.from_date because that's optional.
-    from_date = min([work_session.date for work_session in work_sessions])
+    # Don't use self.from_dt because that's optional.
+    from_dt = beginning_of_day(
+        min([work_session.date for work_session in work_sessions]))
 
     to_dos = manager.allowed_by_user(self.user)
-    return manager.filter_done(to_dos, from_date, self.to_date)
+    return manager.filter_done(to_dos, from_dt, self.to)
 
   def time_description(self, work_session):
     return work_session.describe_time_span_for_invoices(self.tz_str)
@@ -129,4 +132,4 @@ class WorkSessionDescriptions(object):
     return to_do.description
 
   def list_params(self):
-    return [self.user, self.from_date, self.to_date, self.tz_str]
+    return [self.user, self.from_dt, self.to, self.tz_str]

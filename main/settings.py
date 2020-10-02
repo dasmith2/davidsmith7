@@ -168,7 +168,6 @@ INSTALLED_APPS = [
     'djaveHTML',
     'djavError',
     'djaveLogin',
-    'djaveReport',
     'djaveRelease',
     'djaveStyle',
     'djaveTest',

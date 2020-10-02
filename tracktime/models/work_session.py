@@ -1,7 +1,7 @@
 """ All this class knows about is a user tracking time. But you probably want
 to track time against something specific, so you'll probably inherit from these
 classes. See tracktime.models.project_work_session as an example. """
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from django.contrib.auth.models import User
 from django.db import models
@@ -29,6 +29,10 @@ class WorkSessionManager(LivePublishableManager):
     return self.done_by_user_and_date_range(user, date, date, nnow=nnow)
 
   def done_by_user_and_date_range(self, user, from_date, to_date, nnow=None):
+    if isinstance(from_date, datetime):
+      from_date = from_date.date()
+    if isinstance(to_date, datetime):
+      to_date = to_date.date()
     to_return = self.filter(
         Q(started__isnull=True) | Q(stopped__isnull=False),
         user=user).select_related(*self.select_related_list()).order_by('-pk')

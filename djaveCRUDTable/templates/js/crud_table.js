@@ -260,7 +260,6 @@ function setup_crud_table(options) {
           }
           // DON'T models.fetch() here in order to reload the list because that
           // creates a race.
-          window.models = models; // DO NOT SUBMIT
         };
         ajax_delete(delete_url, use_success, always, feedback);
         if (options.deleted_model_callback) {

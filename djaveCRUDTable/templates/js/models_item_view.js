@@ -40,7 +40,7 @@ var ModelsItemView = Backbone.View.extend({
       // modified row callback might want to inspect up the dom tree to find
       // the model.
       var do_or_schedule_modified_row_callback = function() {
-        if (row.parent()) {
+        if (row.parent().length) {
           options.modified_row_callback(row, model.toJSON(), model);
         } else {
           window.setTimeout(do_or_schedule_modified_row_callback, 10);

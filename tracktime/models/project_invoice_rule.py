@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from djaveAPI.models.publishable import Publishable
 from djaveAPI.models.user_api_key import UserAPIKey
-from djaveDT import now
+from djaveDT import now, beginning_of_day
 from djmoney.models.fields import MoneyField
 
 from invoice.models.invoice import get_an_invoice_id
@@ -145,9 +145,9 @@ class ProjectInvoiceRule(Publishable):
 
   def _get_descriptions(self, nnow=None):
     nnow = nnow or now()
-    from_date = self.first_billable_day
-    to_date = nnow.date()
+    from_dt = beginning_of_day(self.first_billable_day)
+    to = nnow
     tz_str = settings.TIME_ZONE
     return ProjectWorkSessionDescriptions(
-        self.project, self.creator, from_date, to_date, tz_str,
+        self.project, self.creator, from_dt, to, tz_str,
         include_invoiced=False)

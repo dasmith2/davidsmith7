@@ -67,11 +67,12 @@ class FilterTests(TestCase):
 
   def test_filter_done(self):
     self.assertEqual([self.fifteenth], list(ToDo.live.filter_done(
-        self.to_dos, from_date=date(2020, 1, 15), to_date=date(2020, 1, 15))))
+        self.to_dos, from_dt=to_tz_dt('2020-01-15'),
+        to=to_tz_dt('2020-01-15 23:59:59'))))
 
   def test_filter_created(self):
     self.assertEqual([self.fifteenth], list(ToDo.live.filter_created(
-        self.to_dos, date(2020, 1, 11), date(2020, 1, 11))))
+        self.to_dos, from_date=date(2020, 1, 11), to_date=date(2020, 1, 11))))
 
   def test_filter_status(self):
     self.assertEqual([self.not_done], list(

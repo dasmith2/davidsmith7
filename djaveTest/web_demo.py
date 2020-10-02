@@ -79,11 +79,10 @@ class WebDemo(WebTest):
         self.wait(wait_for)
         location = element.location
         if x_y_0_times >= 20:
-          import pdb
-          pdb.set_trace()
-          raise Exception(
-              '{} stayed at 0, 0 for {} seconds. Giving up.'.format(
-                  element_or_clue, x_y_0_times * wait_for))
+          raise Exception((
+              '{} stayed at 0, 0 for {} seconds. There are probably multiple '
+              'matched elements and the first one isnt visible or '
+              'something.').format(element_or_clue, x_y_0_times * wait_for))
         x_y_0_times += 1
       context = {
           'x': location['x'] + offset_x, 'y': location['y'] + offset_y,

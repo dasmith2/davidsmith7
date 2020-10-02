@@ -33,7 +33,7 @@ def notifications(request):
 
 @superuser_required
 def long_requests(request):
-  report = LongRequests()  # LongRequestsReport(request.GET) DO NOT SUBMIT
+  report = LongRequests()
   return _error_base(request, LONG_REQUESTS, report)
 
 
