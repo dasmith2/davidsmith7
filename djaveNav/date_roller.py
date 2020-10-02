@@ -35,7 +35,6 @@ class DateRoller(object):
 
   def as_html(self, nnow=None):
     nnow = nnow or now()
-    today = nnow.date()
     days = []
     day_delta_and_css_classes = [
         (-2, 'two_before'),
