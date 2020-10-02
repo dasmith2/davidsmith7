@@ -8,7 +8,7 @@ from django.db import models
 from django.db.models import Q
 from djaveAPI.models.user_api_key import UserAPIKey
 from djaveAPI.models.publishable import Publishable, LivePublishableManager
-from djaveClassMagic.models.base_knows_child import BaseKnowsChildTransition
+from djaveClassMagic.models.base_knows_child import BaseKnowsChild
 from djaveDT import (
     now, d_to_str, time_to_time_str, tz_dt_to_tz_dt,
     tz_dt_to_str, beginning_of_day, dt_to_time_str)
@@ -88,7 +88,7 @@ class WorkSessionManager(LivePublishableManager):
         return work_session
 
 
-class WorkSession(Publishable, BaseKnowsChildTransition):
+class WorkSession(Publishable, BaseKnowsChild):
   user = models.ForeignKey(User, on_delete=models.PROTECT, help_text=(
       'Which User actually did the work?'))
   date = models.DateField(db_index=True, help_text=(

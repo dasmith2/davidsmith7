@@ -51,10 +51,7 @@ class DateRoller(object):
         continue
       is_current = this_day == self.on_day
       text = days_ago_str(this_day)
-      if this_day == today:
-        url = reverse('enter_time')
-      else:
-        url = url_with_date(reverse('enter_time'), day=this_day)
+      url = url_with_date(reverse('enter_time'), day=this_day)
       days.append(RollerDay(
           is_current, text, css_class, url, date_to_url_str(this_day)))
     try:

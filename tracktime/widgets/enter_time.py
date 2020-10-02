@@ -24,7 +24,7 @@ class EnterTime(CRUDTable):
         hidden_filter('date', day.isoformat()),
         hidden_filter('hours', False, 'hours__isnull'),
         HIDDEN_NOT_DELETED_FILTER]
-    save_new_defaults = {'user': 'me', 'date': 'today'}
+    save_new_defaults = {'user': 'me', 'date': day.isoformat()}
     super().__init__(
         ProjectWorkSession, display_columns,
         save_new_defaults=save_new_defaults, list_url=reverse('enter_time'),
