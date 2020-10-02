@@ -110,7 +110,6 @@ var ModelsView = Backbone.View.extend({
     this.maybe_hide();
   },
   update_row_count: function() {
-    window.collection = this.collection; // DO NOT SUBMIT
     var tfoot = this.tfoot();
     var count_row = tfoot.find('tr.count');
     var count = this.collection.length;
