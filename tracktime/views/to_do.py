@@ -79,10 +79,12 @@ MODEL_NAME = 'ProjectToDo'
 @ajax_or_api_endpoint_authenticated
 def project_to_dos_for_ui(request_method, request_dict, credentials):
   if request_method == 'GET':
-    done_cutoff = now() - timedelta(days=1)
+    recent = request_dict.pop('recent', False)
     filtered = filter_model(MODEL_NAME, credentials, request_dict).filter(
-        Q(done__gte=done_cutoff) | Q(done__isnull=True)).order_by(
-            'sort_timestamp', 'pk')
+        project__deleted__isnull=True).order_by('sort_timestamp', 'pk')
+    if recent:
+      filtered = filtered.filter(
+          Q(done__gte=now() - timedelta(days=1)) | Q(done__isnull=True))
     return paged_results(filtered, page=get_page(request_dict))
   return do_list_or_save_new(
       request_method, request_dict, credentials, MODEL_NAME)

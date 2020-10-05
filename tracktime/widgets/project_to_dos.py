@@ -32,6 +32,7 @@ class ProjectToDos(ToDos):
   def hidden_filters(self):
     filters = super().hidden_filters()
     filters.append(hidden_filter('project', self.project.pk))
+    filters.append(hidden_filter('recent', True))
     return filters
 
   def model(self):
@@ -76,3 +77,6 @@ class AllProjectToDos(ToDos):
 
   def list_url(self):
     return reverse('all_to_dos')
+
+  def get_list_api_url(self):
+    return reverse('project_to_dos_for_ui')
