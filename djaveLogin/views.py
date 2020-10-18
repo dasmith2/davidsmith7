@@ -122,7 +122,10 @@ def logout(request):
 
 
 def _login_url_no_token(request):
-  return append_next_url(reverse('djave_login'), _next_url(request))
+  nxt_url = _next_url(request)
+  if not nxt_url or not is_valid_url(nxt_url):
+    nxt_url = '/'
+  return append_next_url(reverse('djave_login'), nxt_url)
 
 
 def _next_url(request):

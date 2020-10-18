@@ -55,4 +55,6 @@ class Nav(object):
 
   def first_nav_item_current_or_not(self):
     if self.nav_items_current_or_not:
-      return self.nav_items_current_or_not[0]
+      for nav_item in self.nav_items_current_or_not:
+        if nav_item.is_visible:
+          return nav_item
