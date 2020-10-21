@@ -3,6 +3,8 @@
 # local_settings.py locally or in environment variables on Heroku for stage and
 # live.
 
+import os
+
 from djavEmail.users_email_config import UsersEmailConfig
 
 
@@ -21,3 +23,7 @@ TRACK_TIME_USERS = UsersEmailConfig(
 USERS_EMAIL_LOOKUP = {
     'http://127.0.0.1:8000': TRACK_TIME_USERS,
     'https://tracktime.tech': TRACK_TIME_USERS}
+
+
+QUICKBOOKS_CLIENT_ID = os.environ.get('QUICKBOOKS_CLIENT_ID', None)
+QUICKBOOKS_CLIENT_SECRET = os.environ.get('QUICKBOOKS_CLIENT_SECRET', None)
