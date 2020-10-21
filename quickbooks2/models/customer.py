@@ -8,13 +8,14 @@ from quickbooks2.get_client import get_client
 
 
 def retrieve_customers(user, protocol_and_host):
-  """ Simply get and return the list of customers from QuickBooks. """
+  """ Get and return the list of customers from QuickBooks. """
   qb_client = get_client(user, protocol_and_host)
   return Customer.all(Active=True, qb=qb_client)
 
 
 def merge_customers(user, quickbooks_customers):
-  """ merge_customers(user, retrieve_customers(user, protocol_and_host)) """
+  """ Actually put the given customers in our database.
+  quickbooks_customers should be the results of retrieve_customers """
   for qb_customer in quickbooks_customers:
     pass
 
