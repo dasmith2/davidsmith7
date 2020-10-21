@@ -42,6 +42,7 @@ def post_quickbooks_authorization(request):
   return HttpResponse('You just completed the Quickbooks OAuth flow.')
 
 
+@login_required
 def show_authorization_url(request):
   return HttpResponse('<a href="{}">Quickbooks authorization url</a>'.format(
       get_authorization_url(protocol_and_host(request))))

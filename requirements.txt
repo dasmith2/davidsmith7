@@ -11,5 +11,6 @@ intuit-oauth
 ipython
 pillow
 psycopg2
+python-quickbooks
 requests
 rq
