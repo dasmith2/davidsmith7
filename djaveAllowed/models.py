@@ -10,7 +10,7 @@ class AllowedInterface(object):
     """ Filter the query_set to only include "live" objects, meaning they
     haven't been deleted or deactivated and they're appropriate for showing in
     the user interface. """
-    raise NotImplementedError('filter_live {}'.format(cls))
+    return query_set
 
   @classmethod
   def filter_allowed_by_user(cls, user, query_set):

@@ -15,7 +15,8 @@ class UserCredentials(models.Model):
   user = OneToOneOrNoneField(User, on_delete=models.CASCADE)
   code = models.CharField(max_length=100, default='')
   state = models.TextField(default='')
-  realmId = models.CharField(max_length=100, default='')
+  realmId = models.CharField(max_length=100, default='', help_text=(
+      'This is also known as the COMPANY_ID in the python-quickbooks docs'))
   error_response = models.CharField(max_length=100, default='')
   error_description = models.TextField(default='')
   raw_response = models.TextField(default='')
