@@ -1,3 +1,6 @@
+""" Return an intuitlib AuthClient, which is useful both for authorization and
+for interacting with QuickBooks business objects like Customers and Invoices.
+"""
 from django.conf import settings
 from intuitlib.client import AuthClient
 
