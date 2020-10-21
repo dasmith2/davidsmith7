@@ -24,7 +24,7 @@ DEBUG = LOCAL or STAGE
 # ./manage.py runserver --settings main.web_test_settings or
 # --settings=main.web_test_settings
 WEB_TEST = any_arg_contains('main.web_test_settings')
-USE_DEBUG_TOOLBAR = DEBUG and not WEB_TEST
+USE_DEBUG_TOOLBAR = LOCAL and not WEB_TEST
 RUNSERVER = 'runserver' in sys.argv
 GUNICORN = 'gunicorn' in sys.argv
 WEB = RUNSERVER or GUNICORN

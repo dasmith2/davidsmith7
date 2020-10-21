@@ -22,6 +22,7 @@ TRACK_TIME_USERS = UsersEmailConfig(
     'TrackTime.TECH')
 USERS_EMAIL_LOOKUP = {
     'http://127.0.0.1:8000': TRACK_TIME_USERS,
+    'http://davidsmith7-stage.herokuapp.com': TRACK_TIME_USERS,
     'https://tracktime.tech': TRACK_TIME_USERS}
 
 
