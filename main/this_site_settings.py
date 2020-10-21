@@ -27,3 +27,5 @@ USERS_EMAIL_LOOKUP = {
 
 QUICKBOOKS_CLIENT_ID = os.environ.get('QUICKBOOKS_CLIENT_ID', None)
 QUICKBOOKS_CLIENT_SECRET = os.environ.get('QUICKBOOKS_CLIENT_SECRET', None)
+# This is just a prototype so the environment will forever be sandbox.
+QUICKBOOKS_ENVIRONMENT = 'sandbox'

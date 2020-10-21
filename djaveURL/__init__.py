@@ -138,3 +138,9 @@ def url_str_to_date(date_str):
         date_str = '-'.join((parts[0], str(int(parts[1]) - 1), parts[2]))
       else:
         raise ex
+
+
+def strip_trailing_slash(url_or_whatever):
+  if url_or_whatever and url_or_whatever[-1] == '/':
+    return url_or_whatever[:-1]
+  return url_or_whatever

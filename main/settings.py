@@ -16,10 +16,10 @@ def any_arg_contains(contains):
 
 """ What environment are you in? Just check your settings! """
 LOCAL = os.path.exists('main/local_settings.py')
-DEBUG = LOCAL
 STAGE = os.environ.get('STAGE', default='False') == 'True'
 PROD = os.environ.get('PROD', default='False') == 'True'
 TEST = 'test' in sys.argv
+DEBUG = LOCAL or STAGE
 # In order to remove the Django Debug Toolbar from the web test, you have to
 # ./manage.py runserver --settings main.web_test_settings or
 # --settings=main.web_test_settings

@@ -11,4 +11,5 @@ def get_request_dict(request):
   try:
     return json.loads(request.body)
   except json.decoder.JSONDecodeError:
+    # bool(QueryDict('')) is False
     return (QueryDict(request.body) or request.GET).dict()
