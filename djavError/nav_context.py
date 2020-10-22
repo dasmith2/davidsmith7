@@ -1,4 +1,4 @@
-from djaveNav.nav import NavItem, Nav
+from djaveNav.nav import ViewNavItem, Nav
 from djavError.models.error import Error
 from djavError.models.notification import Notification
 from djavError.models.long_request import LongRequest
@@ -6,11 +6,11 @@ from djavError.models.too_many_queries_request import TooManyQueriesRequest
 from djavError.models.fixable import get_last_week_unfixed_count
 
 
-ERRORS = NavItem('errors', 'Errors', True)
-NOTIFICATIONS = NavItem('notifications', 'Notifications', True)
-LONG_REQUESTS = NavItem('long_requests', 'Long requests', True)
-TOO_MANY_QUERIES = NavItem('too_many_queries', 'Too many queries', True)
-TRIGGER_ERRORS = NavItem('trigger_errors', 'Trigger', True)
+ERRORS = ViewNavItem('errors', 'Errors', True)
+NOTIFICATIONS = ViewNavItem('notifications', 'Notifications', True)
+LONG_REQUESTS = ViewNavItem('long_requests', 'Long requests', True)
+TOO_MANY_QUERIES = ViewNavItem('too_many_queries', 'Too many queries', True)
+TRIGGER_ERRORS = ViewNavItem('trigger_errors', 'Trigger', True)
 
 NAV_LIST = [
     ERRORS, NOTIFICATIONS, LONG_REQUESTS, TOO_MANY_QUERIES, TRIGGER_ERRORS]
@@ -23,7 +23,7 @@ def nav_context(current_view, **kwargs):
     display = '{} ({})'.format(nav.display, how_many)
     if how_many is None:
       display = nav.display
-    use_nav_list.append(NavItem(nav.view_name, display, True))
+    use_nav_list.append(ViewNavItem(nav.view_name, display, True))
   context = {'nav': Nav(use_nav_list, current_view)}
   context.update(kwargs)
   return context

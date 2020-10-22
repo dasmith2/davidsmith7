@@ -11,9 +11,9 @@ from django.db.models import Model
 
 def model_from_name(model_name, subclass_of=None):
   """ Given just the name of the model, return the model itself. The point is
-  not to have to also specify an app. """
+  not to have to also specify an app. model_name is case insensitive. """
   for model in all_models(subclass_of=subclass_of):
-    if model.__name__ == model_name:
+    if model.__name__.lower() == model_name.lower():
       return model
   raise Exception('I was unable to find the {} model, subclass_of {}'.format(
       model_name, subclass_of))
@@ -35,7 +35,7 @@ def models_in_app(app_name, subclass_of=None):
 
   subclass_of = subclass_of or Model
   to_return = []
-  for possible_sub_module in ['models', 'browser']:
+  for possible_sub_module in ['models', 'browser', 'widgets']:
     try:
       sub_module = import_module('{}.{}'.format(app_name, possible_sub_module))
       for model_name, cls in sub_module.__dict__.items():

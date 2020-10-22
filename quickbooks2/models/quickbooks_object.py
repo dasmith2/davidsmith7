@@ -14,6 +14,7 @@ from djaveAPI.models.publishable import Publishable
 from djaveClassMagic.model_fields import model_fields
 from django.contrib.auth.models import User
 from django.db import models
+from django.shortcuts import reverse
 from djaveDT import now
 
 from quickbooks2.get_quickbooks_client import get_quickbooks_client
@@ -91,6 +92,10 @@ class QuickBooksObject(Publishable):
 
   def add_to_json(self, data):
     data['url'] = self.url()
+
+  def url(self):
+    return reverse('quickbooks2_model_instance', kwargs={
+        'model_name': self._meta.model_name, 'pk': self.pk})
 
   class Meta:
     abstract = True

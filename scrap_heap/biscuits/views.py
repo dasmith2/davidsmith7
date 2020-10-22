@@ -1,6 +1,6 @@
 from django.shortcuts import render, reverse
 from django.conf import settings
-from djaveNav.nav import NavItem, Nav
+from djaveNav.nav import ViewNavItem, Nav
 from djaveLogin.login_required import login_required
 from djaveS3.public_file_url import public_file_url_root
 from djaveS3.views import sensitive_file_response
@@ -38,8 +38,8 @@ def view_private_biscuit(request, file_name):
 
 def biscuit_context(current_view_name, bucket, biscuits):
   nav_list = [
-      NavItem('public_biscuits', 'Public biscuits'),
-      NavItem('private_biscuits', 'Private biscuits')]
+      ViewNavItem('public_biscuits', 'Public biscuits'),
+      ViewNavItem('private_biscuits', 'Private biscuits')]
   return {
       'nav': Nav(nav_list, current_view_name),
       'bucket': bucket,

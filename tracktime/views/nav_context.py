@@ -1,5 +1,5 @@
 from django.utils.safestring import mark_safe
-from djaveNav.nav import NavItem
+from djaveNav.nav import ViewNavItem
 from djaveNav.nav import Nav
 from djaveNav.nav_with_settings import NavWithAccount
 
@@ -30,13 +30,14 @@ def tracktime_nav(user, current_view):
       has_to_do_list = has_to_do_list or project.has_to_do_list
       has_invoices = has_invoices or project.has_invoices
     nav_list = []
-    nav_list.append(NavItem(ENTER_TIME, 'Clock', use_clock))
-    nav_list.append(NavItem(TO_DO, 'To do', has_to_do_list))
-    nav_list.append(NavItem(PROJECT_WORK_SESSION_SUMMARY, 'Report', use_clock))
-    nav_list.append(NavItem(INVOICES, 'Invoices', has_invoices))
-    nav_list.append(NavItem(PROJECTS, 'Projects', True))
+    nav_list.append(ViewNavItem(ENTER_TIME, 'Clock', use_clock))
+    nav_list.append(ViewNavItem(TO_DO, 'To do', has_to_do_list))
+    nav_list.append(ViewNavItem(
+        PROJECT_WORK_SESSION_SUMMARY, 'Report', use_clock))
+    nav_list.append(ViewNavItem(INVOICES, 'Invoices', has_invoices))
+    nav_list.append(ViewNavItem(PROJECTS, 'Projects', True))
     return NavWithAccount(nav_list, SETTINGS, current_view)
   else:
     return Nav(
-        [NavItem('tracktime_homepage', mark_safe('&laquo; Home'), True)],
+        [ViewNavItem('tracktime_homepage', mark_safe('&laquo; Home'), True)],
         'tracktime_homepage')
