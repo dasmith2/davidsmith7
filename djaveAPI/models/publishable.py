@@ -47,6 +47,11 @@ class Publishable(Allowed):
     super().save(*args, **kwargs)
     publishable_post_save.send(sender=self.__class__, instance=self)
 
+  def add_to_json(self, data):
+    """ You can override this function to have the API include additional
+    attributes. """
+    pass
+
   @classmethod
   def filter_live(cls, query_set):
     return query_set.filter(deleted__isnull=True)

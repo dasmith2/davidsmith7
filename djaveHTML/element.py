@@ -9,7 +9,10 @@ class Element(object):
   def __init__(self, css_classes=None):
     self.css_classes = set()
     if css_classes:
-      self.css_classes.update(css_classes)
+      if isinstance(css_classes, str):
+        self.css_classes.add(css_classes)
+      else:
+        self.css_classes.update(css_classes)
 
   def css_class_str(self):
     if self.css_classes:

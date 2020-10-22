@@ -1,12 +1,11 @@
 from collections import namedtuple
 import re
 
+from django.db.models import Model
 from django.db.models.fields import NOT_PROVIDED
 from django.db.models.fields.reverse_related import ManyToOneRel
+from djaveDT import dt_to_str, d_to_str
 
-ModelField = namedtuple('ModelField', [
-    'name', 'display_name', 'help_text', 'can_filter', 'type',
-    'foreign_key_to', 'max_length', 'required', 'editable', 'default'])
 
 DATE_TIME = 'DateTime'
 DATE = 'Date'
@@ -16,6 +15,38 @@ TEXT = 'Text'
 CHAR = 'Char'
 BOOLEAN = 'Boolean'
 TYPES = [DATE_TIME, DATE, FLOAT, INTEGER, TEXT, CHAR, BOOLEAN]
+
+
+# I would have just inlined this and not had to name it, except flake8.
+FIELD_FIELD_LIST = [
+    'name', 'display_name', 'help_text', 'can_filter', 'type',
+    'foreign_key_to', 'max_length', 'required', 'editable', 'default']
+
+
+class ModelField(namedtuple('ModelField', FIELD_FIELD_LIST)):
+  def value_as_str(self, instance_or_value):
+    """ instance_or_value can be either an instance of an object that has this
+    field, or it can be a, like, primitive value that's hopefully of the same
+    "type" as this ModelField. """
+    if isinstance(instance_or_value, Model):
+      value = getattr(instance_or_value, self.name)
+    else:
+      value = instance_or_value
+
+    if value is None:
+      return ''
+
+    if self.type == FLOAT:
+      return round(value, 2)
+    elif self.type in [INTEGER, TEXT, CHAR, BOOLEAN]:
+      return value
+    elif self.type == DATE_TIME:
+      return dt_to_str(value)
+    elif self.type == DATE:
+      return d_to_str(value)
+    else:
+      raise Exception(
+          'Not sure how to represent a value of type {}'.format(self.type))
 
 
 def _get_django_model_fields(cls):

@@ -140,3 +140,11 @@ class EditDeleteColumn(DeleteColumn):
     super().__init__(
         delete_button_text=delete_button_text,
         prepend_buttons=prepend_buttons)
+
+
+class LinkColumn(DisplayColumn):
+  def __init__(self, header, href_attr, display_attr):
+    cell_template = self.td_around(
+        display_attr,
+        '<a href="<%= {} %>"><%= {} %></a>'.format(href_attr, display_attr))
+    super().__init__(header, cell_template)

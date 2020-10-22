@@ -3,7 +3,7 @@ from django.urls import path
 from quickbooks2.views.auth import (
     qb_authorize_callback, show_authorization_url,
     post_quickbooks_authorization)
-from quickbooks2.views.browse import qb2_customers
+from quickbooks2.views.browse import qb2_customers, qb2_customer
 
 
 quickbooks2_urls = [
@@ -17,4 +17,6 @@ quickbooks2_urls = [
         'post_quickbooks_authorization', post_quickbooks_authorization,
         name='post_quickbooks_authorization'),
     path(
-        'quickbooks/customers', qb2_customers, name='qb2_customers')]
+        'quickbooks/customers', qb2_customers, name='qb2_customers'),
+    path(
+        'quickbooks/customer/<pk>', qb2_customer, name='qb2_customer')]

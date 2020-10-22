@@ -89,6 +89,9 @@ class QuickBooksObject(Publishable):
   def merge_all(cls, user, protocol_and_host):
     cls.merge_list(user, cls.retrieve_all(user, protocol_and_host))
 
+  def add_to_json(self, data):
+    data['url'] = self.url()
+
   class Meta:
     abstract = True
     unique_together = [('user', 'qb_id')]
