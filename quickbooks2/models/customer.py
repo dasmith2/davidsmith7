@@ -3,8 +3,8 @@
 QuickBooks has a concept of Customer. This is our local copy.
 
 from quickbooks2.get_client import get_client
-from django.contrib.auth.models import User
 from quickbooks.objects.customer import Customer
+from django.contrib.auth.models import User
 pah = 'https://davidsmith7-stage.herokuapp.com'
 qb_client = get_client(User.objects.first(), pah)
 customers = Customer.filter(Active=True, qb=qb_client)
@@ -23,7 +23,7 @@ from quickbooks2.get_quickbooks_client import get_quickbooks_client
 def retrieve_all_customers(user, protocol_and_host):
   """ Get and return the list of customers from QuickBooks. """
   qb_client = get_quickbooks_client(user, protocol_and_host)
-  return QBCustomer.all(Active=True, qb=qb_client)
+  return QBCustomer.filter(Active=True, qb=qb_client)
 
 
 def merge_customers(user, quickbooks_customers):

@@ -50,3 +50,16 @@ class UserCredentials(models.Model):
     self.access_token = auth_client.access_token
     self.refresh_token = auth_client.refresh_token
     self.save()
+
+  def revoke(self, protocol_and_host):
+    if not self.refresh_token:
+      raise Exception(
+          'Youre missing a refresh token, so you probably cant even access '
+          'the api, much less revoke access to the api.')
+
+    auth_client = get_auth_client(protocol_and_host)
+    auth_client.revoke(token=self.refresh_token)
+
+    self.access_token = ''
+    self.refresh_token = ''
+    self.save()
