@@ -10,6 +10,24 @@ from django.utils.dateparse import parse_datetime, parse_date
 from django.utils.timezone import make_aware, is_aware, now as django_now
 
 
+def to_tz_dt(dt_or_dt_str, tz_str=None):
+  """ I put this up top because it's used all the time in tests, like,
+  nnow = to_tz_dt('2020-01-01')
+  nnow = to_tz_dt('2020-01-01 12:00')
+
+  dt_or_dt_str can be None, a string like "2012-02-21 10:28:45", or a
+  timezone enabled datetime. This returns in the tz_str timezone if provided,
+  otherwise it uses settings.TIME_ZONE. """
+  if dt_or_dt_str is None:
+    return None
+  if isinstance(dt_or_dt_str, str):
+    return str_to_tz_dt(dt_or_dt_str, tz_str=tz_str)
+  elif isinstance(dt_or_dt_str, datetime):
+    return tz_dt_to_tz_dt(dt_or_dt_str)
+  raise Exception('I am not sure what to do with a {}'.format(
+      dt_or_dt_str.__class__))
+
+
 def tz_dt_to_str(tz_dt, tz_str=None):
   """ Turn tz_dt into a human readable string. For example, Jan. 10, 2019, 8:18
   a.m.  I just reverse engineered Django's formula for turning datetimes into
@@ -113,20 +131,6 @@ def to_d(d_or_d_str):
     return d_or_d_str
   raise Exception(
       'Im not sure what to do with a {}'.format(d_or_d_str.__class__))
-
-
-def to_tz_dt(dt_or_dt_str, tz_str=None):
-  """ dt_or_dt_str can be None, a string like "2012-02-21 10:28:45", or a
-  timezone enabled datetime. This returns in the tz_str timezone if provided,
-  otherwise it uses settings.TIME_ZONE """
-  if dt_or_dt_str is None:
-    return None
-  if isinstance(dt_or_dt_str, str):
-    return str_to_tz_dt(dt_or_dt_str, tz_str=tz_str)
-  elif isinstance(dt_or_dt_str, datetime):
-    return tz_dt_to_tz_dt(dt_or_dt_str)
-  raise Exception('I am not sure what to do with a {}'.format(
-      dt_or_dt_str.__class__))
 
 
 def str_to_tz_dt(dt_str, tz_str=None):
