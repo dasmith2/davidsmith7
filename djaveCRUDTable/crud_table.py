@@ -17,6 +17,7 @@ from djaveHTML.a import AButton
 from djaveHTML.field import Field
 from djaveHTML.h import H1
 
+from djaveCRUDTable.columns import DisplayFieldColumn
 from djaveCRUDTable.edit_model_table import EditModelTable
 from djaveCRUDTable.filters import HIDDEN_NOT_DELETED_FILTER
 
@@ -29,14 +30,15 @@ class CRUDTable(object):
   # templates/(crud_table.html bottom of the page, js/crud_table.js
   # crud_table_options))
   def __init__(
-      self, model, display_columns, visible_filters=None,
-      hidden_filters=USE_DEFAULT,
+      self, model, display_columns,
+
+      list_url=None, details_url_root=None, list_api_url=None,
+
+      hidden_filters=USE_DEFAULT, visible_filters=None,
 
       can_create_new=True, inline_create=False,
       edit_field_names_or_rows=None, save_new_defaults=None,
       new_button_text=None,
-
-      list_url=None, details_url_root=None, list_api_url=None,
 
       list_header=USE_DEFAULT, label_edit_page_with_field=None,
       nav_css_class=None, show_column_headers=True, margin_top_css=None,
@@ -79,7 +81,7 @@ class CRUDTable(object):
             'query_key e.g. DateField(query_key=\'create_date__lte\'). You '
             'specified {}'.format(filter_widget.as_html()))
 
-    self.display_columns = display_columns  # A list of DisplayColumns
+    self.display_columns = self.use_display_columns(display_columns)
     # A list of strings
     self.edit_field_names_or_rows = edit_field_names_or_rows or []
     # A dict, perhaps like {'user': 'me'}. These values get passed along to
@@ -196,3 +198,12 @@ class CRUDTable(object):
       new_button_url = '{}/0'.format(self.details_url_root)
       return AButton(
           new_button_text, new_button_url, css_classes=['createnew'])
+
+  def use_display_columns(self, display_columns):
+    use = []
+    for column in display_columns:
+      use_column = column
+      if isinstance(column, str):
+        use_column = DisplayFieldColumn(column)
+      use.append(use_column)
+    return use

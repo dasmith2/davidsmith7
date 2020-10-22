@@ -81,6 +81,8 @@ def model_fields(model, specific_field=None):
               'yet. See filter_model in djaveAPI.filters specifically')
         field_type = INTEGER
         foreign_key_to = field.related_model
+      elif field_type == 'ManyToMany':
+        continue
       if field_type == 'PositiveInteger':
         field_type = INTEGER
       if field_type == 'Decimal':

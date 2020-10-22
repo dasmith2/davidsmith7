@@ -85,8 +85,10 @@ class QuickBooksObject(Publishable):
 
       local_obj.save()
 
+  @classmethod
   def merge_all(cls, user, protocol_and_host):
     cls.merge_list(user, cls.retrieve_all(user, protocol_and_host))
 
   class Meta:
     abstract = True
+    unique_together = [('user', 'qb_id')]

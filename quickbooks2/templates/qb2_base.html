@@ -1,0 +1,8 @@
+{% extends "this_site.html" %}
+
+{% block this_section_body %}
+  {{ nav.as_html }}
+  {% block qb2_body %}
+    {{ the_one_thing_on_this_page.as_html }}
+  {% endblock qb2_body %}
+{% endblock this_section_body %}
