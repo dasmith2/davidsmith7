@@ -1,13 +1,12 @@
-""" get_client returns a python-quickbooks QuickBooks object that can query and
-update a user's data on QuickBooks. """
+""" Returns a python-quickbooks QuickBooks object that can query and update a
+user's data on QuickBooks. """
 from djaveAPI.problem import Problem
 from quickbooks import QuickBooks
 
 from quickbooks2.get_auth_client import get_auth_client
 
 
-def get_client(user, protocol_and_host):
-  """ Simply get and return the list of customers from QuickBooks. """
+def get_quickbooks_client(user, protocol_and_host):
   user_credentials = user.usercredentials_or_none
   if not user_credentials:
     raise Problem(
