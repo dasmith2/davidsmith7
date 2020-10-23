@@ -10,14 +10,18 @@ In fact, this base class stuff is tested by the specific example of
 quickbooks2/models/test_customer.py
 """
 
+import json
+
 from djaveAPI.models.publishable import Publishable
 from djaveClassMagic.model_fields import model_fields
 from django.contrib.auth.models import User
 from django.db import models
 from django.shortcuts import reverse
 from djaveDT import now
+from intuitlib.exceptions import AuthClientError
 
-from quickbooks2.get_quickbooks_client import get_quickbooks_client
+from quickbooks2.get_quickbooks_client import (
+    get_quickbooks_client, get_quickbooks_client_from_credentials)
 
 
 class QuickBooksObject(Publishable):
@@ -57,9 +61,32 @@ class QuickBooksObject(Publishable):
   @classmethod
   def retrieve_all(cls, user, protocol_and_host):
     """ Get and return the list of cls.get_quickbooks_class() (e.g.
-    quickbooks.objects.Customer) from QuickBooks. """
-    qb_client = get_quickbooks_client(user, protocol_and_host)
-    return cls.get_quickbooks_class().filter(Active=True, qb=qb_client)
+    quickbooks.objects.Customer) from QuickBooks. So for example,
+    from quickbooks.objects.customer import Customer as QBCustomer
+    class Customer(QuickBooksObject):
+      @classmethod
+      def get_quickbooks_class(cls):
+        return QBCustomer
+
+    Customer.retrieve_all(user, 'https://whatever')
+    """
+    def do_retrieve(use_qb_client):
+      """ e.g. QBCustomer.filter(Active=True, ...) """
+      return cls.get_quickbooks_class().filter(Active=True, qb=use_qb_client)
+
+    try:
+      do_retrieve(get_quickbooks_client(user, protocol_and_host))
+    except AuthClientError as ex:
+      # If user_credentials doesn't exist, get-quickbooks_client throws an
+      # exception, so no need to check that here.
+      user_credentials = user.usercredentials
+      if json.loads(ex.content.decode('utf8')) == {
+          'error': 'invalid_grant'}:
+        user_credentials.refresh(protocol_and_host)
+        do_retrieve(get_quickbooks_client_from_credentials(
+            user_credentials, protocol_and_host))
+      else:
+        raise ex
 
   @classmethod
   def merge_list(cls, user, quickbooks_objects, nnow=None):

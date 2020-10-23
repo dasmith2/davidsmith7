@@ -46,7 +46,8 @@ class UserCredentials(models.Model):
     auth_client.refresh(refresh_token=self.refresh_token)
 
     # I'm not totally convinced this is correct. The documentation is unclear
-    # which of these change when you refresh.
+    # which of these change when you refresh. Ah, but I think it doesn't matter
+    # because it appears access_token is never used.
     self.access_token = auth_client.access_token
     self.refresh_token = auth_client.refresh_token
     self.save()
