@@ -1,0 +1,12 @@
+{% extends "qb2_base.html" %}
+
+{% block qb2_body %}
+  <form method="POST" class="margin-top">
+    {% csrf_token %}
+    {{ refresh_button.as_html }}
+    {% if feedback %}
+      {{ feedback.as_html }}
+    {% endif %}
+  </form>
+  {{ list_widget.as_html }}
+{% endblock qb2_body %}

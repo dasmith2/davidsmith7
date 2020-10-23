@@ -14,7 +14,7 @@ def qb2_nav_context(current_url, **kwargs):
 
 
 def qb2_nav(current_url):
-  nav_items = []
+  nav_items = [URLNavItem(reverse('auth_stuff'), 'Auth stuff', True)]
   for model in all_models(subclass_of=QuickBooksObject):
     list_url = reverse(
         'quickbooks2_model_list',

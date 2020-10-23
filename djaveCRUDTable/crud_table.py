@@ -13,6 +13,7 @@ from django.utils.safestring import mark_safe
 from djaveClassMagic.cases import (
     upper_case_singular, lower_case_singular, upper_case_plural,
     lower_case_plural)
+from djaveClassMagic.model_fields import model_fields, DATE_TIME, DATE
 from djaveHTML.a import AButton
 from djaveHTML.field import Field
 from djaveHTML.h import H1
@@ -204,6 +205,11 @@ class CRUDTable(object):
     for column in display_columns:
       use_column = column
       if isinstance(column, str):
-        use_column = DisplayFieldColumn(column)
+        field = model_fields(self.model, specific_field=column)
+        display = field.display_name
+        column_name = column
+        if field.type in [DATE, DATE_TIME]:
+          column_name = '{}_str'.format(column_name)
+        use_column = DisplayFieldColumn(display, column_name)
       use.append(use_column)
     return use

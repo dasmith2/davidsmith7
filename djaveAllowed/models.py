@@ -5,16 +5,17 @@ class AllowedInterface(object):
   """ An interface you should have under any class that will need to check who
   is allowed to do things to its instances. But if it's a model, use Allowed
   """
+
+  @classmethod
+  def filter_allowed_by_user(cls, user, query_set):
+    raise NotImplementedError('filter_allowed_by_user {}'.format(cls))
+
   @classmethod
   def filter_live(cls, query_set):
     """ Filter the query_set to only include "live" objects, meaning they
     haven't been deleted or deactivated and they're appropriate for showing in
     the user interface. """
     return query_set
-
-  @classmethod
-  def filter_allowed_by_user(cls, user, query_set):
-    raise NotImplementedError('filter_allowed_by_user {}'.format(cls))
 
   @classmethod
   def allowed_by_user(cls, user):

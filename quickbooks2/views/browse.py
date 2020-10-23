@@ -1,7 +1,11 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, reverse
 from djaveClassMagic.instance_to_html import instance_to_html
 from djaveClassMagic.find_models import all_models
+from djaveHTML.a import A
+from djaveHTML.button import Button
+from djaveHTML.problem import Problem
 from djaveLogin.login_required import login_required
+from djaveURL import protocol_and_host
 
 from quickbooks2.list_url import list_url
 from quickbooks2.quickbooks_model_from_name import quickbooks_model_from_name
@@ -22,10 +26,25 @@ def list_widget_for_model(model):
 def quickbooks2_model_list(request, model_name):
   model = quickbooks_model_from_name(model_name)
 
+  refresh_button = Button('Pull from QuickBooks', button_type='submit')
+  feedback = None
+  if refresh_button.get_was_clicked(request.POST):
+    user_credentials = request.user.usercredentials_or_none
+    auth_stuff = A(
+        'authorize us on QuickBooks', reverse('auth_stuff')).as_html()
+    if not user_credentials:
+      feedback = Problem('Can you please {} first?'.format(auth_stuff))
+    elif not user_credentials.refresh_token:
+      feedback = Problem('Can you please re-{}?'.format(auth_stuff))
+    else:
+      model.merge_all(request.user, protocol_and_host(request))
+
   context = qb2_nav_context(
       list_url(model_name),
-      the_one_thing_on_this_page=list_widget_for_model(model))
-  return render(request, 'qb2_base.html', context)
+      list_widget=list_widget_for_model(model),
+      refresh_button=refresh_button,
+      feedback=feedback)
+  return render(request, 'quickbooks2_model_list.html', context)
 
 
 @login_required

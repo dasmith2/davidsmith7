@@ -6,6 +6,7 @@ https://developer.intuit.com/app/developer/qbo/docs/develop/authentication-and-a
 """
 from django.contrib.auth.models import User
 from django.db import models
+from djaveAllowed.models import Allowed
 from djaveClassMagic.one_to_one_or_none_field import OneToOneOrNoneField
 from djaveDT import now
 
@@ -14,7 +15,7 @@ from quickbooks2.get_auth_client import (
     get_authenticated_auth_client_with_new_refresh_token)
 
 
-class UserCredentials(models.Model):
+class UserCredentials(Allowed):
   user = OneToOneOrNoneField(User, on_delete=models.CASCADE)
   code = models.CharField(max_length=100, default='')
   state = models.TextField(default='')
@@ -30,6 +31,10 @@ class UserCredentials(models.Model):
   refresh_token_updated_at = models.DateTimeField(
       null=True, blank=True,
       help_text='When was the last time the refresh token changed?')
+
+  @classmethod
+  def filter_allowed_by_user(cls, user, query_set):
+    return query_set.filter(user=user)
 
   def get_authenticated_auth_client(self, protocol_and_host):
     """ My current understanding is that instantiating the auth_client with a

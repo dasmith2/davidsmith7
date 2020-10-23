@@ -1,0 +1,19 @@
+{% extends "qb2_base.html" %}
+
+{% block qb2_body %}
+  <p class="margin-top">
+    <a href="{{ authorize_url }}">
+      {% if credentials_exist %}
+        Re-authorize
+      {% else %}
+        Authorize
+      {% endif %}
+      "Dave's Cool Online Bank" to access your Quickbooks
+    </a>
+  </p>
+  {% if credentials_exist %}
+    {{ credentials_table.as_html }}
+  {% else %}
+    <p>You don't appear to have authorized "Dave's Cool Online Bank" to access your Quickbooks</p>
+  {% endif %}
+{% endblock qb2_body %}
