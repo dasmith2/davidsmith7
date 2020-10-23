@@ -8,9 +8,10 @@ https://developer.intuit.com/app/developer/qbo/docs/develop/authentication-and-a
 """
 from intuitlib.enums import Scopes
 
-from quickbooks2.get_auth_client import get_auth_client
+from quickbooks2.get_auth_client import get_anonymous_auth_client
 
 
 def get_authorization_url(protocol_and_host):
   scopes = [Scopes.ACCOUNTING]
-  return get_auth_client(protocol_and_host).get_authorization_url(scopes)
+  return get_anonymous_auth_client(protocol_and_host).get_authorization_url(
+      scopes)
