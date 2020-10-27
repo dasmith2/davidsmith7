@@ -73,8 +73,8 @@ class QuickBooksObject(Publishable):
           'QuickBooks.').format(user))
 
     def do_retrieve(use_qb_client):
-      """ e.g. QBCustomer.filter(Active=True, qb=use_qb_client) """
-      return cls.get_quickbooks_class().filter(Active=True, qb=use_qb_client)
+      """ e.g. QBCustomer.filter(qb=use_qb_client) """
+      return cls.get_quickbooks_class().filter(qb=use_qb_client)
 
     return user_credentials.do_query(protocol_and_host, do_retrieve)
 
@@ -92,10 +92,11 @@ class QuickBooksObject(Publishable):
       if not local_obj:
         local_obj = cls(user=user, qb_id=qb_id)
 
-      if qb_obj.Active:
-        local_obj.deleted = None
-      elif not local_obj.deleted:
-        local_obj.deleted = nnow
+      if hasattr(qb_obj, 'Active'):
+        if qb_obj.Active:
+          local_obj.deleted = None
+        elif not local_obj.deleted:
+          local_obj.deleted = nnow
 
       local_obj.last_synced = nnow
       local_obj.sync_token = qb_obj.SyncToken
