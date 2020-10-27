@@ -2,26 +2,26 @@
 This class is for any state you might want to hold on to as part of doing an
 OAuth2.0 handshake with Quickbooks.
 
-The big challenge here is that refresh tokens seem to refresh as a side effect
-of unexpected calls such as, possibly, instantiating the QuickBooks auth
-client, and executing queries. So ALL interaction with quickbooks needs to go
-through these functions to capture those changes, otherwise we lose permission
-and have to re-authorize.
+The big challenge here is that refresh tokens refresh as a side effect of
+executing queries. There may be other cases too that I haven't encountered. So
+ALL interaction with quickbooks needs to go through these functions to capture
+those changes, otherwise we lose permission and have to re-authorize.
 """
 
 import json
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 from djaveAllowed.models import Allowed
 from djaveClassMagic.one_to_one_or_none_field import OneToOneOrNoneField
 from djaveDT import now
+from intuitlib.client import AuthClient
 from intuitlib.exceptions import AuthClientError
 from quickbooks import QuickBooks
 
-from quickbooks2.get_auth_client import (
-    get_anonymous_auth_client,
-    get_authenticated_auth_client_with_new_refresh_token)
+from quickbooks2.get_anonymous_auth_client import get_anonymous_auth_client
+from quickbooks2.get_redirect_url import get_redirect_url
 
 
 class UserCredentials(Allowed):
@@ -49,11 +49,19 @@ class UserCredentials(Allowed):
     return query_set.filter(user=user)
 
   def do_query(self, protocol_and_host, query_callback):
-    """ query_callback should be a function that takes a single argument:
-    a quickbooks.QuickBooks client.
+    """ For example,
+
+    from quickbooks.objects.customer import Customer
+
+    def query_callback(quickbooks: quickbooks.QuickBooks):
+      return Customer.filter(Active=True, qb=quickbooks)
+
+    customers = user.usercredentials.do_query('http://...', query_callback)
 
     The whole issue is that when you execute a query against QuickBooks,
-    you may simultaneously get a new refresh token. """
+    you may simultaneously get a new refresh token. Hence, it's best if
+    I hide the auth_client from you entirely and handle updated refresh_tokens
+    here. """
     auth_client = self._get_authenticated_auth_client(protocol_and_host)
     quickbooks = QuickBooks(
         auth_client=auth_client, company_id=self.realmId,
@@ -74,6 +82,7 @@ class UserCredentials(Allowed):
           'A new refresh token was in the QuickBooks client after running a '
           'query.'))
     else:
+      # Aha! This happens.
       self._set_refresh_token(auth_client.refresh_token, (
           'A new refresh token was in the auth_client after running a '
           'QuickBooks query'))
@@ -130,7 +139,7 @@ class UserCredentials(Allowed):
           'These user_credentials for {} dont have a realmId, '
           'so I cant use them to create an authenticated quickbooks auth '
           'client.').format(self.user))
-    auth_client = get_authenticated_auth_client_with_new_refresh_token(
+    auth_client = _get_authenticated_auth_client_with_new_refresh_token(
         self.refresh_token, self.realmId, protocol_and_host)
     self._set_refresh_token(
         auth_client.refresh_token,
@@ -165,3 +174,16 @@ class UserCredentials(Allowed):
     self.access_token = auth_client.access_token
     self._set_refresh_token(
         auth_client.refresh_token, 'Explicitly refreshing the refresh token')
+
+
+def _get_authenticated_auth_client_with_new_refresh_token(
+    existing_refresh_token, realm_id, protocol_and_host):
+  """ I don't actually know that this causes a new refresh token as a side
+  effect, but it might, according to a thread on the internet. """
+  return AuthClient(
+      settings.QUICKBOOKS_CLIENT_ID,
+      settings.QUICKBOOKS_CLIENT_SECRET,
+      get_redirect_url(protocol_and_host),
+      settings.QUICKBOOKS_ENVIRONMENT,
+      refresh_token=existing_refresh_token,
+      realm_id=realm_id)

@@ -1,11 +1,4 @@
-"""
-QuickBooks has a concept of Customer. This is our local copy.
-
-from quickbooks2.models.customer import Customer
-from django.contrib.auth.models import User
-pah = 'https://davidsmith7-stage.herokuapp.com'
-Customer.retrieve_all(User.objects.first(), pah)
-"""
+""" QuickBooks has a concept of Customer. This is our local copy. """
 
 from django.db import models
 from quickbooks.objects.customer import Customer as QBCustomer

@@ -21,6 +21,7 @@ from djaveDT import now
 class QuickBooksObject(Publishable):
   user = models.ForeignKey(User, on_delete=models.CASCADE)
   qb_id = models.PositiveIntegerField(db_index=True)
+  sync_token = models.CharField(max_length=200, default='')
   last_synced = models.DateTimeField()
 
   @classmethod
@@ -97,6 +98,7 @@ class QuickBooksObject(Publishable):
         local_obj.deleted = nnow
 
       local_obj.last_synced = nnow
+      local_obj.sync_token = qb_obj.SyncToken
 
       local_obj.populate_fields(qb_obj)
 
