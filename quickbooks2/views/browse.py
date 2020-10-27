@@ -10,16 +10,16 @@ from djaveURL import protocol_and_host
 from quickbooks2.list_url import list_url
 from quickbooks2.quickbooks_model_from_name import quickbooks_model_from_name
 from quickbooks2.views.nav import qb2_nav_context
-from quickbooks2.widgets.quickbooks_objects import QuickbooksObjects
+from quickbooks2.widgets.quickbooks_objects import QuickBooksObjects
 
 
 def list_widget_for_model(model):
-  for widget_class in all_models(subclass_of=QuickbooksObjects):
+  for widget_class in all_models(subclass_of=QuickBooksObjects):
     if widget_class.get_model() is model:
       return widget_class()
   raise Exception((
-      'I was unable to find a subclass of QuickbooksObjects whose '
-      'model is {}').format(model))
+      'I was unable to find a widget, subclass of QuickBooksObjects '
+      '(note the s), whose model is {}').format(model))
 
 
 @login_required

@@ -4,7 +4,7 @@ from djaveCRUDTable.crud_table import CRUDTable
 from quickbooks2.list_url import list_url
 
 
-class QuickbooksObjects(CRUDTable):
+class QuickBooksObjects(CRUDTable):
   def __init__(self):
     super().__init__(
         self.get_model(), self.get_display_columns(),
