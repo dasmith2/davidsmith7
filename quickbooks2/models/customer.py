@@ -16,7 +16,7 @@ def qb_customer_name(qb_customer):
 class Customer(QuickBooksObject):
   name = models.CharField(max_length=200)
 
-  def populate_extra_fields(self, obj_from_quickbooks):
+  def copy_non_obvious_data(self, obj_from_quickbooks, nnow=None):
     self.name = qb_customer_name(obj_from_quickbooks)
 
   @classmethod

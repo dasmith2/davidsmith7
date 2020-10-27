@@ -14,7 +14,7 @@ def qb_vendor_name(qb_vendor):
 class Vendor(QuickBooksObject):
   name = models.CharField(max_length=200)
 
-  def populate_extra_fields(self, obj_from_quickbooks):
+  def copy_non_obvious_data(self, obj_from_quickbooks, nnow=None):
     self.name = qb_vendor_name(obj_from_quickbooks)
 
   @classmethod
