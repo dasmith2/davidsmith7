@@ -8,5 +8,5 @@ from quickbooks2.models.user_credentials import (
 class UserCredentials(CRUDTable):
   def __init__(self):
     super().__init__(
-        UserCredentialsModel, ['refresh_token_updated_at'],
+        UserCredentialsModel, ['refresh_token_updated_at', 'refresh_reason'],
         list_url=reverse('auth_stuff'), can_create_new=False, list_header=None)
