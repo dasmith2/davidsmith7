@@ -55,7 +55,9 @@ class UserCredentials(Allowed):
     The whole issue is that when you execute a query against QuickBooks,
     you may simultaneously get a new refresh token. """
     auth_client = self._get_authenticated_auth_client(protocol_and_host)
-    quickbooks = QuickBooks(auth_client=auth_client, company_id=self.realmId)
+    quickbooks = QuickBooks(
+        auth_client=auth_client, company_id=self.realmId,
+        refresh_token=auth_client.refresh_token)
     results = None
 
     try:
@@ -67,8 +69,14 @@ class UserCredentials(Allowed):
         results = query_callback(quickbooks)
       else:
         raise ex
-    self._set_refresh_token(
-        auth_client.refresh_token, 'Ran a QuickBooks query')
+    if quickbooks.refresh_token != self.refresh_token:
+      self._set_refresh_token(quickbooks.refresh_token, (
+          'A new refresh token was in the QuickBooks client after running a '
+          'query.'))
+    else:
+      self._set_refresh_token(auth_client.refresh_token, (
+          'A new refresh token was in the auth_client after running a '
+          'QuickBooks query'))
 
     return results
 
