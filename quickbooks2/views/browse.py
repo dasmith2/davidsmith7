@@ -4,22 +4,25 @@ from djaveClassMagic.find_models import all_models
 from djaveHTML.a import A
 from djaveHTML.button import Button
 from djaveHTML.problem import Problem
+from djaveHTML.wrapper import Wrapper
 from djaveLogin.login_required import login_required
 from djaveURL import protocol_and_host
 
 from quickbooks2.list_url import list_url
+from quickbooks2.models.quickbooks_object import NestedListQuickBooksObject
 from quickbooks2.quickbooks_model_from_name import quickbooks_model_from_name
 from quickbooks2.views.nav import qb2_nav_context
 from quickbooks2.widgets.quickbooks_objects import QuickBooksObjects
 
 
-def list_widget_for_model(model):
+def list_widget_class_for_model(model):
   for widget_class in all_models(subclass_of=QuickBooksObjects):
     if widget_class.get_model() is model:
-      return widget_class()
+      return widget_class
   raise Exception((
       'I was unable to find a widget, subclass of QuickBooksObjects '
-      '(note the s), whose model is {}').format(model))
+      '(note the s), whose model is {}. Did you add it to '
+      'quickbooks2.widgets.__init__?').format(model))
 
 
 @login_required
@@ -41,7 +44,7 @@ def quickbooks2_model_list(request, model_name):
 
   context = qb2_nav_context(
       list_url(model_name),
-      list_widget=list_widget_for_model(model),
+      list_widget=list_widget_class_for_model(model)(),
       refresh_button=refresh_button,
       feedback=feedback)
   return render(request, 'quickbooks2_model_list.html', context)
@@ -53,7 +56,15 @@ def quickbooks2_model_instance(request, model_name, pk):
 
   instance = get_object_or_404(model.allowed_by_user(request.user), pk=pk)
 
+  wrapper = Wrapper(instance_to_html(instance))
+
+  current_url = request.path
+  for nested_model in all_models(NestedListQuickBooksObject):
+    if nested_model.nested_under_model() is model:
+      # For instance, wrapper.add(Lines(current_bill, current_url))
+      wrapper.add(list_widget_class_for_model(nested_model)(
+          instance, current_url))
+
   context = qb2_nav_context(
-      list_url(model_name),
-      the_one_thing_on_this_page=instance_to_html(instance))
+      list_url(model_name), the_one_thing_on_this_page=wrapper)
   return render(request, 'qb2_base.html', context)

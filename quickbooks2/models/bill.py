@@ -14,8 +14,9 @@ class Bill(QuickBooksObject):
   VendorRef = models.ForeignKey(Vendor, on_delete=models.PROTECT)
 
   def copy_non_obvious_data(self, qb_bill, nnow=None):
-    # save to avoid "ValueError: save() prohibited to prevent data loss due to
-    # unsaved related object 'bill'."
+    # self.save() to avoid "ValueError: save() prohibited to prevent data loss
+    # due to unsaved related object 'bill'" when you try to save the Lines with
+    # a fk to this bill.
     self.save()
     for qb_line in qb_bill.Line:
       Line.merge_obj(self.user, qb_line, nnow=nnow, bill=self)
@@ -25,7 +26,7 @@ class Bill(QuickBooksObject):
     return QBBill
 
   def __str__(self):
-    return self.name
+    return '{} {}'.format(str(self.VendorRef), self.Balance)
 
 
 class Line(NestedListQuickBooksObject):
@@ -36,6 +37,10 @@ class Line(NestedListQuickBooksObject):
   @classmethod
   def filter_allowed_by_user(cls, user, query_set):
     return query_set.filter(bill__user=user)
+
+  @classmethod
+  def nested_under_model(cls):
+    return Bill
 
   class Meta:
     unique_together = [('bill', 'qb_id')]

@@ -125,8 +125,21 @@ class BaseQuickBooksObject(Publishable):
   def merge_all(cls, user, protocol_and_host):
     cls.merge_list(user, cls.retrieve_all(user, protocol_and_host))
 
+  def select_related_list(self):
+    to_return = []
+    for model_field in model_fields(self.__class__):
+      if model_field.foreign_key_to:
+        to_return.append(model_field.name)
+    return to_return
+
   def add_to_json(self, data):
     data['url'] = self.url()
+    for field in model_fields(self.__class__):
+      if field.foreign_key_to:
+        foreign_obj = getattr(self, field.name)
+        if hasattr(foreign_obj, 'url'):
+          data['{}_url'.format(field.name)] = foreign_obj.url()
+          data['{}_str'.format(field.name)] = str(foreign_obj)
 
   def url(self):
     return reverse('quickbooks2_model_instance', kwargs={
@@ -156,5 +169,9 @@ class QuickBooksObject(BaseQuickBooksObject):
 
 
 class NestedListQuickBooksObject(BaseQuickBooksObject):
+  @classmethod
+  def nested_under_model(cls):
+    raise NotImplementedError('nested_under_model')
+
   class Meta:
     abstract = True
