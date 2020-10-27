@@ -32,7 +32,8 @@ def qb_authorize_callback(request):
 
   user_credentials.save()
 
-  user_credentials.get_access_and_refresh_tokens(protocol_and_host(request))
+  user_credentials.exchange_authorization_code_for_refresh_and_access_tokens(
+      protocol_and_host(request))
 
   # It's best not to display a page directly because sensitive IDs are in the
   # query string, and any embedded Javascript or whatever could then easily

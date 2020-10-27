@@ -2,7 +2,11 @@
 This class is for any state you might want to hold on to as part of doing an
 OAuth2.0 handshake with Quickbooks.
 
-https://developer.intuit.com/app/developer/qbo/docs/develop/authentication-and-authorization/oauth-2.0#step-4-handle-the-oauth-2-0-server-response
+The big challenge here is that refresh tokens seem to refresh as a side effect
+of unexpected calls such as, possibly, instantiating the QuickBooks auth
+client, and executing queries. So ALL interaction with quickbooks needs to go
+through these functions to capture those changes, otherwise we lose permission
+and have to re-authorize.
 """
 
 import json
@@ -50,7 +54,7 @@ class UserCredentials(Allowed):
 
     The whole issue is that when you execute a query against QuickBooks,
     you may simultaneously get a new refresh token. """
-    auth_client = self.get_authenticated_auth_client(protocol_and_host)
+    auth_client = self._get_authenticated_auth_client(protocol_and_host)
     quickbooks = QuickBooks(auth_client=auth_client, company_id=self.realmId)
     results = None
 
@@ -59,16 +63,49 @@ class UserCredentials(Allowed):
     except AuthClientError as ex:
       if json.loads(ex.content.decode('utf8')) == {
           'error': 'invalid_grant'}:
-        self.refresh(protocol_and_host)
+        self._refresh(protocol_and_host)
         results = query_callback(quickbooks)
       else:
         raise ex
-    self.set_refresh_token(
+    self._set_refresh_token(
         auth_client.refresh_token, 'Ran a QuickBooks query')
 
     return results
 
-  def get_authenticated_auth_client(self, protocol_and_host):
+  def exchange_authorization_code_for_refresh_and_access_tokens(
+      self, protocol_and_host):
+    """
+    Step 5 in
+    https://developer.intuit.com/app/developer/qbo/docs/develop/authentication-and-authorization/oauth-2.0
+    """
+    if not self.code or not self.realmId:
+      raise Exception(
+          'You cant get an access or refresh token if youre missing a code or '
+          'realmId, which typically happens when the user declines to grant '
+          'the app access.')
+    # You obviously don't need an authenticated auth_client in order to get
+    # authenticated.
+    auth_client = get_anonymous_auth_client(protocol_and_host)
+    auth_client.get_bearer_token(self.code, self.realmId)
+
+    self.access_token = auth_client.access_token
+    self._set_refresh_token(
+        auth_client.refresh_token,
+        'Exchanged an access code for a refresh token')
+
+  def revoke(self, protocol_and_host):
+    if not self.refresh_token:
+      raise Exception(
+          'Youre missing a refresh token, so you probably cant even access '
+          'the api, much less revoke access to the api.')
+
+    auth_client = self._get_authenticated_auth_client(protocol_and_host)
+    auth_client.revoke()
+
+    self.access_token = ''
+    self._set_refresh_token('', 'Clearing out the refresh token', clear=True)
+
+  def _get_authenticated_auth_client(self, protocol_and_host):
     """ My current understanding is that instantiating the auth_client with a
     refresh token sometimes has the totally unexpected, bug-causing side-effect
     of updating the refresh token!
@@ -87,28 +124,12 @@ class UserCredentials(Allowed):
           'client.').format(self.user))
     auth_client = get_authenticated_auth_client_with_new_refresh_token(
         self.refresh_token, self.realmId, protocol_and_host)
-    self.set_refresh_token(
+    self._set_refresh_token(
         auth_client.refresh_token,
         'Instantiated the intuitlib.client.AuthClient object')
     return auth_client
 
-  def get_access_and_refresh_tokens(self, protocol_and_host):
-    if not self.code or not self.realmId:
-      raise Exception(
-          'You cant get an access or refresh token if youre missing a code or '
-          'realmId, which typically happens when the user declines to grant '
-          'the app access.')
-    # You obviously don't need an authenticated auth_client in order to get
-    # authenticated.
-    auth_client = get_anonymous_auth_client(protocol_and_host)
-    auth_client.get_bearer_token(self.code, self.realmId)
-
-    self.access_token = auth_client.access_token
-    self.set_refresh_token(
-        auth_client.refresh_token,
-        'Exchanged an access code for a refresh token')
-
-  def set_refresh_token(self, new_refresh_token, reason, clear=False):
+  def _set_refresh_token(self, new_refresh_token, reason, clear=False):
     """ If you really want to clear out the refresh token, you have to specify
     clear=True
 
@@ -124,29 +145,15 @@ class UserCredentials(Allowed):
     self.refresh_reason = reason
     self.save()
 
-  def refresh(self, protocol_and_host):
+  def _refresh(self, protocol_and_host):
     if not self.refresh_token:
-      raise Exception(
-          'Youre missing a refresh token, so you cant refresh the access '
-          'token.')
-    auth_client = self.get_authenticated_auth_client(protocol_and_host)
+      raise Exception('You need a refresh token to get a new refresh token.')
+    auth_client = self._get_authenticated_auth_client(protocol_and_host)
     auth_client.refresh()
 
     # I'm not totally convinced this is correct. The documentation is unclear
     # which of these change when you refresh. Ah, but I think it doesn't matter
     # because it appears access_token is never used.
     self.access_token = auth_client.access_token
-    self.set_refresh_token(
+    self._set_refresh_token(
         auth_client.refresh_token, 'Explicitly refreshing the refresh token')
-
-  def revoke(self, protocol_and_host):
-    if not self.refresh_token:
-      raise Exception(
-          'Youre missing a refresh token, so you probably cant even access '
-          'the api, much less revoke access to the api.')
-
-    auth_client = self.get_authenticated_auth_client(protocol_and_host)
-    auth_client.revoke()
-
-    self.access_token = ''
-    self.set_refresh_token('', 'Clearing out the refresh token', clear=True)
