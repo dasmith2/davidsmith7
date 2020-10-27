@@ -6,8 +6,7 @@ from quickbooks2.models.quickbooks_object import QuickBooksObject
 
 
 def qb_vendor_name(qb_vendor):
-  """ Sometimes they don't have a DisplayName, so, I guess try a bunch
-  of other attributes as well. """
+  """ Vendors seem to always have a DisplayName. """
   return qb_vendor.DisplayName or qb_vendor.Title or (
       qb_vendor.GivenName or qb_vendor.FamilyName)
 
