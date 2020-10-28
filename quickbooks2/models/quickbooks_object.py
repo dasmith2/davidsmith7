@@ -141,9 +141,14 @@ class BaseQuickBooksObject(Publishable):
     for field in model_fields(self.__class__):
       if field.foreign_key_to:
         foreign_obj = getattr(self, field.name)
+        url_attr = '{}_url'.format(field.name)
+        str_attr = '{}_str'.format(field.name)
         if hasattr(foreign_obj, 'url'):
-          data['{}_url'.format(field.name)] = foreign_obj.url()
-          data['{}_str'.format(field.name)] = str(foreign_obj)
+          data[url_attr] = foreign_obj.url()
+          data[str_attr] = str(foreign_obj)
+        elif foreign_obj is None:
+          data[url_attr] = None
+          data[str_attr] = None
 
   def url(self):
     return reverse('quickbooks2_model_instance', kwargs={
@@ -151,7 +156,6 @@ class BaseQuickBooksObject(Publishable):
 
   class Meta:
     abstract = True
-    unique_together = [('user', 'qb_id')]
 
 
 class QuickBooksObject(BaseQuickBooksObject):

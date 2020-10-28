@@ -92,6 +92,10 @@ class Line(NestedListQuickBooksObject):
   bill = models.ForeignKey(Bill, on_delete=models.CASCADE)
   Description = models.TextField(default='', null=True, blank=True)
   Amount = models.FloatField(default=0.0)
+  AccountRef = models.ForeignKey(
+      Account, on_delete=models.PROTECT, blank=True, null=True, help_text=(
+          'A Line could, I believe, have an ItemBasedExpenseLineDetail in '
+          'which case there wont be an Account.'))
 
   @classmethod
   def filter_allowed_by_user(cls, user, query_set):
@@ -100,6 +104,13 @@ class Line(NestedListQuickBooksObject):
   @classmethod
   def nested_under_model(cls):
     return Bill
+
+  def copy_non_obvious_data(self, qb_line, nnow=None):
+    if hasattr(qb_line, 'AccountBasedExpenseLineDetail'):
+      # I thiiiiink it's possible for a Line to have an
+      # ItemBasedExpenseLineDetail instead.
+      self.AccountRef = Account.objects.get(
+          qb_id=qb_line.AccountBasedExpenseLineDetail.AccountRef.value)
 
   class Meta:
     unique_together = [('bill', 'qb_id')]

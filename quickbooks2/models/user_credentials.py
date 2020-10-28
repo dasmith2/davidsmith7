@@ -24,13 +24,6 @@ from quickbooks2.get_anonymous_auth_client import get_anonymous_auth_client
 from quickbooks2.get_redirect_url import get_redirect_url
 
 
-def do_query(user, protocol_and_host, query_callback):
-  # This is a paranoid effort to MAKE SURE I'm using the latest refresh token,
-  # because once you drop the ball, you're out of luck.
-  user.refresh_from_db()
-  return user.usercredentials.do_query(protocol_and_host, query_callback)
-
-
 class UserCredentials(Allowed):
   user = OneToOneOrNoneField(User, on_delete=models.CASCADE)
   code = models.CharField(max_length=100, default='')

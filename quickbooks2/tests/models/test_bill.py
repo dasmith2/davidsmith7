@@ -2,6 +2,7 @@ from collections import namedtuple
 from djaveClassMagic.get_test_instance import get_test_instance
 from djaveDT import to_tz_dt
 from djaveTest.unit_test import TestCase, get_test_user
+from unittest.mock import MagicMock
 
 from quickbooks2.models.account import Account
 from quickbooks2.models.bill import Bill, Line
@@ -20,19 +21,25 @@ QuickBooksBill = namedtuple(
     'QuickBooksBill', 'Id SyncToken APAccountRef Balance VendorRef Line')
 
 
-QuickBooksLine = namedtuple('QuickBooksLine', 'Id Description Amount')
+QuickBooksLine = namedtuple(
+    'QuickBooksLine', 'Id Description Amount AccountBasedExpenseLineDetail')
 
 
 class BillTests(TestCase):
   def test_merge_list(self):
     user = get_test_user()
 
-    account = get_test_instance(
+    ap_account = get_test_instance(
         Account, user=user, qb_id='222', Name='Accounts Payable')
+    expense_account = get_test_instance(
+        Account, user=user, qb_id='888', Name='Supplies')
     vendor = get_test_instance(
         Vendor, user=user, qb_id='123', name='The Business Woman Hotel')
 
-    lines = [QuickBooksLine(33, 'Lumber', 500.5)]
+    line_detail = MagicMock()
+    line_detail.AccountRef.value = '888'
+    lines = [QuickBooksLine(33, 'Lumber', 500.5, line_detail)]
+
     qb_bill = QuickBooksBill(
         1, '0', DictToDict({'value': '222'}), 500.5,
         DictToDict({'value': '123'}), lines)
@@ -40,5 +47,7 @@ class BillTests(TestCase):
 
     self.assertEqual(1, Bill.objects.count())
     bill = Bill.objects.get(
-        qb_id=1, APAccountRef=account, Balance=500.5, VendorRef=vendor)
-    Line.objects.get(qb_id=33, bill=bill, Description='Lumber', Amount=500.5)
+        qb_id=1, APAccountRef=ap_account, Balance=500.5, VendorRef=vendor)
+    Line.objects.get(
+        qb_id=33, bill=bill, Description='Lumber', Amount=500.5,
+        AccountRef=expense_account)

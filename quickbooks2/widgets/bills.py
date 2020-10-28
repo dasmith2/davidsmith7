@@ -26,7 +26,9 @@ class Lines(NestedQuickBooksObjects):
     super().__init__()
 
   def get_leading_columns(self):
-    return ['Description', 'Amount']
+    return [
+        'Description', 'Amount',
+        LinkColumn('AccountRef', 'AccountRef_url', 'AccountRef_str')]
 
   def get_list_url(self):
     return self.list_url
