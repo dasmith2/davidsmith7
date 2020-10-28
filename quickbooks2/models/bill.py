@@ -1,11 +1,11 @@
 """ QuickBooks has a concept of Bill. This is our local copy. """
 
+from django.contrib.auth.models import User
 from django.db import models
-from quickbooks.objects.account import Account as QBAccount
+from quickbooks.objects.base import Ref
 from quickbooks.objects.bill import Bill as QBBill
 from quickbooks.objects.detailline import (
     AccountBasedExpenseLine, AccountBasedExpenseLineDetail)
-from quickbooks.objects.vendor import Vendor as QBVendor
 
 from quickbooks2.models.account import Account
 from quickbooks2.models.quickbooks_object import (
@@ -14,11 +14,14 @@ from quickbooks2.models.vendor import Vendor
 
 
 def get_bill_to_create(vendor, account, amount, description):
-  qb_vendor = QBVendor()
-  qb_vendor.Id = vendor.qb_id
+  bill = Line.objects.first().bill
+  vendor = bill.VendorRef
 
-  qb_account = QBAccount()
-  qb_account.Id = account.qb_id
+  qb_vendor = Ref()
+  qb_vendor.value = vendor.qb_id
+
+  qb_account = Ref()
+  qb_account.value = account.qb_id
 
   qb_line_detail = AccountBasedExpenseLineDetail()
   qb_line_detail.AccountRef = qb_account
@@ -35,11 +38,12 @@ def get_bill_to_create(vendor, account, amount, description):
   return qb_bill
 
 
-def create_bill(qb_bill, user, protocol_and_host):
+def create_bill(qb_bill, protocol_and_host):
   def do_create(qb):
     qb_bill.save(qb=qb)
 
-  return user.usercredentials.do_query(protocol_and_host, do_create)
+  return User.objects.first().usercredentials.do_query(
+      protocol_and_host, do_create)
 
 
 class Bill(QuickBooksObject):
