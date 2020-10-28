@@ -105,7 +105,11 @@ class BaseQuickBooksObject(Publishable):
     nnow = nnow or now()
 
     qb_id = qb_obj.Id
-    local_obj = cls.allowed_by_user(user).filter(qb_id=qb_id).first()
+    # For example, the first Line of every Bill has qb_id 1, so you also need
+    # to filter by bill=bill to find an existing object. Otherwise all Lines
+    # will always go under the same Bill basically.
+    local_obj = cls.allowed_by_user(user).filter(
+        qb_id=qb_id, **new_kwargs).first()
     if not local_obj:
       local_obj = cls(qb_id=qb_id, **new_kwargs)
 

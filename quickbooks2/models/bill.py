@@ -20,12 +20,16 @@ def get_bill_to_create(amount, description):
   qb_vendor = Ref()
   qb_vendor.value = vendor.qb_id
 
-  account = bill.APAccountRef
-  qb_account = Ref()
-  qb_account.value = account.qb_id
+  ap_account = bill.APAccountRef
+  qb_ap_account = Ref()
+  qb_ap_account.value = ap_account.qb_id
+
+  expense_account = Account.objects.get(qb_id=20, Name='Supplies')
+  qb_ex_account = Ref()
+  qb_ex_account.value = expense_account.qb_id
 
   qb_line_detail = AccountBasedExpenseLineDetail()
-  qb_line_detail.AccountRef = qb_account
+  qb_line_detail.AccountRef = qb_ex_account
 
   qb_line = AccountBasedExpenseLine()
   qb_line.Description = description
@@ -34,17 +38,33 @@ def get_bill_to_create(amount, description):
 
   qb_bill = QBBill()
   qb_bill.VendorRef = qb_vendor
+  qb_bill.APAccountRef = qb_ap_account
   qb_bill.Line = [qb_line]
 
   return qb_bill
 
 
-def create_bill(qb_bill, protocol_and_host):
+def create_bill(qb_bill):
   def do_create(qb):
     qb_bill.save(qb=qb)
+    return qb_bill
 
-  return User.objects.first().usercredentials.do_query(
-      protocol_and_host, do_create)
+  try:
+    return User.objects.first().usercredentials.do_query(
+        'https://davidsmith7-stage.herokuapp.com', do_create)
+  except Exception as ex:
+    return ex
+
+
+def get_bill(qb_id):
+  def do_get(qb):
+    return QBBill.get(qb_id, qb)
+
+  try:
+    return User.objects.first().usercredentials.do_query(
+        'https://davidsmith7-stage.herokuapp.com', do_get)
+  except Exception as ex:
+    return ex
 
 
 class Bill(QuickBooksObject):
