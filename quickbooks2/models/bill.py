@@ -31,7 +31,7 @@ class Bill(QuickBooksObject):
 
 class Line(NestedListQuickBooksObject):
   bill = models.ForeignKey(Bill, on_delete=models.CASCADE)
-  Description = models.TextField(default='')
+  Description = models.TextField(default='', null=True, blank=True)
   Amount = models.FloatField(default=0.0)
 
   @classmethod
