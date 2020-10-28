@@ -13,13 +13,14 @@ from quickbooks2.models.quickbooks_object import (
 from quickbooks2.models.vendor import Vendor
 
 
-def get_bill_to_create(vendor, account, amount, description):
+def get_bill_to_create(amount, description):
   bill = Line.objects.first().bill
-  vendor = bill.VendorRef
 
+  vendor = bill.VendorRef
   qb_vendor = Ref()
   qb_vendor.value = vendor.qb_id
 
+  account = bill.APAccountRef
   qb_account = Ref()
   qb_account.value = account.qb_id
 
