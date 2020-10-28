@@ -1,11 +1,42 @@
 """ QuickBooks has a concept of Bill. This is our local copy. """
 
 from django.db import models
+from quickbooks.objects.account import Account as QBAccount
 from quickbooks.objects.bill import Bill as QBBill
+from quickbooks.objects.detailline import (
+    AccountBasedExpenseLine, AccountBasedExpenseLineDetail)
+from quickbooks.objects.vendor import Vendor as QBVendor
+
 from quickbooks2.models.account import Account
 from quickbooks2.models.quickbooks_object import (
     QuickBooksObject, NestedListQuickBooksObject)
 from quickbooks2.models.vendor import Vendor
+
+
+def create_a_bill(
+    vendor, account, amount, description, user, protocol_and_host):
+  qb_vendor = QBVendor()
+  qb_vendor.Id = vendor.qb_id
+
+  qb_account = QBAccount()
+  qb_account.Id = account.qb_id
+
+  qb_line_detail = AccountBasedExpenseLineDetail()
+  qb_line_detail.AccountRef = qb_account
+
+  qb_line = AccountBasedExpenseLine()
+  qb_line.Description = description
+  qb_line.Amount = amount
+  qb_line.AccountBasedExpenseLineDetail = qb_line_detail
+
+  qb_bill = QBBill()
+  qb_bill.VendorRef = qb_vendor
+  qb_bill.Line = [qb_line]
+
+  def do_create(qb):
+    qb_bill.save(qb=qb)
+
+  return user.usercredentials.do_query(protocol_and_host, do_create)
 
 
 class Bill(QuickBooksObject):
@@ -44,3 +75,6 @@ class Line(NestedListQuickBooksObject):
 
   class Meta:
     unique_together = [('bill', 'qb_id')]
+
+  def __repr__(self):
+    return f"{self.Description} {self.Amount}"
