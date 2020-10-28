@@ -10,7 +10,8 @@ class QuickBooksObjects(CRUDTable):
         self.get_model(), self.get_display_columns(),
         list_url=self.get_list_url(),
         can_create_new=False, list_header=None,
-        hidden_filters=self.get_hidden_filters())
+        hidden_filters=self.get_hidden_filters(),
+        margin_top_css=self.get_margin_top_css())
 
   def get_list_url(self):
     return list_url(self.get_model())
@@ -29,3 +30,11 @@ class QuickBooksObjects(CRUDTable):
   @classmethod
   def get_model(cls):
     raise NotImplementedError('get_model')
+
+  def get_margin_top_css(self):
+    return 'margin-top'
+
+
+class NestedQuickBooksObjects(QuickBooksObjects):
+  def get_margin_top_css(self):
+    return 'margin-top-half'

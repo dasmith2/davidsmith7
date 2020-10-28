@@ -1,8 +1,10 @@
 from django.shortcuts import render, get_object_or_404, reverse
+from djaveClassMagic.cases import upper_case_plural
 from djaveClassMagic.instance_to_html import instance_to_html
 from djaveClassMagic.find_models import all_models
 from djaveHTML.a import A
 from djaveHTML.button import Button
+from djaveHTML.h import H3
 from djaveHTML.problem import Problem
 from djaveHTML.wrapper import Wrapper
 from djaveLogin.login_required import login_required
@@ -61,6 +63,7 @@ def quickbooks2_model_instance(request, model_name, pk):
   current_url = request.path
   for nested_model in all_models(NestedListQuickBooksObject):
     if nested_model.nested_under_model() is model:
+      wrapper.add(H3(upper_case_plural(nested_model)))
       # For instance, wrapper.add(Lines(current_bill, current_url))
       wrapper.add(list_widget_class_for_model(nested_model)(
           instance, current_url))

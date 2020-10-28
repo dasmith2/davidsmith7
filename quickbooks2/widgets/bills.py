@@ -2,7 +2,8 @@ from djaveCRUDTable.columns import LinkColumn
 from djaveCRUDTable.filters import hidden_filter
 
 from quickbooks2.models.bill import Bill, Line
-from quickbooks2.widgets.quickbooks_objects import QuickBooksObjects
+from quickbooks2.widgets.quickbooks_objects import (
+    QuickBooksObjects, NestedQuickBooksObjects)
 
 
 class Bills(QuickBooksObjects):
@@ -18,7 +19,7 @@ class Bills(QuickBooksObjects):
     return Bill
 
 
-class Lines(QuickBooksObjects):
+class Lines(NestedQuickBooksObjects):
   def __init__(self, bill, list_url):
     self.bill = bill
     self.list_url = list_url

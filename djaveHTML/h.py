@@ -9,3 +9,8 @@ class H1(TagElement):
 class H2(TagElement):
   def tag_name(self):
     return 'h2'
+
+
+class H3(TagElement):
+  def tag_name(self):
+    return 'h3'
