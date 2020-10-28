@@ -13,8 +13,7 @@ from quickbooks2.models.quickbooks_object import (
 from quickbooks2.models.vendor import Vendor
 
 
-def create_a_bill(
-    vendor, account, amount, description, user, protocol_and_host):
+def get_bill_to_create(vendor, account, amount, description):
   qb_vendor = QBVendor()
   qb_vendor.Id = vendor.qb_id
 
@@ -33,6 +32,10 @@ def create_a_bill(
   qb_bill.VendorRef = qb_vendor
   qb_bill.Line = [qb_line]
 
+  return qb_bill
+
+
+def create_bill(qb_bill, user, protocol_and_host):
   def do_create(qb):
     qb_bill.save(qb=qb)
 
