@@ -75,18 +75,32 @@ class BaseQuickBooksObject(Publishable):
 
     Customer.retrieve_all(user, 'https://whatever')
     """
+
+    def do_retrieve(use_qb_client):
+      """ e.g. QBCustomer.filter(qb=use_qb_client) """
+      return cls.get_quickbooks_class().filter(qb=use_qb_client)
+
+    return cls.get_user_credentials(user).do_query(
+        protocol_and_host, do_retrieve)
+
+  @classmethod
+  def retrieve_one(cls, user, protocol_and_host, Id):
+
+    def do_retrieve_one(qb):
+      return cls.get_quickbooks_class().get(Id)
+
+    return cls.get_user_credentials(user).do_query(
+        protocol_and_host, do_retrieve_one)
+
+  @classmethod
+  def get_user_credentials(cls, user):
     user_credentials = user.usercredentials_or_none
     if not user_credentials:
       raise Exception((
           '{} doesnt have any UserCredentials for Quickbooks so they probably '
           'havent authorized quickbooks yet, so I cant possibly query their '
           'QuickBooks.').format(user))
-
-    def do_retrieve(use_qb_client):
-      """ e.g. QBCustomer.filter(qb=use_qb_client) """
-      return cls.get_quickbooks_class().filter(qb=use_qb_client)
-
-    return user_credentials.do_query(protocol_and_host, do_retrieve)
+    return user_credentials
 
   @classmethod
   def merge_list(cls, user, quickbooks_objects, nnow=None):
